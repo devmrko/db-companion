@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
+<th:block th:fragment="tracking">
+  <section th:if="${!profile.isEmpty()}" class="app-history" data-feedback-tracking th:attr="data-schema=${selectedSchema},data-profile=${profile},data-url=@{/ai-feedback/tracking}">
+    <input th:if="${_csrf != null}" type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-ft-csrf>
+    <div class="app-history-toolbar">
+      <span class="app-muted" role="status" data-ft-state th:text="#{ui.1bb421cbcb68}">트리거 상태 확인 중…</span>
+      <button type="button" class="btn app-btn app-btn-secondary" data-ft-action="prepare" hidden disabled th:text="#{ui.604768ed0b76}">공통 이력 준비</button>
+      <button type="button" class="btn app-btn app-btn-secondary" data-ft-action="install" hidden disabled th:text="#{ui.d663d25901af}">트리거 설치·켜기</button>
+      <button type="button" class="btn app-btn app-btn-quiet" data-ft-action="enable" hidden disabled th:text="#{ui.64508ccccc70}">트리거 켜기</button>
+      <button type="button" class="btn app-btn app-btn-quiet" data-ft-action="disable" hidden disabled th:text="#{ui.db37996c412a}">트리거 끄기</button>
+      <button type="button" class="btn app-btn app-btn-quiet" data-ft-refresh th:text="#{ui.f04089806775}">상태 갱신</button>
+      <button type="button" class="btn app-btn app-btn-quiet" data-ft-history th:text="#{ui.e78d03ec8597}">변경 이력</button>
+      <button type="button" class="app-help-button" popovertarget="feedback-tracking-help" th:aria-label="#{ui.12d0573ab613}">?</button>
+    </div>
+    <div id="feedback-tracking-help" class="app-help-tooltip" popover="auto" role="tooltip" th:text="#{ui.59e354b3141a}">설치 이후 해당 Feedback 테이블의 등록·수정·삭제를 DB 트리거로 기록합니다. 외부 API 변경도 대상이며 이력 저장 오류는 변경을 막습니다. 변경자는 DB 계정입니다. 트리거 해제·테이블 재생성·직접 LOB 수정은 추적 공백이 생길 수 있습니다. 끄면 기존 이력은 유지됩니다.</div>
+    <p class="app-muted" data-ft-detail hidden></p>
+    <p class="app-alert is-error" role="alert" data-ft-error hidden></p>
+    <dialog class="app-preview-dialog" aria-labelledby="feedback-history-title" data-ft-dialog>
+      <header class="app-preview-header"><h2 id="feedback-history-title" th:text="${profile + #messages.msg('ui.3bcb6f249ac7')}"></h2><button type="button" class="btn app-btn app-btn-quiet" data-ft-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+      <div class="app-history-content"><p role="status" data-ft-message></p><div data-ft-comparison></div><div data-ft-entries></div>
+        <div class="app-history-pagination"><button type="button" class="btn app-btn app-btn-quiet" data-ft-prev disabled th:text="#{ui.da7e61c67cc5}">이전</button><span data-ft-page></span><button type="button" class="btn app-btn app-btn-quiet" data-ft-next disabled th:text="#{ui.aef613c6612d}">다음</button></div>
+      </div>
+    </dialog>
+  </section>
+  <script type="module" th:src="@{/js/feedback-tracking.mjs}"></script>
+</th:block>
+</body></html>

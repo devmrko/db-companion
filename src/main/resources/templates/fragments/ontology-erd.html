@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="erd" class="app-card app-erd" data-on-erd hidden th:attr="data-profiles-url=@{/tables/profiles}">
+  <div class="app-dds-toolbar app-erd-toolbar">
+    <label class="app-erd-filter"><span th:text="#{ontology.erd.profile}"></span><select class="form-select app-select" data-erd-profile th:aria-label="#{ontology.erd.profile}"><option value="" th:text="#{ontology.erd.all}"></option></select></label>
+    <button type="button" class="btn app-btn app-btn-quiet" data-erd-fit th:text="#{ontology.erd.fit}"></button>
+    <button type="button" class="btn app-btn app-btn-quiet" data-erd-layout th:text="#{ontology.erd.layout}"></button>
+    <button type="button" class="btn app-btn app-btn-quiet" data-erd-focus th:text="#{ontology.erd.focus}"></button>
+    <button type="button" class="btn app-btn app-btn-quiet" data-erd-actual th:aria-label="#{ontology.erd.actual}">100%</button>
+    <button type="button" class="btn app-btn app-btn-quiet" data-erd-in th:aria-label="#{ontology.erd.zoomIn}">＋</button>
+    <button type="button" class="btn app-btn app-btn-quiet" data-erd-out th:aria-label="#{ontology.erd.zoomOut}">−</button>
+    <output class="app-erd-zoom" data-erd-zoom th:aria-label="#{ontology.erd.zoomLevel}">—</output>
+    <details class="app-dds-help"><summary th:aria-label="#{ontology.erd.helpTitle}">?</summary><div><p th:text="#{ontology.erd.help}"></p><p th:text="#{ontology.erd.legend}"></p><a href="https://js.cytoscape.org/" target="_blank" rel="noopener noreferrer">Cytoscape.js · MIT</a></div></details>
+  </div>
+  <p class="app-filter-message" role="status" data-erd-message></p>
+  <p class="app-filter-message" data-erd-profile-message></p>
+  <div class="app-erd-workspace">
+    <div class="app-erd-canvas" data-erd-canvas role="img" th:aria-label="#{ontology.erd.canvas}"></div>
+    <aside class="app-erd-inspector">
+      <label class="app-erd-filter"><span th:text="#{ontology.erd.select}"></span><select class="form-select app-select" data-erd-select th:aria-label="#{ontology.erd.select}"></select></label>
+      <div data-erd-detail><p th:text="#{ontology.erd.choose}"></p></div>
+    </aside>
+  </div>
+</section>
+</body></html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Catalog column diagnostics')}"></head>
+<body><main class="container py-4">
+  <h1 class="h4">Catalog column diagnostics</h1>
+  <p th:unless="${allowed}" class="app-alert is-error">Configured login required.</p>
+  <div th:if="${allowed}">
+  <p th:text="${target.login + ' · ' + target.catalog + ' · ' + target.schema + '.' + target.table}"></p>
+  <p>Read-only metadata. Each step runs once per login session.</p>
+  <a th:href="@{/db/external-sources(tab='catalogs')}">Catalogs</a>
+  <form th:action="@{/db/external-sources/catalog-column-probe}" method="post" class="my-3">
+    <button th:each="step : ${steps}" type="submit" name="step" th:value="${step}" th:text="${step}" class="btn app-btn app-btn-secondary me-2"></button>
+  </form>
+  <section th:each="result : ${results}" class="app-card p-3 my-3" th:fragment="results">
+    <h2 class="h5" th:text="${result.step}"></h2><time th:text="${result.time}"></time>
+    <pre class="text-wrap" th:text="${result.sql}"></pre>
+    <p th:text="${result.binds}"></p>
+    <pre th:if="${!result.error.isEmpty()}" class="app-alert is-error text-wrap" th:text="${result.error}"></pre>
+    <div th:if="${result.grid != null}">
+      <p th:text="${'Rows: ' + result.grid.rows.size()}"></p>
+      <div class="table-responsive"><table class="table app-table">
+        <thead><tr><th th:each="field : ${result.grid.fields}" th:text="${field}"></th></tr></thead>
+        <tbody><tr th:each="row : ${result.grid.rows}"><td th:each="field : ${result.grid.fields}" th:text="${row.get(field)}"></td></tr></tbody>
+      </table></div>
+    </div>
+  </section>
+  </div>
+</main></body></html>

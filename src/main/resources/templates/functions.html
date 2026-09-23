@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{functions.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content">
+  <div class="app-page-heading"><h1 th:text="#{functions.title}">함수</h1></div>
+  <p class="app-alert is-error" th:if="${schemaError}" th:text="${schemaError}"></p>
+  <p class="app-alert is-error" th:if="${loadError}" th:text="${loadError}"></p>
+  <div class="app-function-layout" th:if="${loadError == null}" data-functions
+       th:attr="data-schema=${selectedSchema},data-reference=${routineName},data-base=@{/db/functions}">
+    <section class="app-card app-function-list">
+      <div class="app-card-heading"><h2 th:text="${selectedSchema}"></h2><button type="button" class="btn app-btn app-btn-quiet app-icon-button" data-functions-refresh th:title="#{ui.8259f9d35351}" th:aria-label="#{ui.8259f9d35351}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg></button></div>
+      <div class="app-function-filter"><label class="visually-hidden" for="function-filter" th:text="#{functions.filter}">함수명 검색</label><input id="function-filter" class="form-control" type="search" data-functions-filter th:placeholder="#{functions.filter}"></div>
+      <p class="app-filter-message" role="status" data-functions-message th:text="#{ui.8bf609c884ca}">불러오는 중…</p>
+      <nav class="app-function-items" data-functions-list th:aria-label="#{functions.title}"></nav>
+      <div class="app-function-pages"><span data-functions-count></span><div><button type="button" class="btn app-btn app-btn-quiet" data-functions-prev disabled th:text="#{ui.da7e61c67cc5}">이전</button><span data-functions-page></span><button type="button" class="btn app-btn app-btn-quiet" data-functions-next disabled th:text="#{ui.aef613c6612d}">다음</button></div></div>
+    </section>
+    <section class="app-card app-function-detail" aria-live="polite" data-functions-detail><p class="app-empty" th:text="#{functions.choose}">함수를 선택하세요.</p></section>
+  </div>
+</main></div>
+<dialog class="app-preview-dialog app-assistant-dialog" aria-labelledby="assistant-explain-title" data-function-explain th:attr="data-preview=@{/db/functions/explain/preview},data-run=@{/db/functions/explain}">
+  <header class="app-preview-header"><h2 id="assistant-explain-title" th:text="#{assistant.explain}">AI 설명</h2><button type="button" class="btn app-btn app-btn-quiet" data-ae-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+  <div class="app-preview-body">
+    <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-ae-csrf>
+    <p class="app-object-title" data-ae-target></p><p class="app-filter-message" data-ae-profile></p>
+    <p role="status" data-ae-message></p>
+    <div data-ae-fields hidden>
+      <details data-ae-source-details><summary data-ae-scope></summary><pre class="app-preview-source" data-ae-source></pre></details>
+      <label class="app-assistant-consent"><input type="checkbox" class="form-check-input" data-ae-consent><span th:text="#{assistant.consent}"></span></label>
+      <div class="app-editor-actions"><button type="button" class="btn app-btn app-btn-primary" data-ae-run disabled th:text="#{assistant.generate}">설명 생성</button></div>
+    </div>
+    <div class="app-assistant-result" data-ae-result hidden></div>
+    <a class="app-inline-link" th:href="@{/ai-assistant}" th:text="#{assistant.title}">AI 도우미 설정</a>
+  </div>
+</dialog>
+<script type="module" th:src="@{/js/functions.mjs}"></script></body></html>

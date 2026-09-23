@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ui.6c9c3023153d})}"></head>
+<body class="app-shell">
+<aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main">
+  <header th:replace="~{fragments/common :: topbar}"></header>
+  <main class="app-content">
+    <div class="app-alert is-error" role="alert" th:if="${schemaError}" th:text="${schemaError}"></div>
+    <div class="app-page-heading"><h1 th:text="#{ui.6c9c3023153d}">접속 정보</h1><a class="btn app-btn app-btn-secondary" th:href="@{/}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg><th:block th:text="#{ui.8259f9d35351}">새로고침</th:block></a></div>
+    <div class="row g-3 app-summary-row">
+      <div class="col-md-4"><section class="app-card app-stat"><span class="app-stat-label"><svg th:replace="~{fragments/common :: icon('database')}"></svg><th:block th:text="#{ui.cb53ca6fdafa}">데이터베이스</th:block></span><strong th:text="${info.database}">—</strong></section></div>
+      <div class="col-md-4"><section class="app-card app-stat"><span class="app-stat-label"><svg th:replace="~{fragments/common :: icon('layers')}"></svg><th:block th:text="#{ui.6e84bc961027}">선택 스키마</th:block></span><strong th:text="${selectedSchema}">—</strong></section></div>
+      <div class="col-md-4"><section class="app-card app-stat"><span class="app-stat-label"><svg th:replace="~{fragments/common :: icon('user')}"></svg><th:block th:text="#{ui.fb0853b6412a}">로그인 계정</th:block></span><strong th:text="${info.username}">—</strong></section></div>
+    </div>
+    <section class="app-card"><div class="app-card-heading"><h2 th:text="#{ui.4d436de70456}">연결 상세</h2></div>
+      <dl class="app-detail-list"><div><dt th:text="#{ui.59cd06a914b4}">TNS 별칭</dt><dd th:text="${alias}">—</dd></div><div><dt th:text="#{ui.916b246acb2d}">DB 서비스</dt><dd th:text="${info.service}">—</dd></div><div><dt th:text="#{ui.eb365cb2597c}">연결 방식</dt><dd><span class="app-badge">Wallet · mTLS</span></dd></div><div><dt th:text="#{ui.3f46d3d6b605}">세션 정책</dt><dd th:text="#{ui.33da57020978}">15분 동안 활동이 없으면 자동 종료</dd></div></dl>
+    </section>
+  </main>
+</div>
+</body></html>

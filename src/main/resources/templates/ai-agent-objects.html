@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Select AI Agent')}"></head><body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content">
+<a th:href="@{/ai-agents}" class="app-back-link" th:text="#{ui.cd637234ce24}">← Team 목록</a>
+<div class="app-page-heading"><h1 th:text="${objectKind}"></h1><button th:if="${info.username == selectedSchema}" type="button" class="btn app-btn app-btn-secondary" th:attr="data-ai-create=${objectKind}" th:text="#{creation.create}">생성</button></div>
+<form method="get" th:action="@{/ai-agents/objects}" class="app-history-toolbar"><select name="kind" class="form-select" aria-label="Type"><option th:each="kind : ${ {'AGENT','TASK','TOOL'} }" th:value="${kind}" th:text="${kind}" th:selected="${kind == objectKind}"></option></select><button class="btn app-btn app-btn-secondary" th:text="#{ui.8259f9d35351}">새로고침</button></form>
+<div th:if="${loadError}" class="app-alert is-error" th:text="${loadError}"></div>
+<section class="app-card" th:if="${objects != null}" data-paged-list>
+  <table class="table app-table">
+    <thead><tr><th th:text="#{ui.253d1510caf5}">이름</th><th th:text="#{ui.8c3f651d3083}">설명</th></tr></thead>
+    <tbody><tr th:each="item : ${objects}" data-list-row>
+      <td><a th:href="@{/ai-agents/object(schema=${selectedSchema},kind=${objectKind},name=${item.name})}" th:text="${item.name}"></a></td>
+      <td class="app-metadata-text" th:text="${item.description}"></td>
+    </tr></tbody>
+  </table>
+  <div class="app-pagination" data-list-controls hidden><span data-page-summary></span><button class="btn app-btn app-btn-quiet" type="button" data-page-prev th:text="#{ui.da7e61c67cc5}">이전</button><span data-page-number></span><button class="btn app-btn app-btn-quiet" type="button" data-page-next th:text="#{ui.aef613c6612d}">다음</button></div>
+</section>
+</main></div><th:block th:if="${info.username == selectedSchema}"><th:block th:replace="~{fragments/ai-creation :: dialog}"></th:block></th:block><script type="module" th:src="@{/js/paged-list.mjs}"></script></body></html>

@@ -1,0 +1,12 @@
+{
+ "feedbackEdit.title":["Feedback 등록·편집","Add or edit Feedback","注册或编辑 Feedback","Feedback 登録・編集"],
+ "feedbackEdit.add":["Feedback 등록","Add Feedback","注册 Feedback","Feedback 登録"],
+ "feedbackEdit.history":["프로필 변경 이력","Profile change history","配置文件变更历史","プロファイル変更履歴"],
+ "feedbackEdit.confirm":["입력한 응답 SQL과 설명을 Feedback으로 저장합니다.","Save the entered SQL response and explanation as Feedback.","将输入的 SQL 响应和说明保存为 Feedback。","入力した応答 SQL と説明を Feedback として保存します。"],
+ "feedbackEdit.saved":["저장값과 전후 이력을 확인했습니다.","Saved values and before/after history verified.","已验证保存值和前后历史。","保存値と変更前後の履歴を確認しました。"],
+ "feedbackEdit.help":["negative Feedback을 등록합니다. Select AI 원문은 ‘select ai showsql 질문’ 형식입니다. 응답 SQL은 저장만 하며 실행하지 않습니다. 기존 항목은 원문·질문을 바꾸지 않고 응답·설명만 교체합니다. sql_id가 있거나 미지원 속성이 있는 항목은 편집하지 않습니다. 앱 변경 이력은 프로필 변경 이력에서, 외부 변경은 설치된 트리거 이력에서 확인합니다.","Registers negative Feedback. Use ‘select ai showsql question’ for the source text. Response SQL is stored, never executed. Editing replaces only the response and explanation, not the source question. Entries with sql_id or unsupported attributes cannot be edited. App changes appear in profile history; external changes require the tracking trigger.","注册 negative Feedback。原文格式为 ‘select ai showsql 问题’。仅保存响应 SQL，不执行。编辑仅替换响应和说明，不修改原问题。包含 sql_id 或不支持属性的项无法编辑。应用内变更见配置文件历史；外部变更需要跟踪触发器。","negative Feedback を登録します。原文は ‘select ai showsql 質問’ 形式です。応答 SQL は保存のみで実行しません。編集は応答・説明のみを置換し、質問は変えません。sql_id や未対応属性がある項目は編集できません。アプリ内変更はプロファイル履歴、外部変更は追跡トリガーの履歴で確認します。"],
+ "feedbackEdit.sqlText":["Select AI 원문은 select ai showsql 뒤에 질문을 입력하고, 응답 SQL도 입력하세요.","Enter select ai showsql followed by a question, and a nonempty SQL response.","请输入 select ai showsql 和问题，并填写 SQL 响应。","select ai showsql の後に質問を入力し、応答 SQL も入力してください。"],
+ "feedbackEdit.changed":["Feedback이 변경됐거나 키가 중복됩니다. 다시 조회하세요.","Feedback changed or its key is duplicated. Reload it.","Feedback 已更改或键重复。请重新查询。","Feedback が変更されたかキーが重複しています。再取得してください。"],
+ "feedbackEdit.exists":["같은 Select AI 원문의 Feedback이 있습니다. 해당 항목에서 편집하세요.","Feedback for this source text already exists. Edit that entry instead.","该原文的 Feedback 已存在。请编辑对应项。","同じ原文の Feedback があります。その項目を編集してください。"],
+ "feedbackEdit.fixedKey":["기존 Feedback의 Select AI 원문은 변경할 수 없습니다.","An existing Feedback source text cannot be changed.","无法修改现有 Feedback 的原文。","既存 Feedback の原文は変更できません。"]
+}

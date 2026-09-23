@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{scheduler.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content">
+  <div class="app-page-heading"><h1 th:text="#{scheduler.title}"></h1><details class="app-dds-help"><summary th:aria-label="#{scheduler.helpTitle}">?</summary><div><p th:text="#{scheduler.help}"></p><pre>SELECT job_name, enabled, state, job_type,
+       last_start_date, next_run_date
+FROM user_scheduler_jobs ORDER BY job_name;
+
+SELECT job_action, program_owner, program_name
+FROM user_scheduler_jobs WHERE job_name = :job_name;
+
+SELECT log_id, status, actual_start_date, run_duration, errors
+FROM user_scheduler_job_run_details
+WHERE job_name = :job_name
+ORDER BY log_id DESC FETCH FIRST 10 ROWS ONLY;</pre></div></details></div>
+  <p class="app-alert is-error" th:if="${schemaError}" th:text="${schemaError}"></p>
+  <section data-scheduler th:attr="data-schema=${selectedSchema},data-base=@{/db/scheduler}">
+    <div class="app-card">
+      <div class="app-dds-toolbar">
+        <strong th:text="${selectedSchema}"></strong>
+        <input type="search" class="form-control" data-scheduler-filter th:placeholder="#{scheduler.filter}" th:aria-label="#{scheduler.filter}">
+        <select class="form-select app-select app-acl-mode" data-scheduler-state th:aria-label="#{scheduler.state}"><option value="" th:text="#{scheduler.allStates}"></option></select>
+        <button type="button" class="btn app-btn app-btn-quiet app-icon-button" data-scheduler-refresh th:title="#{ui.8259f9d35351}" th:aria-label="#{ui.8259f9d35351}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg></button>
+      </div>
+      <p class="app-dds-status" data-scheduler-checked></p><p class="app-dds-status" role="status" data-scheduler-message></p>
+      <div class="app-scheduler-list" data-scheduler-list></div>
+      <div class="app-dds-pages"><span data-scheduler-count></span><div><button type="button" class="btn app-btn app-btn-quiet" data-scheduler-prev disabled th:text="#{ui.da7e61c67cc5}"></button><span data-scheduler-page></span><button type="button" class="btn app-btn app-btn-quiet" data-scheduler-next disabled th:text="#{ui.aef613c6612d}"></button></div></div>
+    </div>
+    <section class="app-card app-dds-detail app-scheduler-detail" data-scheduler-detail hidden>
+      <h2 data-scheduler-target></h2>
+      <div class="app-dds-tabs" th:aria-label="#{scheduler.detail}">
+        <button type="button" data-scheduler-tab="settings" aria-pressed="true" th:text="#{scheduler.settings}"></button>
+        <button type="button" data-scheduler-tab="code" aria-pressed="false" th:text="#{scheduler.code}"></button>
+        <button type="button" data-scheduler-tab="history" aria-pressed="false" th:text="#{scheduler.history}"></button>
+      </div>
+      <div aria-live="polite" data-scheduler-panel></div><div data-scheduler-log hidden></div>
+    </section>
+  </section>
+</main></div><script type="module" th:src="@{/js/scheduler.mjs}"></script></body></html>

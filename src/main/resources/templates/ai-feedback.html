@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Select AI Feedback')}"></head>
+<body class="app-shell">
+<aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+  <main class="app-content">
+    <div class="app-page-heading"><h1>Select AI Feedback</h1>
+      <a th:unless="${detailMode}" class="btn app-btn app-btn-secondary" th:href="@{/ai-feedback(schema=${selectedSchema},profile=${profile},search=${search},type=${type})}" th:text="#{ui.8259f9d35351}">새로고침</a>
+      <a th:if="${detailMode}" class="btn app-btn app-btn-secondary" th:href="@{/ai-feedback(schema=${selectedSchema},profile=${profile},search=${search},type=${type},page=${pageNumber})}" th:text="#{ui.d7fcbd676ea7}">← 목록</a>
+    </div>
+    <section class="app-card">
+      <div class="app-card-heading"><h2 th:text="${detailMode ? profile : selectedSchema}"></h2>
+        <button type="button" class="app-help-button" popovertarget="feedback-help" th:aria-label="#{ui.4614a116caaf}">?</button>
+      </div>
+      <div id="feedback-help" class="app-help-tooltip" popover="auto" role="tooltip" th:text="#{ui.d9811f531fed}">현재 등록된 Feedback입니다. 변경 이력이 아니며 외부에서 수정·삭제하면 조회 내용도 바뀝니다. 목록은 저장 위치 기준으로 정렬하며 등록일 순서가 아닙니다. 질문·설명은 최대 500자 미리보기, 상세는 전체 내용입니다.</div>
+      <form th:unless="${detailMode}" method="get" th:action="@{/ai-feedback}" class="app-table-toolbar app-execution-filters app-feedback-filters">
+        <input type="hidden" name="schema" th:value="${selectedSchema}">
+        <div><label for="feedback-profile" th:text="#{ui.e65249eb5f3c}">Select AI 프로필</label>
+          <select id="feedback-profile" name="profile" class="form-select app-select" data-query-select>
+            <option value="" th:text="#{ui.ebe914f9410d}">프로필 선택</option>
+            <th:block th:if="${result != null}"><option th:each="p : ${result.profiles}" th:value="${p.name}" th:text="${p.name}" th:selected="${p.name == profile}"></option></th:block>
+            <option th:if="${result == null && !profile.isEmpty()}" th:value="${profile}" th:text="${profile}" selected></option>
+          </select>
+        </div>
+        <div class="app-execution-question-filter"><label for="feedback-search" th:text="#{ui.4b8d541ebe6d}">검색</label><input id="feedback-search" name="search" type="search" class="form-control app-input" maxlength="500" th:value="${search}" th:placeholder="#{ui.f272b7f63921}"></div>
+        <div><label for="feedback-type" th:text="#{ui.d8ba487317ac}">구분</label><select id="feedback-type" name="type" class="form-select app-select">
+          <option value="" th:text="#{ui.a4b69faf0c11}">전체</option><option value="positive" th:selected="${type == 'positive'}" th:text="#{ui.d7cd27be0534}">긍정</option><option value="negative" th:selected="${type == 'negative'}" th:text="#{ui.2c78911d2e9f}">부정</option>
+        </select></div>
+        <button type="submit" class="btn app-btn app-btn-secondary" th:text="#{ui.4b8d541ebe6d}">검색</button>
+      </form>
+      <div class="app-alert is-error app-execution-error" role="alert" th:if="${loadError}"><p th:text="${loadError}"></p>
+        <details th:if="${loadErrorDetails}"><summary th:text="#{ui.a2157e1ed7fc}">오류 상세</summary><pre th:text="${loadErrorDetails}"></pre></details>
+      </div>
+      <th:block th:if="${result != null}">
+        <th:block th:if="${!profile.isEmpty()}" th:replace="~{fragments/feedback-tracking :: tracking}"></th:block>
+        <p class="app-empty" th:if="${result.missingTable}" th:text="#{ui.ab671094a6df}">Feedback 저장 테이블이 없거나 조회할 수 없습니다.</p>
+        <p class="app-empty" th:if="${!detailMode && profile.isEmpty()}" th:text="${#lists.isEmpty(result.profiles) ? #messages.msg('ui.c897839cebb2') : #messages.msg('ui.ea247f8adebc')}"></p>
+        <th:block th:if="${result.page != null}">
+          <div class="table-responsive"><table class="table app-table app-summary-table app-feedback-table">
+            <caption class="visually-hidden" th:text="#{ui.db23e7ff2405}">프로필 Feedback 목록</caption>
+            <colgroup><col class="app-feedback-question"><col class="app-feedback-type"><col></colgroup>
+            <thead><tr><th scope="col" th:text="#{ui.32729cc3f7b6}">질문</th><th scope="col" th:text="#{ui.d8ba487317ac}">구분</th><th scope="col" th:text="#{ui.fb26bb95e447}">Feedback 설명</th></tr></thead>
+            <tbody><tr th:each="item : ${result.page.items}">
+              <td><a class="app-table-description" th:href="@{/ai-feedback(schema=${selectedSchema},profile=${profile},search=${search},type=${type},page=${pageNumber},id=${item.id})}" th:text="${item.question.isBlank() ? #messages.msg('ui.bc63a54b1812') : item.question}" th:title="${item.question}"></a></td>
+              <td th:text="${item.typeLabel}"></td><td><span class="app-table-description" th:text="${item.feedback.isBlank() ? '—' : item.feedback}" th:title="${item.feedback}"></span></td>
+            </tr><tr th:if="${#lists.isEmpty(result.page.items)}"><td colspan="3" class="app-empty" th:text="#{ui.f34b6fa27317}">조회된 Feedback이 없습니다.</td></tr></tbody>
+          </table></div>
+          <div class="app-pagination"><span th:text="${#lists.size(result.page.items)} + #{ui.f5fd44f22ad3}"></span><nav th:aria-label="#{ui.ddaa8bae8ada}">
+            <a th:if="${pageNumber > 1}" class="btn app-btn app-btn-secondary" th:href="@{/ai-feedback(schema=${selectedSchema},profile=${profile},search=${search},type=${type},page=${pageNumber - 1})}" th:text="#{ui.da7e61c67cc5}">이전</a>
+            <button th:unless="${pageNumber > 1}" class="btn app-btn app-btn-secondary" disabled th:text="#{ui.da7e61c67cc5}">이전</button>
+            <span th:text="${pageNumber} + #{ui.841171b1338d}"></span>
+            <a th:if="${result.page.hasNext && pageNumber < 1000}" class="btn app-btn app-btn-secondary" th:href="@{/ai-feedback(schema=${selectedSchema},profile=${profile},search=${search},type=${type},page=${pageNumber + 1})}" th:text="#{ui.aef613c6612d}">다음</a>
+            <button th:unless="${result.page.hasNext && pageNumber < 1000}" class="btn app-btn app-btn-secondary" disabled th:text="#{ui.aef613c6612d}">다음</button>
+          </nav></div>
+          <p class="app-filter-message" th:if="${result.page.hasNext && pageNumber == 1000}" th:text="#{ui.c424bdf56eef}">검색 조건을 좁혀 조회해 주세요.</p>
+        </th:block>
+        <div th:if="${result.detail != null}" class="app-feedback-detail">
+          <dl class="app-detail-list"><dt th:text="#{ui.d8ba487317ac}">구분</dt><dd th:text="${result.detail.typeLabel}"></dd><dt>SQL ID</dt><dd th:text="${result.detail.sqlId ?: '—'}"></dd></dl>
+          <section class="app-execution-content"><h3 th:text="#{ui.32729cc3f7b6}">질문</h3><pre th:text="${result.detail.question ?: '—'}"></pre></section>
+          <section class="app-execution-content"><h3 th:text="#{ui.fb26bb95e447}">Feedback 설명</h3><pre th:text="${result.detail.feedback ?: '—'}"></pre></section>
+          <section class="app-execution-content"><h3 th:text="#{ui.53818ff46ad2}">응답 SQL</h3><pre th:text="${result.detail.response ?: '—'}"></pre></section>
+          <section class="app-execution-content"><h3 th:text="#{ui.b3cee53ed773}">Select AI 원문</h3><pre th:text="${result.detail.sqlText ?: '—'}"></pre></section>
+          <details class="app-execution-content"><summary th:text="#{ui.2e54bc3fafd1}">원문 JSON</summary><pre th:text="${result.detail.attributes ?: '—'}"></pre></details>
+        </div>
+        <div class="app-history-toolbar" th:if="${!profile.isEmpty() and info.username == selectedSchema}">
+          <button type="button" class="btn app-btn app-btn-secondary" data-feedback-edit="" th:text="#{feedbackEdit.add}">Feedback 등록</button>
+          <button th:if="${result.detail != null}" type="button" class="btn app-btn app-btn-secondary" th:attr="data-feedback-edit=${feedbackRowId}" th:text="#{ui.87b0acef85a7}">편집</button>
+          <a class="btn app-btn app-btn-quiet" th:href="@{/ai-profiles/detail(profile=${profile})}" th:text="#{feedbackEdit.history}">프로필 변경 이력</a>
+        </div>
+      </th:block>
+    </section>
+  </main>
+</div><th:block th:if="${result != null and !profile.isEmpty() and info.username == selectedSchema}"><th:block th:replace="~{fragments/feedback-editor :: dialog}"></th:block></th:block></body></html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ui.e65249eb5f3c})}"></head>
+<body class="app-shell">
+<aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main">
+  <header th:replace="~{fragments/common :: topbar}"></header>
+  <main class="app-content">
+    <a class="app-back-link" th:if="${profileName != null}" th:href="@{/ai-profiles}" th:text="#{ui.ab881c31afb0}">← 프로필 목록</a>
+    <div class="app-page-heading"><h1 th:text="${profileName == null ? #messages.msg('ui.e65249eb5f3c') : profileName}"></h1><a class="btn app-btn app-btn-secondary" th:href="${profileName == null} ? @{/ai-profiles} : @{/ai-profiles(profile=${profileName})}" th:text="#{ui.8259f9d35351}">새로고침</a></div>
+    <div class="app-history-toolbar" th:if="${info != null and info.username == selectedSchema}"><button type="button" class="btn app-btn app-btn-secondary" data-ai-create="PROFILE" th:text="#{creation.newProfile}">프로필 생성</button><button th:if="${profileName != null}" type="button" class="btn app-btn app-btn-secondary" data-ai-create="PROFILE" th:attr="data-source=${profileName}" th:text="#{creation.clone}">복제</button></div>
+    <div class="app-alert is-error" role="alert" th:if="${schemaError}" th:text="${schemaError}"></div>
+    <div class="app-alert is-error" role="alert" th:if="${loadError}" th:text="${loadError}"></div>
+    <th:block th:if="${page != null and profileName != null}"><th:block th:replace="~{fragments/profile-history :: history}"></th:block></th:block>
+    <section class="app-card" th:if="${page != null and profileName == null}" data-paged-list>
+      <div class="app-card-heading"><h2 th:text="${selectedSchema}"></h2></div>
+      <div class="table-responsive"><table class="table app-table app-summary-table">
+        <colgroup><col class="app-name-column"><col></colgroup>
+        <caption class="visually-hidden" th:text="#{ui.15bf830f67eb}">Select AI 프로필 목록</caption>
+        <thead><tr><th th:text="#{ui.c55831fbc2ba}">프로필명</th><th th:text="#{ui.8c3f651d3083}">설명</th></tr></thead>
+        <tbody>
+          <tr th:each="profile : ${page.profiles}" data-list-row>
+            <td><a class="app-table-name" th:title="${profile.name}" th:href="@{/ai-profiles/detail(profile=${profile.name})}" th:text="${profile.name}"></a></td>
+            <td><span class="app-table-description" tabindex="0" th:title="${profile.description}" th:text="${profile.description}"></span></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(page.profiles)}"><td colspan="2" class="app-empty" th:text="#{ui.8de254df9b25}">등록된 프로필이 없습니다.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="app-pagination" data-list-controls hidden>
+        <span class="app-muted" data-page-summary role="status" aria-live="polite"></span>
+        <nav th:aria-label="#{ui.608132b51774}">
+          <button class="btn app-btn app-btn-quiet" type="button" data-page-prev th:text="#{ui.da7e61c67cc5}">이전</button>
+          <span data-page-number></span>
+          <button class="btn app-btn app-btn-quiet" type="button" data-page-next th:text="#{ui.aef613c6612d}">다음</button>
+        </nav>
+      </div>
+    </section>
+    <section class="app-card" th:if="${page != null and profileName != null}">
+      <dl class="app-detail-list" th:each="profile : ${page.profiles}">
+        <div><dt th:text="#{ui.c55831fbc2ba}">프로필명</dt><dd th:text="${profile.name}"></dd></div>
+        <div><dt th:text="#{ui.3f863f643fcc}">스키마</dt><dd th:text="${selectedSchema}"></dd></div>
+        <div><dt>ID</dt><dd th:text="${profile.id}"></dd></div>
+        <div><dt th:text="#{ui.e10195a1239f}">상태</dt><dd th:text="${profile.status}"></dd></div>
+        <div><dt th:text="#{ui.8c3f651d3083}">설명</dt><dd class="app-metadata-text" th:text="${profile.description}"></dd></div>
+        <div><dt th:text="#{ui.5efd3ddd4584}">생성일</dt><dd th:text="${profile.created}"></dd></div>
+        <div><dt th:text="#{ui.d3a98476e16a}">수정일</dt><dd th:text="${profile.modified}"></dd></div>
+      </dl>
+    </section>
+    <section class="app-card table-responsive mt-3" th:if="${page != null and profileName != null}">
+      <p class="app-muted app-profile-owner-note" th:unless="${profileEditable}" th:text="#{ui.5f6566f910f8}">프로필 소유자 계정으로 로그인하면 편집할 수 있습니다.</p>
+      <table class="table app-table">
+        <caption class="visually-hidden" th:text="#{ui.827b08f12021}">선택한 프로필 설정</caption>
+        <thead><tr><th th:text="#{ui.286d43f0f3cf}">속성</th><th th:text="#{ui.b19ddf94b4c9}">값</th><th th:if="${profileEditable}"><span class="visually-hidden" th:text="#{ui.87b0acef85a7}">편집</span></th></tr></thead>
+        <tbody><tr th:each="attribute : ${page.attributes}"><td class="app-profile-attribute-name" th:attr="data-profile-attribute-name=${attribute.name}"><span th:text="${attribute.name}"></span></td><td class="app-metadata-text" th:text="${attribute.value}"></td>
+          <td class="app-profile-edit-action" th:if="${profileEditable}"><button th:if="${editableAttributes.contains(attribute.name)}" type="button" class="btn app-btn app-btn-quiet" th:attr="data-edit-profile-attribute=${attribute.name},aria-label=${attribute.name + #messages.msg('ui.12b90692ea79')}" th:text="#{ui.87b0acef85a7}">편집</button></td></tr>
+          <tr th:if="${#lists.isEmpty(page.attributes)}"><td th:attr="colspan=${profileEditable ? 3 : 2}" class="app-empty" th:text="#{ui.d14b7f78faa4}">등록된 속성이 없습니다.</td></tr>
+        </tbody>
+      </table>
+    </section>
+    <th:block th:if="${page != null and profileName != null and profileEditable}"><th:block th:replace="~{fragments/profile-editor :: editor}"></th:block></th:block>
+  </main>
+</div>
+<script type="module" th:src="@{/js/paged-list.mjs}"></script>
+<script type="module" th:src="@{/js/profile-fields.mjs}"></script>
+<th:block th:if="${info != null and info.username == selectedSchema}"><th:block th:replace="~{fragments/ai-creation :: dialog}"></th:block></th:block>
+</body></html>

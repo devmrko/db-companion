@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title} + ' · DB Companion'">DB Companion</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <script th:src="@{/i18n/messages.js}"></script>
+  <script type="module" th:src="@{/js/common.js}"></script>
+</head>
+<body>
+<svg th:fragment="icon(name)" class="app-icon" aria-hidden="true" focusable="false"><use th:href="@{/icons.svg} + '#' + ${name}"></use></svg>
+<a th:fragment="brand" class="app-brand" th:href="@{/login}" th:aria-label="#{ui.542681d48a34}">
+  <span class="app-brand-mark"><svg th:replace="~{fragments/common :: icon('database')}"></svg></span>
+  <span class="app-brand-name">DB<span class="app-brand-light">companion</span></span>
+</a>
+<aside th:fragment="sidebar" class="app-sidebar" id="app-sidebar">
+  <a th:replace="~{fragments/common :: brand}"></a>
+  <p class="app-nav-label" th:text="#{nav.workspace}">Workspace</p>
+  <nav th:aria-label="#{ui.72fbacf096bf}">
+    <a class="app-nav-item" th:classappend="${activePage == 'overview'} ? 'is-active'" th:href="@{/}" th:attr="aria-current=${activePage == 'overview' ? 'page' : null}" th:aria-label="#{ui.6c9c3023153d}" th:title="#{ui.6c9c3023153d}"><svg th:replace="~{fragments/common :: icon('grid')}"></svg><span class="app-nav-text" th:text="#{ui.6c9c3023153d}">접속 정보</span></a>
+  </nav>
+  <p class="app-nav-label app-nav-group" th:text="#{ui.e307b2f42689}">AI 데이터 관리</p>
+  <nav th:aria-label="#{ui.e307b2f42689}">
+    <a class="app-nav-item" th:classappend="${activePage == 'ontology'} ? 'is-active'" th:href="@{/ontology}" th:attr="aria-current=${activePage == 'ontology' ? 'page' : null}" th:aria-label="#{ontology.title}" th:title="#{ontology.title}"><svg th:replace="~{fragments/common :: icon('layers')}"></svg><span class="app-nav-text" th:text="#{ontology.title}">온톨로지</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'ontology-query'} ? 'is-active'" th:href="@{/ontology-query}" th:attr="aria-current=${activePage == 'ontology-query' ? 'page' : null}" th:aria-label="#{ontology.query.title}" th:title="#{ontology.query.title}"><svg th:replace="~{fragments/common :: icon('search')}"></svg><span class="app-nav-text" th:text="#{ontology.query.title}">온톨로지 질의</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'assistant'} ? 'is-active'" th:href="@{/ai-assistant}" th:attr="aria-current=${activePage == 'assistant' ? 'page' : null}" th:aria-label="#{assistant.title}" th:title="#{assistant.title}"><svg th:replace="~{fragments/common :: icon('layers')}"></svg><span class="app-nav-text" th:text="#{assistant.title}">AI 도우미 설정</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'vectors'} ? 'is-active'" th:href="@{/vector-search}" th:attr="aria-current=${activePage == 'vectors' ? 'page' : null}" th:aria-label="#{ui.fee12485ed4c}" th:title="#{ui.fee12485ed4c}"><svg th:replace="~{fragments/common :: icon('search')}"></svg><span class="app-nav-text" th:text="#{ui.fee12485ed4c}">벡터 검색</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'tables'} ? 'is-active'" th:href="@{/tables}" th:attr="aria-current=${activePage == 'tables' ? 'page' : null}" th:aria-label="#{ui.31c660ef0b9a}" th:title="#{ui.31c660ef0b9a}"><svg th:replace="~{fragments/common :: icon('table')}"></svg><span class="app-nav-text" th:text="#{ui.31c660ef0b9a}">테이블·컬럼</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'profiles'} ? 'is-active'" th:href="@{/ai-profiles}" th:attr="aria-current=${activePage == 'profiles' ? 'page' : null}" th:aria-label="#{ui.e65249eb5f3c}" th:title="#{ui.e65249eb5f3c}"><svg th:replace="~{fragments/common :: icon('database')}"></svg><span class="app-nav-text" th:text="#{ui.e65249eb5f3c}">Select AI 프로필</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'ai-test'} ? 'is-active'" th:href="@{/ai-test}" th:attr="aria-current=${activePage == 'ai-test' ? 'page' : null}" th:aria-label="#{aitest.title}" th:title="#{aitest.title}"><svg th:replace="~{fragments/common :: icon('database')}"></svg><span class="app-nav-text" th:text="#{aitest.title}">Select AI 테스트</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'feedback'} ? 'is-active'" th:href="@{/ai-feedback}" th:attr="aria-current=${activePage == 'feedback' ? 'page' : null}" aria-label="Select AI Feedback" title="Select AI Feedback"><svg th:replace="~{fragments/common :: icon('table')}"></svg><span class="app-nav-text">Select AI Feedback</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'agents'} ? 'is-active'" th:href="@{/ai-agents}" th:attr="aria-current=${activePage == 'agents' ? 'page' : null}" aria-label="Select AI Agent" title="Select AI Agent"><svg th:replace="~{fragments/common :: icon('layers')}"></svg><span class="app-nav-text">Select AI Agent</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'executions'} ? 'is-active'" th:href="@{/ai-executions}" th:attr="aria-current=${activePage == 'executions' ? 'page' : null}" th:aria-label="#{ui.cf835c698541}" th:title="#{ui.cf835c698541}"><svg th:replace="~{fragments/common :: icon('history')}"></svg><span class="app-nav-text" th:text="#{ui.cf835c698541}">AI 실행 이력</span></a>
+  </nav>
+  <p class="app-nav-label app-nav-group" th:text="#{functions.nav}">DB 관리</p>
+  <nav th:aria-label="#{functions.nav}">
+    <a class="app-nav-item" th:classappend="${activePage == 'scheduler'} ? 'is-active'" th:href="@{/db/scheduler}" th:attr="aria-current=${activePage == 'scheduler' ? 'page' : null}" th:aria-label="#{scheduler.title}" th:title="#{scheduler.title}"><svg th:replace="~{fragments/common :: icon('history')}"></svg><span class="app-nav-text" th:text="#{scheduler.title}">스케줄러</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'external'} ? 'is-active'" th:href="@{/db/external-sources}" th:attr="aria-current=${activePage == 'external' ? 'page' : null}" th:aria-label="#{external.title}" th:title="#{external.title}"><svg th:replace="~{fragments/common :: icon('database')}"></svg><span class="app-nav-text" th:text="#{external.title}">외부 데이터 소스</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'credentials'} ? 'is-active'" th:href="@{/db/credentials}" th:attr="aria-current=${activePage == 'credentials' ? 'page' : null}" aria-label="Credential" title="Credential"><svg th:replace="~{fragments/common :: icon('shield')}"></svg><span class="app-nav-text">Credential</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'security'} ? 'is-active'" th:href="@{/db/security}" th:attr="aria-current=${activePage == 'security' ? 'page' : null}" aria-label="Deep Data Security" title="Deep Data Security"><svg th:replace="~{fragments/common :: icon('shield')}"></svg><span class="app-nav-text">Deep Data Security</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'functions'} ? 'is-active'" th:href="@{/db/functions}" th:attr="aria-current=${activePage == 'functions' ? 'page' : null}" th:aria-label="#{functions.title}" th:title="#{functions.title}"><svg th:replace="~{fragments/common :: icon('code')}"></svg><span class="app-nav-text" th:text="#{functions.title}">함수</span></a>
+  </nav>
+</aside>
+<header th:fragment="topbar" class="app-topbar">
+  <div class="app-breadcrumb">
+    <button class="btn app-btn app-btn-quiet app-icon-button" type="button" data-sidebar-toggle aria-controls="app-sidebar" aria-expanded="true" th:aria-label="#{ui.9f6ec12024c7}" th:title="#{ui.9f6ec12024c7}"><svg th:replace="~{fragments/common :: icon('sidebar')}"></svg></button>
+    <strong th:if="${info != null}" th:text="${info.username}"></strong>
+  </div>
+  <div class="app-topbar-actions">
+    <form th:replace="~{fragments/common :: language}"></form>
+    <form th:if="${schemas != null}" th:action="@{/schema}" method="post" class="app-schema-form" data-schema-form>
+      <label for="schema" th:text="#{ui.3f863f643fcc}">스키마</label>
+      <select class="form-select app-select app-schema-select" name="schema" id="schema" data-schema-select>
+        <option th:each="schema : ${schemas}" th:value="${schema}" th:text="${schema}" th:selected="${schema == selectedSchema}"></option>
+      </select>
+      <input type="hidden" name="returnTo" th:value="${activePage == 'ontology-query' ? '/ontology-query' : activePage == 'ontology' ? '/ontology' : (activePage == 'scheduler' ? '/db/scheduler' : (activePage == 'external' ? '/db/external-sources' : (activePage == 'assistant' ? '/ai-assistant' : (activePage == 'credentials' ? '/db/credentials' : (activePage == 'security' ? '/db/security' : (activePage == 'functions' ? '/db/functions' : (activePage == 'vectors' ? '/vector-search' : (activePage == 'feedback' ? '/ai-feedback' : (activePage == 'executions' ? (executionReturn ?: '/ai-executions') : (activePage == 'agents' ? '/ai-agents' : (activePage == 'profiles' ? '/ai-profiles' : (activePage == 'tables' ? '/tables' : '/'))))))))))))}">
+      <noscript><button class="btn app-btn app-btn-secondary" type="submit" th:text="#{ui.6a1c963d5bc5}">적용</button></noscript>
+    </form>
+    <form th:if="${schemas != null}" th:action="@{/schema/refresh}" method="post">
+      <input type="hidden" name="returnTo" th:value="${activePage == 'ontology-query' ? '/ontology-query' : activePage == 'ontology' ? '/ontology' : (activePage == 'scheduler' ? '/db/scheduler' : (activePage == 'external' ? '/db/external-sources' : (activePage == 'assistant' ? '/ai-assistant' : (activePage == 'credentials' ? '/db/credentials' : (activePage == 'security' ? '/db/security' : (activePage == 'functions' ? '/db/functions' : (activePage == 'vectors' ? '/vector-search' : (activePage == 'feedback' ? '/ai-feedback' : (activePage == 'executions' ? (executionReturn ?: '/ai-executions') : (activePage == 'agents' ? '/ai-agents' : (activePage == 'profiles' ? '/ai-profiles' : (activePage == 'tables' ? '/tables' : '/'))))))))))))}">
+      <button class="btn app-btn app-btn-quiet app-icon-button" type="submit" th:title="#{ui.9f919575a4d0}" th:aria-label="#{ui.9f919575a4d0}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg></button>
+    </form>
+    <form th:action="@{/logout}" method="post"><button class="btn app-btn app-btn-quiet" type="submit"><svg th:replace="~{fragments/common :: icon('logout')}"></svg><th:block th:text="#{ui.919c1b323225}">로그아웃</th:block></button></form>
+  </div>
+</header>
+<form th:fragment="language" th:action="@{/language}" method="post" class="app-language-form" data-language-form>
+  <input type="hidden" name="returnTo" th:value="${languageReturn ?: '/login'}" data-language-return>
+  <select name="language" class="form-select app-select app-language-select" th:aria-label="#{language.label}" data-language-select>
+    <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
+    <option value="en" th:selected="${#locale.language == 'en'}">English</option>
+    <option value="zh-CN" th:selected="${#locale.language == 'zh'}">简体中文</option>
+    <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
+  </select>
+  <button type="submit" class="btn app-btn app-btn-quiet" th:aria-label="#{language.apply}" data-language-submit>✓</button>
+</form>
+</body></html>

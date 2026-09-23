@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
+<dialog th:fragment="editor" class="app-preview-dialog" aria-labelledby="object-editor-title" data-object-editor
+        th:attr="data-schema=${targetSchema},data-url=@{/ai-agents/object/attribute}">
+  <header class="app-preview-header"><h2 id="object-editor-title" data-aoe-title th:text="#{ui.a15da5722531}">속성 편집</h2><button type="button" class="btn app-btn app-btn-quiet" data-aoe-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+  <form class="app-editor-form" data-aoe-form>
+    <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-aoe-csrf>
+    <p class="app-muted" data-aoe-object></p>
+    <p class="app-muted" th:text="#{ui.97085d1644bf}">같은 객체를 사용하는 다른 Team에도 적용됩니다.</p>
+    <p class="app-alert" role="status" aria-live="polite" data-aoe-message hidden></p>
+    <fieldset data-aoe-fields disabled>
+      <div class="app-profile-field-label"><label for="object-attribute-value" data-aoe-label th:text="#{ui.b19ddf94b4c9}">값</label><span data-aoe-help></span></div>
+      <div data-aoe-control></div>
+      <details class="app-profile-json-editor" data-aoe-raw><summary th:text="#{ui.7e7265068560}">JSON 직접 편집</summary><textarea class="form-control app-editor-value" id="object-attribute-value" rows="10" spellcheck="false" data-aoe-value></textarea></details>
+      <div class="app-editor-actions"><button class="btn app-btn app-btn-primary" type="submit" data-aoe-save disabled th:text="#{ui.5fb926229090}">저장</button></div>
+    </fieldset>
+  </form>
+</dialog>
+</body></html>

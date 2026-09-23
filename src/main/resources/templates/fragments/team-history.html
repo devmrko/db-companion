@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
+<th:block th:fragment="history">
+  <dialog class="app-preview-dialog" aria-labelledby="team-history-title" data-team-history
+          th:attr="data-schema=${targetSchema},data-team=${teamName},data-url=@{/ai-agents/team/history}">
+    <header class="app-preview-header"><h2 id="team-history-title" th:text="${teamName + #messages.msg('ui.3bcb6f249ac7')}"><th:block th:text="#{ui.e78d03ec8597}">변경 이력</th:block></h2><button type="button" class="btn app-btn app-btn-quiet" data-tmh-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+    <div class="app-history-content">
+      <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-tmh-csrf>
+      <div class="app-history-toolbar"><button type="button" class="btn app-btn app-btn-secondary" data-tmh-refresh th:text="#{ui.8259f9d35351}">새로고침</button><button type="button" class="btn app-btn app-btn-secondary" data-tmh-install hidden th:text="#{ui.604768ed0b76}">공통 이력 준비</button></div>
+      <p class="app-alert" role="status" aria-live="polite" data-tmh-message hidden></p>
+      <div data-tmh-comparison></div><div data-tmh-entries></div>
+      <div class="app-history-pagination"><button type="button" class="btn app-btn app-btn-quiet" data-tmh-prev disabled th:text="#{ui.da7e61c67cc5}">이전</button><span data-tmh-page></span><button type="button" class="btn app-btn app-btn-quiet" data-tmh-next disabled th:text="#{ui.aef613c6612d}">다음</button></div>
+    </div>
+  </dialog>
+  <script type="module" th:src="@{/js/team-history.mjs}"></script>
+</th:block>
+</body></html>

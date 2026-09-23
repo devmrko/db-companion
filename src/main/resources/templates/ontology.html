@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ontology.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside><div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content">
+  <div class="app-page-heading"><h1 th:text="#{ontology.title}">온톨로지</h1><details class="app-dds-help"><summary aria-label="Help">?</summary><div><p th:text="#{ontology.help}"></p></div></details></div>
+  <section data-ontology th:attr="data-schema=${selectedSchema},data-base=@{/ontology}">
+    <input type="hidden" data-on-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+    <div class="app-card">
+      <div class="app-dds-toolbar"><strong th:text="${selectedSchema}"></strong><span data-on-status></span><button type="button" class="btn app-btn app-btn-secondary" data-on-install hidden th:text="#{ontology.install}">관리 테이블 생성</button><button type="button" class="btn app-btn app-btn-quiet app-icon-button" data-on-refresh th:title="#{ui.8259f9d35351}" th:aria-label="#{ui.8259f9d35351}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg></button></div>
+      <p class="app-filter-message" role="status" data-on-message></p>
+      <p class="app-filter-message" th:text="#{ontology.cacheHint}"></p>
+      <div class="app-ontology-viewbar" data-on-views hidden>
+        <div class="app-dds-tabs"><button type="button" data-on-view="list" aria-pressed="true" th:text="#{ontology.erd.list}"></button><button type="button" data-on-view="erd" aria-pressed="false">ERD</button><button type="button" data-on-view="relationships" aria-pressed="false" th:text="#{ontology.relationships.title}"></button></div>
+        <button type="button" class="btn app-btn app-btn-primary" data-on-analyze aria-controls="ontology-relationships" th:text="#{ontology.relationships.analyze}"></button>
+      </div>
+      <div data-on-ready hidden>
+        <div class="app-dds-toolbar"><select class="form-select app-select" data-on-source th:aria-label="#{ontology.sourceTable}"></select><button type="button" class="btn app-btn app-btn-secondary" data-on-capture th:text="#{ontology.capture}">메타데이터 가져오기</button><button type="button" class="btn app-btn app-btn-secondary" data-on-import-all th:text="#{ontology.import.all}">전체 메타데이터 가져오기</button></div>
+        <div class="app-dds-toolbar"><input class="form-control" type="search" data-on-filter th:placeholder="#{ontology.search}" th:aria-label="#{ontology.search}"><span data-on-checked></span></div>
+        <div data-on-list></div><div class="app-dds-pages"><span data-on-count></span><div><button type="button" class="btn app-btn app-btn-quiet" data-on-prev th:text="#{ui.da7e61c67cc5}">이전</button><span data-on-page></span><button type="button" class="btn app-btn app-btn-quiet" data-on-next th:text="#{ui.aef613c6612d}">다음</button></div></div>
+      </div>
+    </div>
+    <section th:replace="~{fragments/ontology-erd :: erd}"></section>
+    <section th:replace="~{fragments/ontology-relationships :: relationships}"></section>
+    <dialog class="app-preview-dialog app-ontology-dialog" data-on-pipeline-dialog aria-labelledby="ontology-pipeline-title">
+      <div class="app-preview-header"><h2 id="ontology-pipeline-title" data-pipeline-title></h2><button type="button" class="btn app-btn app-btn-quiet" data-pipeline-close th:text="#{ontology.close}"></button></div>
+      <p role="status" aria-live="polite" data-pipeline-status></p><div data-pipeline-body></div>
+      <button type="button" class="btn app-btn app-btn-secondary" data-pipeline-stop hidden th:text="#{ontology.discovery.stop}"></button>
+    </dialog>
+    <section class="app-card app-dds-detail" data-on-detail hidden>
+      <div class="app-card-heading"><h2 data-on-target></h2><div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-secondary" data-on-wizard th:text="#{ontology.wizard.title}">컬럼 정의 마법사</button><button type="button" class="btn app-btn app-btn-quiet" data-on-latest th:text="#{ontology.latest}">최신 버전</button></div></div>
+      <p class="app-filter-message" data-on-version></p>
+      <div class="app-dds-tabs" th:aria-label="#{ontology.definition}"><button type="button" data-on-tab="definition" th:text="#{ontology.definition}">정의</button><button type="button" data-on-tab="columns" th:text="#{ontology.columns}">컬럼</button><button type="button" data-on-tab="values" th:text="#{ontology.values.title}">값·용어 매핑</button><button type="button" data-on-tab="relations" th:text="#{ontology.relations}">관계</button><button type="button" data-on-tab="rdf">RDF</button><button type="button" data-on-tab="history" th:text="#{ontology.versions}">버전</button></div>
+      <div data-on-panel></div>
+      <div class="app-ontology-actions" data-on-actions><button type="button" class="btn app-btn app-btn-primary" data-on-save th:text="#{ontology.save}">초안 저장</button><button type="button" class="btn app-btn app-btn-secondary" data-on-approve th:text="#{ontology.approve}">승인 저장</button><button type="button" class="btn app-btn app-btn-quiet" data-on-ai th:text="#{ontology.ai}">AI 초안</button><a class="app-link" th:href="@{/ai-assistant}" th:text="#{assistant.title}">AI 도우미 설정</a></div>
+    </section>
+    <dialog class="app-preview-dialog app-ontology-dialog app-ontology-import" data-on-import-dialog aria-labelledby="ontology-import-title">
+      <div class="app-preview-header"><h2 id="ontology-import-title" th:text="#{ontology.import.all}">전체 메타데이터 가져오기</h2><button type="button" class="btn app-btn app-btn-quiet" data-import-close th:text="#{ontology.close}">닫기</button></div>
+      <p data-import-scope></p><p class="app-filter-message" th:text="#{ontology.import.help}"></p>
+      <p role="status" aria-live="polite" data-import-status></p>
+      <progress data-import-progress th:aria-label="#{ontology.import.progress}" max="1" value="0"></progress>
+      <div class="app-ontology-import-list"><table class="table app-table"><thead><tr><th scope="col" th:text="#{ontology.table}"></th><th scope="col" th:text="#{ontology.state}"></th><th scope="col" th:text="#{ontology.version}"></th><th scope="col" th:text="#{ontology.import.triples}"></th></tr></thead><tbody data-import-rows></tbody></table></div>
+      <p class="app-alert is-error" role="alert" data-import-error hidden></p>
+      <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-primary" data-import-start th:text="#{ontology.import.start}">가져오기 시작</button><button type="button" class="btn app-btn app-btn-secondary" data-import-stop hidden th:text="#{ontology.import.stop}">현재 테이블 후 중단</button></div>
+    </dialog>
+    <dialog class="app-preview-dialog app-assistant-dialog app-ontology-dialog" data-on-dialog aria-labelledby="ontology-ai-title">
+      <div class="app-preview-header"><h2 id="ontology-ai-title" th:text="#{ontology.ai}">AI 초안</h2><button type="button" class="btn app-btn app-btn-quiet" data-on-close th:text="#{ontology.close}">닫기</button></div>
+      <p data-on-ai-profile></p><p role="status" class="app-filter-message" data-on-ai-message></p>
+      <details data-on-ai-diagnostic hidden><summary th:text="#{ontology.context.rawResponse}"></summary><p data-on-ai-diagnostic-path></p><p class="app-filter-message" th:text="#{ontology.context.rawHelp}"></p><pre class="app-preview-source" data-on-ai-raw></pre></details>
+      <div data-on-ai-context></div>
+      <details class="app-dds-help"><summary th:aria-label="#{ontology.context.helpTitle}">?</summary><p th:text="#{ontology.context.help}"></p></details>
+      <details data-on-ai-payload><summary th:text="#{ontology.transmitted}">전송할 메타데이터</summary><pre class="app-preview-source" data-on-ai-source></pre></details>
+      <label class="app-ontology-consent"><input type="checkbox" data-on-consent><span th:text="#{ontology.consent}"></span></label>
+      <button type="button" class="btn app-btn app-btn-primary" data-on-generate disabled th:text="#{ontology.generate}">초안 생성</button>
+      <div class="app-ontology-ai-review" data-on-ai-result hidden></div><button type="button" class="btn app-btn app-btn-primary" data-on-apply hidden th:text="#{ontology.apply}">제안을 새 초안으로 저장</button>
+    </dialog>
+    <div th:replace="~{fragments/ontology-wizard :: wizard}"></div>
+  </section>
+</main></div><script th:src="@{/webjars/cytoscape/3.34.1/dist/cytoscape.min.js}"></script><script type="module" th:src="@{/js/ontology.mjs}"></script></body></html>

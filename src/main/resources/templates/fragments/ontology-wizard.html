@@ -1,0 +1,23 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<dialog th:fragment="wizard" class="app-preview-dialog app-ontology-dialog app-ontology-wizard" data-on-wizard-dialog aria-labelledby="ontology-wizard-title">
+  <div class="app-preview-header"><h2 id="ontology-wizard-title" th:text="#{ontology.wizard.title}">AI 정의 마법사</h2><button type="button" class="btn app-btn app-btn-quiet" data-w-close th:text="#{ontology.close}">닫기</button></div>
+  <p data-w-target></p>
+  <p role="status" aria-live="polite" data-w-message></p>
+  <ol class="app-wizard-steps" data-w-steps><li th:text="#{ontology.wizard.choose}"></li><li th:text="#{ontology.wizard.preview}"></li><li th:text="#{ontology.wizard.review}"></li></ol>
+  <section data-w-select>
+    <details class="app-wizard-help"><summary th:text="#{ontology.wizard.helpTitle}"></summary><p th:text="#{ontology.wizard.genericHelp}"></p><p th:text="#{ontology.wizard.semanticsHelp}"></p><p th:text="#{ontology.wizard.help}"></p></details>
+    <div data-w-columns class="app-wizard-columns"></div>
+    <label class="app-ontology-field"><span th:text="#{ontology.wizard.rows}"></span><select class="form-select app-select" data-w-count><option value="10">10</option><option value="20">20</option></select></label>
+    <label class="app-ontology-consent"><input type="checkbox" data-w-local-consent><span th:text="#{ontology.wizard.localConsent}"></span></label>
+    <button type="button" class="btn app-btn app-btn-primary" data-w-sample disabled th:text="#{ontology.wizard.sample}"></button>
+  </section>
+  <section data-w-preview hidden>
+    <p data-w-profile></p><p data-w-summary></p><p data-w-excluded></p>
+    <div data-w-samples></div>
+    <details><summary th:text="#{ontology.wizard.payload}"></summary><pre class="app-preview-source" data-w-payload></pre></details>
+    <label class="app-ontology-consent"><input type="checkbox" data-w-consent><span th:text="#{ontology.wizard.consent}"></span></label>
+    <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-secondary" data-w-back th:text="#{ontology.wizard.back}"></button><button type="button" class="btn app-btn app-btn-primary" data-w-generate disabled th:text="#{ontology.wizard.generate}"></button></div>
+  </section>
+  <section data-w-review hidden><details class="app-wizard-help"><summary th:text="#{ontology.wizard.semanticsTitle}"></summary><p th:text="#{ontology.wizard.semanticsHelp}"></p></details><div data-w-results></div><button type="button" class="btn app-btn app-btn-primary" data-w-save disabled th:text="#{ontology.wizard.save}"></button></section>
+</dialog>
+</body></html>

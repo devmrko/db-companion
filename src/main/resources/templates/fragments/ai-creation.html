@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body><th:block th:fragment="dialog">
+<dialog class="app-preview-dialog" data-ai-creation th:attr="data-base=@{/ai-create},data-schema=${selectedSchema}" aria-labelledby="ai-creation-title">
+  <header class="app-preview-header"><h2 id="ai-creation-title" th:text="#{creation.title}">AI 객체 생성</h2><button type="button" class="btn app-btn app-btn-quiet" data-ac-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+  <form class="app-editor-form" data-ac-form>
+    <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-ac-csrf>
+    <p data-ac-target class="app-muted"></p>
+    <div class="app-alert" role="status" aria-live="polite" data-ac-message></div>
+    <div data-ac-setup hidden><p th:text="#{creation.historyRequired}">공통 이력이 필요합니다.</p><button type="button" data-ac-install class="btn app-btn app-btn-secondary" th:text="#{creation.install}">공통 이력 준비</button></div>
+    <fieldset data-ac-fields disabled>
+      <div class="app-creation-grid">
+        <label><span th:text="#{creation.name}">새 이름</span><input class="form-control" data-ac-name maxlength="125" pattern="[A-Z][A-Z0-9_$#]{0,124}" required autocomplete="off"></label>
+        <label><span th:text="#{ui.e10195a1239f}">상태</span><select class="form-select" data-ac-status><option value="DISABLED">DISABLED</option><option value="ENABLED">ENABLED</option></select></label>
+      </div>
+      <label class="app-creation-field"><span th:text="#{ui.8c3f651d3083}">설명</span><textarea class="form-control" rows="2" data-ac-description></textarea></label>
+      <details data-ac-help><summary th:text="#{creation.helpTitle}">설정 도움말</summary><p th:text="#{creation.help}"></p><pre class="app-preview-source" data-ac-references></pre></details>
+      <div data-ac-typed class="app-creation-grid"></div>
+      <details data-ac-json-panel><summary th:text="#{creation.attributes}">설정 JSON</summary><textarea class="form-control app-editor-value" rows="12" spellcheck="false" data-ac-attributes></textarea><button type="button" data-ac-apply-json class="btn app-btn app-btn-quiet" th:text="#{creation.applyJson}">JSON을 입력란에 반영</button></details>
+      <div data-ac-copy-label class="app-creation-field"><label><input type="checkbox" data-ac-copy aria-describedby="ai-creation-copy-help"> <span th:text="#{creation.copyFeedback}">Feedback도 복사</span></label><p id="ai-creation-copy-help" class="app-muted" th:text="#{creation.copyHelp}"></p></div>
+      <button type="submit" class="btn app-btn app-btn-secondary" data-ac-preview th:text="#{creation.preview}">생성 미리보기</button>
+    </fieldset>
+    <section data-ac-review hidden class="app-creation-review">
+      <h3 th:text="#{creation.preview}">생성 미리보기</h3><pre data-ac-payload class="app-preview-source"></pre>
+      <details data-ac-feedback-detail hidden><summary data-ac-feedback-count></summary><pre class="app-preview-source" data-ac-feedback></pre></details>
+      <label data-ac-consent-label class="app-creation-field"><input type="checkbox" data-ac-consent> <span th:text="#{creation.costConsent}"></span></label>
+      <label class="app-creation-field"><input type="checkbox" data-ac-confirm> <span th:text="#{creation.confirmLabel}"></span></label>
+      <div class="app-editor-actions"><button type="button" class="btn app-btn app-btn-primary" data-ac-create disabled th:text="#{creation.create}">생성</button><button type="button" class="btn app-btn app-btn-secondary" data-ac-stop hidden th:text="#{creation.stop}">현재 항목 후 중단</button></div>
+    </section>
+    <a data-ac-link class="app-back-link" hidden th:text="#{creation.openResult}">생성 결과 보기</a>
+  </form>
+</dialog><script type="module" th:src="@{/js/ai-creation.mjs}"></script>
+</th:block></body></html>

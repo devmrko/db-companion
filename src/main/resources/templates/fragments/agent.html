@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="component(item, label)" class="app-card app-agent-component"
+         th:with="objectKind=${label == 'Supervisor Agent' ? 'AGENT' : #strings.toUpperCase(label)},canEditObject=${label != 'Team' and objectEditable == true}"
+         th:attr="data-component-kind=${label},data-object-kind=${objectKind},data-object-name=${item.name}">
+  <div class="app-card-heading"><h2><span class="app-muted" th:text="${label}"></span> <span th:text="${item.name}"></span></h2><div class="app-history-toolbar">
+    <span class="app-muted" th:if="${item.info != null}" th:text="${item.info.status}"></span>
+    <button th:if="${item.info != null and canEditObject}" type="button" class="btn app-btn app-btn-quiet" data-open-object-history
+            th:attr="data-kind=${objectKind},data-name=${item.name},aria-label=${item.name + #messages.msg('ui.3c14927fdb47')}" th:text="#{ui.e78d03ec8597}">변경 이력</button></div></div>
+  <p th:if="${item.info == null}" class="app-agent-description" th:text="#{ui.0e68bd60002d}">참조된 항목이 없거나 조회 권한이 없습니다.</p>
+  <th:block th:if="${item.info != null}">
+    <p class="app-agent-description app-metadata-text" th:text="${#strings.isEmpty(item.info.description) ? #messages.msg('ui.5f28b8789536') : item.info.description}"></p>
+    <details class="app-agent-details">
+      <summary th:text="#{ui.928d92ff9943}">상세·속성</summary>
+      <dl class="app-detail-list">
+        <div th:if="${item.info.id != null}"><dt>ID</dt><dd th:text="${item.info.id}"></dd></div>
+        <div th:if="${item.info.created != null}"><dt th:text="#{ui.5efd3ddd4584}">생성일</dt><dd th:text="${item.info.created}"></dd></div>
+        <div th:if="${item.info.modified != null}"><dt th:text="#{ui.d3a98476e16a}">수정일</dt><dd th:text="${item.info.modified}"></dd></div>
+      </dl>
+      <div class="table-responsive"><table class="table app-table"><caption class="visually-hidden" th:text="${label} + #{ui.a68cde4c288e}"></caption>
+        <thead><tr><th scope="col" th:text="#{ui.286d43f0f3cf}">속성</th><th scope="col" th:text="#{ui.b19ddf94b4c9}">값</th><th scope="col" th:text="#{ui.d3a98476e16a}">수정일</th><th scope="col" th:if="${(label == 'Team' and teamEditable == true) or canEditObject}"><span class="visually-hidden" th:text="#{ui.87b0acef85a7}">편집</span></th></tr></thead>
+        <tbody><tr th:each="attribute : ${item.attributes}" th:attr="data-attribute=${attribute.name}"><td th:attr="data-team-attribute-name=${label == 'Team' ? attribute.name : null},data-object-attribute-name=${label != 'Team' ? attribute.name : null}"><span th:text="${attribute.name}"></span></td><td class="app-metadata-text" data-attribute-value th:text="${attribute.value}"></td><td th:text="${attribute.modified}"></td>
+          <td th:if="${label == 'Team' and teamEditable == true}"><button type="button" class="btn app-btn app-btn-quiet"
+              th:if="${editableTeamAttributes.contains(attribute.name)}" th:attr="data-edit-team-attribute=${attribute.name},aria-label=${attribute.name + #messages.msg('ui.12b90692ea79')}" th:text="#{ui.87b0acef85a7}">편집</button></td>
+          <td th:if="${canEditObject}"><button type="button" class="btn app-btn app-btn-quiet" th:if="${editableObjectAttributes.get(objectKind).contains(attribute.name)}"
+              th:attr="data-edit-object-attribute=${attribute.name},aria-label=${attribute.name + #messages.msg('ui.12b90692ea79')}" th:text="#{ui.87b0acef85a7}">편집</button></td></tr>
+          <tr th:if="${#lists.isEmpty(item.attributes)}"><td th:colspan="${(label == 'Team' and teamEditable == true) or canEditObject ? 4 : 3}" class="app-empty" th:text="#{ui.d14b7f78faa4}">등록된 속성이 없습니다.</td></tr>
+        </tbody>
+      </table></div>
+    </details>
+  </th:block>
+</section>
+</body></html>

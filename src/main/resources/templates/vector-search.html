@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ui.fee12485ed4c})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content">
+  <div class="app-page-heading"><h1 th:text="#{ui.fee12485ed4c}">벡터 검색</h1>
+    <a th:if="${tableName.isEmpty()}" class="btn app-btn app-btn-secondary" th:href="@{/vector-search(refresh=true)}" th:text="#{ui.8259f9d35351}">새로고침</a>
+    <a th:unless="${tableName.isEmpty()}" class="btn app-btn app-btn-secondary" th:href="@{/vector-search}" th:text="#{ui.020f79b4f086}">← 테이블 목록</a>
+  </div>
+  <div class="app-alert is-error" role="alert" th:if="${schemaError}" th:text="${schemaError}"></div>
+  <div class="app-alert is-error" role="alert" th:if="${loadError}" th:text="${loadError}"></div>
+  <section class="app-card" th:if="${vectorTables != null}" data-vector-list>
+    <div class="app-card-heading"><h2 th:text="${selectedSchema}"></h2></div>
+    <div class="app-table-toolbar"><label for="vector-filter" th:text="#{ui.8c831f621e14}">필터</label><input id="vector-filter" type="search" class="form-control app-table-filter" th:placeholder="#{ui.d68db81c1b13}" data-filter></div>
+    <div class="table-responsive"><table class="table app-table app-summary-table">
+      <caption class="visually-hidden" th:text="#{ui.dc0a08fe23f3}">VECTOR 컬럼이 있는 테이블</caption>
+      <colgroup><col class="app-name-column"><col><col></colgroup>
+      <thead><tr><th th:text="#{ui.a0ab5fe64109}">테이블명</th><th th:text="#{ui.8c3f651d3083}">설명</th><th th:text="#{ui.b397fe866324}">벡터 컬럼</th></tr></thead>
+      <tbody><tr th:each="t : ${vectorTables}" data-vector-row th:attr="data-name=${t.name},data-description=${(t.description ?: '') + ' ' + t.vectorLabel()}">
+        <td><a class="app-table-description" th:href="@{/vector-search(schema=${selectedSchema},table=${t.name})}" th:text="${t.name}" th:title="${t.name}"></a></td>
+        <td><span class="app-table-description" th:text="${t.description ?: '—'}" th:title="${t.description}"></span></td>
+        <td><span class="app-table-description" th:text="${t.vectorLabel()}" th:title="${t.vectorLabel()}"></span></td>
+      </tr><tr data-empty hidden><td colspan="3" class="app-empty" th:text="#{ui.5fb16fbd85cb}">조회된 테이블이 없습니다.</td></tr></tbody>
+    </table></div>
+    <div class="app-pagination"><span data-summary role="status"></span><nav th:aria-label="#{ui.bcddf0642222}"><button type="button" class="btn app-btn app-btn-quiet" data-prev th:text="#{ui.da7e61c67cc5}">이전</button><span data-page></span><button type="button" class="btn app-btn app-btn-quiet" data-next th:text="#{ui.aef613c6612d}">다음</button></nav></div>
+  </section>
+  <section class="app-card app-vector-explorer" th:if="${!tableName.isEmpty() && loadError == null}" data-vector-explorer
+           th:attr="data-schema=${selectedSchema},data-table=${tableName},data-base=@{/vector-search}">
+    <div class="app-card-heading"><h2 class="app-object-title" th:text="${selectedSchema + '.' + tableName}"></h2><button type="button" class="btn app-btn app-btn-quiet" data-options-refresh th:text="#{ui.e643c42d1037}">옵션 새로고침</button></div>
+    <section th:replace="~{fragments/table-row-history :: history}"></section>
+    <p class="app-filter-message" data-status role="status" aria-live="polite" th:text="#{ui.a78c077c81e9}">컬럼 조회 중…</p>
+    <div class="app-alert is-error app-vector-error" data-error role="alert" hidden></div>
+    <form method="post" th:action="@{/vector-search/search}" data-search-form>
+      <fieldset disabled data-fields>
+        <div class="app-table-toolbar app-execution-filters">
+          <div><label for="vector-column" th:text="#{ui.b397fe866324}">벡터 컬럼</label><select id="vector-column" class="form-select app-select" data-vector></select></div>
+          <div><label for="vector-content" th:text="#{ui.d7abf41fbf15}">내용 컬럼</label><select id="vector-content" class="form-select app-select" data-content></select></div>
+          <button class="btn app-btn app-btn-secondary" type="button" data-browse th:text="#{ui.37a90c4753e2}">데이터 조회</button>
+          <button class="app-help-button" type="button" popovertarget="vector-help" th:aria-label="#{ui.1d5cf320c043}">?</button>
+        </div>
+        <div id="vector-help" class="app-help-tooltip" popover="auto" th:text="#{ui.f21f6bcc5480}">벡터를 만든 모델·전처리·거리 방식에 맞춰 선택하세요. 차원이 같아도 모델이 다르면 검색 의미가 달라집니다. 정확 검색은 테이블의 벡터 전체를 비교할 수 있으며, K는 반환 건수입니다. 목록은 500자 미리보기, 상세는 필드당 최대 100,000자입니다. 일반 조회는 ROWID 순서이며 생성일 순서가 아닙니다.</div>
+        <div class="app-vector-options">
+          <div><label for="embedding-provider" th:text="#{ui.82d224c31360}">임베딩 방식</label><select id="embedding-provider" class="form-select app-select" data-provider>
+            <option value="" th:text="#{ui.8d1a750c9351}">선택</option><option value="database" th:text="#{ui.162ad573d623}">DB 모델</option><option value="ocigenai">OCI Generative AI</option><option value="cohere">Cohere</option><option value="openai">OpenAI</option>
+          </select></div>
+          <div data-db-option hidden><label for="embedding-db-model" th:text="#{ui.1da2d9e66ea6}">DB 임베딩 모델</label><select id="embedding-db-model" class="form-select app-select" data-db-model></select></div>
+          <div data-remote-option hidden>
+            <div class="app-model-label"><label id="embedding-model-label" for="embedding-model" data-model-label th:text="#{ui.5b865c0957ee}">임베딩 모델</label><button type="button" class="app-help-button" data-oci-option data-public-model-help hidden popovertarget="embedding-public-model-help" aria-controls="embedding-public-model-help" aria-expanded="false" th:aria-label="#{vector.public.helpLabel}">?</button><a class="app-model-source" data-public-model-source hidden target="_blank" rel="noopener noreferrer" th:text="#{vector.public.modelDoc}">모델 문서</a></div>
+            <select id="embedding-public-model" class="form-select app-select" data-public-model aria-labelledby="embedding-model-label" hidden></select>
+            <input id="embedding-model" class="form-control" list="embedding-examples" data-model aria-labelledby="embedding-model-label" autocomplete="off" maxlength="255"><datalist id="embedding-examples"></datalist>
+          </div>
+          <div data-remote-option hidden><label for="embedding-credential">Credential <button type="button" class="app-help-button" popovertarget="credential-help" th:aria-label="#{ui.8bf4241e49ad}">?</button></label><select id="embedding-credential" class="form-select app-select" data-credential></select></div>
+          <div data-oci-option hidden>
+            <div class="app-model-label"><label id="embedding-region-label" for="embedding-region-select" th:text="#{ui.ef2db501299d}">OCI 리전</label><button type="button" class="app-help-button" data-region-help popovertarget="embedding-region-help" aria-controls="embedding-region-help" aria-expanded="false" th:aria-label="#{vector.region.helpLabel}">?</button></div>
+            <select id="embedding-region-select" class="form-select app-select" data-region-select aria-labelledby="embedding-region-label"></select>
+            <input id="embedding-region" class="form-control" data-region maxlength="64" autocomplete="off" aria-labelledby="embedding-region-label" th:placeholder="#{vector.region.identifier}" hidden>
+          </div>
+          <div data-input-option hidden><label for="embedding-input-type">input_type <button type="button" class="app-help-button" popovertarget="embedding-input-type-help" aria-controls="embedding-input-type-help" aria-expanded="false" data-input-type-help th:aria-label="#{vector.inputType.helpLabel}">?</button></label><select id="embedding-input-type" class="form-select app-select" data-input-type>
+            <option value="" th:text="#{ui.2744c0cc666e}">제공자 기본값</option><option value="search_query">search_query</option><option value="search_document">search_document</option><option value="classification">classification</option><option value="clustering">clustering</option>
+          </select></div>
+          <div><label for="vector-metric" th:text="#{ui.52aa4878cc58}">거리 방식</label><select id="vector-metric" class="form-select app-select" data-metric>
+            <option value="" th:text="#{ui.8d1a750c9351}">선택</option><option>COSINE</option><option>EUCLIDEAN</option><option>EUCLIDEAN_SQUARED</option><option>DOT</option><option>MANHATTAN</option><option>HAMMING</option><option>JACCARD</option>
+          </select></div>
+          <div><label for="vector-k">K</label><input id="vector-k" class="form-control" type="number" min="1" max="100" value="10" required data-k></div>
+        </div>
+        <div id="embedding-public-model-help" class="app-help-tooltip" popover="auto" role="tooltip">
+          <p th:text="#{vector.public.help}"></p>
+          <p data-public-catalog-date></p><a data-public-catalog-source target="_blank" rel="noopener noreferrer" th:text="#{vector.public.source}">Oracle 공개 모델 목록</a>
+        </div>
+        <div id="embedding-region-help" class="app-help-tooltip" popover="auto" role="tooltip">
+          <p th:text="#{vector.region.help}"></p>
+          <p data-region-date></p><a data-region-source target="_blank" rel="noopener noreferrer" th:text="#{vector.region.source}">Oracle 리전 목록</a>
+        </div>
+        <div id="embedding-input-type-help" class="app-help-tooltip" popover="auto" role="tooltip">
+          <dl class="mb-0">
+            <dt>search_query</dt><dd th:text="#{vector.inputType.searchQuery}">검색하는 사람의 질문·검색어</dd>
+            <dt>search_document</dt><dd th:text="#{vector.inputType.searchDocument}">검색 대상이 될 문서·예제를 저장할 때</dd>
+            <dt>classification</dt><dd th:text="#{vector.inputType.classification}">분류에 사용할 벡터</dd>
+            <dt>clustering</dt><dd class="mb-0" th:text="#{vector.inputType.clustering}">비슷한 내용끼리 묶는 데 사용할 벡터</dd>
+          </dl>
+        </div>
+        <div id="credential-help" class="app-help-tooltip" popover="auto" th:text="#{ui.a1b16fa849f3}">로그인 계정의 활성 Credential입니다. 외부 임베딩에는 DBMS_VECTOR용 인증 형식과 DB 네트워크 권한이 필요합니다. Select AI에서 사용 중인 Credential이라도 이 API와 호환된다고 보장할 수 없습니다. 키·비밀번호 조회, Credential 생성, 권한 부여는 하지 않습니다.</div>
+        <p class="app-filter-message" data-option-message hidden></p>
+        <div class="app-vector-query"><label for="vector-question" th:text="#{ui.bda397fc5b2a}">검색어</label><textarea id="vector-question" class="form-control" rows="3" maxlength="4000" data-question></textarea>
+          <label data-remote-option class="app-vector-consent" hidden><input type="checkbox" data-consent> <th:block th:text="#{ui.5c2d0f240ee4}">입력한 검색어를 선택한 외부 제공자에 전송하며 API 사용량이 발생할 수 있음을 확인했습니다.</th:block></label>
+          <div><button class="btn app-btn app-btn-primary" type="submit" data-search th:text="#{ui.60a4d745e86b}">Top-K 검색</button><span class="app-muted" th:text="#{ui.ea3e8d832db3}">정확 검색</span></div>
+        </div>
+      </fieldset>
+    </form>
+    <section data-results hidden>
+      <div class="app-card-heading"><h2 data-result-title th:text="#{ui.0ca01a7d3942}">조회 결과</h2></div>
+      <div class="table-responsive"><table class="table app-table app-summary-table app-vector-results"><caption class="visually-hidden" th:text="#{ui.e10a45fc070f}">벡터 테이블 조회 결과</caption><colgroup><col class="app-vector-rank"><col><col class="app-vector-shape"><col class="app-vector-distance"></colgroup><thead><tr><th th:text="#{ui.ef711cfc7674}">순서</th><th data-content-title th:text="#{ui.cb0f24046b50}">내용</th><th th:text="#{ui.056dadac25cf}">벡터</th><th th:text="#{ui.51e49276d394}">거리</th></tr></thead><tbody data-rows></tbody></table></div>
+      <div class="app-pagination"><span data-result-summary></span><nav th:aria-label="#{ui.8548318012b9}"><button type="button" class="btn app-btn app-btn-quiet" data-result-prev th:text="#{ui.da7e61c67cc5}">이전</button><span data-result-page></span><button type="button" class="btn app-btn app-btn-quiet" data-result-next th:text="#{ui.aef613c6612d}">다음</button></nav></div>
+    </section>
+    <dialog class="app-preview-dialog" data-detail aria-labelledby="vector-detail-title"><div class="app-preview-header"><h2 id="vector-detail-title" th:text="#{ui.e9548500167d}">행 상세</h2><button type="button" class="btn app-btn app-btn-quiet" data-close autofocus th:text="#{ui.1e8c10206f5b}">닫기</button></div><div class="app-preview-body" data-detail-body></div></dialog>
+  </section>
+</main></div><script type="module" th:src="@{/js/vector-search.mjs}"></script><script type="module" th:src="@{/js/table-row-history.mjs}"></script></body></html>

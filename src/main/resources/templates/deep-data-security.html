@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Deep Data Security')}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content">
+  <div class="app-page-heading"><h1>Deep Data Security</h1>
+    <details class="app-dds-help"><summary aria-label="Deep Data Security ?">?</summary><div th:text="#{dds.help}"></div></details>
+  </div>
+  <p class="app-alert is-error" th:if="${schemaError}" th:text="${schemaError}"></p>
+  <section data-dds th:attr="data-schema=${selectedSchema},data-base=@{/db/security}">
+    <nav class="app-dds-tabs" th:aria-label="#{dds.sections}">
+      <button type="button" data-dds-tab="roles" aria-pressed="true" th:text="#{dds.roles}">역할</button>
+      <button type="button" data-dds-tab="assignments" aria-pressed="false" th:text="#{dds.assignments}">역할 부여</button>
+      <button type="button" data-dds-tab="grants" aria-pressed="false">Data Grant</button>
+      <button type="button" data-dds-tab="applications" aria-pressed="false" th:text="#{dds.applications}">애플리케이션 매핑</button>
+    </nav>
+    <div class="app-card">
+      <div class="app-dds-toolbar">
+        <span class="app-filter-message" data-dds-scope></span>
+        <label class="visually-hidden" for="dds-filter" th:text="#{dds.filter}">이름·값 검색</label>
+        <input class="form-control" id="dds-filter" type="search" data-dds-filter th:placeholder="#{dds.filter}">
+        <button class="btn app-btn app-btn-quiet app-icon-button" type="button" data-dds-refresh th:title="#{ui.8259f9d35351}" th:aria-label="#{ui.8259f9d35351}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg></button>
+      </div>
+      <div class="app-dds-status" role="status" data-dds-status></div>
+      <div class="table-responsive" data-dds-list></div>
+      <div class="app-dds-pages"><span data-dds-count></span><div><button type="button" class="btn app-btn app-btn-quiet" data-dds-prev disabled th:text="#{ui.da7e61c67cc5}">이전</button><span data-dds-page></span><button type="button" class="btn app-btn app-btn-quiet" data-dds-next disabled th:text="#{ui.aef613c6612d}">다음</button></div></div>
+    </div>
+    <section class="app-card app-dds-detail" data-dds-detail aria-live="polite" hidden></section>
+  </section>
+</main></div><script type="module" th:src="@{/js/deep-data-security.mjs}"></script></body></html>

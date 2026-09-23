@@ -1,0 +1,164 @@
+{
+  "functions.nav": [
+    "DB 관리",
+    "DB management",
+    "数据库管理",
+    "DB 管理"
+  ],
+  "functions.title": [
+    "함수",
+    "Functions",
+    "函数",
+    "関数"
+  ],
+  "functions.filter": [
+    "함수명 검색",
+    "Find a function",
+    "搜索函数名",
+    "関数名を検索"
+  ],
+  "functions.choose": [
+    "함수를 선택하세요.",
+    "Select a function.",
+    "请选择函数。",
+    "関数を選択してください。"
+  ],
+  "functions.empty": [
+    "조회된 함수가 없습니다.",
+    "No functions found.",
+    "未找到函数。",
+    "関数が見つかりません。"
+  ],
+  "functions.loadError": [
+    "함수 정보를 조회하지 못했습니다. 조회 권한을 확인해 주세요.",
+    "Could not load function information. Check your read permissions.",
+    "无法读取函数信息。请检查查询权限。",
+    "関数情報を取得できません。参照権限を確認してください。"
+  ],
+  "functions.tooLarge": [
+    "소스가 화면 조회 한도(2,000,000자)를 넘습니다. SQL 도구에서 확인해 주세요.",
+    "Source exceeds the viewer limit (2,000,000 characters). Use a SQL tool to inspect it.",
+    "源码超过查看器限制（2,000,000 个字符）。请使用 SQL 工具查看。",
+    "ソースが表示上限（2,000,000 文字）を超えています。SQL ツールで確認してください。"
+  ],
+  "functions.source": [
+    "소스",
+    "Source",
+    "源码",
+    "ソース"
+  ],
+  "functions.readOnlySource": [
+    "읽기 전용 소스",
+    "Read-only source",
+    "只读源码",
+    "読み取り専用ソース"
+  ],
+  "functions.find": [
+    "소스 검색",
+    "Find in source",
+    "搜索源码",
+    "ソースを検索"
+  ],
+  "functions.wrap": [
+    "줄바꿈",
+    "Wrap lines",
+    "自动换行",
+    "折り返し"
+  ],
+  "functions.copy": [
+    "복사",
+    "Copy",
+    "复制",
+    "コピー"
+  ],
+  "functions.copied": [
+    "복사했습니다.",
+    "Copied.",
+    "已复制。",
+    "コピーしました。"
+  ],
+  "functions.copyError": [
+    "복사하지 못했습니다. 소스를 선택해 복사해 주세요.",
+    "Could not copy. Select the source and copy it manually.",
+    "复制失败。请选择源码并手动复制。",
+    "コピーできません。ソースを選択して手動でコピーしてください。"
+  ],
+  "functions.matches": [
+    "일치 줄 {0} / {1}",
+    "Matching line {0} / {1}",
+    "匹配行 {0} / {1}",
+    "一致する行 {0} / {1}"
+  ],
+  "functions.plain": [
+    "큰 소스는 구문 강조 없이 표시합니다.",
+    "Large sources are shown without syntax highlighting.",
+    "较大的源码不显示语法高亮。",
+    "大きなソースは構文強調なしで表示します。"
+  ],
+  "functions.ddlTime": [
+    "최종 DDL (DB)",
+    "Last DDL (DB)",
+    "最后 DDL（数据库）",
+    "最終 DDL（DB）"
+  ],
+  "functions.arguments": [
+    "인자·반환값",
+    "Arguments & return value",
+    "参数与返回值",
+    "引数・戻り値"
+  ],
+  "functions.argument": [
+    "인자",
+    "Argument",
+    "参数",
+    "引数"
+  ],
+  "functions.type": [
+    "타입",
+    "Type",
+    "类型",
+    "型"
+  ],
+  "functions.default": [
+    "기본값",
+    "Default",
+    "默认值",
+    "デフォルト"
+  ],
+  "functions.return": [
+    "반환값",
+    "Return value",
+    "返回值",
+    "戻り値"
+  ],
+  "functions.yes": [
+    "있음",
+    "Yes",
+    "有",
+    "あり"
+  ],
+  "functions.noArguments": [
+    "인자 정보가 없습니다.",
+    "No argument information.",
+    "无参数信息。",
+    "引数情報はありません。"
+  ],
+  "functions.overload": [
+    "오버로드 {0} · ID {1}",
+    "Overload {0} · ID {1}",
+    "重载 {0} · ID {1}",
+    "オーバーロード {0} · ID {1}"
+  ],
+  "functions.packageSource": [
+    "패키지 전체 명세·본문입니다. 같은 이름의 오버로드는 소스 검색으로 확인하세요.",
+    "Full package specification and body. Use source search to locate overloads with the same name.",
+    "显示完整的包规范和包体。请使用源码搜索查找同名重载。",
+    "パッケージの仕様・本体全体です。同名のオーバーロードはソース検索で確認してください。"
+  ],
+  "functions.open": [
+    "함수 화면에서 보기",
+    "Open in Functions",
+    "在函数页面查看",
+    "関数画面で表示"
+  ]
+}

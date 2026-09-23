@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ui.cf835c698541})}"></head>
+<body class="app-shell">
+<aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+  <main class="app-content">
+    <div class="app-page-heading"><h1 th:text="#{ui.cf835c698541}">AI 실행 이력</h1><a class="btn app-btn app-btn-secondary" th:href="@{/ai-executions(from=${from},to=${to},profile=${profile},question=${question})}" th:text="#{ui.8259f9d35351}">새로고침</a></div>
+    <div class="app-alert is-error" role="alert" th:if="${schemaError}" th:text="${schemaError}"></div>
+    <nav th:replace="~{fragments/execution-tabs :: tabs('conversations')}"></nav>
+    <section class="app-card" data-execution-history th:attr="data-schema=${selectedSchema}">
+      <div class="app-card-heading"><h2><th:block th:text="#{ui.dca5e7d32e68}">저장된 대화</th:block><button type="button" class="app-help-button" data-execution-help popovertarget="conversation-help" aria-controls="conversation-help" aria-expanded="false" th:aria-label="#{ui.16cab682b648}">?</button></h2><span class="app-muted" th:text="${selectedSchema}"></span></div>
+      <div id="conversation-help" class="app-help-tooltip" popover="auto" role="tooltip" th:text="#{ui.1b47c1137620}">대화 ID를 지정해 보관한 질문·응답입니다. 프로필의 conversation=true만 켠 임시 대화는 포함되지 않습니다. 보관 기간이 지나거나 삭제된 기록은 조회되지 않습니다.</div>
+      <form method="get" th:action="@{/ai-executions}" class="app-table-toolbar app-execution-filters">
+        <div><label for="history-from" th:text="#{ui.8f27ff351722}">시작일 (한국 시간)</label><input type="date" class="form-control app-input" id="history-from" name="from" th:value="${from}" required></div>
+        <div><label for="history-to" th:text="#{ui.9e586213e334}">종료일</label><input type="date" class="form-control app-input" id="history-to" name="to" th:value="${to}" required></div>
+        <div><label for="history-profile" th:text="#{ui.c55831fbc2ba}">프로필명</label><input type="search" class="form-control app-input" id="history-profile" name="profile" th:value="${profile}" maxlength="128" th:placeholder="#{ui.acbd1ad21990}"></div>
+        <div class="app-execution-question-filter"><label for="history-question" th:text="#{ui.32729cc3f7b6}">질문</label><input type="search" class="form-control app-input" id="history-question" name="question" th:value="${question}" maxlength="500" th:placeholder="#{ui.acbd1ad21990}"></div>
+        <button type="submit" class="btn app-btn app-btn-secondary" th:text="#{ui.4b8d541ebe6d}">검색</button>
+      </form>
+      <div class="app-alert is-error app-execution-error" role="alert" th:if="${loadError}" th:text="${loadError}"></div>
+      <th:block th:if="${history != null}">
+        <div class="table-responsive"><table class="table app-table app-summary-table app-execution-table">
+          <caption class="visually-hidden" th:text="#{ui.d1232f747972}">질문·응답 실행 이력</caption>
+          <colgroup><col class="app-execution-date"><col class="app-execution-profile"><col class="app-execution-action"><col></colgroup>
+          <thead><tr><th scope="col" th:text="#{ui.ed5e184f5148}">일시</th><th scope="col" th:text="#{ui.4a7849864c3b}">프로필</th><th scope="col" th:text="#{ui.01dfd369cfa7}">작업</th><th scope="col" th:text="#{ui.32729cc3f7b6}">질문</th></tr></thead>
+          <tbody><tr th:each="item : ${history.items}">
+            <td th:text="${item.created}"></td>
+            <td><span class="app-table-description" th:text="${item.profile ?: '—'}" th:title="${item.profile}"></span></td>
+            <td th:text="${item.action}"></td>
+            <td><button type="button" class="app-inline-link app-table-description app-execution-open" th:attr="data-execution-id=${item.id}" th:text="${item.preview == null || item.preview.isBlank() ? #messages.msg('ui.bc63a54b1812') : item.preview}" th:title="${item.preview}"></button></td>
+          </tr><tr th:if="${#lists.isEmpty(history.items)}"><td colspan="4" class="app-empty" th:text="#{ui.b1ab48542be7}">조회된 기록이 없습니다.</td></tr></tbody>
+        </table></div>
+        <div class="app-pagination"><span th:text="${#lists.size(history.items)} + #{ui.f5fd44f22ad3}"></span><nav th:aria-label="#{ui.5162df1a0000}">
+          <a th:if="${history.number > 1}" class="btn app-btn app-btn-secondary" th:href="@{/ai-executions(from=${from},to=${to},profile=${profile},question=${question},page=${history.number - 1})}" th:text="#{ui.da7e61c67cc5}">이전</a>
+          <button th:unless="${history.number > 1}" class="btn app-btn app-btn-secondary" disabled th:text="#{ui.da7e61c67cc5}">이전</button>
+          <span th:text="${history.number} + #{ui.841171b1338d}"></span>
+          <a th:if="${history.hasNext && history.number < 1000}" class="btn app-btn app-btn-secondary" th:href="@{/ai-executions(from=${from},to=${to},profile=${profile},question=${question},page=${history.number + 1})}" th:text="#{ui.aef613c6612d}">다음</a>
+          <button th:unless="${history.hasNext && history.number < 1000}" class="btn app-btn app-btn-secondary" disabled th:text="#{ui.aef613c6612d}">다음</button>
+        </nav></div>
+        <p class="app-filter-message" th:if="${history.hasNext && history.number == 1000}" th:text="#{ui.69bc5101e4c3}">더 이전 기록은 기간이나 검색 조건을 좁혀 조회해 주세요.</p>
+      </th:block>
+      <dialog class="app-preview-dialog app-execution-dialog" data-execution-dialog aria-labelledby="execution-detail-title">
+        <header class="app-preview-header"><h2 id="execution-detail-title" th:text="#{ui.e3ea1373abf1}">질문·응답 상세</h2><button class="btn app-btn app-btn-quiet" type="button" data-execution-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+        <div class="app-execution-body"><p role="status" data-execution-message></p><div data-execution-detail hidden>
+          <dl class="app-detail-list" data-execution-summary></dl>
+          <section class="app-execution-content"><h3 th:text="#{ui.32729cc3f7b6}">질문</h3><pre data-execution-prompt></pre></section>
+          <section class="app-execution-content"><h3 th:text="#{ui.3042803f7f90}">응답</h3><pre data-execution-response></pre></section>
+          <details class="app-agent-details"><summary th:text="#{ui.4872798d3ae7}">접속·대화 정보</summary><dl class="app-detail-list" data-execution-metadata></dl></details>
+        </div></div>
+      </dialog>
+    </section>
+  </main>
+</div><script type="module" th:src="@{/js/execution-history.mjs}"></script></body></html>

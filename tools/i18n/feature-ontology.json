@@ -1,0 +1,434 @@
+{
+  "ontology.cacheHint": [
+    "목록 조회 제한은 30초입니다. 테이블 목록·코멘트는 로그인 세션에 보관하며, 이 화면의 새로고침 버튼으로 다시 읽습니다. 저장한 정의는 별도로 갱신합니다.",
+    "List reads have a 30-second limit. Table names and comments are cached for this login session; use this page's refresh button to reload them. Saved definitions are updated separately.",
+    "列表查询限时30秒。表名和注释缓存在当前登录会话中；使用此页面的刷新按钮重新读取。已保存的定义单独更新。",
+    "一覧の取得制限は30秒です。テーブル名とコメントはログインセッションに保持され、この画面の更新ボタンで再取得します。保存した定義は別途更新します。"
+  ],
+  "ontology.title": [
+    "온톨로지",
+    "Ontology",
+    "本体",
+    "オントロジー"
+  ],
+  "ontology.help": [
+    "선택 스키마의 DBC_ONTOLOGY_CATALOG에 정의와 버전을 JSON으로 저장합니다. 원본 코멘트·업무 데이터는 변경하지 않습니다. 기본 AI 초안은 메타데이터만 사용하며, AI 정의 마법사는 별도 동의 후 선택 컬럼의 표본을 조회하고 전송합니다. 민감도 미확인은 안전을 뜻하지 않습니다. RDF는 저장된 정의를 표현하며 DB 그래프 생성이나 추론은 아닙니다. 버전은 앱 저장 이력이며 외부 변경 감사가 아닙니다.",
+    "Definitions and versions are stored as JSON in DBC_ONTOLOGY_CATALOG. Source comments and business data remain unchanged. Basic AI drafts use metadata only; the definition wizard reads and sends selected samples after separate consent. Unknown sensitivity does not mean safe. RDF represents saved definitions, not database graph creation or inference. Versions record app saves, not external auditing.",
+    "定义和版本以JSON存入DBC_ONTOLOGY_CATALOG。不修改原始注释或业务数据。基本AI草稿仅使用元数据；定义向导在单独同意后读取并发送所选样本。敏感性未知不代表安全。RDF表达已保存的定义，不创建数据库图或推理。版本记录应用保存，不审计外部修改。",
+    "定義と版をDBC_ONTOLOGY_CATALOGにJSONで保存します。元のコメント・業務データは変更しません。基本AI草案はメタデータのみ使用し、定義ウィザードは別途同意後に選択標本を読み取り送信します。機密区分の未確認は安全を意味しません。RDFは保存済み定義を表現し、DBグラフ作成や推論ではありません。版はアプリ保存履歴で外部監査ではありません。"
+  ],
+  "ontology.install": [
+    "관리 테이블 생성",
+    "Create catalog table",
+    "创建管理表",
+    "管理テーブル作成"
+  ],
+  "ontology.READY": [
+    "준비됨",
+    "Ready",
+    "就绪",
+    "準備完了"
+  ],
+  "ontology.MISSING": [
+    "관리 테이블 없음",
+    "Catalog not installed",
+    "未安装管理表",
+    "管理テーブル未作成"
+  ],
+  "ontology.UNAVAILABLE": [
+    "저장소를 확인할 수 없습니다. 소유자 계정에서 확인해 주세요.",
+    "Storage not visible. Check with its owner.",
+    "无法查看存储，请使用所有者账户确认。",
+    "保存先を確認できません。所有者で確認してください。"
+  ],
+  "ontology.MISMATCH": [
+    "관리 테이블 구조 불일치",
+    "Catalog structure mismatch",
+    "管理表结构不匹配",
+    "管理テーブル構造不一致"
+  ],
+  "ontology.installConfirm": [
+    "선택 스키마에 관리 테이블 하나를 생성할까요?",
+    "Create one catalog table in this schema?",
+    "在此模式中创建一个管理表？",
+    "このスキーマに管理テーブルを1つ作成しますか？"
+  ],
+  "ontology.sourceTable": [
+    "가져올 테이블 선택",
+    "Select table to import",
+    "选择要导入的表",
+    "取込テーブルを選択"
+  ],
+  "ontology.capture": [
+    "메타데이터 가져오기",
+    "Import metadata",
+    "导入元数据",
+    "メタデータ取込"
+  ],
+  "ontology.captureConfirm": [
+    "메타데이터를 첫 초안으로 저장할까요? 업무 행은 조회하지 않습니다.",
+    "Save metadata as the first draft? Business rows are not queried.",
+    "将元数据保存为初稿？不查询业务行。",
+    "メタデータを初稿として保存しますか？業務行は照会しません。"
+  ],
+  "ontology.search": [
+    "테이블·상태·작성자 검색",
+    "Search table, status or author",
+    "搜索表、状态或作者",
+    "テーブル・状態・作成者を検索"
+  ],
+  "ontology.table": [
+    "테이블",
+    "Table",
+    "表",
+    "テーブル"
+  ],
+  "ontology.column": [
+    "컬럼",
+    "Column",
+    "列",
+    "列"
+  ],
+  "ontology.version": [
+    "버전",
+    "Version",
+    "版本",
+    "版"
+  ],
+  "ontology.versions": [
+    "버전",
+    "Versions",
+    "版本",
+    "版履歴"
+  ],
+  "ontology.state": [
+    "상태",
+    "Status",
+    "状态",
+    "状態"
+  ],
+  "ontology.actor": [
+    "작성자",
+    "Author",
+    "作者",
+    "作成者"
+  ],
+  "ontology.recordedAt": [
+    "저장 시각 (DB)",
+    "Saved at (DB)",
+    "保存时间 (DB)",
+    "保存日時 (DB)"
+  ],
+  "ontology.latest": [
+    "최신 버전",
+    "Latest version",
+    "最新版本",
+    "最新版"
+  ],
+  "ontology.definition": [
+    "정의",
+    "Definition",
+    "定义",
+    "定義"
+  ],
+  "ontology.columns": [
+    "컬럼",
+    "Columns",
+    "列",
+    "列"
+  ],
+  "ontology.relations": [
+    "관계",
+    "Relationships",
+    "关系",
+    "関係"
+  ],
+  "ontology.field": [
+    "항목",
+    "Field",
+    "字段",
+    "項目"
+  ],
+  "ontology.value": [
+    "값",
+    "Value",
+    "值",
+    "値"
+  ],
+  "ontology.sourceComment": [
+    "원본 코멘트",
+    "Source comment",
+    "原始注释",
+    "元のコメント"
+  ],
+  "ontology.capturedAt": [
+    "수집 시각",
+    "Captured at",
+    "采集时间",
+    "収集日時"
+  ],
+  "ontology.origin": [
+    "정의 작성 방식",
+    "Definition origin",
+    "定义来源",
+    "定義の作成元"
+  ],
+  "ontology.profile": [
+    "AI 프로필",
+    "AI profile",
+    "AI 配置",
+    "AI プロファイル"
+  ],
+  "ontology.concept": [
+    "업무 개념",
+    "Business concept",
+    "业务概念",
+    "業務概念"
+  ],
+  "ontology.description": [
+    "관리 설명",
+    "Managed description",
+    "管理说明",
+    "管理用説明"
+  ],
+  "ontology.type": [
+    "타입",
+    "Type",
+    "类型",
+    "型"
+  ],
+  "ontology.sensitivity": [
+    "민감도",
+    "Sensitivity",
+    "敏感性",
+    "機密区分"
+  ],
+  "ontology.UNKNOWN": [
+    "미확인",
+    "Unknown",
+    "未确认",
+    "未確認"
+  ],
+  "ontology.SENSITIVE": [
+    "민감 · AI 제외",
+    "Sensitive · excluded from AI",
+    "敏感 · 排除 AI",
+    "機密 · AI 対象外"
+  ],
+  "ontology.NON_SENSITIVE": [
+    "비민감 · 사용자 판단",
+    "Non-sensitive · user assessment",
+    "非敏感 · 用户判断",
+    "非機密 · 利用者判断"
+  ],
+  "ontology.key": [
+    "키 이름",
+    "Key name",
+    "键名",
+    "キー名"
+  ],
+  "ontology.sourceColumns": [
+    "원본 컬럼",
+    "Source columns",
+    "源列",
+    "元の列"
+  ],
+  "ontology.target": [
+    "참조 대상",
+    "Reference target",
+    "引用目标",
+    "参照先"
+  ],
+  "ontology.empty": [
+    "등록된 항목이 없습니다.",
+    "No entries.",
+    "无记录。",
+    "登録項目はありません。"
+  ],
+  "ontology.savedVersion": [
+    "저장된 버전 기준 · RDF 미리보기",
+    "Saved version · RDF preview",
+    "已保存版本 · RDF 预览",
+    "保存済みの版 · RDF プレビュー"
+  ],
+  "ontology.download": [
+    "Turtle 다운로드",
+    "Download Turtle",
+    "下载 Turtle",
+    "Turtle ダウンロード"
+  ],
+  "ontology.DRAFT": [
+    "초안",
+    "Draft",
+    "草稿",
+    "下書き"
+  ],
+  "ontology.APPROVED": [
+    "승인",
+    "Approved",
+    "已批准",
+    "承認済み"
+  ],
+  "ontology.save": [
+    "초안 저장",
+    "Save draft",
+    "保存草稿",
+    "下書き保存"
+  ],
+  "ontology.approve": [
+    "승인 저장",
+    "Save and approve",
+    "保存并批准",
+    "承認して保存"
+  ],
+  "ontology.discard": [
+    "저장하지 않은 편집을 버릴까요?",
+    "Discard unsaved edits?",
+    "放弃未保存的修改？",
+    "未保存の編集を破棄しますか？"
+  ],
+  "ontology.ai": [
+    "관계·업무 정의",
+    "Relationships & business meaning",
+    "关系与业务定义",
+    "関係・業務定義"
+  ],
+  "ontology.close": [
+    "닫기",
+    "Close",
+    "关闭",
+    "閉じる"
+  ],
+  "ontology.transmitted": [
+    "전송할 RDF",
+    "RDF to send",
+    "将发送的 RDF",
+    "送信する RDF"
+  ],
+  "ontology.consent": [
+    "위 메타데이터의 외부 전송과 AI 사용량 발생을 확인했습니다.",
+    "I confirm external transmission of this metadata and AI usage charges.",
+    "我确认上述元数据的外部传输和 AI 使用费用。",
+    "上記メタデータの外部送信と AI 利用料金の発生を確認しました。"
+  ],
+  "ontology.aiMetadata": [
+    "저장된 메타데이터만 사용합니다. 전송 내용을 확인해 주세요.",
+    "Uses saved metadata only. Review the payload.",
+    "仅使用已保存元数据，请检查发送内容。",
+    "保存済みメタデータのみ使用します。送信内容を確認してください。"
+  ],
+  "ontology.generate": [
+    "초안 생성",
+    "Generate draft",
+    "生成草稿",
+    "下書き生成"
+  ],
+  "ontology.reviewAi": [
+    "AI 제안입니다. 저장 전 원본과 대조해 주세요.",
+    "AI suggestion. Compare with the source before saving.",
+    "AI 建议，保存前请与原始信息核对。",
+    "AI の提案です。保存前に元の情報と照合してください。"
+  ],
+  "ontology.apply": [
+    "선택 항목을 초안으로 저장",
+    "Save selected items as draft",
+    "将选中项保存为草稿",
+    "選択項目を草案に保存"
+  ],
+  "ontology.invalid": [
+    "입력 항목을 확인해 주세요.",
+    "Check the input fields.",
+    "请检查输入字段。",
+    "入力項目を確認してください。"
+  ],
+  "ontology.mismatch": [
+    "저장소 구조나 정의가 호환되지 않습니다. 자동 변경하지 않습니다.",
+    "Incompatible storage or definition. No automatic changes.",
+    "存储或定义不兼容，不自动更改。",
+    "保存先または定義に互換性がありません。自動変更しません。"
+  ],
+  "ontology.limit": [
+    "메타데이터 크기 한도를 초과했습니다. 내용을 잘라 저장하지 않습니다.",
+    "Metadata limit exceeded. Content is not truncated.",
+    "元数据超出限制，不截断保存。",
+    "メタデータの上限を超えました。切り詰めません。"
+  ],
+  "ontology.aiLimit": [
+    "AI 입력이 64,000자를 초과했습니다. 자동 절단하지 않습니다.",
+    "AI input exceeds 64,000 characters. No automatic truncation.",
+    "AI 输入超过 64,000 字符，不自动截断。",
+    "AI 入力が64,000文字を超えました。自動で切り詰めません。"
+  ],
+  "ontology.aiInvalid": [
+    "AI 응답 형식이나 컬럼을 확인하지 못했습니다. 저장하지 않았습니다.",
+    "Invalid AI response format or columns. Nothing saved.",
+    "AI 响应格式或列信息无效，未保存。",
+    "AI 応答の形式または列情報が不正です。保存していません。"
+  ],
+  "ontology.notReady": [
+    "관리 테이블을 먼저 준비해 주세요.",
+    "Prepare the catalog table first.",
+    "请先准备管理表。",
+    "先に管理テーブルを準備してください。"
+  ],
+  "ontology.ownerRequired": [
+    "관리 테이블 생성은 선택 스키마의 소유자로 로그인해 실행해 주세요.",
+    "Log in as the selected schema owner to create storage.",
+    "请以所选模式所有者登录后创建。",
+    "選択スキーマの所有者でログインして作成してください。"
+  ],
+  "ontology.notFound": [
+    "테이블 또는 저장된 정의를 찾지 못했습니다.",
+    "Table or saved definition not found.",
+    "未找到表或已保存定义。",
+    "テーブルまたは保存済み定義が見つかりません。"
+  ],
+  "ontology.stale": [
+    "버전·선택 정보가 바뀌었거나 요청이 만료되었습니다. 최신 버전을 다시 열어 주세요.",
+    "Version or selection changed, or request expired. Reopen the latest version.",
+    "版本或选择已更改，或请求过期。请重新打开最新版本。",
+    "版・選択が変わったか期限切れです。最新版を開き直してください。"
+  ],
+  "ontology.verifyFailed": [
+    "저장값 대조가 일치하지 않아 트랜잭션을 중단했습니다.",
+    "Saved values did not match; transaction aborted.",
+    "保存值不一致，事务已中止。",
+    "保存値が一致せずトランザクションを中止しました。"
+  ],
+  "ontology.confirmRequired": [
+    "생성 확인이 필요합니다.",
+    "Creation confirmation is required.",
+    "需要确认创建。",
+    "作成の確認が必要です。"
+  ],
+  "ontology.chooseProfile": [
+    "AI 도우미 설정에서 프로필을 먼저 선택해 주세요.",
+    "Select a profile in AI assistant settings first.",
+    "请先在 AI 助手设置中选择配置。",
+    "AI アシスタント設定でプロファイルを選択してください。"
+  ],
+  "ontology.loadError": [
+    "온톨로지 조회 오류",
+    "Ontology query error",
+    "本体查询错误",
+    "オントロジー照会エラー"
+  ],
+  "ontology.installError": [
+    "생성 결과를 확인해야 합니다. DDL은 남아 있을 수 있으므로 새로고침해 주세요. 자동 재시도하지 않았습니다.",
+    "Verify creation. DDL may persist; refresh before retrying. No automatic retry.",
+    "请确认创建结果。DDL 可能已生效，请先刷新。未自动重试。",
+    "作成結果を確認してください。DDL が残る可能性があります。更新してください。自動再試行なし。"
+  ],
+  "ontology.saveError": [
+    "저장 결과를 확인해야 합니다. 입력을 보관하고 최신 버전을 다시 조회해 주세요. 자동 재시도하지 않았습니다.",
+    "Verify save result. Preserve input and reload the latest version. No automatic retry.",
+    "请确认保存结果，保留输入并重新查询最新版。未自动重试。",
+    "保存結果を確認してください。入力を控えて最新版を再照会してください。自動再試行なし。"
+  ],
+  "ontology.aiError": [
+    "AI 결과를 확인하지 못했습니다. 사용량이 발생했을 수 있으며 자동 재시도하지 않았습니다.",
+    "AI result unavailable. Usage may have occurred; no automatic retry.",
+    "无法确认 AI 结果，可能已产生费用，未自动重试。",
+    "AI 結果を確認できません。料金が発生した可能性があります。自動再試行なし。"
+  ]
+}

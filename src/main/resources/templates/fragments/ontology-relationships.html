@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="relationships" id="ontology-relationships" class="app-card app-relationships" data-on-relationships hidden tabindex="-1" aria-labelledby="ontology-relationships-title">
+  <div class="app-dds-toolbar">
+    <h2 id="ontology-relationships-title" th:text="#{ontology.relationships.title}"></h2>
+    <button type="button" class="btn app-btn app-btn-secondary" data-rel-manual th:text="#{ontology.relationships.manual}"></button>
+    <button type="button" class="btn app-btn app-btn-secondary" data-rel-discover th:text="#{ontology.discovery.title}"></button>
+    <button type="button" class="btn app-btn app-btn-primary" data-rel-graph th:text="#{ontology.pg.title}"></button>
+    <button type="button" class="btn app-btn app-btn-quiet" data-rel-fit th:text="#{ontology.erd.fit}"></button>
+    <button type="button" class="btn app-btn app-btn-quiet" data-rel-focus th:text="#{ontology.erd.focus}"></button>
+    <button type="button" class="btn app-btn app-btn-quiet" data-rel-layout th:text="#{ontology.erd.layout}"></button>
+    <button type="button" class="btn app-btn app-btn-quiet" data-rel-in th:aria-label="#{ontology.erd.zoomIn}">＋</button>
+    <button type="button" class="btn app-btn app-btn-quiet" data-rel-out th:aria-label="#{ontology.erd.zoomOut}">−</button>
+    <output data-rel-zoom class="app-erd-zoom" th:aria-label="#{ontology.erd.zoomLevel}">—</output>
+    <details class="app-dds-help"><summary th:aria-label="#{ontology.relationships.helpTitle}">?</summary><div><p th:text="#{ontology.relationships.help}"></p><p th:text="#{ontology.relationships.legend}"></p></div></details>
+  </div>
+  <p data-rel-result role="status" aria-live="polite" class="app-relationship-result" hidden></p>
+  <p data-rel-message role="status" aria-live="polite" class="app-filter-message"></p>
+  <p data-rel-coverage class="app-filter-message"></p>
+  <details class="app-relationship-isolated"><summary data-rel-isolated-title></summary><p data-rel-isolated></p></details>
+  <div class="app-erd-workspace">
+    <div><div class="app-erd-canvas" data-rel-canvas role="img" th:aria-label="#{ontology.relationships.canvas}"></div></div>
+    <aside class="app-erd-inspector" data-rel-detail></aside>
+  </div>
+  <div class="app-dds-toolbar app-relationship-filters">
+    <input type="search" class="form-control" data-rel-query th:placeholder="#{ontology.relationships.search}" th:aria-label="#{ontology.relationships.search}">
+    <select class="form-select app-select" data-rel-state th:aria-label="#{ontology.relationships.state}">
+      <option value="" th:text="#{ontology.relationships.all}"></option>
+      <option value="FK" th:text="#{ontology.relationships.FK}"></option><option value="CANDIDATE" th:text="#{ontology.relationships.CANDIDATE}"></option>
+      <option value="APPROVED" th:text="#{ontology.relationships.APPROVED}"></option><option value="REJECTED" th:text="#{ontology.relationships.REJECTED}"></option><option value="STALE" th:text="#{ontology.relationships.STALE}"></option>
+    </select>
+  </div>
+  <div class="table-responsive"><table class="table app-table app-relationship-list"><thead><tr><th th:text="#{ontology.relationships.state}" scope="col"></th><th th:text="#{ontology.relationships.connection}" scope="col"></th><th th:text="#{ontology.relationships.name}" scope="col"></th><th th:text="#{ontology.relationships.review}" scope="col"></th></tr></thead><tbody data-rel-rows></tbody></table></div>
+  <div class="app-dds-pages"><span data-rel-page></span><div><button type="button" class="btn app-btn app-btn-quiet" data-rel-prev th:text="#{ui.da7e61c67cc5}"></button><button type="button" class="btn app-btn app-btn-quiet" data-rel-next th:text="#{ui.aef613c6612d}"></button></div></div>
+</section>
+</body></html>

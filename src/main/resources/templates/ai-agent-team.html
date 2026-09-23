@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ui.fa818cd7852a})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+  <main class="app-content">
+    <a class="app-back-link" th:href="@{/ai-agents}" th:text="#{ui.cd637234ce24}">← Team 목록</a>
+    <div class="app-page-heading"><h1 class="app-object-title" th:text="${teamName}"></h1><div class="app-history-toolbar">
+      <button th:if="${teamPage != null and teamEditable == true}" type="button" class="btn app-btn app-btn-secondary" data-open-team-history th:text="#{ui.e78d03ec8597}">변경 이력</button>
+      <button th:if="${teamPage != null and teamEditable == true}" type="button" class="btn app-btn app-btn-secondary" data-ai-create="TEAM" th:attr="data-source=${teamName}" th:text="#{creation.clone}">복제</button>
+      <a class="btn app-btn app-btn-secondary" th:href="@{/ai-agents/team(schema=${targetSchema},team=${teamName})}" th:text="#{ui.8259f9d35351}">새로고침</a></div></div>
+    <div class="app-alert is-error" role="alert" th:if="${loadError}" th:text="${loadError}"></div>
+    <th:block th:if="${teamPage != null}">
+      <section th:replace="~{fragments/agent :: component(${teamPage.team}, 'Team')}"></section>
+      <h2 class="app-section-title">Agent</h2>
+      <p class="app-muted" th:if="${#lists.isEmpty(teamPage.agents)}" th:text="#{ui.e5a2e0e78c05}">연결된 Agent가 없습니다.</p>
+      <th:block th:each="agent : ${teamPage.agents}"><section th:replace="~{fragments/agent :: component(${agent}, ${agent.name == teamPage.supervisor ? 'Supervisor Agent' : 'Agent'})}"></section></th:block>
+      <h2 class="app-section-title">Task</h2>
+      <section class="app-card table-responsive"><table class="table app-table"><caption class="visually-hidden" th:text="#{ui.1cbfd0dd558e}">Team의 Agent·Task 연결</caption>
+        <thead><tr><th scope="col">Agent</th><th scope="col" th:text="#{ui.3c729343ac4a}">Task명</th><th scope="col" th:text="#{ui.8c3f651d3083}">설명</th></tr></thead>
+        <tbody><tr th:each="task : ${teamPage.tasks}"><td th:text="${task.agent}"></td>
+          <td><a th:if="${task.info != null}" th:href="@{/ai-agents/task(schema=${targetSchema},team=${teamName},task=${task.name})}" th:text="${task.name}"></a><span th:if="${task.info == null}" th:text="${task.name}"></span></td>
+          <td class="app-metadata-text" th:text="${task.info == null ? #messages.msg('ui.2d93bcd4cfeb') : task.info.description}"></td></tr>
+          <tr th:if="${#lists.isEmpty(teamPage.tasks)}"><td colspan="3" class="app-empty" th:text="#{ui.1919ade21a59}">연결된 Task가 없습니다.</td></tr>
+        </tbody>
+      </table></section>
+    </th:block>
+  </main>
+</div><th:block th:replace="~{fragments/catalog-preview :: modal}"></th:block>
+<th:block th:if="${teamPage != null and teamEditable == true}"><th:block th:replace="~{fragments/team-editor :: editor}"></th:block><th:block th:replace="~{fragments/team-history :: history}"></th:block></th:block>
+<th:block th:if="${teamPage != null and objectEditable == true}"><th:block th:replace="~{fragments/object-editor :: editor}"></th:block><th:block th:replace="~{fragments/object-history :: history}"></th:block></th:block>
+<th:block th:if="${teamPage != null and teamEditable == true}"><th:block th:replace="~{fragments/ai-creation :: dialog}"></th:block></th:block>
+<script type="module" th:src="@{/js/team-editor.mjs}"></script><script type="module" th:src="@{/js/object-editor.mjs}"></script></body></html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
+<dialog th:fragment="editor" class="app-preview-dialog" aria-labelledby="team-editor-title" data-team-editor
+        th:attr="data-schema=${targetSchema},data-team=${teamName},data-url=@{/ai-agents/team/attribute}">
+  <header class="app-preview-header"><h2 id="team-editor-title" th:text="#{ui.d9aa78bb3679}">Team 속성 편집</h2><button type="button" class="btn app-btn app-btn-quiet" data-te-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+  <form class="app-editor-form" data-te-form>
+    <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-te-csrf>
+    <p class="app-muted" data-te-object></p>
+    <p class="app-alert" role="status" aria-live="polite" data-te-message hidden></p>
+    <fieldset data-te-fields disabled>
+      <div class="app-profile-field-label"><label for="team-attribute-value" data-te-label th:text="#{ui.b19ddf94b4c9}">값</label><span data-te-help></span></div>
+      <div data-te-control></div>
+      <details class="app-profile-json-editor" data-te-raw><summary th:text="#{ui.7e7265068560}">JSON 직접 편집</summary><textarea class="form-control app-editor-value" id="team-attribute-value" rows="10" spellcheck="false" data-te-value></textarea></details>
+      <div class="app-editor-actions"><button class="btn app-btn app-btn-primary" type="submit" data-te-save disabled th:text="#{ui.5fb926229090}">저장</button></div>
+    </fieldset>
+  </form>
+</dialog>
+</body></html>

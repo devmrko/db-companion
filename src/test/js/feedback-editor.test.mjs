@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {feedbackSaveAllowed} from '../../main/resources/static/js/feedback-editor.mjs';
+test('storage, affirmative confirmation and consent gate save',()=>{const form={historyReady:true};assert.equal(feedbackSaveAllowed(form,false,false,true,true),true);for(const values of [[null,false,false,true,true],[{historyReady:false},false,false,true,true],[form,true,false,true,true],[form,false,true,true,true],[form,false,false,false,true],[form,false,false,true,false]])assert.equal(feedbackSaveAllowed(...values),false);});
+test('one attempt preserves input and errors, never executes response SQL',()=>{const source=readFileSync('src/main/resources/static/js/feedback-editor.mjs','utf8');assert.ok(source.includes('attempted=true'));assert.ok(source.includes("get('sql').readOnly=form.editing"));assert.ok(source.includes("get('confirm').checked=false"));assert.ok(source.includes('creation.uncertain'));assert.doesNotMatch(source,/innerHTML|eval\(|localStorage|sessionStorage|runsql|setInterval|setTimeout/);});
+test('help and errors are translated in four languages',()=>{const entries=JSON.parse(readFileSync('tools/i18n/feature-feedback-edit.json','utf8'));for(const [key,values]of Object.entries(entries)){assert.equal(values.length,4);values.forEach((v,i)=>{assert.ok(v.trim(),key);if(i)assert.doesNotMatch(v,/[가-힣]/u,key);});}});

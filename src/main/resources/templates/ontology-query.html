@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ontology.query.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside><div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content">
+  <div class="app-page-heading"><h1 th:text="#{ontology.query.title}"></h1><details class="app-dds-help"><summary th:aria-label="#{ontology.query.helpTitle}">?</summary><div><p th:text="#{ontology.query.help}"></p><p th:text="#{ontology.query.skos}"></p><p th:text="#{ontology.query.limits}"></p></div></details></div>
+  <section data-ontology-query th:attr="data-schema=${selectedSchema},data-base=@{/ontology-query},data-rdf=@{/ontology/rdf}">
+    <input type="hidden" data-oq-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+    <section class="app-card">
+      <div class="app-dds-toolbar"><strong th:text="${selectedSchema}"></strong><span class="app-filter-message" data-oq-checked></span><button type="button" class="btn app-btn app-btn-quiet app-icon-button" data-oq-refresh th:title="#{ui.8259f9d35351}" th:aria-label="#{ui.8259f9d35351}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg></button><a class="app-link" th:href="@{/ai-assistant}" th:text="#{assistant.title}"></a><button type="button" class="btn app-btn app-btn-quiet" data-oa-open th:text="#{ontology.archive.title}"></button></div>
+      <form data-oq-form class="app-query-form">
+        <label for="oq-question" th:text="#{ontology.query.question}"></label><textarea id="oq-question" class="form-control" rows="3" maxlength="2000" required data-oq-question th:placeholder="#{ontology.query.example}"></textarea>
+        <div class="app-dds-toolbar"><label for="oq-anchor" th:text="#{ontology.query.anchor}"></label><select id="oq-anchor" class="form-select app-select" data-oq-anchor></select><button type="submit" class="btn app-btn app-btn-primary" data-oq-find th:text="#{ontology.query.find}"></button></div>
+      </form>
+      <p role="status" aria-live="polite" data-oq-message></p>
+    </section>
+    <section class="app-card" data-oq-evidence hidden>
+      <div class="app-card-heading"><h2 th:text="#{ontology.query.paths.title}"></h2><span data-oq-selected></span></div>
+      <p class="app-filter-message" data-oq-matches></p>
+      <p class="app-filter-message" data-oq-path-note></p><div data-oq-routes></div>
+      <details class="app-query-alternatives" data-oq-alternatives hidden><summary th:text="#{ontology.query.paths.alternatives}"></summary><div data-oq-other-routes></div></details>
+      <p class="app-filter-message" th:text="#{ontology.query.paths.confirmMeaning}"></p>
+      <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-secondary" data-oq-answer disabled th:text="#{ontology.query.explain}"></button><button type="button" class="btn app-btn app-btn-primary" data-oq-sql disabled th:text="#{ontology.query.makeSql}"></button><button type="button" class="btn app-btn app-btn-quiet" data-oa-preview disabled th:text="#{ontology.archive.preview}"></button></div>
+    </section>
+    <section class="app-card" data-oq-answer-panel hidden><h2 th:text="#{ontology.query.explanation}"></h2><div data-oq-answer-body></div><p class="app-filter-message" data-oq-answer-meta></p></section>
+    <section class="app-card" data-oq-sql-panel hidden>
+      <h2 th:text="#{ontology.query.reviewSql}"></h2><p class="app-filter-message" data-oq-sql-meta></p><pre class="app-preview-source app-query-code" data-oq-sql-text tabindex="0"></pre><p role="status" data-oq-sql-status></p>
+      <label class="app-ontology-consent"><input type="checkbox" data-oq-reviewed><span th:text="#{ontology.query.reviewConsent}"></span></label><button type="button" class="btn app-btn app-btn-primary" data-oq-execute disabled th:text="#{ontology.query.execute}"></button>
+    </section>
+    <section class="app-card" data-oq-result-panel hidden>
+      <h2 th:text="#{ontology.query.result}"></h2><p class="app-filter-message" data-oq-result-meta></p><p role="status" data-oq-result-note></p><div class="app-query-scroll" data-oq-result-table></div>
+      <div class="app-dds-pages"><span data-oq-result-count></span><div><button type="button" class="btn app-btn app-btn-quiet" data-oq-result-prev th:text="#{ui.da7e61c67cc5}"></button><span data-oq-result-page></span><button type="button" class="btn app-btn app-btn-quiet" data-oq-result-next th:text="#{ui.aef613c6612d}"></button></div></div>
+    </section>
+    <dialog class="app-preview-dialog app-ontology-dialog" data-oq-preview aria-labelledby="oq-preview-title">
+      <div class="app-preview-header"><h2 id="oq-preview-title" th:text="#{ontology.query.preview}"></h2><button type="button" class="btn app-btn app-btn-quiet" data-oq-close-preview th:text="#{ontology.close}"></button></div>
+      <p data-oq-profile></p><p class="app-filter-message" data-oq-transmission></p><pre class="app-preview-source" data-oq-payload tabindex="0"></pre>
+      <label class="app-ontology-consent"><input type="checkbox" data-oq-consent><span th:text="#{ontology.consent}"></span></label><p role="status" aria-live="polite" data-oq-preview-status></p><button type="button" class="btn app-btn app-btn-primary" data-oq-generate disabled th:text="#{ontology.query.generate}"></button>
+    </dialog>
+    <dialog class="app-preview-dialog app-ontology-dialog" data-oq-detail aria-labelledby="oq-detail-title">
+      <div class="app-preview-header"><h2 id="oq-detail-title" th:text="#{ontology.query.detail}"></h2><button type="button" class="btn app-btn app-btn-quiet" data-oq-close-detail th:text="#{ontology.close}"></button></div><div data-oq-detail-body></div>
+    </dialog>
+    <dialog class="app-preview-dialog app-ontology-dialog" data-oa-dialog aria-labelledby="oa-title">
+      <div class="app-preview-header"><h2 id="oa-title" th:text="#{ontology.archive.title}"></h2><button type="button" class="btn app-btn app-btn-quiet" data-oa-close th:text="#{ontology.close}"></button></div>
+      <div class="app-dds-toolbar"><span data-oa-status></span><button type="button" class="btn app-btn app-btn-quiet" data-oa-refresh th:text="#{ui.8259f9d35351}"></button><details class="app-dds-help"><summary th:aria-label="#{ontology.query.helpTitle}">?</summary><div><p th:text="#{ontology.archive.help}"></p><p th:text="#{ontology.archive.prerequisites}"></p></div></details></div>
+      <p role="status" aria-live="polite" data-oq-archive-message></p>
+      <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-quiet" data-oa-install hidden th:text="#{ontology.archive.install}"></button><button type="button" class="btn app-btn app-btn-quiet" data-oa-setup hidden th:text="#{ontology.archive.setup}"></button><button type="button" class="btn app-btn app-btn-quiet" data-oa-back hidden th:text="#{ontology.archive.back}"></button></div>
+      <section data-oa-list><div class="app-query-scroll" data-oa-rows></div><div class="app-dds-pages"><span data-oa-page></span><div><button type="button" class="btn app-btn app-btn-quiet" data-oa-prev th:text="#{ui.da7e61c67cc5}"></button><button type="button" class="btn app-btn app-btn-quiet" data-oa-next th:text="#{ui.aef613c6612d}"></button></div></div></section>
+      <section data-oa-review hidden><h3 data-oa-review-title></h3><p data-oa-meta></p><pre class="app-preview-source app-query-code" data-oa-script tabindex="0"></pre><details><summary th:text="#{ontology.archive.payload}"></summary><pre class="app-preview-source" data-oa-json tabindex="0"></pre></details><details data-oa-rdf-section><summary>RDF</summary><pre class="app-preview-source" data-oa-rdf tabindex="0"></pre></details>
+        <label class="app-ontology-consent" data-oa-consent-label><input type="checkbox" data-oa-consent><span data-oa-consent-text></span></label><button type="button" class="btn app-btn app-btn-primary" data-oa-save disabled th:text="#{ontology.archive.save}"></button><button type="button" class="btn app-btn app-btn-quiet" data-oa-read-graph hidden th:text="#{ontology.archive.readGraph}"></button>
+      </section>
+    </dialog>
+  </section>
+</main></div><script type="module" th:src="@{/js/ontology-query.mjs}"></script></body></html>

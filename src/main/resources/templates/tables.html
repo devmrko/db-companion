@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ui.31c660ef0b9a})}"></head>
+<body class="app-shell">
+<aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main">
+  <header th:replace="~{fragments/common :: topbar}"></header>
+  <main class="app-content">
+    <div class="app-page-heading"><h1 th:text="#{ui.31c660ef0b9a}">테이블·컬럼</h1><a class="btn app-btn app-btn-secondary" th:href="@{/tables}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg><th:block th:text="#{ui.8259f9d35351}">새로고침</th:block></a></div>
+    <div class="app-alert is-error" role="alert" th:if="${schemaError}" th:text="${schemaError}"></div>
+    <div class="app-alert is-error" role="alert" th:if="${loadError}" th:text="${loadError}"></div>
+    <section class="app-card" th:if="${loadError == null}" data-table-list th:attr="data-schema=${selectedSchema},data-profiles-url=@{/tables/profiles}">
+      <div class="app-card-heading"><h2><span th:text="${selectedSchema}"></span><span class="app-count" th:text="${#lists.size(tables)} + #{ui.a57ab05712bf}"></span></h2></div>
+      <div class="app-table-toolbar" data-list-controls hidden>
+        <label for="profile-filter" th:text="#{ui.e65249eb5f3c}">Select AI 프로필</label>
+        <select id="profile-filter" class="form-select app-select app-profile-filter" data-profile-filter disabled><option value="" th:text="#{ui.a4b69faf0c11}">전체</option></select>
+        <label for="table-filter" th:text="#{ui.8c831f621e14}">필터</label>
+        <input id="table-filter" class="form-control app-table-filter" type="search" th:placeholder="#{ui.4559ca572093}" autocomplete="off" data-table-filter>
+      </div>
+      <p class="app-filter-message" data-profile-message role="status" hidden></p>
+      <div class="table-responsive">
+        <table class="table app-table app-summary-table">
+          <colgroup><col class="app-name-column"><col></colgroup>
+          <caption class="visually-hidden" th:text="${selectedSchema} + #{ui.ce1888d2310b}"></caption>
+          <thead><tr><th scope="col" th:text="#{ui.a0ab5fe64109}">테이블명</th><th scope="col" th:text="#{ui.8c3f651d3083}">설명</th></tr></thead>
+          <tbody>
+            <tr th:each="table : ${tables}" data-table-row th:attr="data-name=${table.name},data-description=${table.description}">
+              <td><a class="app-table-name" th:href="@{/tables/detail(schema=${selectedSchema},table=${table.name})}" th:title="${table.name}" th:attr="aria-label=${table.name}" th:text="${table.shortName()}"></a></td>
+              <td><span class="app-table-description" tabindex="0" th:title="${table.description}" th:attr="aria-label=${table.description}" th:text="${#strings.isEmpty(table.description) ? '—' : table.description}"></span></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(tables)}"><td colspan="2" class="app-empty" th:text="#{ui.677221da0525}">표시할 테이블이 없습니다.</td></tr>
+            <tr data-filter-empty hidden><td colspan="2" class="app-empty" th:text="#{ui.58726bf27e70}">검색 결과가 없습니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="app-pagination" data-list-controls hidden>
+        <span class="app-muted" data-page-summary role="status" aria-live="polite"></span>
+        <nav th:aria-label="#{ui.b890477adc07}">
+          <button class="btn app-btn app-btn-quiet" type="button" data-page-prev th:text="#{ui.da7e61c67cc5}">이전</button>
+          <span data-page-number></span>
+          <button class="btn app-btn app-btn-quiet" type="button" data-page-next th:text="#{ui.aef613c6612d}">다음</button>
+        </nav>
+      </div>
+    </section>
+  </main>
+</div>
+<script type="module" th:src="@{/js/table-list.mjs}"></script>
+</body></html>

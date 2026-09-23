@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ui.cf835c698541})}"></head>
+<body class="app-shell">
+<aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content" th:with="kind=${q.source.name()}">
+  <div class="app-page-heading"><h1 th:text="#{ui.cf835c698541}">AI 실행 이력</h1>
+    <a class="btn app-btn app-btn-secondary" th:href="@{/ai-executions/sql/sources(source=${kind},match=${q.match},from=${q.from},to=${q.to},sqlId=${q.sqlId},text=${q.text},actor=${q.actor},load=${load},awrAllowed=${awrAllowed},refresh=true,policies=${policies != null})}" th:text="#{ui.8259f9d35351}">새로고침</a>
+  </div>
+  <nav th:replace="~{fragments/execution-tabs :: tabs('sql')}"></nav>
+  <nav th:replace="~{fragments/sql-history-sources :: sources(${kind})}"></nav>
+  <section class="app-card" data-execution-history data-execution-mode="history">
+    <div class="app-card-heading"><h2><span th:text="${#messages.msg('sqlh.' + kind)}"></span>
+      <button type="button" class="app-help-button" data-execution-help popovertarget="sql-source-help" aria-controls="sql-source-help" aria-expanded="false" th:aria-label="#{sqlh.help}">?</button></h2>
+      <span class="app-muted" th:text="${info.username} + #{ui.7a3c79456d33}"></span>
+    </div>
+    <div id="sql-source-help" class="app-help-tooltip app-execution-access-help" popover="auto" role="tooltip">
+      <p th:text="${#messages.msg('sqlh.help.' + kind)}"></p>
+      <p th:text="${#messages.msg('sqlh.access.' + kind)}"></p>
+      <p th:text="#{sqlh.help.common}"></p>
+      <p th:text="#{sqlh.help.match}"></p>
+    </div>
+    <form method="get" th:action="@{/ai-executions/sql/sources}" class="app-table-toolbar app-execution-filters">
+      <input type="hidden" name="source" th:value="${kind}"><input type="hidden" name="load" value="true">
+      <div><label for="sqlh-match" th:text="#{sqlh.match}"></label><select class="form-select app-input" id="sqlh-match" name="match">
+        <option value="all" th:selected="${q.match.name() == 'all'}" th:text="#{sqlh.match.all}"></option>
+        <option value="select_ai" th:selected="${q.match.name() == 'select_ai'}">SELECT AI</option>
+        <option value="generate" th:selected="${q.match.name() == 'generate'}">DBMS_CLOUD_AI.GENERATE</option>
+      </select></div>
+      <div><label for="sqlh-from" th:text="${#messages.msg('sqlh.from.' + (kind == 'audit' ? 'utc' : 'db'))}"></label><input class="form-control app-input" type="date" id="sqlh-from" name="from" th:value="${q.from}" required></div>
+      <div><label for="sqlh-to" th:text="${#messages.msg('sqlh.to.' + (kind == 'audit' ? 'utc' : 'db'))}"></label><input class="form-control app-input" type="date" id="sqlh-to" name="to" th:value="${q.to}" required></div>
+      <div th:unless="${kind == 'audit'}"><label for="sqlh-id">SQL ID</label><input class="form-control app-input" type="search" id="sqlh-id" name="sqlId" th:value="${q.sqlId}" maxlength="13" th:placeholder="#{ui.71b867f31195}"></div>
+      <div th:unless="${kind == 'awr'}"><label for="sqlh-actor" th:text="${#messages.msg('sqlh.actor.' + kind)}"></label><input class="form-control app-input" type="search" id="sqlh-actor" name="actor" th:value="${q.actor}" maxlength="128" th:placeholder="#{ui.71b867f31195}"></div>
+      <div class="app-execution-question-filter"><label for="sqlh-text" th:text="#{ui.bc407b78f233}"></label><input class="form-control app-input" type="search" id="sqlh-text" name="text" th:value="${q.text}" maxlength="500" th:placeholder="#{ui.268bdb05718b}"></div>
+      <label th:if="${kind == 'awr'}" class="app-sql-history-consent"><input type="checkbox" name="awrAllowed" value="true" th:checked="${awrAllowed}" required><span th:text="#{sqlh.awr.allow}"></span></label>
+      <button type="submit" class="btn app-btn app-btn-secondary" th:text="#{ui.4b8d541ebe6d}">검색</button>
+    </form>
+    <div class="app-alert is-error" role="alert" th:if="${inputError}" th:text="${inputError}"></div>
+    <p class="app-muted" th:if="${result == null && inputError == null}" th:text="#{sqlh.start}"></p>
+    <th:block th:if="${result != null}">
+      <div class="app-execution-access">
+        <span class="app-badge app-access-status" role="status" th:attr="data-access=${result.failure == null ? 'available' : (result.failure.code == 1031 ? 'required' : (result.failure.code == 942 ? 'check' : 'unknown'))}" th:text="${result.failure == null ? #messages.msg('ui.ea34d61b41ac') : (result.failure.code == 1031 ? #messages.msg('ui.a5cae5e8d03b') : (result.failure.code == 942 ? #messages.msg('ui.31da696f6e46') : #messages.msg('ui.298859a04696')))}"></span>
+        <span class="app-muted" th:text="#{sqlh.observed} + ' ' + ${result.observed}"></span>
+      </div>
+      <div class="app-alert is-error" role="alert" th:if="${result.failure != null}"><p th:text="#{sqlh.failed}"></p><details><summary th:text="#{ui.a2157e1ed7fc}"></summary><pre th:text="${result.failure.details}"></pre></details></div>
+      <th:block th:if="${result.failure == null}">
+        <div class="table-responsive"><table class="table app-table app-summary-table app-execution-table app-sql-source-table">
+          <thead><tr><th th:text="${#messages.msg('sqlh.time.' + kind)}"></th><th th:unless="${kind == 'audit'}">SQL ID</th><th th:unless="${kind == 'awr'}" th:text="${#messages.msg('sqlh.actor.' + kind)}"></th><th th:text="#{sqlh.kind}"></th><th th:text="${#messages.msg('sqlh.count.' + kind)}"></th><th th:text="#{ui.bc407b78f233}"></th></tr></thead>
+          <tbody><tr th:each="item : ${result.items}">
+            <td th:text="${item.time}"></td><td th:unless="${kind == 'audit'}" class="app-table-name" th:text="${item.sqlId}"></td><td th:unless="${kind == 'awr'}" th:text="${item.actor ?: '—'}"></td><td th:text="${item.kind}"></td><td th:text="${item.count ?: '—'}"></td>
+            <td><button type="button" class="app-inline-link app-table-description app-execution-open" th:attr="data-execution-id=${item.id}" th:text="${item.preview == null || item.preview.isBlank() ? #messages.msg('ui.bc63a54b1812') : item.preview}" th:title="${item.preview}"></button></td>
+          </tr><tr th:if="${#lists.isEmpty(result.items)}"><td th:colspan="${kind == 'cache' ? 6 : 5}" class="app-empty" th:text="#{sqlh.empty}"></td></tr></tbody>
+        </table></div>
+        <div class="app-pagination"><span th:text="${#lists.size(result.items)} + #{ui.f5fd44f22ad3}"></span><nav th:aria-label="#{ui.7a411598c122}">
+          <a th:if="${result.number > 1}" class="btn app-btn app-btn-secondary" th:href="@{/ai-executions/sql/sources(source=${kind},match=${q.match},from=${q.from},to=${q.to},sqlId=${q.sqlId},text=${q.text},actor=${q.actor},page=${result.number - 1},load=true,awrAllowed=${awrAllowed})}" th:text="#{ui.da7e61c67cc5}"></a>
+          <button th:unless="${result.number > 1}" class="btn app-btn app-btn-secondary" disabled th:text="#{ui.da7e61c67cc5}"></button>
+          <span th:text="${result.number} + #{ui.841171b1338d}"></span>
+          <a th:if="${result.hasNext && result.number < 1000}" class="btn app-btn app-btn-secondary" th:href="@{/ai-executions/sql/sources(source=${kind},match=${q.match},from=${q.from},to=${q.to},sqlId=${q.sqlId},text=${q.text},actor=${q.actor},page=${result.number + 1},load=true,awrAllowed=${awrAllowed})}" th:text="#{ui.aef613c6612d}"></a>
+          <button th:unless="${result.hasNext && result.number < 1000}" class="btn app-btn app-btn-secondary" disabled th:text="#{ui.aef613c6612d}"></button>
+        </nav></div>
+        <p class="app-filter-message" th:if="${result.hasNext && result.number == 1000}" th:text="#{ui.c424bdf56eef}"></p>
+      </th:block>
+    </th:block>
+    <section th:if="${kind == 'audit'}" class="app-agent-details">
+      <form method="get" th:action="@{/ai-executions/sql/sources}"><input type="hidden" name="source" value="audit"><input type="hidden" name="policies" value="true">
+        <input type="hidden" name="match" th:value="${q.match}"><input type="hidden" name="from" th:value="${q.from}"><input type="hidden" name="to" th:value="${q.to}"><input type="hidden" name="actor" th:value="${q.actor}"><input type="hidden" name="text" th:value="${q.text}">
+        <button class="btn app-btn app-btn-secondary" type="submit" th:text="#{sqlh.policies}"></button>
+      </form>
+      <th:block th:if="${policies != null}">
+        <p class="app-muted" th:text="#{sqlh.policies.note}"></p>
+        <div th:if="${policies.failure != null}" class="app-alert is-error" role="alert"><p th:text="#{sqlh.policies.failed}"></p><details><summary th:text="#{ui.a2157e1ed7fc}"></summary><pre th:text="${policies.failure.details}"></pre></details></div>
+        <th:block th:if="${policies.failure == null}">
+          <span class="app-muted" th:text="#{sqlh.observed} + ' ' + ${policies.observed}"></span>
+          <p th:if="${#lists.isEmpty(policies.rows)}" th:text="#{sqlh.policies.empty}"></p>
+          <details th:each="row : ${policies.rows}" class="app-agent-details"><summary th:text="${row[0].value} + ' · ' + ${row[8].value ?: '—'}"></summary><dl class="app-detail-list"><div th:each="field : ${row}"><dt th:text="${field.name}"></dt><dd th:text="${field.value ?: '—'}"></dd></div></dl></details>
+          <p th:if="${policies.more}" th:text="#{sqlh.policies.more}"></p>
+        </th:block>
+      </th:block>
+    </section>
+    <dialog class="app-preview-dialog app-execution-dialog" data-execution-dialog aria-labelledby="sqlh-detail-title">
+      <header class="app-preview-header"><h2 id="sqlh-detail-title" th:text="#{ui.6a4bea28cafb}"></h2><button class="btn app-btn app-btn-quiet" type="button" data-execution-close th:text="#{ui.1e8c10206f5b}"></button></header>
+      <div class="app-execution-body"><p role="status" data-execution-message></p><div data-execution-detail hidden>
+        <dl class="app-detail-list" data-execution-summary></dl><section class="app-execution-content"><h3 th:text="#{ui.bc407b78f233}"></h3><pre data-execution-prompt></pre></section>
+        <pre data-execution-response hidden></pre><dl class="app-detail-list" data-execution-metadata></dl>
+      </div></div>
+    </dialog>
+  </section>
+</main></div><script type="module" th:src="@{/js/execution-history.mjs}"></script>
+</body></html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
+<th:block th:fragment="history">
+  <section class="app-history" data-profile-history th:attr="data-schema=${selectedSchema},data-profile=${profileName},data-url=@{/ai-profiles/history}">
+    <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-ph-csrf>
+    <div class="app-history-toolbar"><button type="button" class="btn app-btn app-btn-secondary" data-ph-open th:text="#{ui.e78d03ec8597}">변경 이력</button></div>
+    <dialog class="app-preview-dialog" aria-labelledby="profile-history-title" data-ph-dialog>
+      <header class="app-preview-header"><h2 id="profile-history-title" th:text="${profileName + #messages.msg('ui.3bcb6f249ac7')}"><th:block th:text="#{ui.e78d03ec8597}">변경 이력</th:block></h2><button type="button" class="btn app-btn app-btn-quiet" data-ph-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+      <div class="app-history-content">
+        <div class="app-history-toolbar">
+          <label class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" data-ph-toggle disabled><span th:text="${selectedSchema + #messages.msg('ui.1f5e268e052e')}"></span></label>
+          <button type="button" class="btn app-btn app-btn-quiet" data-ph-state-refresh th:text="#{ui.7e0de4165b8e}">상태 확인</button>
+          <button type="button" class="btn app-btn app-btn-secondary" data-ph-collect disabled th:text="#{ui.24b8a106083a}">이력 새로고침</button>
+          <button type="button" class="btn app-btn app-btn-secondary" data-ph-install hidden th:text="#{ui.604768ed0b76}">공통 이력 준비</button>
+        </div>
+        <p class="app-muted" role="status" data-ph-state></p>
+        <p role="status" aria-live="polite" data-ph-message></p>
+        <div data-ph-comparison></div><div data-ph-entries></div>
+        <div class="app-history-pagination"><button type="button" class="btn app-btn app-btn-quiet" data-ph-prev disabled th:text="#{ui.da7e61c67cc5}">이전</button><span data-ph-page></span><button type="button" class="btn app-btn app-btn-quiet" data-ph-next disabled th:text="#{ui.aef613c6612d}">다음</button></div>
+      </div>
+    </dialog>
+  </section>
+  <script type="module" th:src="@{/js/profile-history.mjs}"></script>
+</th:block>
+</body></html>

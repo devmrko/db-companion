@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ui.6d253673db90})}"></head>
+<body class="app-login-page">
+<header class="app-login-header"><a th:replace="~{fragments/common :: brand}"></a><form th:replace="~{fragments/common :: language}"></form></header>
+<main class="app-login-layout">
+  <section class="app-card app-login-card" aria-labelledby="login-title">
+    <h1 id="login-title" th:text="#{ui.6d253673db90}">로그인</h1><p class="app-muted" th:text="#{ui.2801b1b68e0d}">Oracle DB 계정을 입력하세요.</p>
+    <div class="app-alert is-warning" th:if="${configurationError}"><svg th:replace="~{fragments/common :: icon('info')}"></svg><span th:text="${configurationError}"></span></div>
+    <div class="app-alert is-error" role="alert" th:if="${error}" th:text="${error}"></div>
+    <div class="app-alert" role="status" th:if="${param.logout}" th:text="#{ui.cf315476d56c}">로그아웃되었습니다.</div>
+    <div class="app-alert is-warning" role="alert" th:if="${param.expired}" th:text="#{ui.3029f404ef36}">연결이 종료되었습니다. 다시 로그인해 주세요.</div>
+    <form th:action="@{/login}" method="get" class="app-form mb-3" data-wallet-form>
+      <div><label class="form-label" for="walletId" th:text="#{login.wallet.label}">Wallet</label>
+        <select class="form-select app-select" id="walletId" name="walletId" required aria-describedby="wallet-help" data-wallet-select>
+          <option value="" th:text="#{login.wallet.choose}">Wallet을 선택하세요</option>
+          <option th:each="wallet : ${walletOptions}" th:value="${wallet.id}" th:text="${wallet.name}" th:selected="${wallet.id == selectedWallet}"></option>
+        </select>
+        <p id="wallet-help" class="app-muted mt-2" th:text="#{login.wallet.help}">Wallet을 바꾸면 해당 접속 서비스 목록을 불러오고 계정 입력을 초기화합니다.</p>
+      </div>
+      <button class="btn app-btn app-btn-secondary" type="submit" data-wallet-apply th:text="#{login.wallet.apply}">Wallet 적용</button>
+    </form>
+    <form th:action="@{/login}" method="post" class="app-form" data-login-form>
+      <input type="hidden" name="walletId" th:value="${selectedWallet}">
+      <p class="app-muted" th:if="${selectedWalletName != null}"><span th:text="#{login.wallet.target}">로그인 대상 Wallet</span>: <strong th:text="${selectedWalletName}"></strong></p>
+      <div><label class="form-label" for="tnsAlias" th:text="#{ui.4ef705e92d68}">접속 서비스</label><select class="form-select app-select" id="tnsAlias" name="tnsAlias" aria-describedby="tns-help" required><option value="" th:text="#{ui.ce6d3e789059}">TNS 서비스를 선택하세요</option><option th:each="option : ${tnsOptions}" th:value="${option.alias}" th:text="${option.alias}" th:selected="${option.alias == selectedAlias}"></option></select>
+        <details id="tns-help" class="app-service-help"><summary th:text="#{ui.ad3573e1a8eb}">서비스별 차이</summary><dl><div th:each="option : ${tnsOptions}"><dt th:text="${option.alias}"></dt><dd th:text="${option.description}"></dd></div></dl><p th:text="#{ui.da089bc2641a}">일반 조회에는 LOW를 권장합니다. 병렬도와 동시 실행 한도는 DB 설정에 따라 다릅니다.</p><a href="https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/predefined-database-services-names.html" target="_blank" rel="noopener noreferrer" th:text="#{ui.849d4078a218}">Oracle 문서 ↗</a></details>
+      </div>
+      <div><label class="form-label" for="username" th:text="#{ui.8add9d24a148}">DB 사용자명</label><div class="app-input-wrap"><svg th:replace="~{fragments/common :: icon('user')}"></svg><input class="form-control app-input" id="username" name="username" th:placeholder="#{ui.eb6cb3af3cf7}" autocomplete="username" maxlength="128" required></div></div>
+      <div><label class="form-label" for="password" th:text="#{ui.4fa210a06f9f}">비밀번호</label><div class="app-input-wrap"><svg th:replace="~{fragments/common :: icon('lock')}"></svg><input class="form-control app-input" id="password" name="password" type="password" th:placeholder="#{ui.ba17bdc86bd0}" autocomplete="current-password" maxlength="1024" required></div></div>
+      <button class="btn app-btn app-btn-primary w-100" type="submit" th:disabled="${configurationError != null}" th:text="#{ui.6d253673db90}">로그인</button>
+    </form>
+  </section>
+</main>
+<script type="module" th:src="@{/js/login.mjs}"></script>
+</body></html>

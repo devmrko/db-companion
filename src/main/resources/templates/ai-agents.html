@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Select AI Agent')}"></head>
+<body class="app-shell">
+<aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+  <main class="app-content">
+    <div class="app-page-heading"><h1>Select AI Agent</h1><a class="btn app-btn app-btn-secondary" th:href="@{/ai-agents}" th:text="#{ui.8259f9d35351}">새로고침</a></div>
+    <div class="app-history-toolbar" th:if="${info.username == selectedSchema}"><button th:each="kind : ${ {'TEAM','AGENT','TASK','TOOL'} }" type="button" class="btn app-btn app-btn-secondary" th:attr="data-ai-create=${kind}" th:text="${kind + ' · ' + #messages.msg('creation.create')}"></button></div>
+    <div class="app-alert is-error" role="alert" th:if="${schemaError}" th:text="${schemaError}"></div>
+    <div class="app-alert is-error" role="alert" th:if="${loadError}" th:text="${loadError}"></div>
+    <a class="app-back-link" th:href="@{/ai-agents/objects}" th:text="#{creation.objects}">Agent·Task·Tool 목록</a>
+    <section class="app-card table-responsive" th:if="${teams != null}">
+      <div class="app-card-heading"><h2>Team <span class="app-count" th:text="${#lists.size(teams)} + #{ui.a57ab05712bf}"></span></h2><span class="app-muted" th:text="${selectedSchema}"></span></div>
+      <table class="table app-table"><caption class="visually-hidden" th:text="#{ui.dd945238ec5c}">Team 목록</caption>
+        <thead><tr><th scope="col" th:text="#{ui.560e15361aab}">Team명</th><th scope="col" th:text="#{ui.8c3f651d3083}">설명</th></tr></thead>
+        <tbody><tr th:each="team : ${teams}"><td><a th:href="@{/ai-agents/team(schema=${selectedSchema},team=${team.name})}" th:text="${team.name}"></a></td><td class="app-metadata-text" th:text="${team.description}"></td></tr>
+          <tr th:if="${#lists.isEmpty(teams)}"><td colspan="2" class="app-empty" th:text="#{ui.d7d56bb64671}">등록된 Team이 없습니다.</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</div><th:block th:if="${info.username == selectedSchema}"><th:block th:replace="~{fragments/ai-creation :: dialog}"></th:block></th:block></body></html>

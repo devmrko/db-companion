@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ui.cf835c698541})}"></head>
+<body class="app-shell">
+<aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+  <main class="app-content">
+    <div class="app-page-heading"><h1 th:text="#{ui.cf835c698541}">AI 실행 이력</h1>
+      <a th:unless="${runPage}" class="btn app-btn app-btn-secondary" th:href="@{/ai-executions/agents(from=${from},to=${to},team=${team},state=${state})}" th:text="#{ui.8259f9d35351}">새로고침</a>
+      <a th:if="${runPage}" class="btn app-btn app-btn-secondary" th:href="@{/ai-executions/agents/run(schema=${selectedSchema},runId=${runId},from=${from},to=${to},team=${team},state=${state},page=${query?.page})}" th:text="#{ui.8259f9d35351}">새로고침</a>
+    </div>
+    <nav th:replace="~{fragments/execution-tabs :: tabs('agents')}"></nav>
+    <section class="app-card" data-agent-executions th:attr="data-schema=${selectedSchema},data-run-id=${runId}">
+      <div class="app-card-heading"><h2><th:block th:text="#{ui.575531e24aa6}">Agent 실행</th:block><button type="button" class="app-help-button" data-execution-help popovertarget="agent-execution-help" aria-controls="agent-execution-help" aria-expanded="false" th:aria-label="#{ui.11346d2be223}">?</button></h2><span class="app-muted" th:text="${selectedSchema}"></span></div>
+      <div id="agent-execution-help" class="app-help-tooltip" popover="auto" role="tooltip" th:text="#{ui.20e3948a23e0}">로그인 계정 소유 Team의 실행 기록입니다. 시작일·시각은 DB 기준입니다. 실행을 선택하면 Task별 Agent·입력·결과를 조회합니다. 실행 이력과 대화의 보관 기간은 다를 수 있으며, ADMIN도 이 화면에서는 본인 기록만 조회합니다.</div>
+      <form th:unless="${runPage}" method="get" th:action="@{/ai-executions/agents}" class="app-table-toolbar app-execution-filters">
+        <div><label for="agent-run-from" th:text="#{ui.7c45ff040aaf}">시작일 (DB 기준)</label><input type="date" class="form-control app-input" id="agent-run-from" name="from" th:value="${from}" required></div>
+        <div><label for="agent-run-to" th:text="#{ui.9e586213e334}">종료일</label><input type="date" class="form-control app-input" id="agent-run-to" name="to" th:value="${to}" required></div>
+        <div class="app-execution-question-filter"><label for="agent-run-team" th:text="#{ui.560e15361aab}">Team명</label><input type="search" class="form-control app-input" id="agent-run-team" name="team" th:value="${team}" maxlength="128" th:placeholder="#{ui.acbd1ad21990}"></div>
+        <div><label for="agent-run-state" th:text="#{ui.e10195a1239f}">상태</label><select class="form-select app-select" id="agent-run-state" name="state">
+          <option value="" th:text="#{ui.a4b69faf0c11}">전체</option><option value="RUNNING" th:selected="${state == 'RUNNING'}" th:text="#{ui.1e6771997e8b}">실행 중</option><option value="WAITING_FOR_HUMAN" th:selected="${state == 'WAITING_FOR_HUMAN'}" th:text="#{ui.15be6ee44b15}">입력 대기</option><option value="RESUMING" th:selected="${state == 'RESUMING'}" th:text="#{ui.63b051ba7563}">재개 중</option><option value="SUCCEEDED" th:selected="${state == 'SUCCEEDED'}" th:text="#{ui.727333ab0740}">완료</option><option value="FAILED" th:selected="${state == 'FAILED'}" th:text="#{ui.2743911f83e1}">실패</option>
+        </select></div><button type="submit" class="btn app-btn app-btn-secondary" th:text="#{ui.4b8d541ebe6d}">검색</button>
+      </form>
+      <div th:if="${runPage}" class="app-table-toolbar"><a class="app-inline-link" th:href="@{/ai-executions/agents(from=${from},to=${to},team=${team},state=${state},page=${query?.page})}" th:text="#{ui.6da7868e9e4b}">← 실행 목록</a></div>
+      <div class="app-alert is-error app-execution-error" role="alert" th:if="${loadError}" th:text="${loadError}"></div>
+      <th:block th:if="${runs != null}">
+        <div id="agent-query-help" class="app-help-tooltip" popover="auto" role="tooltip" th:text="#{ui.9a7aade96fb7}">실행의 첫 Task 입력입니다. 목록에는 앞 500자까지 표시하며, 전체 내용은 Task 상세에서 확인할 수 있습니다. 첫 Task 입력은 최초 사용자 질문과 다를 수 있습니다.</div>
+        <div class="table-responsive"><table class="table app-table app-summary-table app-execution-table">
+          <caption class="visually-hidden" th:text="#{ui.e521f37de0b7}">Team 실행 목록</caption>
+          <colgroup><col class="app-execution-date"><col class="app-run-team"><col><col class="app-execution-action"><col class="app-execution-action"></colgroup>
+          <thead><tr><th scope="col" th:text="#{ui.5820f0a91949}">시작일시 (DB)</th><th scope="col">Team</th><th scope="col"><th:block th:text="#{ui.3c18f4df59ae}">질의</th:block><button type="button" class="app-help-button" data-execution-help popovertarget="agent-query-help" aria-controls="agent-query-help" aria-expanded="false" th:aria-label="#{ui.b242f9146a87}">?</button></th><th scope="col" th:text="#{ui.e10195a1239f}">상태</th><th scope="col" th:text="#{ui.3626dceab66b}">소요시간</th></tr></thead>
+          <tbody><tr th:each="item : ${runs.items}">
+            <td th:text="${item.started}"></td><td><a class="app-inline-link app-table-description" th:href="@{/ai-executions/agents/run(schema=${selectedSchema},runId=${item.id},from=${from},to=${to},team=${team},state=${state},page=${runs.number})}" th:text="${item.team}" th:title="${item.team}"></a></td>
+            <td><a class="app-inline-link app-table-description app-run-query" th:href="@{/ai-executions/agents/run(schema=${selectedSchema},runId=${item.id},from=${from},to=${to},team=${team},state=${state},page=${runs.number})}" th:text="${item.preview.display}" th:title="${item.preview.title}"></a></td>
+            <td><span class="app-badge" th:text="${item.stateLabel}" th:title="${item.state}"></span></td><td th:text="${item.duration}"></td>
+          </tr><tr th:if="${#lists.isEmpty(runs.items)}"><td colspan="5" class="app-empty" th:text="#{ui.3d6d799cc248}">조회된 Agent 실행이 없습니다.</td></tr></tbody>
+        </table></div>
+        <div class="app-pagination"><span th:text="${#lists.size(runs.items)} + #{ui.f5fd44f22ad3}"></span><nav th:aria-label="#{ui.2e90bd211e7c}">
+          <a th:if="${runs.number > 1}" class="btn app-btn app-btn-secondary" th:href="@{/ai-executions/agents(from=${from},to=${to},team=${team},state=${state},page=${runs.number - 1})}" th:text="#{ui.da7e61c67cc5}">이전</a><button th:unless="${runs.number > 1}" class="btn app-btn app-btn-secondary" disabled th:text="#{ui.da7e61c67cc5}">이전</button>
+          <span th:text="${runs.number} + #{ui.841171b1338d}"></span>
+          <a th:if="${runs.hasNext && runs.number < 1000}" class="btn app-btn app-btn-secondary" th:href="@{/ai-executions/agents(from=${from},to=${to},team=${team},state=${state},page=${runs.number + 1})}" th:text="#{ui.aef613c6612d}">다음</a><button th:unless="${runs.hasNext && runs.number < 1000}" class="btn app-btn app-btn-secondary" disabled th:text="#{ui.aef613c6612d}">다음</button>
+        </nav></div>
+        <p class="app-filter-message" th:if="${runs.hasNext && runs.number == 1000}" th:text="#{ui.1ceb248849c0}">기간이나 검색 조건을 좁혀 조회해 주세요.</p>
+      </th:block>
+      <th:block th:if="${detail != null}">
+        <dl class="app-detail-list">
+          <div><dt>Team</dt><dd th:text="${detail.run.team}"></dd></div><div><dt th:text="#{ui.e10195a1239f}">상태</dt><dd th:text="${detail.run.stateLabel}" th:title="${detail.run.state}"></dd></div>
+          <div><dt th:text="#{ui.5820f0a91949}">시작일시 (DB)</dt><dd th:text="${detail.run.started}"></dd></div><div><dt th:text="#{ui.6e331c928584}">종료일시 (DB)</dt><dd th:text="${detail.run.ended ?: '—'}"></dd></div>
+          <div><dt th:text="#{ui.3626dceab66b}">소요시간</dt><dd th:text="${detail.run.duration}"></dd></div><div><dt th:text="#{ui.73a91d202958}">실행 ID</dt><dd th:text="${detail.run.id}"></dd></div>
+        </dl>
+        <div class="table-responsive"><table class="table app-table app-summary-table app-execution-table">
+          <caption class="visually-hidden" th:text="#{ui.532a474f91d9}">실행에 속한 Task</caption><colgroup><col class="app-run-order"><col><col><col class="app-execution-action"><col class="app-execution-date"></colgroup>
+          <thead><tr><th scope="col" th:text="#{ui.8576ea403d3e}">순번</th><th scope="col">Task</th><th scope="col">Agent</th><th scope="col" th:text="#{ui.e10195a1239f}">상태</th><th scope="col" th:text="#{ui.5820f0a91949}">시작일시 (DB)</th></tr></thead>
+          <tbody><tr th:each="item : ${detail.tasks.items}">
+            <td th:text="${item.order}"></td><td><button type="button" class="app-inline-link app-table-description app-execution-open" th:attr="data-agent-task=${item.order}" th:text="${item.task ?: #messages.msg('ui.bc63a54b1812')}" th:title="${item.task}"></button></td><td><span class="app-table-description" th:text="${item.agent}" th:title="${item.agent}"></span></td><td th:text="${item.stateLabel}" th:title="${item.state}"></td><td th:text="${item.started}"></td>
+          </tr><tr th:if="${#lists.isEmpty(detail.tasks.items)}"><td colspan="5" class="app-empty" th:text="#{ui.dbce2e7860d7}">조회된 Task 실행이 없습니다.</td></tr></tbody>
+        </table></div>
+        <div class="app-pagination"><span th:text="${#lists.size(detail.tasks.items)} + #{ui.f5fd44f22ad3}"></span><nav th:aria-label="#{ui.4acf50d63eb8}">
+          <a th:if="${detail.tasks.number > 1}" class="btn app-btn app-btn-secondary" th:href="@{/ai-executions/agents/run(schema=${selectedSchema},runId=${runId},from=${from},to=${to},team=${team},state=${state},page=${query.page},taskPage=${detail.tasks.number - 1})}" th:text="#{ui.da7e61c67cc5}">이전</a><button th:unless="${detail.tasks.number > 1}" class="btn app-btn app-btn-secondary" disabled th:text="#{ui.da7e61c67cc5}">이전</button>
+          <span th:text="${detail.tasks.number} + #{ui.841171b1338d}"></span>
+          <a th:if="${detail.tasks.hasNext && detail.tasks.number < 1000}" class="btn app-btn app-btn-secondary" th:href="@{/ai-executions/agents/run(schema=${selectedSchema},runId=${runId},from=${from},to=${to},team=${team},state=${state},page=${query.page},taskPage=${detail.tasks.number + 1})}" th:text="#{ui.aef613c6612d}">다음</a><button th:unless="${detail.tasks.hasNext && detail.tasks.number < 1000}" class="btn app-btn app-btn-secondary" disabled th:text="#{ui.aef613c6612d}">다음</button>
+        </nav></div>
+        <p class="app-filter-message" th:if="${detail.tasks.hasNext && detail.tasks.number == 1000}" th:text="#{ui.5bb03dacb138}">Task 조회는 10,000건까지 제공합니다.</p>
+      </th:block>
+      <dialog class="app-preview-dialog app-execution-dialog" data-agent-dialog aria-labelledby="agent-task-title">
+        <header class="app-preview-header"><h2 id="agent-task-title" th:text="#{ui.f1bdbbfca8b2}">Task 실행 상세</h2><button class="btn app-btn app-btn-quiet" type="button" data-agent-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+        <div class="app-execution-body"><p role="status" data-agent-message></p><div data-agent-detail hidden>
+          <dl class="app-detail-list" data-agent-summary></dl>
+          <section class="app-execution-content"><h3 th:text="#{ui.ad83311ef94f}">입력</h3><pre data-agent-input></pre></section>
+          <section class="app-execution-content"><h3 th:text="#{ui.baa914cf283d}">실행 결과</h3><pre data-agent-result></pre></section>
+          <section class="app-execution-content"><h3><th:block th:text="#{ui.b8febf28efd2}">연결된 대화</th:block><button type="button" class="app-help-button" data-execution-help popovertarget="agent-conversation-help" aria-controls="agent-conversation-help" aria-expanded="false" th:aria-label="#{ui.02b71a21b43a}">?</button></h3>
+            <div id="agent-conversation-help" class="app-help-tooltip" popover="auto" role="tooltip" th:text="#{ui.b47fd3751403}">Task가 참조한 대화 ID의 질문·응답입니다. 같은 대화가 여러 실행에서 재사용되면 다른 Task·실행의 메시지도 포함될 수 있습니다. 해당 Task의 확정된 결과는 위의 실행 결과를 기준으로 확인하세요.</div>
+            <button type="button" class="btn app-btn app-btn-secondary" data-agent-conversations th:text="#{ui.cd3223a9a0f5}">대화 조회</button>
+            <p role="status" data-agent-conversation-message></p><div data-agent-conversation-list></div>
+            <nav class="app-run-message-pages" th:aria-label="#{ui.86758d08735c}" data-agent-conversation-pages hidden><button type="button" class="btn app-btn app-btn-secondary" data-agent-conversation-prev th:text="#{ui.da7e61c67cc5}">이전</button><span data-agent-conversation-page></span><button type="button" class="btn app-btn app-btn-secondary" data-agent-conversation-next th:text="#{ui.aef613c6612d}">다음</button></nav>
+            <p role="status" data-agent-prompt-message></p><div data-agent-prompt-detail hidden><h3 th:text="#{ui.32729cc3f7b6}">질문</h3><pre data-agent-prompt></pre><h3 th:text="#{ui.3042803f7f90}">응답</h3><pre data-agent-response></pre></div>
+          </section>
+        </div></div>
+      </dialog>
+    </section>
+  </main>
+</div><script type="module" th:src="@{/js/agent-executions.mjs}"></script></body></html>

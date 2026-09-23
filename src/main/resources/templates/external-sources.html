@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{external.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content">
+  <div class="app-page-heading"><h1 th:text="#{external.title}"></h1><details class="app-dds-help"><summary th:aria-label="#{external.helpTitle}">?</summary><div th:text="#{external.help}"></div></details></div>
+  <p class="app-alert is-error" th:if="${schemaError}" th:text="${schemaError}"></p>
+  <section data-external th:attr="data-schema=${selectedSchema},data-base=@{/db/external-sources}">
+    <div class="app-dds-tabs" th:aria-label="#{external.kind}">
+      <button type="button" data-external-tab="links" aria-pressed="true">DB Link</button>
+      <button type="button" data-external-tab="tables" aria-pressed="false">External Table</button>
+      <button type="button" data-external-tab="acl" aria-pressed="false">Network ACL</button>
+      <button type="button" data-external-tab="catalogs" aria-pressed="false" th:text="#{catalog.title}"></button>
+    </div>
+    <div class="app-card">
+      <div class="app-dds-toolbar">
+        <strong data-external-scope th:text="${selectedSchema}" th:attr="data-login=${info.username}"></strong>
+        <select class="form-select app-select app-acl-mode" data-external-acl-mode th:aria-label="#{external.aclView}" hidden><option value="schema" th:text="#{external.selectedSchema}"></option><option value="all" th:text="#{external.allAcl}"></option></select>
+        <label class="visually-hidden" for="external-filter" th:text="#{external.filter}"></label>
+        <input class="form-control" id="external-filter" type="search" data-external-filter th:placeholder="#{external.filter}">
+        <button class="btn app-btn app-btn-quiet app-icon-button" type="button" data-external-refresh th:title="#{ui.8259f9d35351}" th:aria-label="#{ui.8259f9d35351}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg></button>
+        <details class="app-dds-help" data-external-acl-help hidden><summary th:aria-label="#{external.aclHelpTitle}">?</summary><div><p th:text="#{external.schemaAclHelp}"></p><pre>SELECT host, lower_port, upper_port, principal, privilege,
+       grant_type, ace_order, start_date, end_date
+FROM dba_host_aces
+ORDER BY host, lower_port, ace_order;
+
+SELECT * FROM user_host_aces;
+
+SELECT grantee, granted_role, default_role
+FROM dba_role_privs
+WHERE grantee IN (:schema_name, 'PUBLIC');</pre></div></details>
+        <details class="app-dds-help" data-external-catalog-help hidden><summary th:aria-label="#{catalog.helpTitle}">?</summary><div><p th:text="#{catalog.help}"></p><pre>SELECT catalog_name, catalog_type, is_enabled
+FROM user_mounted_catalogs
+ORDER BY catalog_name;</pre></div></details>
+      </div>
+      <p class="app-dds-status" role="status" data-external-message></p>
+      <p class="app-dds-status" data-external-capabilities hidden></p>
+      <div data-external-review></div>
+      <div class="table-responsive" data-external-list></div>
+      <div class="app-dds-pages"><span data-external-count></span><div><button type="button" class="btn app-btn app-btn-quiet" data-external-prev disabled th:text="#{ui.da7e61c67cc5}"></button><span data-external-page></span><button type="button" class="btn app-btn app-btn-quiet" data-external-next disabled th:text="#{ui.aef613c6612d}"></button></div></div>
+    </div>
+    <section class="app-card app-dds-detail app-external-detail" data-external-detail aria-live="polite" hidden></section>
+    <input type="hidden" data-catalog-csrf th:value="${_csrf != null ? _csrf.token : ''}" th:attr="data-csrf-header=${_csrf != null ? _csrf.headerName : ''}">
+    <dialog class="app-preview-dialog app-profile-editor-compact" data-catalog-dialog aria-labelledby="catalog-mount-title">
+      <header class="app-preview-header"><h2 id="catalog-mount-title" th:text="#{catalogOps.register}"></h2><button type="button" class="btn app-btn app-btn-quiet" data-catalog-close th:text="#{catalogOps.close}"></button></header>
+      <div class="app-editor-form">
+        <p data-catalog-target></p>
+        <label for="catalog-name" th:text="#{catalog.name}"></label><input id="catalog-name" data-catalog-name class="form-control" maxlength="128" autocomplete="off" spellcheck="false">
+        <details class="app-assistant-help"><summary th:text="#{catalogOps.helpTitle}"></summary><p th:text="#{catalogOps.help}"></p></details>
+        <p role="status" class="app-filter-message" data-catalog-message></p>
+        <pre class="app-preview-source" data-catalog-sql hidden></pre>
+        <div class="app-assistant-actions"><button type="button" class="btn app-btn app-btn-quiet" data-catalog-preview th:text="#{catalogOps.preview}"></button><button type="button" class="btn app-btn app-btn-primary" data-catalog-mount disabled th:text="#{catalogOps.register}"></button></div>
+      </div>
+    </dialog>
+  </section>
+</main></div><script type="module" th:src="@{/js/external-sources.mjs}"></script></body></html>

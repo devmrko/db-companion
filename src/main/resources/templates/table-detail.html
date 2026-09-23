@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ui.e93b4661283e})}"></head>
+<body class="app-shell">
+<aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main">
+  <header th:replace="~{fragments/common :: topbar}"></header>
+  <main class="app-content">
+    <a class="app-back-link" th:href="@{/tables}" th:text="#{ui.076938936706}">← 테이블·컬럼</a>
+    <div class="app-page-heading"><div><p class="app-muted" th:text="${targetSchema}"></p><h1 class="app-object-title" th:text="${targetTable}"></h1></div></div>
+    <div class="app-alert is-error" role="alert" th:if="${loadError}" th:text="${loadError}"></div>
+    <th:block th:if="${detail != null}">
+      <th:block th:replace="~{fragments/metadata-history :: history}"></th:block>
+      <nav class="app-tabs" th:aria-label="#{ui.e93b4661283e}">
+        <a th:href="@{/tables/detail(schema=${targetSchema},table=${targetTable},tab='columns')}" th:classappend="${selectedTab == 'columns'} ? 'is-active'" th:attr="aria-current=${selectedTab == 'columns' ? 'page' : null}" th:text="#{ui.10637724093a}">컬럼</a>
+        <a th:href="@{/tables/detail(schema=${targetSchema},table=${targetTable},tab='comments')}" th:classappend="${selectedTab == 'comments'} ? 'is-active'" th:attr="aria-current=${selectedTab == 'comments' ? 'page' : null}" th:text="#{ui.eed74758dafd}">코멘트</a>
+        <a th:href="@{/tables/detail(schema=${targetSchema},table=${targetTable},tab='annotations')}" th:classappend="${selectedTab == 'annotations'} ? 'is-active'" th:attr="aria-current=${selectedTab == 'annotations' ? 'page' : null}">Annotation</a>
+        <a th:href="@{/tables/detail(schema=${targetSchema},table=${targetTable},tab='constraints')}" th:classappend="${selectedTab == 'constraints'} ? 'is-active'" th:attr="aria-current=${selectedTab == 'constraints' ? 'page' : null}" th:text="#{ui.a24c67380485}">제약조건</a>
+        <a th:href="@{/tables/detail(schema=${targetSchema},table=${targetTable},tab='indexes')}" th:classappend="${selectedTab == 'indexes'} ? 'is-active'" th:attr="aria-current=${selectedTab == 'indexes' ? 'page' : null}" th:text="#{ui.e65f1a080083}">인덱스</a>
+      </nav>
+      <section class="app-card table-responsive" th:if="${selectedTab == 'columns'}">
+        <table class="table app-table app-column-summary"><caption class="visually-hidden" th:text="#{ui.cf5e0267c953}">컬럼 목록</caption>
+          <colgroup><col class="app-position-column"><col class="app-column-name"><col class="app-type-column"><col class="app-null-column"><col></colgroup>
+          <thead><tr><th scope="col" th:text="#{ui.ef711cfc7674}">순서</th><th scope="col" th:text="#{ui.45745ae9594a}">컬럼명</th><th scope="col" th:text="#{ui.2083b6c7cd87}">타입</th><th scope="col" th:text="#{ui.fcc6f59f7afa}">NULL 허용</th><th scope="col" th:text="#{ui.eed74758dafd}">코멘트</th></tr></thead>
+          <tbody><tr th:each="column : ${detail.columns}"><td th:text="${column.position}"></td><td class="app-table-name" th:text="${column.name}"></td><td th:text="${column.dataType}"></td><td th:text="${column.nullable == 'Y' ? #messages.msg('ui.2eb73fba696e') : #messages.msg('ui.9474acc7539b')}"></td><td><span class="app-table-description" tabindex="0" th:title="${column.comment}" th:text="${#strings.isEmpty(column.comment) ? '—' : column.comment}"></span></td></tr>
+            <tr th:if="${#lists.isEmpty(detail.columns)}"><td colspan="5" class="app-empty" th:text="#{ui.8fc405d1e1bb}">표시할 컬럼이 없습니다.</td></tr></tbody>
+        </table>
+      </section>
+      <section th:if="${selectedTab == 'comments'}">
+        <div class="app-card app-comment-card"><div class="app-page-heading"><h2 th:text="#{ui.20da8e5a926b}">테이블 코멘트</h2><button class="btn app-btn app-btn-quiet" type="button" data-edit-metadata="comment" th:text="#{ui.87b0acef85a7}">편집</button></div><p class="app-metadata-text" th:text="${#strings.isEmpty(detail.table.description) ? #messages.msg('ui.1d8cdb11129f') : detail.table.description}"></p></div>
+        <div class="app-card table-responsive"><table class="table app-table"><caption class="visually-hidden" th:text="#{ui.68b25cc721eb}">컬럼 코멘트</caption>
+          <thead><tr><th scope="col" th:text="#{ui.45745ae9594a}">컬럼명</th><th scope="col" th:text="#{ui.eed74758dafd}">코멘트</th><th scope="col" th:text="#{ui.87b0acef85a7}">편집</th></tr></thead>
+          <tbody><tr th:each="column : ${detail.columns}"><td class="app-table-name" th:text="${column.name}"></td><td class="app-metadata-text" th:text="${#strings.isEmpty(column.comment) ? '—' : column.comment}"></td><td><button class="btn app-btn app-btn-quiet" type="button" data-edit-metadata="comment" th:attr="data-column=${column.name},aria-label=${column.name + #messages.msg('ui.18516537c209')}" th:text="#{ui.87b0acef85a7}">편집</button></td></tr>
+            <tr th:if="${#lists.isEmpty(detail.columns)}"><td colspan="3" class="app-empty" th:text="#{ui.8fc405d1e1bb}">표시할 컬럼이 없습니다.</td></tr></tbody>
+        </table></div>
+      </section>
+      <section th:if="${selectedTab == 'annotations'}">
+        <div class="app-editor-actions" th:if="${detail.annotationError == null}"><button class="btn app-btn app-btn-secondary" type="button" data-edit-metadata="annotation" th:text="#{ui.4f4931aae8a1}">Annotation 추가</button></div>
+        <div class="app-alert is-warning" role="alert" th:if="${detail.annotationError}" th:text="${detail.annotationError}"></div>
+        <div class="app-card table-responsive" th:if="${detail.annotationError == null}"><table class="table app-table"><caption class="visually-hidden" th:text="#{ui.44c6e90a531b}">테이블 및 컬럼 Annotation</caption>
+          <thead><tr><th scope="col" th:text="#{ui.8c609debc12c}">대상</th><th scope="col" th:text="#{ui.253d1510caf5}">이름</th><th scope="col" th:text="#{ui.b19ddf94b4c9}">값</th><th scope="col" th:text="#{ui.ef99debb95e8}">상속 도메인</th><th scope="col" th:text="#{ui.87b0acef85a7}">편집</th></tr></thead>
+          <tbody><tr th:each="annotation : ${detail.annotations}"><td th:text="${annotation.column == null ? #messages.msg('ui.3d721f9ac601') : annotation.column}"></td><td th:text="${annotation.name}"></td><td class="app-metadata-text" th:text="${annotation.value == null ? '—' : annotation.value}"></td><td th:text="${annotation.domainName == null ? '—' : annotation.domainOwner + '.' + annotation.domainName}"></td><td><button th:if="${annotation.domainName == null}" class="btn app-btn app-btn-quiet" type="button" data-edit-metadata="annotation" th:attr="data-column=${annotation.column},data-name=${annotation.name},aria-label=${annotation.name + #messages.msg('ui.fa651fcb3c75')}" th:text="#{ui.87b0acef85a7}">편집</button><span class="app-muted" th:if="${annotation.domainName != null}" th:text="#{ui.607c3b63faad}">상속 · 읽기 전용</span></td></tr>
+            <tr th:if="${#lists.isEmpty(detail.annotations)}"><td colspan="5" class="app-empty" th:text="#{ui.05b6a32d0cb4}">등록된 Annotation이 없습니다.</td></tr></tbody>
+        </table></div>
+      </section>
+      <th:block th:if="${selectedTab == 'constraints'}"><section th:replace="~{fragments/table-structure :: constraints(${detail.constraints})}"></section></th:block>
+      <th:block th:if="${selectedTab == 'indexes'}"><section th:replace="~{fragments/table-structure :: indexes(${detail.indexes})}"></section></th:block>
+    </th:block>
+  </main>
+</div>
+<th:block th:if="${detail != null}"><th:block th:replace="~{fragments/metadata-editor :: editor}"></th:block></th:block>
+</body></html>

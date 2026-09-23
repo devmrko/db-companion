@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{aitest.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content" data-ai-test>
+  <div class="app-page-heading"><h1 th:text="#{aitest.title}">Select AI 테스트</h1><a th:href="@{/ai-executions/sql}" th:text="#{aitest.history}">실행 이력</a></div>
+  <section class="app-card app-test-card">
+    <div class="app-card-heading"><h2 th:text="${info.username}"></h2><button type="button" class="btn app-btn app-btn-quiet app-icon-button" data-test-refresh th:title="#{ui.8259f9d35351}" th:aria-label="#{ui.8259f9d35351}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg></button></div>
+    <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-test-csrf>
+    <label for="test-profile" th:text="#{aitest.profile}">프로필</label>
+    <select id="test-profile" class="form-select app-select" data-test-profile disabled></select>
+    <details data-test-details><summary th:text="#{aitest.settings}">프로필 설정</summary><div data-test-attributes></div></details>
+    <label for="test-question" th:text="#{aitest.question}">질문</label>
+    <textarea id="test-question" class="form-control" rows="4" maxlength="16000" data-test-question disabled></textarea>
+    <div class="app-test-evidence">
+      <label class="app-object-toggle"><input type="checkbox" class="form-check-input" data-test-evidence-enabled><span th:text="#{aitest.evEnable}">온톨로지 근거 사용</span></label>
+      <div data-test-evidence-panel hidden>
+        <div class="app-test-evidence-fields">
+          <label><span th:text="#{aitest.evSchema}">근거 스키마</span><select class="form-select app-select" data-test-evidence-schema></select></label>
+          <label><span th:text="#{aitest.evAnchor}">기준 테이블</span><select class="form-select app-select" data-test-evidence-anchor></select></label>
+          <button type="button" class="btn app-btn app-btn-quiet" data-test-evidence-find th:text="#{aitest.evFind}">근거 찾기</button>
+          <button type="button" class="btn app-btn app-btn-quiet app-icon-button" data-test-evidence-refresh th:title="#{ui.8259f9d35351}" th:aria-label="#{ui.8259f9d35351}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg></button>
+        </div>
+        <p class="app-filter-message" data-test-evidence-checked></p>
+        <label data-test-evidence-route-field hidden><span th:text="#{aitest.evChoose}">경로 선택</span><select class="form-select app-select" data-test-evidence-routes></select></label>
+        <div data-test-evidence-selected hidden></div>
+        <p class="app-filter-message" data-test-evidence-hint></p>
+        <details class="app-assistant-help"><summary th:text="#{aitest.evHelpTitle}">온톨로지 근거 ?</summary><p th:text="#{aitest.evHelp}"></p><p th:text="#{aitest.evLimits}"></p></details>
+      </div>
+    </div>
+    <div class="app-assistant-actions">
+      <button type="button" class="btn app-btn app-btn-primary" data-test-sql disabled th:text="#{aitest.sql}">SQL 만들기</button>
+      <button type="button" class="btn app-btn app-btn-quiet" data-test-chat disabled th:text="#{aitest.chat}">대화</button>
+      <button type="button" class="btn app-btn app-btn-quiet" data-test-showprompt disabled th:text="#{aitest.showprompt}">프롬프트 보기</button>
+    </div>
+    <p role="status" aria-live="polite" data-test-message></p>
+    <details class="app-assistant-help"><summary th:text="#{aitest.helpTitle}">테스트 ?</summary><p th:text="#{aitest.help}"></p><p th:text="#{aitest.historyHelp}"></p><p th:text="#{aitest.reviewHelp}"></p></details>
+  </section>
+  <section class="app-card app-test-card app-inspection">
+    <div class="app-card-heading"><h2 th:text="#{inspect.title}">참고정보 · 테이블 / 컬럼 / Feedback</h2><button type="button" class="btn app-btn app-btn-quiet" data-inspect-load disabled th:text="#{inspect.load}">참고정보 조회</button></div>
+    <p class="app-filter-message" th:text="#{inspect.help}"></p>
+    <p role="status" class="app-filter-message" data-inspect-stale></p>
+    <div data-inspect-body hidden></div>
+  </section>
+  <section class="app-card app-test-card" data-test-prompt-result hidden>
+    <div class="app-card-heading"><h2 th:text="#{aitest.showprompt}">프롬프트 보기</h2><button type="button" class="btn app-btn app-btn-primary" data-test-review disabled th:text="#{aitest.review}">AI 검토</button></div>
+    <p class="app-filter-message" data-test-prompt-meta></p><p class="app-filter-message" th:text="#{aitest.reconstructed}"></p>
+    <details><summary th:text="#{aitest.question}">질문</summary><pre class="app-preview-value" data-test-prompt-question></pre></details>
+    <details><summary th:text="#{aitest.evidence}">온톨로지 근거</summary><div data-test-prompt-evidence hidden></div></details>
+    <div data-test-prompt-inspection class="app-inspection"></div><div data-test-prompt-content></div>
+    <p class="app-filter-message" data-test-review-condition></p><a th:href="@{/ai-assistant}" th:text="#{aitest.assistantSettings}">AI 도우미 설정</a>
+  </section>
+  <section class="app-card app-test-card" data-test-review-result hidden>
+    <h2 th:text="#{aitest.review}">AI 검토</h2><p class="app-filter-message" data-test-review-meta></p>
+    <p class="app-filter-message" th:text="#{aitest.advisory}"></p><div class="app-assistant-result" data-test-review-content></div>
+  </section>
+  <section class="app-card app-test-card" data-test-result hidden>
+    <h2 th:text="#{aitest.result}">최근 결과</h2><p class="app-filter-message" data-test-result-meta></p>
+    <details><summary th:text="#{aitest.request}">요청 정보</summary><p class="app-filter-message" data-test-request-id></p><pre class="app-preview-value" data-test-request-question></pre><div data-test-request-evidence hidden></div></details>
+    <div data-test-result-content></div>
+    <div data-test-sql-references class="app-inspection" hidden></div>
+    <button type="button" class="btn app-btn app-btn-primary" data-test-execute hidden th:text="#{aitest.execute}">SQL 실행</button>
+    <p role="status" data-test-execute-message></p>
+    <div data-test-rows></div>
+  </section>
+  <dialog class="app-preview-dialog" data-test-dialog aria-labelledby="test-preview-title">
+    <div class="app-preview-header"><h2 id="test-preview-title" th:text="#{aitest.preview}">전송 확인</h2><button type="button" class="btn app-btn app-btn-quiet" data-test-close th:text="#{aitest.close}">닫기</button></div>
+    <div class="app-preview-body"><p data-test-preview-meta></p><p data-test-transmission th:text="#{aitest.transmission}"></p>
+      <pre class="app-preview-value app-test-prompt" data-test-prompt></pre>
+      <label class="app-assistant-consent"><input type="checkbox" data-test-consent><span th:text="#{aitest.consent}"></span></label>
+      <div class="app-editor-actions"><button type="button" class="btn app-btn app-btn-primary" data-test-run disabled th:text="#{aitest.send}">전송</button></div>
+    </div>
+  </dialog>
+  <dialog class="app-preview-dialog" data-test-review-dialog aria-labelledby="test-review-title">
+    <div class="app-preview-header"><h2 id="test-review-title" th:text="#{aitest.review}">AI 검토</h2><button type="button" class="btn app-btn app-btn-quiet" data-test-review-close th:text="#{aitest.close}">닫기</button></div>
+    <div class="app-preview-body"><p data-test-review-preview-meta></p><p data-test-review-match></p><p th:text="#{aitest.reviewTransmission}"></p>
+      <details><summary th:text="#{aitest.request}">요청 정보</summary><pre class="app-preview-value app-test-prompt" data-test-review-source></pre></details>
+      <label class="app-assistant-consent"><input type="checkbox" data-test-review-consent><span th:text="#{aitest.consent}"></span></label>
+      <div class="app-editor-actions"><button type="button" class="btn app-btn app-btn-primary" data-test-review-run disabled th:text="#{aitest.send}">전송</button></div>
+    </div>
+  </dialog>
+  <dialog class="app-preview-dialog" data-test-execution-dialog aria-labelledby="test-execution-title">
+    <div class="app-preview-header"><h2 id="test-execution-title" th:text="#{aitest.execute}">SQL 실행</h2><button type="button" class="btn app-btn app-btn-quiet" data-test-execution-close th:text="#{aitest.close}">닫기</button></div>
+    <div class="app-preview-body"><p th:text="#{aitest.executeHelp}"></p><pre class="app-preview-value app-test-prompt" data-test-execution-sql></pre>
+      <label class="app-assistant-consent"><input type="checkbox" data-test-execution-consent><span th:text="#{aitest.executeConsent}"></span></label>
+      <div class="app-editor-actions"><button type="button" class="btn app-btn app-btn-primary" data-test-execution-run disabled th:text="#{aitest.execute}">SQL 실행</button></div>
+    </div>
+  </dialog>
+</main></div><script type="module" th:src="@{/js/select-ai-test.mjs}"></script></body></html>

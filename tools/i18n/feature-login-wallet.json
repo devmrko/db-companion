@@ -1,0 +1,9 @@
+{
+  "login.wallet.label": ["Wallet", "Wallet", "Wallet", "Wallet"],
+  "login.wallet.target": ["로그인 대상 Wallet", "Sign-in wallet", "登录目标 Wallet", "ログイン先 Wallet"],
+  "login.wallet.choose": ["Wallet을 선택하세요", "Select a wallet", "选择 Wallet", "Wallet を選択してください"],
+  "login.wallet.apply": ["Wallet 적용", "Apply wallet", "应用 Wallet", "Wallet を適用"],
+  "login.wallet.help": ["Wallet을 바꾸면 해당 접속 서비스 목록을 불러오고 계정 입력을 초기화합니다.", "Changing the wallet loads its services and clears the account fields.", "更改 Wallet 将加载其连接服务并清空账户输入。", "Wallet を変更すると接続サービスを読み込み、アカウント入力をクリアします。"],
+  "login.wallet.configInvalid": ["ORACLE_WALLET_PATHS에 절대 경로의 JSON 문자열 배열을 설정해 주세요. 최대 32개입니다.", "Set ORACLE_WALLET_PATHS to a JSON array of absolute path strings (up to 32).", "请将 ORACLE_WALLET_PATHS 设置为绝对路径的 JSON 字符串数组，最多 32 个。", "ORACLE_WALLET_PATHS に絶対パスの JSON 文字列配列を設定してください（最大32個）。"],
+  "login.wallet.invalid": ["등록된 Wallet을 선택해 주세요. 목록이 변경됐다면 로그인 화면을 새로고침해 주세요.", "Select a registered wallet. Reload the login page if the list has changed.", "请选择已注册的 Wallet。如果列表已更改，请刷新登录页面。", "登録済みの Wallet を選択してください。一覧が変更された場合はログイン画面を再読み込みしてください。"]
+}

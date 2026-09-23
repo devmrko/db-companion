@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ui.cb3678a61172})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+  <main class="app-content">
+    <a class="app-back-link" th:href="@{/ai-agents/team(schema=${targetSchema},team=${teamName})}">← <span th:text="${teamName}"></span></a>
+    <div class="app-page-heading"><h1 class="app-object-title" th:text="${taskName}"></h1><a class="btn app-btn app-btn-secondary" th:href="@{/ai-agents/task(schema=${targetSchema},team=${teamName},task=${taskName})}" th:text="#{ui.8259f9d35351}">새로고침</a></div>
+    <div class="app-alert is-error" role="alert" th:if="${loadError}" th:text="${loadError}"></div>
+    <th:block th:if="${taskPage != null}">
+      <section th:replace="~{fragments/agent :: component(${taskPage.task}, 'Task')}"></section>
+      <h2 class="app-section-title">Tool</h2>
+      <p class="app-muted" th:if="${#lists.isEmpty(taskPage.tools)}" th:text="#{ui.75a7e8045fa9}">연결된 Tool이 없습니다.</p>
+      <th:block th:each="tool : ${taskPage.tools}"><section th:replace="~{fragments/agent :: component(${tool}, 'Tool')}"></section></th:block>
+    </th:block>
+  </main>
+</div><th:block th:replace="~{fragments/catalog-preview :: modal}"></th:block>
+<th:block th:if="${taskPage != null and objectEditable == true}"><th:block th:replace="~{fragments/object-editor :: editor}"></th:block><th:block th:replace="~{fragments/object-history :: history}"></th:block></th:block>
+<script type="module" th:src="@{/js/object-editor.mjs}"></script></body></html>

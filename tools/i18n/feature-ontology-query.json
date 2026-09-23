@@ -1,0 +1,448 @@
+{
+  "ontology.query.title": [
+    "온톨로지 질의",
+    "Ontology query",
+    "本体查询",
+    "オントロジー照会"
+  ],
+  "ontology.query.helpTitle": [
+    "질의 도움말",
+    "Query help",
+    "查询帮助",
+    "照会ヘルプ"
+  ],
+  "ontology.query.help": [
+    "저장된 이름·별칭·정의로 질문의 대상을 찾고 확인된 관계를 최대 3단계 연결합니다. 질문에 맞는 경로를 선택하면 해당 테이블·관계만 AI 설명 또는 SQL 생성에 사용합니다. 선택은 저장 정의의 승인이 아닙니다. 초안은 검색 참고용이며 AI 근거에서 제외합니다. RDF는 실제 행 데이터가 아닙니다.",
+    "Match the question to saved names, aliases and definitions, then connect verified relationships across up to 3 edges. Select a path to use only its tables and relationships for an AI explanation or SQL. Selection does not approve stored definitions. Drafts help retrieval but are excluded from AI evidence. RDF is not actual row data.",
+    "通过已保存的名称、别名和定义匹配问题，连接最多 3 步的已确认关系。选择路径后，仅将相关表和关系用于 AI 说明或 SQL 生成。选择不代表批准定义。草稿仅供搜索参考，不作为 AI 依据。RDF 并非实际行数据。",
+    "保存した名前・別名・定義から質問の対象を探し、確認済みの関係を最大 3 段階つなぎます。選択した経路のテーブルと関係だけを AI 説明や SQL 生成に使用します。選択は定義の承認ではありません。下書きは検索にのみ使い、AI の根拠から除外します。RDF は実際の行データではありません。"
+  ],
+  "ontology.query.skos": [
+    "SKOS로 표현한 컬럼 대표명(prefLabel)과 별칭(altLabel)을 함께 검색합니다. 예를 들어 ‘사용자 식별자’의 별칭으로 ‘회원 번호’를 등록하면 그 표현으로도 찾을 수 있습니다. 미등록 유사어를 자동 추론하거나 새 관계를 만드는 기능은 아닙니다. 별칭은 등록된 컬럼 범위에서만 사용합니다.",
+    "Search uses column preferred labels (SKOS prefLabel) and alternative labels (altLabel). For example, registering ‘member number’ as an alias of ‘user identifier’ lets that phrase find the column too. It does not infer unregistered synonyms or create relationships. Aliases apply only to the column where they are registered.",
+    "搜索同时使用列的首选名称（SKOS prefLabel）和别名（altLabel）。例如，将“会员编号”注册为“用户标识”的别名后，也可用该表达查找列。系统不会自动推断未注册的近义词或创建关系。别名仅适用于其注册的列。",
+    "列の優先名（SKOS prefLabel）と別名（altLabel）を検索に使います。例えば「ユーザー識別子」の別名に「会員番号」を登録すると、その表現でも列を探せます。未登録の類義語の自動推論や関係の作成は行いません。別名は登録した列の範囲でのみ使います。"
+  ],
+  "ontology.query.limits": [
+    "SQL은 검토 후 별도 실행합니다. 첫 버전은 로컬 테이블의 단일 SELECT·집계·승인된 조인만 지원하며 뷰·외부 테이블·서브쿼리는 제외합니다. 최대 200행·40열·셀 2,000자, 실행 제한 15초입니다. 결과를 LLM에 보내지 않으며 영구 이력은 저장하지 않습니다. AI의 업무 해석은 근거와 대조해 확인하세요.",
+    "SQL runs only after a separate review. This version supports a single SELECT, aggregates and verified joins on local tables; views, external tables and subqueries are excluded. Limits: 200 rows, 40 columns, 2,000 characters per cell and a 15-second statement timeout. Results are not sent to an LLM or saved in permanent history. Check the AI interpretation against its evidence.",
+    "SQL 须经单独审查后执行。此版本仅支持本地表的单条 SELECT、聚合和已确认的连接，不支持视图、外部表或子查询。限制为 200 行、40 列、每单元格 2,000 字符及 15 秒语句超时。结果不会发送给 LLM，也不保存永久历史。请对照依据核对 AI 的业务解释。",
+    "SQL は別途確認してから実行します。初版はローカルテーブルの単一 SELECT・集計・確認済み結合のみ対応し、ビュー・外部テーブル・サブクエリは対象外です。上限は 200 行・40 列・セル 2,000 文字、SQL の制限時間は 15 秒です。結果の LLM 送信や永続履歴の保存は行いません。AI の業務解釈は根拠と照合してください。"
+  ],
+  "ontology.query.question": [
+    "질문",
+    "Question",
+    "问题",
+    "質問"
+  ],
+  "ontology.query.example": [
+    "예: 사용자와 권역은 어떻게 연결되나요?",
+    "For example: How are users linked to regions?",
+    "例如：用户与区域如何关联？",
+    "例：ユーザーと地域はどのようにつながりますか？"
+  ],
+  "ontology.query.anchor": [
+    "기준 테이블",
+    "Anchor table",
+    "基准表",
+    "基準テーブル"
+  ],
+  "ontology.query.automatic": [
+    "질문으로 찾기",
+    "Find from question",
+    "根据问题查找",
+    "質問から検索"
+  ],
+  "ontology.query.find": [
+    "근거 찾기",
+    "Find evidence",
+    "查找依据",
+    "根拠を検索"
+  ],
+  "ontology.query.evidence": [
+    "정의·관계 근거",
+    "Definition and relationship evidence",
+    "定义与关系依据",
+    "定義・関係の根拠"
+  ],
+  "ontology.query.filter": [
+    "이름·설명·관계 검색",
+    "Search names, descriptions and relationships",
+    "搜索名称、说明和关系",
+    "名前・説明・関係を検索"
+  ],
+  "ontology.query.selectAll": [
+    "사용 가능 근거 선택",
+    "Select usable evidence",
+    "选择可用依据",
+    "利用可能な根拠を選択"
+  ],
+  "ontology.query.selectNone": [
+    "선택 해제",
+    "Clear selection",
+    "清除选择",
+    "選択解除"
+  ],
+  "ontology.query.select": [
+    "선택",
+    "Select",
+    "选择",
+    "選択"
+  ],
+  "ontology.query.kind": [
+    "구분",
+    "Type",
+    "类型",
+    "種別"
+  ],
+  "ontology.query.detail": [
+    "근거 상세",
+    "Evidence details",
+    "依据详情",
+    "根拠の詳細"
+  ],
+  "ontology.query.explain": [
+    "AI 설명",
+    "AI explanation",
+    "AI 说明",
+    "AI 説明"
+  ],
+  "ontology.query.makeSql": [
+    "SQL 만들기",
+    "Generate SQL",
+    "生成 SQL",
+    "SQL を生成"
+  ],
+  "ontology.query.explanation": [
+    "정의·관계 설명",
+    "Definitions and relationships",
+    "定义与关系说明",
+    "定義・関係の説明"
+  ],
+  "ontology.query.reviewSql": [
+    "SQL 검토",
+    "Review SQL",
+    "审查 SQL",
+    "SQL を確認"
+  ],
+  "ontology.query.reviewConsent": [
+    "질문·근거와 SQL을 대조했으며, 이 SQL의 조회 실행에 동의합니다.",
+    "I have checked the SQL against the question and evidence and agree to execute this query.",
+    "我已对照问题和依据检查 SQL，并同意执行此查询。",
+    "質問・根拠と SQL を照合し、この SQL の照会実行に同意します。"
+  ],
+  "ontology.query.execute": [
+    "이 SQL 실행",
+    "Execute this SQL",
+    "执行此 SQL",
+    "この SQL を実行"
+  ],
+  "ontology.query.result": [
+    "조회 결과",
+    "Query results",
+    "查询结果",
+    "照会結果"
+  ],
+  "ontology.query.preview": [
+    "AI 전송 미리보기",
+    "AI request preview",
+    "AI 发送预览",
+    "AI 送信プレビュー"
+  ],
+  "ontology.query.generate": [
+    "AI 요청",
+    "Request AI",
+    "请求 AI",
+    "AI に依頼"
+  ],
+  "ontology.query.selected": [
+    "{0}개 선택",
+    "{0} selected",
+    "已选择 {0} 项",
+    "{0} 件選択"
+  ],
+  "ontology.query.checked": [
+    "기준 {0}",
+    "As of {0}",
+    "截至 {0}",
+    "基準 {0}"
+  ],
+  "ontology.query.noTables": [
+    "저장된 테이블 정의가 없습니다. 온톨로지에서 메타데이터를 가져와 주세요.",
+    "No saved table definitions. Import metadata in Ontology first.",
+    "没有已保存的表定义。请先在本体中导入元数据。",
+    "保存済みのテーブル定義がありません。オントロジーでメタデータを取り込んでください。"
+  ],
+  "ontology.query.pick": [
+    "근거 선택 · {0}",
+    "Select evidence · {0}",
+    "选择依据 · {0}",
+    "根拠を選択 · {0}"
+  ],
+  "ontology.query.captured": [
+    "원본 수집 {0}",
+    "Metadata captured {0}",
+    "元数据采集于 {0}",
+    "メタデータ取得 {0}"
+  ],
+  "ontology.query.rdf": [
+    "이 버전 RDF",
+    "RDF for this version",
+    "此版本 RDF",
+    "この版の RDF"
+  ],
+  "ontology.query.sqlReady": [
+    "문법·테이블·컬럼·조인 검사를 통과했습니다. 업무 의미와 필터를 확인한 뒤 실행하세요.",
+    "Syntax, table, column and join checks passed. Review business meaning and filters before execution.",
+    "已通过语法、表、列和连接检查。请核对业务含义和筛选条件后再执行。",
+    "構文・テーブル・列・結合の検査を通過しました。業務上の意味と条件を確認してから実行してください。"
+  ],
+  "ontology.query.sqlTransmission": [
+    "선택 근거 외에 Oracle이 대상 테이블의 전체 컬럼명·타입을 LLM에 전달합니다(providerMetadata). 민감 표시 컬럼은 앱의 실행 허용 목록에서는 제외됩니다. 원본 행은 전송하지 않습니다.",
+    "Oracle also sends all selected table column names and types to the LLM (providerMetadata). Sensitive-marked columns are excluded from the app execution allowlist. No source rows are sent.",
+    "除选定依据外，Oracle 还会向 LLM 发送目标表的所有列名和类型（providerMetadata）。标记为敏感的列不在应用执行允许列表中。不会发送原始行数据。",
+    "選択した根拠に加え、Oracle は対象テーブルの全列名・型を LLM に送信します（providerMetadata）。機密指定列はアプリの実行許可リストから除外します。元の行データは送信しません。"
+  ],
+  "ontology.query.answerTransmission": [
+    "질문과 선택한 정의·관계의 RDF/JSON을 전송합니다. 원본 행은 조회하거나 전송하지 않습니다.",
+    "Sends the question and selected RDF/JSON definitions and relationships. Source rows are neither queried nor sent.",
+    "发送问题以及选定定义和关系的 RDF/JSON。不查询或发送原始行数据。",
+    "質問と選択した定義・関係の RDF/JSON を送信します。元の行データの照会・送信は行いません。"
+  ],
+  "ontology.query.clipped": [
+    "… 2,000자까지 표시",
+    "… limited to 2,000 characters",
+    "… 最多显示 2,000 字符",
+    "… 2,000 文字まで表示"
+  ],
+  "ontology.query.noMatch": [
+    "일치하는 근거가 없습니다. 다른 용어 또는 기준 테이블을 선택해 주세요.",
+    "No matching evidence. Try another term or select an anchor table.",
+    "没有匹配的依据。请尝试其他术语或选择基准表。",
+    "一致する根拠がありません。別の用語または基準テーブルを選択してください。"
+  ],
+  "ontology.query.rowLimit": [
+    "최대 200행을 표시합니다. 전체 건수가 아닙니다.",
+    "Showing at most 200 rows, not the full result count.",
+    "最多显示 200 行，并非完整结果数量。",
+    "最大 200 行を表示しています。全件数ではありません。"
+  ],
+  "ontology.query.empty": [
+    "조회 결과가 없습니다.",
+    "No rows returned.",
+    "未返回记录。",
+    "該当するデータはありません。"
+  ],
+  "ontology.query.executed": [
+    "실행 완료 · 다시 실행하려면 새 SQL을 생성해 주세요.",
+    "Executed. Generate new SQL to run again.",
+    "执行完成。再次执行需重新生成 SQL。",
+    "実行完了。再実行するには SQL を再生成してください。"
+  ],
+  "ontology.query.oneUse": [
+    "실행 토큰을 사용했습니다. 자동 재시도하지 않습니다.",
+    "The execution token was consumed. No automatic retry.",
+    "执行令牌已使用。不会自动重试。",
+    "実行トークンは使用済みです。自動再試行はしません。"
+  ],
+  "ontology.query.stale": [
+    "질문·근거·프로필 또는 유효시간이 바뀌었습니다. 근거를 다시 조회해 주세요.",
+    "The question, evidence, profile or expiry has changed. Find evidence again.",
+    "问题、依据、配置文件或有效期已变化。请重新查找依据。",
+    "質問・根拠・プロファイル・有効期限が変わりました。根拠を再検索してください。"
+  ],
+  "ontology.query.confirm": [
+    "SQL 검토 후 실행 동의가 필요합니다.",
+    "Review the SQL and confirm execution.",
+    "请审查 SQL 并确认执行。",
+    "SQL を確認して実行に同意してください。"
+  ],
+  "ontology.query.invalid": [
+    "질문과 선택값을 확인해 주세요.",
+    "Check the question and selection.",
+    "请检查问题和所选项。",
+    "質問と選択内容を確認してください。"
+  ],
+  "ontology.query.narrow": [
+    "관련 범위가 너무 큽니다. 질문이나 기준 테이블을 좁혀 주세요.",
+    "The evidence scope is too large. Narrow the question or anchor table.",
+    "依据范围过大。请缩小问题或基准表范围。",
+    "根拠の範囲が広すぎます。質問または基準テーブルを絞ってください。"
+  ],
+  "ontology.query.noEvidence": [
+    "사용 가능한 근거를 선택해 주세요.",
+    "Select usable evidence.",
+    "请选择可用依据。",
+    "利用可能な根拠を選択してください。"
+  ],
+  "ontology.query.invalidAnswer": [
+    "AI 응답의 형식이나 근거 인용을 확인하지 못했습니다. 자동 재시도하지 않습니다.",
+    "The AI response format or citations could not be validated. No automatic retry.",
+    "无法验证 AI 响应格式或依据引用。不会自动重试。",
+    "AI 応答の形式または根拠引用を検証できませんでした。自動再試行はしません。"
+  ],
+  "ontology.query.sqlBlocked": [
+    "지원하지 않는 SQL이거나 선택 근거·허용 테이블·컬럼·조인과 일치하지 않아 실행할 수 없습니다.",
+    "SQL is unsupported or does not match selected evidence, allowed tables, columns or joins. Execution is blocked.",
+    "SQL 不受支持或与选定依据、允许的表、列或连接不符，已阻止执行。",
+    "未対応の SQL、または選択した根拠・許可テーブル・列・結合と一致しないため実行できません。"
+  ],
+  "ontology.query.profileScope": [
+    "선택 테이블이 AI 프로필의 object_list에 포함되어 있지 않습니다. 해당 테이블을 포함하는 프로필을 선택해 주세요.",
+    "Selected tables are outside the AI profile object_list. Choose a profile that includes them.",
+    "选定表不在 AI 配置文件的 object_list 中。请选择包含这些表的配置文件。",
+    "選択したテーブルが AI プロファイルの object_list に含まれていません。対象を含むプロファイルを選択してください。"
+  ],
+  "ontology.query.localTables": [
+    "첫 버전에서는 로컬 일반 테이블만 조회할 수 있습니다. 뷰·외부 테이블·가상 컬럼이 있는 테이블은 제외됩니다.",
+    "This version queries local physical tables only. Views, external tables and tables with virtual columns are excluded.",
+    "此版本仅查询本地实体表，不支持视图、外部表或包含虚拟列的表。",
+    "初版ではローカルの通常テーブルのみ照会できます。ビュー・外部テーブル・仮想列のあるテーブルは対象外です。"
+  ],
+  "ontology.query.resultLimit": [
+    "결과가 화면 반환 한도를 넘었습니다. 조회 범위를 줄여 주세요.",
+    "The result exceeds display limits. Narrow the query.",
+    "结果超出显示限制。请缩小查询范围。",
+    "結果が表示上限を超えました。照会範囲を絞ってください。"
+  ],
+  "ontology.query.resultType": [
+    "지원하지 않는 결과 데이터 타입입니다.",
+    "Unsupported result data type.",
+    "不支持此结果数据类型。",
+    "未対応の結果データ型です。"
+  ],
+  "ontology.query.loadError": [
+    "온톨로지 질의 준비 오류",
+    "Ontology query preparation error",
+    "本体查询准备错误",
+    "オントロジー照会の準備エラー"
+  ],
+  "ontology.query.callError": [
+    "AI 요청 오류 · 자동 재시도하지 않았습니다. 호출이 시작됐다면 사용량이 발생했을 수 있습니다.",
+    "AI request error. No automatic retry. Usage may apply if the call started.",
+    "AI 请求错误。未自动重试。若调用已开始，可能产生用量。",
+    "AI リクエストエラー。自動再試行はしていません。呼び出しが開始されていれば使用量が発生した可能性があります。"
+  ],
+  "ontology.query.executeError": [
+    "검토 SQL 실행 오류 · 자동 재시도하지 않았습니다.",
+    "Reviewed SQL execution error. No automatic retry.",
+    "已审查 SQL 执行错误。未自动重试。",
+    "確認済み SQL の実行エラー。自動再試行はしていません。"
+  ],
+  "ontology.query.kind.METADATA": [
+    "테이블·컬럼",
+    "Table / columns",
+    "表 / 列",
+    "テーブル・列"
+  ],
+  "ontology.query.kind.DEFINITION": [
+    "업무 정의",
+    "Business definition",
+    "业务定义",
+    "業務定義"
+  ],
+  "ontology.query.kind.RELATION": [
+    "관계",
+    "Relationship",
+    "关系",
+    "関係"
+  ],
+  "ontology.query.status.CATALOG": [
+    "보관 메타데이터",
+    "Saved metadata",
+    "已保存元数据",
+    "保存メタデータ"
+  ],
+  "ontology.query.status.DRAFT": [
+    "초안 · 참고용",
+    "Draft · reference only",
+    "草稿 · 仅供参考",
+    "下書き・参考用"
+  ],
+  "ontology.query.status.APPROVED": [
+    "승인",
+    "Approved",
+    "已批准",
+    "承認済み"
+  ],
+  "ontology.query.status.FK": [
+    "FK · 검증 상태 확인",
+    "FK · check validation",
+    "外键 · 核对验证状态",
+    "FK・検証状態を確認"
+  ],
+  "ontology.query.status.CANDIDATE": [
+    "후보 · 참고용",
+    "Candidate · reference only",
+    "候选 · 仅供参考",
+    "候補・参考用"
+  ],
+  "ontology.query.status.STALE": [
+    "재검토 필요",
+    "Review required",
+    "需要重新审查",
+    "再確認が必要"
+  ],
+  "ontology.query.status.REJECTED": [
+    "제외",
+    "Rejected",
+    "已排除",
+    "除外"
+  ],
+  "ontology.query.basis.SAVED_METADATA": [
+    "보관 메타데이터",
+    "Saved metadata",
+    "已保存元数据",
+    "保存メタデータ"
+  ],
+  "ontology.query.basis.SAVED_DEFINITION": [
+    "보관 정의",
+    "Saved definition",
+    "已保存定义",
+    "保存定義"
+  ],
+  "ontology.query.basis.DATABASE_CONSTRAINT": [
+    "DB 제약조건",
+    "DB constraint",
+    "数据库约束",
+    "DB 制約"
+  ],
+  "ontology.query.basis.REVIEWED_MAPPING": [
+    "사용자 검토 매핑",
+    "Reviewed mapping",
+    "已审查映射",
+    "確認済み対応"
+  ],
+  "ontology.query.basis.RULE_CANDIDATE": ["메타데이터 비교 후보", "Metadata matching candidate", "元数据匹配候选", "メタデータ照合候補"],
+  "ontology.query.basis.AI_CANDIDATE": ["AI 추천 후보", "AI-suggested candidate", "AI 推荐候选", "AI 推薦候補"],
+  "ontology.query.basis.CONDITIONAL": [
+    "추가 조건 있음",
+    "Additional condition",
+    "含附加条件",
+    "追加条件あり"
+  ],
+  "ontology.query.basis.ENABLED": [
+    "활성",
+    "Enabled",
+    "已启用",
+    "有効"
+  ],
+  "ontology.query.basis.DISABLED": [
+    "비활성",
+    "Disabled",
+    "已禁用",
+    "無効"
+  ],
+  "ontology.query.basis.VALIDATED": [
+    "검증됨",
+    "Validated",
+    "已验证",
+    "検証済み"
+  ],
+  "ontology.query.basis.NOT VALIDATED": [
+    "미검증",
+    "Not validated",
+    "未验证",
+    "未検証"
+  ]
+}

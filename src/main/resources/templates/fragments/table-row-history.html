@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="history" class="app-history" data-row-history th:attr="data-schema=${selectedSchema},data-table=${tableName},data-url=@{/vector-search/history}">
+  <input th:if="${_csrf != null}" type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-rh-csrf>
+  <div class="app-history-toolbar">
+    <label class="app-history-toggle" data-rh-toggle-label hidden><input type="checkbox" role="switch" class="form-check-input" data-rh-toggle disabled><span th:text="#{rowHistory.title}">데이터 이력</span></label>
+    <span class="app-muted" role="status" data-rh-state th:text="#{ui.1bb421cbcb68}">트리거 상태 확인 중…</span>
+    <button type="button" class="btn app-btn app-btn-secondary" data-rh-action="prepare" hidden disabled th:text="#{ui.604768ed0b76}">공통 이력 준비</button>
+    <button type="button" class="btn app-btn app-btn-secondary" data-rh-action="install" hidden disabled th:text="#{ui.d663d25901af}">트리거 설치·켜기</button>
+    <button type="button" class="btn app-btn app-btn-quiet" data-rh-refresh th:text="#{ui.f04089806775}">상태 갱신</button>
+    <button type="button" class="btn app-btn app-btn-quiet" data-rh-history th:text="#{ui.e78d03ec8597}">변경 이력</button>
+    <button type="button" class="app-help-button" data-rh-help popovertarget="row-history-help" aria-controls="row-history-help" aria-expanded="false" th:aria-label="#{rowHistory.helpLabel}">?</button>
+  </div>
+  <div id="row-history-help" class="app-help-tooltip" popover="auto" role="tooltip">
+    <p th:text="#{rowHistory.help}"></p><p data-rh-columns></p><p class="mb-0" data-rh-excluded></p>
+  </div>
+  <p class="app-muted" data-rh-detail hidden></p><p class="app-alert is-error" role="alert" data-rh-error hidden></p>
+  <dialog class="app-preview-dialog" aria-labelledby="row-history-title" data-rh-dialog>
+    <header class="app-preview-header"><h2 id="row-history-title" th:text="${tableName + #messages.msg('ui.3bcb6f249ac7')}"></h2><button type="button" class="btn app-btn app-btn-quiet" data-rh-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+    <div class="app-history-content"><p role="status" data-rh-message></p><div data-rh-comparison></div><div data-rh-entries></div>
+      <div class="app-history-pagination"><button type="button" class="btn app-btn app-btn-quiet" data-rh-prev disabled th:text="#{ui.da7e61c67cc5}">이전</button><span data-rh-page></span><button type="button" class="btn app-btn app-btn-quiet" data-rh-next disabled th:text="#{ui.aef613c6612d}">다음</button></div>
+    </div>
+  </dialog>
+</section>
+</body></html>

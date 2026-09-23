@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="constraints(items)" class="app-card table-responsive">
+  <table class="table app-table"><caption class="visually-hidden" th:text="#{ui.a24c67380485}">제약조건</caption>
+    <thead><tr><th scope="col" th:text="#{ui.2d29ecac7bb2}">이름 / 종류</th><th scope="col" th:text="#{ui.10637724093a}">컬럼</th><th scope="col" th:text="#{ui.b52c9b1289dc}">참조 / 조건</th><th scope="col" th:text="#{ui.e10195a1239f}">상태</th></tr></thead>
+    <tbody><tr th:each="item : ${items}">
+      <td><span class="app-object-title" th:text="${item.name}"></span><br><span class="app-muted" th:text="${item.typeLabel()}"></span></td>
+      <td><div th:each="column : ${item.columns}" th:text="${column}"></div><span th:if="${#lists.isEmpty(item.columns)}">—</span></td>
+      <td class="app-metadata-text"><th:block th:if="${item.type == 'R'}"><div th:if="${item.referenceTable != null}" th:text="${item.referenceOwner + '.' + item.referenceTable}"></div><div th:if="${item.referenceTable == null}" th:text="#{ui.f34c040d97cb}">참조 테이블을 조회할 수 없습니다.</div><div th:each="column : ${item.referenceColumns}" th:text="${column}"></div><div class="app-muted" th:text="${#messages.msg('ui.5eefd2baaf60') + item.referenceOwner + '.' + item.referenceName}"></div><div class="app-muted" th:text="${#messages.msg('ui.c68c3caa746b') + item.deleteRule}"></div></th:block><span th:if="${item.condition != null}" th:text="${item.condition}"></span><span th:if="${item.type != 'R' and item.condition == null}">—</span><div class="app-muted" th:if="${item.indexName != null}" th:text="${#messages.msg('ui.14b55741836a') + item.indexOwner + '.' + item.indexName}"></div></td>
+      <td><div th:text="${item.status}"></div><div th:text="${item.validated}"></div><div class="app-muted" th:text="${item.deferrable}"></div><div class="app-muted" th:if="${item.deferrable == 'DEFERRABLE'}" th:text="${item.deferred}"></div></td>
+    </tr><tr th:if="${#lists.isEmpty(items)}"><td colspan="4" class="app-empty" th:text="#{ui.eec5665f2374}">등록된 제약조건이 없습니다.</td></tr></tbody>
+  </table>
+</section>
+<section th:fragment="indexes(items)" class="app-card table-responsive">
+  <table class="table app-table"><caption class="visually-hidden" th:text="#{ui.e65f1a080083}">인덱스</caption>
+    <thead><tr><th scope="col" th:text="#{ui.2d29ecac7bb2}">이름 / 종류</th><th scope="col" th:text="#{ui.d602b97af874}">컬럼 / 표현식 (순서)</th><th scope="col" th:text="#{ui.aba1d81de189}">유일성</th><th scope="col" th:text="#{ui.e10195a1239f}">상태</th></tr></thead>
+    <tbody><tr th:each="item : ${items}">
+      <td><span class="app-object-title" th:text="${item.name}"></span><br><span class="app-muted" th:text="${item.owner + ' · ' + item.type}"></span></td>
+      <td class="app-metadata-text"><div th:each="column : ${item.columns}" th:text="${column.position + '. ' + column.label()}"></div><span th:if="${#lists.isEmpty(item.columns)}" th:text="#{ui.5d2b72f56e24}">컬럼 정보를 조회할 수 없습니다.</span></td>
+      <td th:text="${item.uniqueness}"></td>
+      <td><div th:text="${item.status == null ? '—' : item.status}"></div><div class="app-muted" th:text="${item.visibility}"></div><div th:if="${item.partitioned == 'YES'}" class="app-muted" th:text="#{ui.09d6d3600a52}">파티션 인덱스 · 파티션별 상태는 별도</div></td>
+    </tr><tr th:if="${#lists.isEmpty(items)}"><td colspan="4" class="app-empty" th:text="#{ui.4dd8b95a9cb4}">등록된 인덱스가 없습니다.</td></tr></tbody>
+  </table>
+</section>
+</body></html>

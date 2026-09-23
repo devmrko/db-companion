@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
+<th:block th:fragment="history">
+  <section class="app-history" data-metadata-history th:attr="data-schema=${targetSchema},data-table=${targetTable},data-url=@{/tables/history}">
+    <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-history-csrf>
+    <div class="app-history-toolbar">
+      <button type="button" class="btn app-btn app-btn-secondary" data-history-install hidden disabled th:text="#{ui.d663d25901af}">트리거 설치·켜기</button>
+      <label class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" data-history-toggle disabled><span th:text="#{ui.fa986262e0cd}">이력 관리</span></label>
+      <button type="button" class="btn app-btn app-btn-quiet" data-history-open th:text="#{ui.e78d03ec8597}">변경 이력</button>
+      <button type="button" class="btn app-btn app-btn-quiet" data-history-refresh th:text="#{ui.f04089806775}">상태 갱신</button>
+      <button type="button" class="btn app-btn app-btn-quiet" data-history-inspect th:text="#{ui.542ee3de69a8}">설치 확인</button>
+    </div>
+    <p class="app-muted app-history-status" role="status" data-history-status th:text="#{ui.b919ac7bb74b}">이력 상태 확인 중…</p>
+    <dialog class="app-preview-dialog" aria-labelledby="metadata-history-title" data-history-dialog>
+      <header class="app-preview-header"><h2 id="metadata-history-title" th:text="#{ui.e78d03ec8597}">변경 이력</h2><button type="button" class="btn app-btn app-btn-quiet" data-history-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+      <div class="app-history-content">
+        <p class="app-muted" th:text="${targetSchema + '.' + targetTable}"></p>
+        <div role="status" data-history-message></div><div data-history-entries></div>
+        <button type="button" class="btn app-btn app-btn-secondary" data-history-upgrade hidden disabled th:text="#{ui.81368da9f2ff}">이력 코드 업데이트</button>
+        <div class="app-history-pagination"><button type="button" class="btn app-btn app-btn-quiet" data-history-prev disabled th:text="#{ui.da7e61c67cc5}">이전</button><span data-history-page></span><button type="button" class="btn app-btn app-btn-quiet" data-history-next disabled th:text="#{ui.aef613c6612d}">다음</button></div>
+      </div>
+    </dialog>
+  </section>
+  <script type="module" th:src="@{/js/metadata-history.mjs}"></script>
+</th:block>
+</body></html>

@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
+<th:block th:fragment="modal">
+  <dialog class="app-preview-dialog" aria-labelledby="catalog-preview-title" data-catalog-preview th:attr="data-schema=${targetSchema},data-profile-url=@{/catalog-preview/profile},data-routine-url=@{/catalog-preview/routine}">
+    <header class="app-preview-header"><h2 id="catalog-preview-title" data-preview-title th:text="#{ui.d6a8c525cd47}">상세 정보</h2><button type="button" class="btn app-btn app-btn-quiet" data-preview-close autofocus th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+    <div class="app-preview-body" data-preview-body aria-live="polite"></div>
+  </dialog>
+  <script type="module" th:src="@{/js/catalog-preview.mjs}"></script>
+</th:block>
+</body></html>

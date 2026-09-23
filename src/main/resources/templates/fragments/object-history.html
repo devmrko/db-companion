@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
+<th:block th:fragment="history">
+  <dialog class="app-preview-dialog" aria-labelledby="object-history-title" data-object-history
+          th:attr="data-schema=${targetSchema},data-url=@{/ai-agents/object/history}">
+    <header class="app-preview-header"><h2 id="object-history-title" data-aoh-title th:text="#{ui.e78d03ec8597}">변경 이력</h2><button type="button" class="btn app-btn app-btn-quiet" data-aoh-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+    <div class="app-history-content">
+      <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-aoh-csrf>
+      <div class="app-history-toolbar"><button type="button" class="btn app-btn app-btn-secondary" data-aoh-refresh th:text="#{ui.8259f9d35351}">새로고침</button><button type="button" class="btn app-btn app-btn-secondary" data-aoh-install hidden th:text="#{ui.604768ed0b76}">공통 이력 준비</button></div>
+      <p class="app-alert" role="status" aria-live="polite" data-aoh-message hidden></p>
+      <div data-aoh-comparison></div><div data-aoh-entries></div>
+      <div class="app-history-pagination"><button type="button" class="btn app-btn app-btn-quiet" data-aoh-prev disabled th:text="#{ui.da7e61c67cc5}">이전</button><span data-aoh-page></span><button type="button" class="btn app-btn app-btn-quiet" data-aoh-next disabled th:text="#{ui.aef613c6612d}">다음</button></div>
+    </div>
+  </dialog>
+  <script type="module" th:src="@{/js/object-history.mjs}"></script>
+</th:block>
+</body></html>

@@ -1,0 +1,12 @@
+{
+  "ontology.terms.title": ["용어 검색", "Term search", "术语搜索", "用語検索"],
+  "ontology.terms.search": ["대표명·유사표현·연결 대상 검색", "Search preferred label, alternative or source", "搜索首选标签、替代表达或关联对象", "代表名・別名・参照先を検索"],
+  "ontology.terms.preferred": ["대표명", "Preferred label", "首选标签", "代表名"],
+  "ontology.terms.aliases": ["유사표현", "Alternative labels", "替代表达", "別名"],
+  "ontology.terms.source": ["연결 대상", "Source", "关联对象", "参照先"],
+  "ontology.terms.definition": ["정의", "Definition", "定义", "定義"],
+  "ontology.terms.clear": ["전체 트리플", "All triples", "全部三元组", "全トリプル"],
+  "ontology.terms.empty": ["저장된 대표명이 없습니다.", "No saved preferred labels.", "没有已保存的首选标签。", "保存された代表名はありません。"],
+  "ontology.terms.helpTitle": ["SKOS 용어 도움말", "SKOS term help", "SKOS 术语帮助", "SKOS 用語ヘルプ"],
+  "ontology.terms.help": ["선택한 저장 버전의 업무 개념과 컬럼 대표명·별칭을 SKOS로 표현합니다. 대표명은 prefLabel, 유사표현은 altLabel입니다. 등록된 표현과 연결 대상 이름을 부분 일치로 검색하며 LLM은 호출하지 않습니다. 같은 별칭을 가진 개념도 합치지 않습니다. 연결 대상을 누르면 근거 트리플을 봅니다. 컬럼 용어는 컬럼 정의 마법사에서 검토·저장합니다. 초안은 승인된 정의가 아닙니다. SKOS 라벨은 업무 관계나 사실을 새로 만들지 않습니다.", "SKOS represents the saved version's business concept and column labels and aliases. Preferred labels use prefLabel and alternatives use altLabel. Search matches part of a registered expression or source name without an LLM call. Concepts sharing an alias are not merged. Select a source to inspect its triples. Review and save column terms in the column definition wizard. Drafts are not approved definitions. SKOS labels do not create new business relationships or facts.", "SKOS 表达所选已保存版本的业务概念及列的代表名称和别名。首选标签使用 prefLabel，替代表达使用 altLabel。按已登记表达或关联对象名称进行部分匹配，不调用 LLM。不会合并别名相同的概念。点击关联对象查看三元组。列术语在列定义向导中审核并保存。草稿不是已批准的定义。SKOS 标签不会创建新的业务关系或事实。", "選択した保存版の業務概念と列の代表名・別名を SKOS で表します。代表名は prefLabel、別名は altLabel です。登録済み表現や参照先名を部分一致で検索し、LLM は呼び出しません。同じ別名の概念も統合しません。参照先を押すとトリプルを確認できます。列の用語は列定義ウィザードで確認・保存します。草案は承認済み定義ではありません。SKOS ラベルから新しい業務関係や事実は作りません。"]
+}

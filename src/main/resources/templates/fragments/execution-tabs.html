@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
+<nav th:fragment="tabs(current)" class="app-tabs" th:aria-label="#{ui.6a17ea651819}">
+  <a th:href="@{/ai-executions}" th:classappend="${current == 'conversations'} ? 'is-active'" th:attr="aria-current=${current == 'conversations' ? 'page' : null}" th:text="#{ui.dca5e7d32e68}">저장된 대화</a>
+  <a th:href="@{/ai-executions/agents}" th:classappend="${current == 'agents'} ? 'is-active'" th:attr="aria-current=${current == 'agents' ? 'page' : null}" th:text="#{ui.575531e24aa6}">Agent 실행</a>
+  <a th:href="@{/ai-executions/sql}" th:classappend="${current == 'sql'} ? 'is-active'" th:attr="aria-current=${current == 'sql' ? 'page' : null}">Select AI SQL</a>
+  <span class="app-execution-tab-help"><th:block th:text="#{ui.351967fd4693}">구분 기준</th:block><button type="button" class="app-help-button" data-execution-help popovertarget="execution-kinds-help" aria-controls="execution-kinds-help" aria-expanded="false" th:aria-label="#{ui.bd7db92b43e1}">?</button></span>
+  <div id="execution-kinds-help" class="app-help-tooltip app-execution-access-help" popover="auto" role="tooltip">
+    <p><strong th:text="#{ui.dca5e7d32e68}">저장된 대화</strong> <th:block th:text="#{ui.b65dd81b30ae}">— 보관된 질문·응답 한 건 기준입니다. Agent가 남긴 대화도 포함될 수 있습니다.</th:block></p>
+    <p><strong th:text="#{ui.575531e24aa6}">Agent 실행</strong> <th:block th:text="#{ui.520899159b80}">— Team 실행 ID(TEAM_EXEC_ID) 기준입니다. 실행 안의 Task를 TASK_ORDER 순으로 구분하며, 같은 Task가 반복돼도 합치지 않습니다.</th:block></p>
+    <p><strong>Select AI SQL</strong> <th:block th:text="#{sqlh.kinds}">— SQL 매핑·공유 SQL·AWR·감사 로그를 구분해 조회합니다. 원천별 수집 범위와 보존 기간이 다릅니다.</th:block></p>
+    <p th:text="#{ui.64175288b368}">같은 요청이 여러 탭에 나타날 수 있습니다. 대화 ID만으로 하나의 Team 실행이라고 판단하지 않습니다.</p>
+  </div>
+</nav>
+</body></html>

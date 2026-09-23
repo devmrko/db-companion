@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{assistant.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content">
+  <div class="app-page-heading"><h1 th:text="#{assistant.title}">AI 도우미 설정</h1></div>
+  <section class="app-card app-assistant-settings" data-assistant-settings th:attr="data-base=@{/ai-assistant}">
+    <div class="app-card-heading"><h2 th:text="${info.username}"></h2><button type="button" class="btn app-btn app-btn-quiet app-icon-button" data-as-refresh th:title="#{ui.8259f9d35351}" th:aria-label="#{ui.8259f9d35351}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg></button></div>
+    <form data-as-form>
+      <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-as-csrf>
+      <label for="assistant-profile" th:text="#{assistant.profile}">설명에 사용할 프로필</label>
+      <select id="assistant-profile" class="form-select app-select" data-as-profile disabled></select>
+      <p class="app-filter-message" data-as-model></p>
+      <div class="app-assistant-actions"><button type="submit" class="btn app-btn app-btn-primary" data-as-save disabled th:text="#{assistant.apply}">선택 적용</button><button type="button" class="btn app-btn app-btn-quiet" data-as-clear th:text="#{assistant.clear}">선택 해제</button></div>
+    </form>
+    <p class="app-filter-message" data-as-current></p>
+    <p role="status" data-as-message></p>
+    <details class="app-assistant-help"><summary th:text="#{assistant.helpTitle}">AI 도우미 ?</summary><p th:text="#{assistant.help}"></p></details>
+  </section>
+</main></div><script type="module" th:src="@{/js/ai-assistant.mjs}"></script></body></html>

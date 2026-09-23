@@ -1,0 +1,92 @@
+{
+  "rowHistory.title": [
+    "데이터 이력",
+    "Data history",
+    "数据历史",
+    "データ履歴"
+  ],
+  "rowHistory.helpLabel": [
+    "데이터 이력 안내",
+    "About data history",
+    "数据历史说明",
+    "データ履歴について"
+  ],
+  "rowHistory.help": [
+    "설치 이후 일반 컬럼의 추가·수정·삭제를 DB 트리거로 기록합니다. VECTOR 원문과 일반 컬럼 값이 같은 변경은 보관하지 않습니다. 이력 저장 실패 시 데이터 변경도 중단됩니다. 끄면 기존 이력은 유지됩니다. 컬럼 구조 변경 시 상태를 다시 확인해야 합니다. 직접 LOB 쓰기·TRUNCATE·DROP·트리거 강제 해제는 추적 범위 밖입니다.",
+    "After installation, a database trigger records inserts, updates and deletes of non-vector columns. VECTOR values and unchanged non-vector snapshots are not retained. A history write failure stops the data change. Turning tracking off keeps existing history. Recheck tracking after column changes. Direct LOB writes, TRUNCATE, DROP and forced trigger disabling are outside this tracking scope.",
+    "安装后，数据库触发器记录普通列的新增、修改和删除。不保存 VECTOR 原始值或普通列值未改变的记录。历史写入失败时，数据变更也会中止。关闭后保留已有历史。列结构变更后需重新检查状态。直接写入 LOB、TRUNCATE、DROP 和强制禁用触发器不在跟踪范围内。",
+    "インストール後、DBトリガーで通常列の追加・更新・削除を記録します。VECTORの値と通常列に差分のない変更は保存しません。履歴保存に失敗するとデータ変更も中止します。無効にしても過去の履歴は残ります。列構造を変更した場合は状態を再確認してください。LOBへの直接書き込み、TRUNCATE、DROP、トリガーの強制無効化は追跡対象外です。"
+  ],
+  "rowHistory.unsupported": [
+    "이력 설치를 지원하지 않는 컬럼이 있습니다.",
+    "Some columns are not supported for history installation.",
+    "部分列不支持安装历史跟踪。",
+    "履歴の設定をサポートしていない列があります。"
+  ],
+  "rowHistory.owner": [
+    "관리하려면 {0} 계정으로 로그인해 주세요.",
+    "Sign in as {0} to manage tracking.",
+    "请以 {0} 账户登录以管理跟踪。",
+    "管理するには {0} アカウントでログインしてください。"
+  ],
+  "rowHistory.archive": [
+    "공통 이력 준비가 필요합니다.",
+    "Prepare the shared history archive first.",
+    "请先准备公共历史存储。",
+    "共通履歴ストレージを準備してください。"
+  ],
+  "rowHistory.code": [
+    "테이블 구조 또는 트리거 코드가 다릅니다. 자동 교체하지 않습니다.",
+    "The table structure or trigger code differs. Automatic replacement is disabled.",
+    "表结构或触发器代码不同，不会自动替换。",
+    "テーブル構造またはトリガーのコードが異なります。自動置換は行いません。"
+  ],
+  "rowHistory.columns": [
+    "보관 컬럼: {0}",
+    "Recorded columns: {0}",
+    "记录列：{0}",
+    "記録する列：{0}"
+  ],
+  "rowHistory.excluded": [
+    "제외: {0}",
+    "Excluded: {0}",
+    "排除：{0}",
+    "除外：{0}"
+  ],
+  "rowHistory.prepareConfirm": [
+    "공통 이력 저장소를 준비할까요? 기존 이력은 유지합니다.",
+    "Prepare the shared history archive? Existing history will be preserved.",
+    "准备公共历史存储吗？已有历史将保留。",
+    "共通履歴ストレージを準備しますか？既存の履歴は維持されます。"
+  ],
+  "rowHistory.enableConfirm": [
+    "{0}.{1}의 데이터 이력을 켤까요? 이후 이력 저장이 실패하면 데이터 변경도 중단됩니다. VECTOR 원문은 보관하지 않습니다.",
+    "Enable data history for {0}.{1}? A history write failure will stop the data change. VECTOR values will not be retained.",
+    "启用 {0}.{1} 的数据历史吗？历史写入失败时数据变更也会中止。不保存 VECTOR 原始值。",
+    "{0}.{1} のデータ履歴を有効にしますか？履歴保存に失敗するとデータ変更も中止します。VECTORの値は保存しません。"
+  ],
+  "rowHistory.tableId": [
+    "테이블 ID {0}",
+    "Table ID {0}",
+    "表 ID {0}",
+    "テーブル ID {0}"
+  ],
+  "rowHistory.changed": [
+    "테이블 또는 컬럼 구성이 변경됐습니다. 상태를 갱신해 주세요.",
+    "The table or column structure changed. Refresh the tracking status.",
+    "表或列结构已变更，请刷新跟踪状态。",
+    "テーブルまたは列構造が変更されました。状態を更新してください。"
+  ],
+  "rowHistory.stopped": [
+    "이력 관리 {0} 단계에서 중단했습니다. {1}",
+    "History management stopped at {0}. {1}",
+    "历史管理在 {0} 阶段中止。{1}",
+    "履歴管理は {0} で中止しました。{1}"
+  ],
+  "rowHistory.invalid": [
+    "스키마·테이블·요청값을 확인해 주세요.",
+    "Check the schema, table and request values.",
+    "请检查模式、表和请求值。",
+    "スキーマ、テーブル、リクエストを確認してください。"
+  ]
+}
