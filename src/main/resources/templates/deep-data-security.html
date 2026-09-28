@@ -4,7 +4,7 @@
 <body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
 <main class="app-content">
-  <div class="app-page-heading"><h1>Deep Data Security</h1>
+  <div class="app-page-heading"><h1>Deep Data Security</h1><button th:replace="~{fragments/common :: sqlHelp('security', 'roles')}"></button>
     <details class="app-dds-help"><summary aria-label="Deep Data Security ?">?</summary><div th:text="#{dds.help}"></div></details>
   </div>
   <p class="app-alert is-error" th:if="${schemaError}" th:text="${schemaError}"></p>

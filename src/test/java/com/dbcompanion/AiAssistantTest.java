@@ -90,7 +90,7 @@ class AiAssistantTest {
     }
     @Test void backendNeverLogsSourcesOrStoresDurableSettings() throws Exception {
         String repository=Files.readString(Path.of("src/main/java/com/dbcompanion/repository/AiAssistantRepository.java"));
-        assertThat(repository).contains("setCharacterStream(2","Types.CLOB","setQueryTimeout(90)","result.free()").doesNotContain("logger","getPassword","jdbc.update(","CREATE TABLE","SET_ATTRIBUTE");
+        assertThat(repository).contains("setCharacterStream(2","Types.CLOB","setQueryTimeout(timeoutSeconds)","action,90)","result.free()").doesNotContain("logger","getPassword","jdbc.update(","CREATE TABLE","SET_ATTRIBUTE");
         String service=Files.readString(Path.of("src/main/java/com/dbcompanion/service/AiAssistantService.java"));
         assertThat(service).contains("before.equals(now)","finally{state.finish();}","finally{source.clear();}","functions.detail(session,schema,reference)");
         String controller=Files.readString(Path.of("src/main/java/com/dbcompanion/controller/AiAssistantController.java"));

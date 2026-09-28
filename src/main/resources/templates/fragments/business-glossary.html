@@ -1,0 +1,11 @@
+<!DOCTYPE html><html lang="ko" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="selector" class="app-glossary-card app-glossary-selector" data-business-glossary>
+  <div class="app-glossary-actions"><label class="app-glossary-pick"><input type="checkbox" data-glossary-enabled disabled><span th:text="#{businessGlossary.use}">업무 용어 사전 참고</span></label><a th:href="@{/business-glossary}" th:text="#{businessGlossary.manage}">사전 관리</a></div>
+  <p class="app-filter-message" data-glossary-note role="status" aria-live="polite"></p>
+  <div data-glossary-panel hidden>
+    <p th:text="#{businessGlossary.searchHelp}">원문 용어·별칭을 먼저 찾고 형태소 토큰으로 보완합니다. 원 질문은 변경하지 않으며, 여기서는 AI를 호출하지 않습니다.</p>
+    <div class="app-glossary-toolbar"><label><span th:text="#{businessGlossary.mode}">검색 방식</span><select class="form-select" data-glossary-mode><option value="EXACT" th:text="#{businessGlossary.exact}">정확·등록 별칭</option><option value="TEXT" th:text="#{businessGlossary.combined}">정확·별칭 + Oracle 형태소 검색</option></select></label><button type="button" class="btn app-btn app-btn-quiet" data-glossary-find th:text="#{businessGlossary.findDefinitions}">검색 대상·정의 확인</button></div>
+    <p data-glossary-count class="app-filter-message"></p><div data-glossary-results></div>
+  </div>
+</section>
+</body></html>

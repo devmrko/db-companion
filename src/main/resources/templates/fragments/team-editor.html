@@ -2,7 +2,7 @@
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
 <dialog th:fragment="editor" class="app-preview-dialog" aria-labelledby="team-editor-title" data-team-editor
         th:attr="data-schema=${targetSchema},data-team=${teamName},data-url=@{/ai-agents/team/attribute}">
-  <header class="app-preview-header"><h2 id="team-editor-title" th:text="#{ui.d9aa78bb3679}">Team 속성 편집</h2><button type="button" class="btn app-btn app-btn-quiet" data-te-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+  <header class="app-preview-header"><h2 id="team-editor-title" th:text="#{ui.d9aa78bb3679}">Team 속성 편집</h2><button th:replace="~{fragments/common :: sqlHelp('agents', 'edit')}"></button><button type="button" class="btn app-btn app-btn-quiet" data-te-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
   <form class="app-editor-form" data-te-form>
     <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-te-csrf>
     <p class="app-muted" data-te-object></p>

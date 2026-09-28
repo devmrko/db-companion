@@ -52,6 +52,10 @@ public class MetadataController {
     public ResponseEntity<?> save(@RequestBody SaveRequest body, HttpServletRequest request) {
         return invoke(request, () -> service.save(session(request), body));
     }
+    @PostMapping("/tables/metadata/restore-form")
+    public ResponseEntity<?> restoreForm(@RequestBody RestoreRequest body,HttpServletRequest request) {
+        return invoke(request,()->service.restoreForm(session(request),body));
+    }
     private ResponseEntity<?> invoke(HttpServletRequest request, Supplier<Object> work) {
         if (session(request) == null) return ResponseEntity.status(401).body(Map.of("error", UiMessages.text("ui.e0cca5f2b4e4", "로그인 세션이 만료되었습니다.")));
         try {

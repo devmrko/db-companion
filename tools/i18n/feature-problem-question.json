@@ -1,0 +1,21 @@
+{
+  "problemQuestion.title": ["문제 질문", "Problem questions", "问题提问", "問題の質問"],
+  "problemQuestion.help": ["의심되는 Select AI 응답을 사용자가 선택해 저장합니다. 저장만으로 AI 호출, SQL 실행 또는 Feedback 변경은 일어나지 않습니다.", "Save a user-selected suspicious Select AI response. Saving never calls AI, runs SQL, or changes Feedback.", "保存用户选择的可疑 Select AI 响应。保存不会调用 AI、执行 SQL 或更改 Feedback。", "疑わしい Select AI 応答をユーザーが選択して保存します。保存によって AI 呼び出し、SQL 実行、Feedback 変更は行われません。"],
+  "problemQuestion.storage": ["저장소 상태", "Storage status", "存储状态", "ストレージ状態"],
+  "problemQuestion.create": ["문제 질문 등록", "Register problem question", "登记问题提问", "問題の質問を登録"],
+  "problemQuestion.description": ["문제 설명", "Problem description", "问题说明", "問題の説明"],
+  "problemQuestion.expected": ["기대 동작", "Expected behavior", "预期行为", "期待する動作"],
+  "problemQuestion.expectedSql": ["정답 SQL (선택)", "Expected SQL (optional)", "正确 SQL（可选）", "正解 SQL（任意）"],
+  "problemQuestion.save": ["명시적으로 저장", "Save explicitly", "明确保存", "明示的に保存"],
+  "problemQuestion.attempt": ["실행 기록 추가", "Add attempt", "添加尝试", "実行記録を追加"],
+  "problemQuestion.snapshot": ["선택한 스냅샷", "Selected snapshot", "选择的快照", "選択したスナップショット"],
+  "problemQuestion.export": ["Markdown 진단 내보내기", "Export Markdown diagnostic", "导出 Markdown 诊断", "Markdown 診断をエクスポート"],
+  "problemQuestion.delete": ["선택 자료 수동 정리", "Manually remove selected records", "手动清理所选记录", "選択資料を手動整理"],
+  "problemQuestion.confirmDelete": ["삭제할 자료와 수를 확인해 주세요.", "Confirm the records and count to remove.", "请确认要删除的资料和数量。", "削除する資料と件数を確認してください。"],
+  "problemQuestion.error": ["문제 질문 저장소를 확인하지 못했습니다.", "Could not access problem-question storage.", "无法访问问题提问存储。", "問題の質問ストレージにアクセスできませんでした。"],
+  "problemQuestion.fromResult": ["문제 질문으로 저장", "Save as problem question", "保存为问题提问", "問題の質問として保存"],
+  "problemQuestion.saveHelp": ["선택한 최근 결과만 저장합니다. 이 작업은 AI 호출, SQL 실행, Feedback 변경을 하지 않습니다.", "Saves only the selected latest result. This does not call AI, run SQL, or change Feedback.", "仅保存选定的最新结果。此操作不会调用 AI、执行 SQL 或更改 Feedback。", "選択した最新結果だけを保存します。この操作で AI 呼び出し、SQL 実行、Feedback 変更は行われません。"],
+  "problemQuestion.includeSnapshots": ["현재 읽어 둔 프롬프트·메타데이터 스냅샷도 선택 저장합니다.", "Also save the currently loaded prompt and metadata snapshots.", "同时保存当前已加载的提示和元数据快照。", "現在読み込んだプロンプト・メタデータのスナップショットも選択して保存します。"],
+  "problemQuestion.compare": ["선택한 두 실행 기록 비교", "Compare two selected attempts", "比较两个选定尝试", "選択した二つの実行記録を比較"],
+  "problemQuestion.noResult": ["저장할 Select AI 결과가 없습니다.", "There is no Select AI result to save.", "没有可保存的 Select AI 结果。", "保存する Select AI 結果がありません。"]
+}

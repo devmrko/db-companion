@@ -6,7 +6,7 @@
 <div class="app-main">
   <header th:replace="~{fragments/common :: topbar}"></header>
   <main class="app-content">
-    <div class="app-page-heading"><h1 th:text="#{ui.31c660ef0b9a}">테이블·컬럼</h1><a class="btn app-btn app-btn-secondary" th:href="@{/tables}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg><th:block th:text="#{ui.8259f9d35351}">새로고침</th:block></a></div>
+    <div class="app-page-heading"><h1 th:text="#{ui.31c660ef0b9a}">테이블·컬럼</h1><button th:replace="~{fragments/common :: sqlHelp('tables', 'list')}"></button><a class="btn app-btn app-btn-secondary" th:href="@{/tables}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg><th:block th:text="#{ui.8259f9d35351}">새로고침</th:block></a></div>
     <div class="app-alert is-error" role="alert" th:if="${schemaError}" th:text="${schemaError}"></div>
     <div class="app-alert is-error" role="alert" th:if="${loadError}" th:text="${loadError}"></div>
     <section class="app-card" th:if="${loadError == null}" data-table-list th:attr="data-schema=${selectedSchema},data-profiles-url=@{/tables/profiles}">

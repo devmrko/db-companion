@@ -5,7 +5,7 @@
 <aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
   <main class="app-content">
-    <div class="app-page-heading"><h1 th:text="#{ui.cf835c698541}">AI 실행 이력</h1><a class="btn app-btn app-btn-secondary" th:href="@{/ai-executions(from=${from},to=${to},profile=${profile},question=${question})}" th:text="#{ui.8259f9d35351}">새로고침</a></div>
+    <div class="app-page-heading"><h1 th:text="#{ui.cf835c698541}">AI 실행 이력</h1><button th:replace="~{fragments/common :: sqlHelp('executions', 'conversations')}"></button><a class="btn app-btn app-btn-secondary" th:href="@{/ai-executions(from=${from},to=${to},profile=${profile},question=${question})}" th:text="#{ui.8259f9d35351}">새로고침</a></div>
     <div class="app-alert is-error" role="alert" th:if="${schemaError}" th:text="${schemaError}"></div>
     <nav th:replace="~{fragments/execution-tabs :: tabs('conversations')}"></nav>
     <section class="app-card" data-execution-history th:attr="data-schema=${selectedSchema}">

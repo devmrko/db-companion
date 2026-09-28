@@ -5,7 +5,7 @@
 <aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
 <main class="app-content" th:with="kind=${q.source.name()}">
-  <div class="app-page-heading"><h1 th:text="#{ui.cf835c698541}">AI 실행 이력</h1>
+  <div class="app-page-heading"><h1 th:text="#{ui.cf835c698541}">AI 실행 이력</h1><button th:replace="~{fragments/common :: sqlHelp('executions', 'cache')}"></button>
     <a class="btn app-btn app-btn-secondary" th:href="@{/ai-executions/sql/sources(source=${kind},match=${q.match},from=${q.from},to=${q.to},sqlId=${q.sqlId},text=${q.text},actor=${q.actor},load=${load},awrAllowed=${awrAllowed},refresh=true,policies=${policies != null})}" th:text="#{ui.8259f9d35351}">새로고침</a>
   </div>
   <nav th:replace="~{fragments/execution-tabs :: tabs('sql')}"></nav>

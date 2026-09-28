@@ -3,7 +3,6 @@ package com.dbcompanion.repository;
 import com.dbcompanion.model.CredentialCatalog;
 import com.dbcompanion.model.CredentialCatalog.*;
 import com.dbcompanion.model.AgentCatalog.Kind;
-import java.sql.SQLException;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Supplier;
@@ -103,14 +102,7 @@ public class CredentialCatalogRepository {
         return List.copyOf(values);
     }
     public static int oracleCode(Throwable error){
-        var seen=Collections.newSetFromMap(new IdentityHashMap<Throwable,Boolean>());
-        var queue=new ArrayDeque<Throwable>();queue.add(error);
-        while(!queue.isEmpty()&&seen.size()<32){
-            var item=queue.removeFirst();if(!seen.add(item))continue;
-            if(item instanceof SQLException sql){if(sql.getErrorCode()!=0)return sql.getErrorCode();if(sql.getNextException()!=null)queue.add(sql.getNextException());}
-            if(item.getCause()!=null)queue.add(item.getCause());
-        }
-        return 0;
+        return com.dbcompanion.common.db.OracleErrorDetails.firstCode(error);
     }
     public static String status(Throwable error){
         if(error instanceof LimitExceeded)return "LIMIT";

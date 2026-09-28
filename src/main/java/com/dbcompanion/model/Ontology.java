@@ -14,8 +14,10 @@ public final class Ontology {
                       List<String> targetColumns,String status,String validated){
         public Key {columns=List.copyOf(columns);targetColumns=List.copyOf(targetColumns);}
     }
-    public record Snapshot(String database,String schema,String table,String comment,List<ColumnInfo> columns,List<Key> keys,String capturedAt){
-        public Snapshot {columns=List.copyOf(columns);keys=List.copyOf(keys);}
+    public record Annotation(String column,String name,String value,String domainOwner,String domainName) {}
+    public record Snapshot(String database,String schema,String table,String comment,List<ColumnInfo> columns,List<Key> keys,String capturedAt,List<Annotation> annotations,String annotationStatus){
+        public Snapshot {columns=List.copyOf(columns);keys=List.copyOf(keys);annotations=annotations==null?List.of():List.copyOf(annotations);annotationStatus=annotationStatus==null?"NOT_REQUESTED":annotationStatus;}
+        public Snapshot(String database,String schema,String table,String comment,List<ColumnInfo> columns,List<Key> keys,String capturedAt){this(database,schema,table,comment,columns,keys,capturedAt,List.of(),"NOT_REQUESTED");}
     }
     public record ColumnMeaning(String description,String sensitivity,OntologyWizard.Definition definition){
         public ColumnMeaning(String description,String sensitivity){this(description,sensitivity,null);}

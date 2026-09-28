@@ -57,10 +57,17 @@ public class AiAssistantRepository {
     public String explain(String owner,String profile,String prompt){
         return generate(owner,profile,prompt,com.dbcompanion.model.SelectAiTest.Action.CHAT);
     }
+    public String explain(String owner,String profile,String prompt,int timeoutSeconds){
+        return generate(owner,profile,prompt,com.dbcompanion.model.SelectAiTest.Action.CHAT,timeoutSeconds);
+    }
     public String generate(String owner,String profile,String prompt,com.dbcompanion.model.SelectAiTest.Action action){
+        return generate(owner,profile,prompt,action,90);
+    }
+    public String generate(String owner,String profile,String prompt,com.dbcompanion.model.SelectAiTest.Action action,int timeoutSeconds){
+        com.dbcompanion.common.config.SelectAiExecutionSettings.validate(timeoutSeconds);
         return jdbc.execute((ConnectionCallback<String>) connection->{
             try(var call=connection.prepareCall(generateSql(owner,action));var reader=new StringReader(prompt)){
-                call.setQueryTimeout(90);call.registerOutParameter(1,java.sql.Types.CLOB);
+                call.setQueryTimeout(timeoutSeconds);call.registerOutParameter(1,java.sql.Types.CLOB);
                 call.setCharacterStream(2,reader,prompt.length());call.setString(3,profile);call.execute();
                 var result=call.getClob(1);
                 if(result==null)throw new Failure(502,"assistant.emptyResult","설명 응답이 비어 있습니다. 자동 재시도하지 않았습니다.");

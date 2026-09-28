@@ -2,7 +2,7 @@
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
 <dialog th:fragment="editor" class="app-preview-dialog" aria-labelledby="object-editor-title" data-object-editor
         th:attr="data-schema=${targetSchema},data-url=@{/ai-agents/object/attribute}">
-  <header class="app-preview-header"><h2 id="object-editor-title" data-aoe-title th:text="#{ui.a15da5722531}">속성 편집</h2><button type="button" class="btn app-btn app-btn-quiet" data-aoe-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+  <header class="app-preview-header"><h2 id="object-editor-title" data-aoe-title th:text="#{ui.a15da5722531}">속성 편집</h2><button th:replace="~{fragments/common :: sqlHelp('agents', 'edit')}"></button><button type="button" class="btn app-btn app-btn-quiet" data-aoe-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
   <form class="app-editor-form" data-aoe-form>
     <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-aoe-csrf>
     <p class="app-muted" data-aoe-object></p>

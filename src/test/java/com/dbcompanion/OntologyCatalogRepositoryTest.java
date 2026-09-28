@@ -38,7 +38,7 @@ class OntologyCatalogRepositoryTest {
             case "setQueryTimeout" -> {timeouts.add((int)a[0]);yield null;}
             case "executeQuery" -> {
                 bindings.add(new ArrayList<>(args.values()));
-                if(sql.contains("SYS.ALL_TABLES"))yield result(names.stream().map(List::of).toList(),1);
+                if(sql.contains("SYS.ALL_OBJECTS"))yield result(names.stream().map(List::of).toList(),1);
                 var rows=new ArrayList<List<String>>();
                 for(var arg:args.tailMap(2).values())if(comments.containsKey(arg))rows.add(List.of((String)arg,comments.get(arg)));
                 yield result(rows,2);
@@ -60,6 +60,8 @@ class OntologyCatalogRepositoryTest {
         assertThat(bindings.getFirst()).containsExactly("Mixed Owner",OntologySql.TABLE);
         assertThat(bindings.getLast()).containsExactly("Mixed Owner","A","B","C");
         assertThat(timeouts).containsExactly(30,30);
+        assertThat(sqls.getFirst()).contains("SUBOBJECT_NAME IS NULL", "OBJECT_TYPE IN ('TABLE','VIEW')");
+        assertThat(sqls.getLast()).contains("TABLE_TYPE IN ('TABLE','VIEW')");
     }
     @Test void commentBatchesAreBoundedAndNamesAreNeverInterpolated(){
         names=IntStream.range(0,1201).mapToObj(i->"T'"+i).toList();repository.tables("APP");
@@ -72,4 +74,10 @@ class OntologyCatalogRepositoryTest {
         assertThat(sqls).hasSize(1);
     }
     @Test void emptySchemaDoesNotIssueEmptyInClause(){names=List.of();assertThat(repository.tables("APP")).isEmpty();assertThat(sqls).hasSize(1);}
+    @Test void glossaryProjectionUsesBoundScopeAndErrorsOnMalformedJson(){
+        var scoped=new OntologyRepository(jdbc,new JsonMapper(),new DatabaseRepository(jdbc),new TableStructureRepository(jdbc)){@Override public void require(String schema,String login) { }};
+        assertThat(scoped.glossary("APP","LOGIN",List.of("T'NAME"))).isEmpty();
+        assertThat(sqls.getLast()).contains("JSON_VALUE","JSON_QUERY","ERROR ON ERROR").doesNotContain("T'NAME");
+        assertThat(bindings.getLast()).containsExactly("APP","T'NAME");
+    }
 }

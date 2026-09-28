@@ -162,12 +162,12 @@ public class MetadataHistoryRepository {
     }
     public boolean auditBodyLegacy(Target target) {
         var legacy = HistorySql.auditBody(target, true);
-        return HistorySql.sourceMatches(legacy, source(legacy));
+        return HistorySql.legacyAuditBodyMatches(target, source(legacy));
     }
     public void validateKnownAuditBody(Target target, boolean valid) {
         var asset = HistorySql.auditBody(target, false);
         String actual = source(asset);
-        if (!HistorySql.sourceMatches(asset, actual) && !HistorySql.sourceMatches(HistorySql.auditBody(target, true), actual))
+        if (!HistorySql.sourceMatches(asset, actual) && !HistorySql.legacyAuditBodyMatches(target, actual))
             throw incompatible(asset.name(), UiMessages.text("ui.9a141bd58275", "확인되지 않은 감사 패키지 원문입니다. 교체하지 않습니다."));
         if (valid) requireValid(target.schema(), asset);
     }

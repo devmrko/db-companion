@@ -35,6 +35,12 @@ public final class MetadataSql {
         if (bytes(result) > 1024) throw invalid(UiMessages.text("ui.d73fca5c6fdb", "Annotation 이름은 UTF-8 기준 1024바이트 이내로 입력해 주세요."));
         return result;
     }
+    /** Existing dictionary names are already canonical, including quoted mixed case. Never recase them. */
+    public static String existingAnnotationName(String value) {
+        identifier(value);
+        if (bytes(value) > 1024) throw invalid(UiMessages.text("ui.d73fca5c6fdb", "Annotation 이름은 UTF-8 기준 1024바이트 이내로 입력해 주세요."));
+        return value;
+    }
     public static String normalizedValue(String value) { return value == null || value.isEmpty() ? null : value; }
     public static int bytes(String value) { return value == null ? 0 : value.getBytes(StandardCharsets.UTF_8).length; }
     private static String literal(String value) {

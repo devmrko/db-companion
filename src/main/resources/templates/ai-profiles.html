@@ -7,8 +7,9 @@
   <header th:replace="~{fragments/common :: topbar}"></header>
   <main class="app-content">
     <a class="app-back-link" th:if="${profileName != null}" th:href="@{/ai-profiles}" th:text="#{ui.ab881c31afb0}">← 프로필 목록</a>
-    <div class="app-page-heading"><h1 th:text="${profileName == null ? #messages.msg('ui.e65249eb5f3c') : profileName}"></h1><a class="btn app-btn app-btn-secondary" th:href="${profileName == null} ? @{/ai-profiles} : @{/ai-profiles(profile=${profileName})}" th:text="#{ui.8259f9d35351}">새로고침</a></div>
-    <div class="app-history-toolbar" th:if="${info != null and info.username == selectedSchema}"><button type="button" class="btn app-btn app-btn-secondary" data-ai-create="PROFILE" th:text="#{creation.newProfile}">프로필 생성</button><button th:if="${profileName != null}" type="button" class="btn app-btn app-btn-secondary" data-ai-create="PROFILE" th:attr="data-source=${profileName}" th:text="#{creation.clone}">복제</button></div>
+    <div class="app-page-heading"><h1 th:text="${profileName == null ? #messages.msg('ui.e65249eb5f3c') : profileName}"></h1><button th:replace="~{fragments/common :: sqlHelp('profiles', 'list')}"></button><a class="btn app-btn app-btn-secondary" th:href="${profileName == null} ? @{/ai-profiles} : @{/ai-profiles(profile=${profileName})}" th:text="#{ui.8259f9d35351}">새로고침</a></div>
+    <th:block th:replace="~{fragments/select-ai-setup :: guide}"></th:block>
+    <div class="app-history-toolbar" th:if="${info != null and info.username == selectedSchema}"><button type="button" class="btn app-btn app-btn-secondary" data-ai-create="PROFILE" th:text="#{creation.newProfile}">프로필 생성</button><button th:replace="~{fragments/common :: sqlHelp('profiles', 'create')}"></button><button th:if="${profileName != null}" type="button" class="btn app-btn app-btn-secondary" data-ai-create="PROFILE" th:attr="data-source=${profileName}" th:text="#{creation.clone}">복제</button></div>
     <div class="app-alert is-error" role="alert" th:if="${schemaError}" th:text="${schemaError}"></div>
     <div class="app-alert is-error" role="alert" th:if="${loadError}" th:text="${loadError}"></div>
     <th:block th:if="${page != null and profileName != null}"><th:block th:replace="~{fragments/profile-history :: history}"></th:block></th:block>
@@ -36,6 +37,9 @@
       </div>
     </section>
     <section class="app-card" th:if="${page != null and profileName != null}">
+      <div class="app-card-heading"><h2 th:text="#{profilePreflight.title}">프로필 사전 점검</h2><button type="button" class="btn app-btn app-btn-secondary" data-profile-preflight th:text="#{profilePreflight.check}">점검</button></div>
+      <input type="hidden" th:value="${_csrf.token}" th:attr="data-profile-preflight-csrf=${_csrf.headerName},data-profile-preflight-schema=${selectedSchema},data-profile-preflight-name=${profileName}">
+      <p class="app-muted" data-profile-preflight-note th:text="#{profilePreflight.note}">점검은 읽기 전용입니다.</p><div data-profile-preflight-result aria-live="polite"></div>
       <dl class="app-detail-list" th:each="profile : ${page.profiles}">
         <div><dt th:text="#{ui.c55831fbc2ba}">프로필명</dt><dd th:text="${profile.name}"></dd></div>
         <div><dt th:text="#{ui.3f863f643fcc}">스키마</dt><dd th:text="${selectedSchema}"></dd></div>
@@ -62,5 +66,6 @@
 </div>
 <script type="module" th:src="@{/js/paged-list.mjs}"></script>
 <script type="module" th:src="@{/js/profile-fields.mjs}"></script>
+<script type="module" th:src="@{/js/profile-preflight.mjs}"></script>
 <th:block th:if="${info != null and info.username == selectedSchema}"><th:block th:replace="~{fragments/ai-creation :: dialog}"></th:block></th:block>
 </body></html>

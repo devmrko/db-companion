@@ -14,12 +14,10 @@ public final class SelectAiReview {
     public record Result(String promptId,AiAssistant.Profile reviewer,Instant requestedAt,long elapsedMillis,String text,String error,String code) {}
     public static SelectAiTest.Outcome matching(SelectAiTest.Outcome prompt,SelectAiTest.Outcome generated){
         return generated!=null&&generated.action()==SelectAiTest.Action.SQL&&Objects.equals(prompt.profile(),generated.profile())
-                &&Objects.equals(prompt.question(),generated.question())&&SelectAiEvidence.same(prompt.evidence(),generated.evidence())?generated:null;
+                &&Objects.equals(prompt.question(),generated.question())&&SelectAiEvidence.same(prompt.evidence(),generated.evidence())&&BusinessGlossary.same(prompt.glossary(),generated.glossary())?generated:null;
     }
     public static boolean sqlResponse(String value){
-        if(value==null)return false;
-        String sql=value.strip();if(sql.startsWith("```sql\n")&&sql.endsWith("```"))sql=sql.substring(7,sql.length()-3).strip();
-        return Pattern.compile("(?is)^(SELECT|WITH)\\b").matcher(sql).find();
+        return com.dbcompanion.service.SelectAiReadSql.isQueryResponse(value);
     }
     public static String responseCode(String value){
         var matcher=Pattern.compile("ORA-\\d{5}").matcher(Objects.toString(value,""));return matcher.find()?matcher.group():null;
@@ -34,6 +32,7 @@ public final class SelectAiReview {
         data.put("showprompt",snapshot.text());
         if(SelectAiInspection.matches(inspection,snapshot))data.put("currentCatalogInspection",inspection);
         if(snapshot.evidence()!=null){data.put("ontologyHash",snapshot.evidence().hash());data.put("ontology",JSON.readTree(snapshot.evidence().source()));}
+        if(snapshot.glossary()!=null)data.put("selectedBusinessDictionary",JSON.readTree(snapshot.glossary().source()));
         var match=matching(snapshot,generated);
         if(match!=null){data.put("generationTime",match.requestedAt().toString());data.put("generatedResponse",Objects.toString(match.text(),""));data.put("generationError",Objects.toString(match.code(),""));}
         String result="Review whether the supplied evidence is sufficient to generate Oracle SQL answering the user's question. Respond in "+lang+". "

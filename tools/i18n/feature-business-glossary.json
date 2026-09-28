@@ -1,0 +1,440 @@
+{
+  "businessGlossary.title": [
+    "업무 용어 사전",
+    "Business dictionary",
+    "业务术语词典",
+    "業務用語辞書"
+  ],
+  "businessGlossary.goTest": [
+    "Select AI 테스트",
+    "Select AI test",
+    "Select AI 测试",
+    "Select AI テスト"
+  ],
+  "businessGlossary.storage": [
+    "저장소와 검색 설정",
+    "Storage and search settings",
+    "存储与搜索设置",
+    "保存先と検索設定"
+  ],
+  "businessGlossary.independent": [
+    "온톨로지·프로필과 독립적이며 로그인 소유 스키마에 저장합니다. 등록된 정의는 검증된 정답을 뜻하지 않습니다.",
+    "Independent of ontology and profiles; stored in the signed-in owner schema. Registered definitions are not certified answers.",
+    "独立于本体和配置文件，保存在登录所有者的模式中。已登记定义不代表经过验证的正确答案。",
+    "オントロジーやプロファイルとは独立し、ログイン所有者のスキーマに保存します。登録定義は検証済みの正解を意味しません。"
+  ],
+  "businessGlossary.refresh": [
+    "새로고침",
+    "Refresh",
+    "刷新",
+    "更新"
+  ],
+  "businessGlossary.create": [
+    "사전 테이블 생성",
+    "Create dictionary table",
+    "创建词典表",
+    "辞書テーブルを作成"
+  ],
+  "businessGlossary.textSetup": [
+    "Oracle Text 설정",
+    "Set up Oracle Text",
+    "配置 Oracle Text",
+    "Oracle Text を設定"
+  ],
+  "businessGlossary.sqlHelp": [
+    "SQL / PLSQL로 관리하려면?",
+    "Manage with SQL / PLSQL",
+    "使用 SQL / PLSQL 管理",
+    "SQL / PLSQL で管理するには"
+  ],
+  "businessGlossary.sqlHelpText": [
+    "생성 버튼은 실행 전에 실제 DDL을 보여줍니다. 아래는 조회·등록·수정의 대응 SQL입니다. 자리표시자와 바인드 값을 실제 환경에 맞게 지정하세요. SQL 기준은 실행하지 않는 설명 데이터입니다.",
+    "Creation buttons show the actual DDL before execution. The examples below cover reading, adding and editing terms. Replace placeholders and bind values for your environment. SQL criteria are reference data, not executable commands.",
+    "创建按钮会在执行前显示实际 DDL。以下为查询、登记和编辑 SQL。请按环境指定占位符和绑定值。SQL 标准只是参考数据，不会执行。",
+    "作成ボタンで実行前に実際の DDL を確認できます。下記は参照・登録・編集の SQL です。プレースホルダーとバインド値を環境に合わせて指定してください。SQL 基準は実行しない参照データです。"
+  ],
+  "businessGlossary.entries": [
+    "등록 용어",
+    "Registered terms",
+    "已登记术语",
+    "登録用語"
+  ],
+  "businessGlossary.new": [
+    "용어 등록",
+    "Add term",
+    "登记术语",
+    "用語を登録"
+  ],
+  "businessGlossary.filter": [
+    "대표 용어 검색",
+    "Search canonical terms",
+    "搜索标准术语",
+    "代表用語を検索"
+  ],
+  "businessGlossary.find": [
+    "검색",
+    "Search",
+    "搜索",
+    "検索"
+  ],
+  "businessGlossary.term": [
+    "대표 용어",
+    "Canonical term",
+    "标准术语",
+    "代表用語"
+  ],
+  "businessGlossary.aliases": [
+    "별칭",
+    "Aliases",
+    "别名",
+    "別名"
+  ],
+  "businessGlossary.revision": [
+    "버전",
+    "Revision",
+    "版本",
+    "リビジョン"
+  ],
+  "businessGlossary.state": [
+    "상태",
+    "Status",
+    "状态",
+    "状態"
+  ],
+  "businessGlossary.manage": [
+    "사전 관리",
+    "Manage dictionary",
+    "词典管理",
+    "辞書管理"
+  ],
+  "businessGlossary.previous": [
+    "이전",
+    "Previous",
+    "上一页",
+    "前へ"
+  ],
+  "businessGlossary.next": [
+    "다음",
+    "Next",
+    "下一页",
+    "次へ"
+  ],
+  "businessGlossary.trySearch": [
+    "질문으로 용어 검색 확인",
+    "Test a question against the dictionary",
+    "通过问题检查术语搜索",
+    "質問で用語検索を確認"
+  ],
+  "businessGlossary.searchHelp": [
+    "원문 용어·별칭을 먼저 찾고 형태소 토큰으로 보완합니다. 원 질문은 변경하지 않으며, 여기서는 AI를 호출하지 않습니다.",
+    "Match registered terms and aliases first, then supplement with morphological tokens. The original question is unchanged. This search does not call AI.",
+    "优先匹配原文中的已登记术语和别名，再以形态素补充。不会修改原问题，此处不调用 AI。",
+    "原文の登録用語・別名を優先し、形態素トークンで補います。元の質問は変更せず、ここでは AI を呼び出しません。"
+  ],
+  "businessGlossary.question": [
+    "질문",
+    "Question",
+    "问题",
+    "質問"
+  ],
+  "businessGlossary.mode": [
+    "검색 방식",
+    "Search mode",
+    "搜索方式",
+    "検索方式"
+  ],
+  "businessGlossary.exact": [
+    "정확·등록 별칭",
+    "Exact terms and registered aliases",
+    "精确匹配与已登记别名",
+    "完全一致・登録別名"
+  ],
+  "businessGlossary.combined": [
+    "정확·별칭 + Oracle 형태소 검색",
+    "Exact / alias + Oracle morphological search",
+    "精确匹配 / 别名 + Oracle 形态素搜索",
+    "完全一致・別名 + Oracle 形態素検索"
+  ],
+  "businessGlossary.close": [
+    "닫기",
+    "Close",
+    "关闭",
+    "閉じる"
+  ],
+  "businessGlossary.aliasLines": [
+    "별칭·다른 표현 (한 줄에 하나, 최대 20개)",
+    "Aliases and alternative expressions (one per line, up to 20)",
+    "别名及其他表达（每行一个，最多 20 个）",
+    "別名・別の表現（1 行に 1 件、最大 20 件）"
+  ],
+  "businessGlossary.definition": [
+    "업무 정의",
+    "Business definition",
+    "业务定义",
+    "業務定義"
+  ],
+  "businessGlossary.criteria": [
+    "집계·필터·SQL 기준 (실행하지 않음)",
+    "Aggregation, filter and SQL criteria (not executed)",
+    "聚合、筛选与 SQL 标准（不执行）",
+    "集計・フィルター・SQL 基準（実行しません）"
+  ],
+  "businessGlossary.enabled": [
+    "검색에 사용 (해제하면 비활성화, 삭제하지 않음)",
+    "Use in search (uncheck to disable, not delete)",
+    "用于搜索（取消勾选将停用，不删除）",
+    "検索に使用（解除すると無効化、削除しません）"
+  ],
+  "businessGlossary.saveConsent": [
+    "이 내용을 로그인 소유 스키마의 사전에 저장합니다.",
+    "Save these values in the signed-in owner schema dictionary.",
+    "将这些内容保存到登录所有者的词典中。",
+    "この内容をログイン所有者の辞書に保存します。"
+  ],
+  "businessGlossary.save": [
+    "저장",
+    "Save",
+    "保存",
+    "保存"
+  ],
+  "businessGlossary.setupTitle": [
+    "사전 설정 SQL 확인",
+    "Review dictionary setup SQL",
+    "检查词典设置 SQL",
+    "辞書設定 SQL を確認"
+  ],
+  "businessGlossary.setupWarning": [
+    "DDL은 자동 커밋됩니다. 생성 권한이 필요하며, 일부 단계만 성공할 수 있습니다. 기존 객체를 덮어쓰거나 자동 삭제하지 않습니다. LLM 호출은 없지만 DB 자원은 사용합니다.",
+    "DDL commits automatically. Creation privileges are required and some steps may succeed independently. Existing objects are never overwritten or automatically deleted. No LLM call is made, but database resources are used.",
+    "DDL 会自动提交。需要创建权限，部分步骤可能单独成功。不会覆盖或自动删除现有对象。不调用 LLM，但会使用数据库资源。",
+    "DDL は自動コミットされます。作成権限が必要で、一部の手順だけ成功する場合があります。既存オブジェクトを上書き・自動削除しません。LLM 呼び出しはありませんが DB リソースを使用します。"
+  ],
+  "businessGlossary.setupConsent": [
+    "표시한 객체 생성과 DB 변경 범위를 확인했습니다.",
+    "I reviewed the displayed objects and database changes.",
+    "已检查显示的对象及数据库变更范围。",
+    "表示されたオブジェクトと DB 変更範囲を確認しました。"
+  ],
+  "businessGlossary.apply": [
+    "설정 실행",
+    "Run setup",
+    "执行设置",
+    "設定を実行"
+  ],
+  "businessGlossary.use": [
+    "업무 용어 사전 참고",
+    "Use business dictionary",
+    "参考业务术语词典",
+    "業務用語辞書を参照"
+  ],
+  "businessGlossary.findDefinitions": [
+    "검색 대상·정의 확인",
+    "Inspect search targets and definitions",
+    "检查搜索目标与定义",
+    "検索対象・定義を確認"
+  ],
+  "businessGlossary.termMatch": [
+    "대표 용어 일치",
+    "Canonical term match",
+    "标准术语匹配",
+    "代表用語の一致"
+  ],
+  "businessGlossary.aliasMatch": [
+    "등록 별칭 일치",
+    "Registered alias match",
+    "已登记别名匹配",
+    "登録別名の一致"
+  ],
+  "businessGlossary.textMatch": [
+    "형태소 기반 설명 검색",
+    "Morphological definition search",
+    "基于形态素的定义搜索",
+    "形態素による定義検索"
+  ],
+  "businessGlossary.original": [
+    "검색한 원 질문",
+    "Original search question",
+    "原始搜索问题",
+    "検索した元の質問"
+  ],
+  "businessGlossary.targets": [
+    "검색 대상",
+    "Search targets",
+    "搜索目标",
+    "検索対象"
+  ],
+  "businessGlossary.noExact": [
+    "원문에 일치하는 등록 용어·별칭이 없습니다.",
+    "No registered term or alias matches the original question.",
+    "原文中没有匹配的已登记术语或别名。",
+    "原文に一致する登録用語・別名はありません。"
+  ],
+  "businessGlossary.tokens": [
+    "Oracle 형태소 분석 토큰",
+    "Oracle morphological tokens",
+    "Oracle 形态素词元",
+    "Oracle 形態素トークン"
+  ],
+  "businessGlossary.noTokens": [
+    "추출된 검색 토큰이 없습니다.",
+    "No search tokens were extracted.",
+    "未提取出搜索词元。",
+    "検索トークンは抽出されませんでした。"
+  ],
+  "businessGlossary.query": [
+    "실제 Oracle Text 검색식",
+    "Actual Oracle Text query",
+    "实际 Oracle Text 查询表达式",
+    "実際の Oracle Text 検索式"
+  ],
+  "businessGlossary.exactOnly": [
+    "정확·별칭 검색만 수행했습니다. 형태소 검색은 호출하지 않았습니다.",
+    "Only exact terms and aliases were searched. Morphological search was not called.",
+    "仅执行了精确匹配和别名搜索，未调用形态素搜索。",
+    "完全一致・別名のみ検索しました。形態素検索は呼び出していません。"
+  ],
+  "businessGlossary.definitions": [
+    "검색된 용어 정의",
+    "Matched definitions",
+    "匹配的术语定义",
+    "検索された用語定義"
+  ],
+  "businessGlossary.more": [
+    "후보는 최대 30개까지 표시합니다. 더 정확한 질문으로 범위를 좁힐 수 있습니다.",
+    "At most 30 candidates are shown. Narrow the question for more specific results.",
+    "最多显示 30 个候选项。可使用更具体的问题缩小范围。",
+    "候補は最大 30 件表示します。質問を具体化して範囲を絞れます。"
+  ],
+  "businessGlossary.noHits": [
+    "검색된 정의가 없습니다. 용어를 등록하거나 표현을 바꿔 주세요.",
+    "No definitions matched. Register terms or adjust the expression.",
+    "没有匹配的定义。请登记术语或修改表达。",
+    "一致する定義がありません。用語を登録するか表現を変えてください。"
+  ],
+  "businessGlossary.snapshot": [
+    "이 요청에 전달한 업무 용어 정의",
+    "Business definitions sent with this request",
+    "此请求发送的业务定义",
+    "このリクエストに送信した業務定義"
+  ],
+  "businessGlossary.selected": [
+    "자동 첨부 정의 {0} / {1}개",
+    "Automatically attached definitions: {0} / {1}",
+    "自动附加的定义：{0} / {1}",
+    "自動添付する定義 {0} / {1} 件"
+  ],
+  "businessGlossary.searchAgain": [
+    "현재 질문·프로필로 검색하고 전달할 정의를 선택해 주세요.",
+    "Search with the current question and profile, then select definitions to send.",
+    "请使用当前问题和配置文件搜索，并选择要发送的定义。",
+    "現在の質問・プロファイルで検索し、送信する定義を選択してください。"
+  ],
+  "businessGlossary.missing": [
+    "업무 용어 사전이 없습니다. 사전 관리에서 생성해 주세요.",
+    "No business dictionary exists. Create it in dictionary management.",
+    "没有业务词典。请在词典管理中创建。",
+    "業務用語辞書がありません。辞書管理で作成してください。"
+  ],
+  "businessGlossary.mismatch": [
+    "사전 구조 확인이 필요합니다. 기존 객체는 자동 변경하지 않습니다.",
+    "The dictionary structure needs checking. Existing objects are not changed automatically.",
+    "需要检查词典结构。不会自动修改现有对象。",
+    "辞書構造の確認が必要です。既存オブジェクトは自動変更しません。"
+  ],
+  "businessGlossary.textMissing": [
+    "정확·별칭 검색 가능 · 형태소 검색은 사전 관리에서 별도 설정하세요.",
+    "Exact / alias search is available. Configure morphological search separately in dictionary management.",
+    "可使用精确匹配和别名搜索。形态素搜索需要在词典管理中单独配置。",
+    "完全一致・別名検索は使用可能です。形態素検索は辞書管理で別途設定してください。"
+  ],
+  "businessGlossary.available": [
+    "등록 용어·별칭과 Oracle 형태소 검색을 사용할 수 있습니다.",
+    "Registered terms, aliases and Oracle morphological search are available.",
+    "可使用已登记术语、别名和 Oracle 形态素搜索。",
+    "登録用語・別名と Oracle 形態素検索を使用できます。"
+  ],
+  "businessGlossary.searching": [
+    "사전 검색 중… AI는 호출하지 않습니다.",
+    "Searching the dictionary… No AI call.",
+    "正在搜索词典… 不调用 AI。",
+    "辞書を検索中… AI は呼び出しません。"
+  ],
+  "businessGlossary.limit": [
+    "정의는 최대 30개까지 첨부할 수 있습니다. 전송량 제한은 별도로 적용됩니다.",
+    "Attach at most 30 definitions. The payload size limit also applies.",
+    "最多可附加 30 个定义，同时受传输大小限制。",
+    "定義は最大 30 件添付できます。送信サイズの上限も適用されます。"
+  ],
+  "businessGlossary.choose": [
+    "검색 대상과 정의를 검토하고 AI에 전달할 항목을 선택해 주세요.",
+    "Review the targets and definitions, then select what to send to AI.",
+    "请检查搜索目标和定义，然后选择要发送给 AI 的条目。",
+    "検索対象と定義を確認し、AI に送信する項目を選択してください。"
+  ],
+  "businessGlossary.active": [
+    "사용",
+    "Active",
+    "启用",
+    "有効"
+  ],
+  "businessGlossary.inactive": [
+    "비활성",
+    "Inactive",
+    "停用",
+    "無効"
+  ],
+  "businessGlossary.edit": [
+    "조회·편집",
+    "View / edit",
+    "查看 / 编辑",
+    "参照・編集"
+  ],
+  "businessGlossary.saved": [
+    "용어를 저장했습니다. 이전 검색 결과는 다시 조회해 주세요.",
+    "Term saved. Run earlier searches again.",
+    "术语已保存。请重新执行之前的搜索。",
+    "用語を保存しました。以前の検索をやり直してください。"
+  ],
+  "businessGlossary.searched": [
+    "검색 완료 · AI 호출 없음",
+    "Search complete · No AI call",
+    "搜索完成 · 未调用 AI",
+    "検索完了 · AI 呼び出しなし"
+  ],
+  "businessGlossary.comparisonUnsupported": [
+    "업무 용어 참고는 단일 테스트에서 사용해 주세요. A/B 비교는 아직 지원하지 않습니다.",
+    "Use dictionary evidence in single tests. A/B comparison does not support it yet.",
+    "请在单次测试中使用词典参考。A/B 比较尚不支持此功能。",
+    "辞書参照は単一テストで使用してください。A/B 比較には未対応です。"
+  ],
+  "businessGlossary.textState.checking": [
+    "Oracle Text 구성 상태 확인 중…",
+    "Checking Oracle Text configuration…",
+    "正在检查 Oracle Text 配置…",
+    "Oracle Text の構成を確認中…"
+  ],
+  "businessGlossary.textState.tableRequired": [
+    "Oracle Text 미구성 · 사전 테이블 생성 후 선택적으로 설정할 수 있습니다.",
+    "Oracle Text not configured · Optional setup is available after creating the dictionary table.",
+    "Oracle Text 未配置 · 创建词典表后可选择配置。",
+    "Oracle Text 未構成 · 辞書テーブル作成後に任意で設定できます。"
+  ],
+  "businessGlossary.textState.ready": [
+    "Oracle Text 구성 완료 · 형태소 검색 사용 가능",
+    "Oracle Text configured · Morphological search available",
+    "Oracle Text 已配置 · 可使用形态素搜索",
+    "Oracle Text 構成済み · 形態素検索を利用できます"
+  ],
+  "businessGlossary.textState.missing": [
+    "Oracle Text 미구성 · 정확·별칭 검색은 사용 가능하며, 형태소 검색은 별도 설정이 필요합니다.",
+    "Oracle Text not configured · Exact / alias search is available; morphological search requires separate setup.",
+    "Oracle Text 未配置 · 可使用精确/别名搜索；形态素搜索需要单独配置。",
+    "Oracle Text 未構成 · 完全一致・別名検索は利用可能です。形態素検索には別途設定が必要です。"
+  ],
+  "businessGlossary.textState.unavailable": [
+    "Oracle Text 구성 상태 확인 필요 · 새로고침하여 확인해 주세요.",
+    "Oracle Text configuration needs verification · Refresh to check its status.",
+    "Oracle Text 配置状态需要确认 · 请刷新检查。",
+    "Oracle Text の構成状態を要確認 · 再読み込みして確認してください。"
+  ]
+}

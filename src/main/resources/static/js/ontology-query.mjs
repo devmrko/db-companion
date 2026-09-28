@@ -2,12 +2,16 @@ import {t} from './i18n.mjs';
 import {assistantApi,assistantPost} from './ai-assistant.mjs';
 import {pageOf} from './table-list.mjs';
 import {attachArchive} from './ontology-archive.mjs';
+import {renderTokenAnalysis} from './business-glossary.mjs';
+import {mountQuestionAnalysis,analysisEndpoint} from './question-analysis.mjs';
+import {routeCoverage,coverageLabel,unmatchedLabel} from './ontology-route-coverage.mjs';
 
 export const selectedRoute=(search,id)=>search?.routes?.find(r=>r.id===id)??null;
 export const groupedTables=(search,route)=>(route?.tables??[]).map(name=>search.tables.find(t=>t.name===name)).filter(Boolean);
 export const columnPage=(items,filter,page)=>pageOf(items.map(c=>({...c,description:`${c.description} ${c.label} ${(c.aliases??[]).join(' ')}`})),filter,page);
 export const routeArrow=(search,route,index)=>search.evidence.find(e=>e.id===route.relations[index])?.source===route.tables[index]?'→':'←';
 export const resultPage=(rows,page)=>pageOf(rows.map((cells,i)=>({name:String(i),cells})),'',page);
+export const analysisMissing=search=>search?.analysis?.mode==='ORACLE_TEXT_UNCONFIGURED';
 const q=(key,...args)=>t('ontology.query.'+key,key,...args);
 const node=(tag,text,css)=>{const el=document.createElement(tag);if(text!=null)el.textContent=text;if(css)el.className=css;return el;};
 const button=(text,fn)=>{const el=node('button',text,'btn app-btn app-btn-quiet');el.type='button';el.addEventListener('click',fn);return el;};
@@ -18,6 +22,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
   let search=null,routeId='',draft=null,preview=null,result=null,busy=false,rp=1,optionsReady=false;
   let invalidation=Promise.resolve();
   let archiveUi=null;
+  const analysis=mountQuestionAnalysis(root,{changed:()=>invalidate(true),isBusy:()=>busy});
   const message=(value,error=false,target='message')=>{get(target).textContent=value;get(target).className=error?'app-alert is-error':'app-filter-message';};
   function controls(){
     for(const el of root.querySelectorAll('button,input:not([type="hidden"]),select,textarea'))el.disabled=busy;
@@ -30,6 +35,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
     const pr=resultPage(result?.rows??[],rp);get('result-prev').disabled=busy||pr.page<=1;get('result-next').disabled=busy||pr.page>=pr.pages;
     root.setAttribute('aria-busy',String(busy));
     archiveUi?.controls(busy,!!route);
+    analysis.controls(busy);
   }
   function clearOutput(){draft=null;result=null;preview=null;get('reviewed').checked=false;get('consent').checked=false;for(const name of ['answer-panel','sql-panel','result-panel'])get(name).hidden=true;}
   function invalidate(clearSearch=false){
@@ -46,7 +52,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
     const data=await assistantApi(root.dataset.base+'/options?'+new URLSearchParams({schema:root.dataset.schema,refresh}));
     get('anchor').replaceChildren();const empty=node('option',q('automatic'));empty.value='';get('anchor').append(empty);
     for(const item of data.tables){const o=node('option',item.concept&&item.concept!==item.name?`${item.name} · ${item.concept}`:item.name);o.value=item.name;get('anchor').append(o);}
-    optionsReady=data.tables.length>0;get('checked').textContent=q('checked',timestamp(data.checkedAt));message(optionsReady?'':q('noTables'));
+    optionsReady=data.tables.length>0;get('checked').textContent=q('checked',timestamp(data.checkedAt));message(optionsReady?'':q('noTables'));await analysis.load();
   });}
   function tableDetails(info){
     const section=node('details',null,'app-query-table-details');section.append(node('summary',`${info.name} · v${info.revision} · ${q('status.'+info.state)}`));
@@ -68,6 +74,9 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
     const label=node('label',null,'app-query-route-select'),radio=node('input');radio.type='radio';radio.name='ontology-route';radio.value=route.id;radio.checked=routeId===route.id;
     radio.addEventListener('change',()=>{routeId=route.id;invalidate();root.querySelectorAll('[data-route-id]').forEach(el=>el.classList.toggle('is-selected',el.dataset.routeId===routeId));});
     label.append(radio,node('strong',q(route.relations.length?'paths.route':'paths.table',index+1)),node('span',q('paths.count',route.tables.length,route.relations.length),'app-filter-message'));card.append(label);
+    const coverage=routeCoverage(search,route);
+    if(coverage.total)card.append(node('p',coverageLabel(coverage),'app-filter-message'));
+    if(coverage.unmatched.length)card.append(node('p',unmatchedLabel(coverage),'app-filter-message'));
     const chain=node('div',null,'app-query-route-chain');groupedTables(search,route).forEach((item,i)=>{
       if(i)chain.append(node('span',routeArrow(search,route,i-1),'app-query-arrow'));
       const box=node('div',null,'app-query-route-node');box.append(node('strong',item.name));if(item.concept&&item.concept!==item.name)box.append(node('span',item.concept));chain.append(box);
@@ -78,9 +87,10 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
     groupedTables(search,route).forEach(info=>detail.append(tableDetails(info)));card.append(detail);return card;
   }
   function renderRoutes(){
+    renderTokenAnalysis(get('tokens'),search.analysis);
     get('routes').replaceChildren();get('other-routes').replaceChildren();get('alternatives').open=false;get('alternatives').hidden=search.routes.length<2;
     search.routes.forEach((route,index)=>(index?get('other-routes'):get('routes')).append(routeCard(route,index)));
-    get('path-note').textContent=search.limited?q('paths.limited'):search.routes.length?'':q('paths.noRoute');
+    get('path-note').textContent=search.limited?q('paths.limited'):search.routes.length||analysisMissing(search)?'':q('paths.noRoute');
     get('matches').textContent=search.concepts.length?q('paths.terms',search.concepts.map(c=>c.term).join(' · ')):get('anchor').value;
     controls();
   }
@@ -119,8 +129,8 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
   }
   get('form').addEventListener('submit',event=>{event.preventDefault();work(async()=>{
     clearOutput();search=null;routeId='';get('evidence').hidden=true;
-    search=await post('search',{schema:root.dataset.schema,question:get('question').value,anchor:get('anchor').value});
-    get('evidence').hidden=false;renderRoutes();message(search.concepts.length||get('anchor').value?'':q('noMatch'));
+    search=await post(analysisEndpoint('search',analysis.language()),{schema:root.dataset.schema,question:get('question').value,anchor:get('anchor').value});
+    get('evidence').hidden=false;renderRoutes();message(search.concepts.length||get('anchor').value||analysisMissing(search)?'':q('noMatch'));
   });});
   get('question').addEventListener('input',()=>invalidate(true));get('anchor').addEventListener('change',()=>invalidate(true));
   get('refresh').addEventListener('click',()=>load(true));

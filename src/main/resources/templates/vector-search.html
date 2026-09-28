@@ -4,7 +4,7 @@
 <body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
 <main class="app-content">
-  <div class="app-page-heading"><h1 th:text="#{ui.fee12485ed4c}">벡터 검색</h1>
+  <div class="app-page-heading"><h1 th:text="#{ui.fee12485ed4c}">벡터 검색</h1><button th:replace="~{fragments/common :: sqlHelp('vectors', 'columns')}"></button>
     <a th:if="${tableName.isEmpty()}" class="btn app-btn app-btn-secondary" th:href="@{/vector-search(refresh=true)}" th:text="#{ui.8259f9d35351}">새로고침</a>
     <a th:unless="${tableName.isEmpty()}" class="btn app-btn app-btn-secondary" th:href="@{/vector-search}" th:text="#{ui.020f79b4f086}">← 테이블 목록</a>
   </div>

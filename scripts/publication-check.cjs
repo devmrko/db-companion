@@ -23,8 +23,12 @@ function walk(dir) {
 }
 let files;
 if (fs.existsSync(path.join(root, '.git'))) {
-  files = execFileSync('git', ['ls-files', '-z'], {cwd: root, encoding: 'utf8'}).split('\0').filter(Boolean);
-  if (!files.length) throw new Error('Stage the publication candidate before scanning a Git repository.');
+  const workingTree=process.argv.slice(2).every(value=>value==='--working-tree');
+  if(!workingTree) throw new Error('Use --working-tree to scan tracked and untracked publication candidates.');
+  const listed=args=>execFileSync('git',args,{cwd:root,encoding:'utf8'}).split('\0').filter(Boolean);
+  const deleted=new Set(listed(['ls-files','--deleted','-z']));
+  files=[...new Set(listed(['ls-files','--cached','--others','--exclude-standard','-z']))].filter(name=>!deleted.has(name)&&fs.existsSync(path.join(root,name)));
+  if (!files.length) throw new Error('No non-ignored publication candidates found.');
 } else {
   files = walk('');
 }

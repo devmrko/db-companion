@@ -5,7 +5,7 @@
 <aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
   <main class="app-content">
-    <div class="app-page-heading"><h1>Select AI Feedback</h1>
+    <div class="app-page-heading"><h1>Select AI Feedback</h1><button th:replace="~{fragments/common :: sqlHelp('feedback', 'list')}"></button>
       <a th:unless="${detailMode}" class="btn app-btn app-btn-secondary" th:href="@{/ai-feedback(schema=${selectedSchema},profile=${profile},search=${search},type=${type})}" th:text="#{ui.8259f9d35351}">새로고침</a>
       <a th:if="${detailMode}" class="btn app-btn app-btn-secondary" th:href="@{/ai-feedback(schema=${selectedSchema},profile=${profile},search=${search},type=${type},page=${pageNumber})}" th:text="#{ui.d7fcbd676ea7}">← 목록</a>
     </div>

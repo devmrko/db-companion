@@ -24,7 +24,7 @@ public class OntologyQueryController {
     public record Generate(String token,boolean consent){}
     public record Execute(String token,boolean confirmed){}
     public record Cancel(String token){}
-    @PostMapping("/search") @ResponseBody public ResponseEntity<?> search(@RequestBody Search v,HttpServletRequest r){return run(r,"loadError",()->service.search(session(r),v.schema(),v.question(),v.anchor()));}
+    @PostMapping("/search") @ResponseBody public ResponseEntity<?> search(@RequestBody Search v,@RequestParam(defaultValue="") String language,Locale locale,HttpServletRequest r){return run(r,"loadError",()->service.search(session(r),v.schema(),v.question(),v.anchor(),QuestionAnalysisController.language(language,locale)));}
     @PostMapping("/preview") @ResponseBody public ResponseEntity<?> preview(@RequestBody Prepare v,Locale locale,HttpServletRequest r){return run(r,"loadError",()->service.preview(session(r),v.id(),v.mode(),v.route(),locale));}
     @PostMapping("/generate") @ResponseBody public ResponseEntity<?> generate(@RequestBody Generate v,HttpServletRequest r){return run(r,"callError",()->service.generate(session(r),v.token(),v.consent()));}
     @PostMapping("/execute") @ResponseBody public ResponseEntity<?> execute(@RequestBody Execute v,HttpServletRequest r){return run(r,"executeError",()->service.execute(session(r),v.token(),v.confirmed()));}

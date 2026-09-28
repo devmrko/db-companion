@@ -2,8 +2,8 @@
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
 <th:block th:fragment="editor">
   <dialog class="app-preview-dialog" aria-labelledby="metadata-editor-title" data-metadata-editor
-          th:attr="data-schema=${targetSchema},data-table=${targetTable},data-url=@{/tables/metadata}">
-    <header class="app-preview-header"><h2 id="metadata-editor-title" th:text="#{ui.bdb3cf839cc4}">메타데이터 편집</h2><button type="button" class="btn app-btn app-btn-quiet" data-editor-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+          th:attr="data-schema=${targetSchema},data-table=${targetTable},data-url=@{/tables/metadata},data-object-label=${detail.annotationEditable ? #messages.msg('ui.3d721f9ac601') : #messages.msg('catalog.view.label')}">
+    <header class="app-preview-header"><h2 id="metadata-editor-title" th:text="#{ui.bdb3cf839cc4}">메타데이터 편집</h2><button th:replace="~{fragments/common :: sqlHelp('tables', 'comment')}"></button><button type="button" class="btn app-btn app-btn-quiet" data-editor-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
     <form class="app-editor-form" data-editor-form>
       <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-editor-csrf>
       <p class="app-muted" data-editor-object></p>
@@ -11,7 +11,8 @@
       <fieldset data-editor-fields disabled>
         <label for="metadata-column" th:text="#{ui.8c609debc12c}">대상</label><select class="form-select app-select" id="metadata-column" data-editor-column></select>
         <div data-editor-name-group><label for="metadata-name" th:text="#{ui.a7df29bb4996}">Annotation 이름</label><input class="form-control" id="metadata-name" data-editor-name autocomplete="off"><p class="app-muted app-editor-note" th:text="#{ui.8d5bdfae1655}">새 이름은 대문자로 저장됩니다. 대소문자를 유지하려면 큰따옴표로 감싸 주세요.</p></div>
-        <label for="metadata-value" th:text="#{ui.cb0f24046b50}">내용</label><textarea class="form-control app-editor-value" id="metadata-value" rows="8" data-editor-value></textarea>
+        <div data-editor-current-group hidden><label for="metadata-current-value">현재 DB 값</label><textarea class="form-control app-editor-value" id="metadata-current-value" rows="4" data-editor-current-value readonly></textarea></div>
+        <label for="metadata-value">편집할 과거 값</label><textarea class="form-control app-editor-value" id="metadata-value" rows="8" data-editor-value></textarea>
         <p class="app-muted app-editor-note"><span data-editor-bytes>0</span> <th:block th:text="#{ui.7c9aa16eef81}">/ 4000바이트 (UTF-8)</th:block></p>
         <p class="app-muted app-editor-note" data-editor-hint></p>
         <div class="app-editor-actions"><button class="btn app-btn app-btn-primary" type="submit" data-editor-save th:text="#{ui.5fb926229090}">저장</button></div>

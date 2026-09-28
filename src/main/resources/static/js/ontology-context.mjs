@@ -36,7 +36,7 @@ export function reviewContext(host,rows,onChange){
   }
 }
 export function evidenceView(value){
-  const details=el('details',undefined,'app-dds-help');details.append(el('summary',label('evidence')));
+  const details=el('details',undefined,'app-disclosure');details.append(el('summary',label('evidence')));
   details.append(el('p',value.generatedAt));
   for(const ref of value.sources)details.append(el('p',`${ref.schema}.${ref.table} · v${ref.revision} · ${t('ontology.'+ref.state,ref.state)}`));
   for(const r of value.accepted)details.append(el('p',`${r.name||t('ontology.'+r.field,r.field)}: ${r.value}`),el('p',label('reason')+': '+r.reason),el('p',label('uncertainty')+': '+(r.uncertainty||'—')));

@@ -14,3 +14,16 @@ test('only explicit refresh reloads table comments; saves invalidate views witho
   assert.ok(source.includes('async function reloadSaved(){erd.invalidate();relationships.invalidate();await load();}'));
   assert.ok(source.includes('completed:reloadSaved'));
 });
+test('Annotation baseline initialization is a separate, explicit acceptance action',()=>{
+  const source=readFileSync('src/main/resources/static/js/ontology.mjs','utf8');
+  assert.ok(source.includes("drift.status==='ANNOTATION_BASELINE_REQUIRED'"));
+  assert.ok(source.includes('현재 Annotation을 초기 기준으로 저장'));
+  assert.ok(source.includes('과거 기준에는 확인된 Annotation 조회값이 없습니다.'));
+  assert.ok(source.includes("post('/drift/accept'"));
+});
+test('Oracle Text search remains a read-only scoped endpoint and does not add installation or AI calls',()=>{
+  const source=readFileSync('src/main/java/com/dbcompanion/controller/OntologyController.java','utf8');
+  assert.ok(source.includes('"/ontology/glossary/text-search"'));
+  assert.match(source,/textSearch\(@RequestParam String schema,@RequestParam String question,@RequestParam\(required=false\) List<String> tables,@RequestParam String profile/);
+  assert.doesNotMatch(source,/text-install['"]/);
+});

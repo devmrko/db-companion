@@ -92,6 +92,6 @@ class OntologyInquiryTest {
         String service=java.nio.file.Files.readString(java.nio.file.Path.of("src/main/java/com/dbcompanion/service/OntologyQueryService.java"));
         assertThat(service).contains("strict.setEnforceReadOnly(true)","execute.setReadOnly(true)","graphs.verifyMetadata", "state.current(token)","\"conversation\",false");
         String repository=java.nio.file.Files.readString(java.nio.file.Path.of("src/main/java/com/dbcompanion/repository/OntologyQueryRepository.java"));
-        assertThat(repository).contains("execute(value.search().id(),value.draft().sql(),value.draft().hash(),actor)","c.prepareStatement(sql)","stmt.setQueryTimeout(15)","stmt.setMaxRows(201)","VIRTUAL_COLUMN='YES'","SYS.ALL_EXTERNAL_TABLES").doesNotContain("OFFSET", "runsql");
+        assertThat(repository).contains("execute(value.search().id(),value.draft().sql(),value.draft().hash(),actor)","execute(id,sql,hash,actor,15)","c.prepareStatement(sql)","stmt.setQueryTimeout(timeoutSeconds)","stmt.setMaxRows(201)","VIRTUAL_COLUMN='YES'","SYS.ALL_EXTERNAL_TABLES").doesNotContain("OFFSET", "runsql");
     }
 }

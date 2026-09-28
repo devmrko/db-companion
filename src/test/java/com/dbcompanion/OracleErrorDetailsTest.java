@@ -6,6 +6,26 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class OracleErrorDetailsTest {
+    @Test void preservesOriginalExecutionErrorWhenRollbackOverridesIt() {
+        var original = new SQLException("ORA-18730: Interrupted IO error.: Socket read timed out", "08006", 18730);
+        var wrapped = new org.springframework.dao.RecoverableDataAccessException("SQL [private query]", original);
+        var rollback = new org.springframework.transaction.TransactionSystemException("Could not roll back", new SQLException("ORA-17008: Closed connection", "08003", 17008));
+        rollback.initApplicationException(wrapped);
+        assertThat(OracleErrorDetails.forDisplay(rollback)).startsWith("ORA-18730:").contains("ORA-17008:").doesNotContain("private query");
+        assertThat(OracleErrorDetails.firstCode(rollback)).isEqualTo(18730);
+        assertThat(com.dbcompanion.repository.CredentialCatalogRepository.error(rollback)).isEqualTo("ORA-18730");
+    }
+
+    @Test void readsSuppressedDriverFailuresAndHandlesExceptionGraphCycles() {
+        var original = new SQLException("ORA-01013: user requested cancel", "72000", 1013);
+        var rollback = new org.springframework.transaction.TransactionSystemException("rollback failed");
+        rollback.initApplicationException(original);
+        original.addSuppressed(rollback);
+        original.addSuppressed(new SQLException("ORA-17008: Closed connection", "08003", 17008));
+        assertThat(OracleErrorDetails.forDisplay(rollback)).isEqualTo("ORA-01013: user requested cancel\nORA-17008: Closed connection");
+        assertThat(OracleErrorDetails.firstCode(null)).isZero();
+    }
+
     @Test void retainsOracleCauseAndLocationWithoutTheSpringSqlWrapper() {
         var sql = new SQLException("""
                 ORA-04088: error during execution of trigger 'ADMIN.DBC_MH_B'
@@ -42,5 +62,15 @@ class OracleErrorDetailsTest {
         assertThat(OracleErrorDetails.forDisplay(new SQLException(many)).lines().count()).isEqualTo(32);
         assertThat(OracleErrorDetails.forDisplay(new SQLException("ORA-20000: " + "x".repeat(5000))))
                 .hasSize(1025).endsWith("…");
+    }
+
+    @Test void explainsNestedOracleRowsWithoutPromotingAWrapperToFact() {
+        var nested = new SQLException("ORA-20004: object_list validation failed\nORA-00904: \"X\": invalid identifier");
+        var summary = com.dbcompanion.common.db.AiErrorExplanation.explain("AI request", nested);
+        assertThat(summary.stage()).isEqualTo("AI request");
+        assertThat(summary.original()).contains("ORA-20004", "ORA-00904");
+        assertThat(summary.confirmed()).containsExactly("Oracle returned the displayed code(s)");
+        assertThat(summary.possible()).anyMatch(value -> value.contains("not prove an external object"));
+        assertThat(summary.display()).contains("Failed stage: AI request", "Oracle original:", "Possible cause (not confirmed)");
     }
 }

@@ -47,8 +47,9 @@ public final class OntologyInquiry {
     public record Field(String name,String type,String description,String label,List<String> aliases){public Field{aliases=List.copyOf(aliases);}}
     public record TableContext(String name,String concept,String description,String state,int revision,List<Field> columns){public TableContext{columns=List.copyOf(columns);}}
     public record Search(String id,String schema,String question,String anchor,List<Match> matches,List<Evidence> evidence,
-                         List<OntologyAnalysis.Reference> references,String checkedAt,List<Concept> concepts,List<Route> routes,List<TableContext> tables,boolean limited){
+                         List<OntologyAnalysis.Reference> references,String checkedAt,List<Concept> concepts,List<Route> routes,List<TableContext> tables,boolean limited,BusinessGlossary.Analysis analysis){
         public Search{matches=List.copyOf(matches);evidence=List.copyOf(evidence);references=List.copyOf(references);concepts=List.copyOf(concepts);routes=List.copyOf(routes);tables=List.copyOf(tables);}
+        public Search(String id,String schema,String question,String anchor,List<Match> matches,List<Evidence> evidence,List<OntologyAnalysis.Reference> references,String checkedAt,List<Concept> concepts,List<Route> routes,List<TableContext> tables,boolean limited){this(id,schema,question,anchor,matches,evidence,references,checkedAt,concepts,routes,tables,limited,BusinessGlossary.Analysis.exact());}
         public Search(String id,String schema,String question,String anchor,List<Match> matches,List<Evidence> evidence,List<OntologyAnalysis.Reference> references,String checkedAt){this(id,schema,question,anchor,matches,evidence,references,checkedAt,List.of(),List.of(),List.of(),false);}
     }
     public record Sentence(String text,List<String> evidence){public Sentence{evidence=List.copyOf(evidence);}}
@@ -91,9 +92,20 @@ public final class OntologyInquiry {
     static boolean confirmed(Relation r){return "APPROVED".equals(r.status())||"FK".equals(r.status())&&r.key()!=null&&"ENABLED".equals(r.key().status())&&"VALIDATED".equals(r.key().validated());}
     private static Map<String,Entry> indexed(List<Entry> entries){var out=new LinkedHashMap<String,Entry>();entries.forEach(e->out.put(e.document().source().table(),e));return out;}
     public static Search search(Dataset data,String question,String anchor){
+        return search(data,question,anchor,BusinessGlossary.Analysis.exact());
+    }
+    public static Search search(Dataset data,String question,String anchor,BusinessGlossary.Analysis analysis){
         question=text(question,2000);anchor=Objects.toString(anchor,"");
         if(!anchor.isEmpty()&&!indexed(data.entries()).containsKey(anchor))throw new Failure(400,"query.invalid");
-        return OntologyPaths.search(data,question,anchor);
+        return OntologyPaths.search(data,question,anchor,analysis);
+    }
+    /** Explicit independent definitions: no inferred path, FK or detail-join authorization. */
+    public static Search definitions(Dataset data,String question,List<String> tables){
+        if(tables==null||tables.isEmpty()||tables.size()>MAX_DOCUMENTS||tables.stream().anyMatch(Objects::isNull)||new HashSet<>(tables).size()!=tables.size())throw new Failure(400,"query.noEvidence");
+        var known=indexed(data.entries());
+        for(String name:tables)if(!known.containsKey(name)||!"APPROVED".equals(known.get(name).state()))throw new Failure(400,"query.noEvidence");
+        var result=evidence(data,question,"",List.of(),new TreeSet<>(tables),List.of());
+        return choose(result,result.evidence().stream().filter(e->e.kind().equals("DEFINITION")&&e.usable()).map(Evidence::id).toList());
     }
     static Search evidence(Dataset data,String question,String anchor,List<Match> matches,Set<String> selected,List<Relation> relations){
         var known=indexed(data.entries());
@@ -121,15 +133,23 @@ public final class OntologyInquiry {
         var route=search.routes().stream().filter(r->r.id().equals(id)).findFirst().orElseThrow(()->new Failure(400,"query.paths.choose"));
         var selected=choose(search,route.evidence());
         return new Search(selected.id(),selected.schema(),selected.question(),selected.anchor(),selected.matches(),selected.evidence(),
-            selected.references(),selected.checkedAt(),selected.concepts(),List.of(route),selected.tables(),selected.limited());
+            selected.references(),selected.checkedAt(),selected.concepts(),List.of(route),selected.tables(),selected.limited(),selected.analysis());
     }
     public static Search choose(Search search,List<String> ids){
         if(ids==null||ids.isEmpty()||ids.size()>search.evidence().size()||new HashSet<>(ids).size()!=ids.size())throw new Failure(400,"query.noEvidence");
         var evidence=search.evidence().stream().filter(e->ids.contains(e.id())).toList();if(evidence.size()!=ids.size()||evidence.stream().anyMatch(e->!e.usable()))throw new Failure(400,"query.noEvidence");
         var refs=evidence.stream().flatMap(e->e.references().stream()).distinct().toList();
-        return new Search(search.id(),search.schema(),search.question(),search.anchor(),search.matches(),evidence,refs,search.checkedAt(),search.concepts(),search.routes().stream().filter(r->new HashSet<>(ids).containsAll(r.evidence())).toList(),search.tables().stream().filter(t->refs.stream().anyMatch(r->r.table().equals(t.name()))).toList(),search.limited());
+        return new Search(search.id(),search.schema(),search.question(),search.anchor(),search.matches(),evidence,refs,search.checkedAt(),search.concepts(),search.routes().stream().filter(r->new HashSet<>(ids).containsAll(r.evidence())).toList(),search.tables().stream().filter(t->refs.stream().anyMatch(r->r.table().equals(t.name()))).toList(),search.limited(),search.analysis());
     }
     public static String payload(Search search,List<Entry> entries,JsonMapper json){
+        return payload(search,entries,json,false);
+    }
+    /** Independent definitions need structured metadata once, not the same content again as RDF. */
+    public static String definitionPayload(Search search,List<Entry> entries,JsonMapper json){
+        if(!search.routes().isEmpty()||search.evidence().stream().anyMatch(e->!e.usable()||!e.kind().equals("DEFINITION")))throw new Failure(400,"query.noEvidence");
+        return payload(search,entries,json,true);
+    }
+    private static String payload(Search search,List<Entry> entries,JsonMapper json,boolean definitionsOnly){
         var usable=search.evidence().stream().filter(Evidence::usable).toList();if(usable.isEmpty())throw new Failure(409,"query.noEvidence");
         var known=indexed(entries);var rdf=new ArrayList<Map<String,String>>();var boundEntries=new ArrayList<Entry>();
         // Draft meanings and unrelated constraints are never promoted into answer evidence.
@@ -142,13 +162,22 @@ public final class OntologyInquiry {
             var bindings=approved?OntologyValues.matching(safe,search.question()):List.<OntologyValues.Binding>of();
             var clean=new Entry(e.seq(),e.revision(),e.documentId(),e.state(),e.actor(),e.recordedAt(),new Document(1,new Snapshot(s.database(),s.schema(),s.table(),approved?s.comment():"",columns,List.of(),s.capturedAt()),new Meaning(approved?m.concept():"",approved?m.description():"",cm,Map.of(),bindings),e.document().origin(),null));
             boundEntries.add(clean);
-            rdf.add(Map.of("table",s.table(),"rdf",OntologyContext.compact(OntologyRdf.export(clean))));
+            if(!definitionsOnly)rdf.add(Map.of("table",s.table(),"rdf",OntologyContext.compact(OntologyRdf.export(clean))));
         }
         OntologyValues.unambiguous(boundEntries,search.question());
         var values=boundEntries.stream().flatMap(e->e.document().meaning().valueMappings().stream().map(b->Map.of("table",e.document().source().table(),"schema",e.document().source().schema(),"revision",e.revision(),"mapping",b,"operator","EQ"))).toList();
-        var paths=search.routes().stream().map(r->Map.of("tables",r.tables(),"relations",r.relations())).toList();
+        var paths=search.routes().stream().map(r->{
+            var matched=search.concepts().stream().filter(c->c.targets().stream().anyMatch(t->r.tables().contains(t.table()))).map(Concept::term).toList();
+            var unmatched=search.concepts().stream().map(Concept::term).filter(t->!matched.contains(t)).toList();
+            return Map.of("tables",r.tables(),"relations",r.relations(),"matchedConcepts",matched,"unmatchedConcepts",unmatched);
+        }).toList();
         var defined=boundEntries.stream().filter(e->usable.stream().anyMatch(x->x.kind().equals("DEFINITION")&&x.source().equals(e.document().source().table()))).toList();
-        String payload=json.writeValueAsString(Map.of("mode","DEFINITION_AND_RELATION_ONLY","question",search.question(),"schema",search.schema(),"checkedAt",search.checkedAt(),"paths",paths,"evidence",usable,"rdf",rdf,"approvedValueMappings",values,"approvedColumnDefinitions",columnDefinitions(defined)));
+        var context=new LinkedHashMap<String,Object>();
+        context.put("mode",definitionsOnly?"APPROVED_DEFINITIONS_ONLY":"DEFINITION_AND_RELATION_ONLY");context.put("question",search.question());context.put("schema",search.schema());context.put("checkedAt",search.checkedAt());
+        context.put("paths",paths);context.put("evidence",usable);context.put("approvedValueMappings",values);context.put("approvedColumnDefinitions",columnDefinitions(defined));
+        if(definitionsOnly)context.put("tableMetadata",boundEntries.stream().map(e->Map.of("reference",OntologyContext.reference(e),"source",e.document().source(),"meaning",e.document().meaning())).toList());
+        else context.put("rdf",rdf);
+        String payload=json.writeValueAsString(context);
         if(payload.length()>AiAssistant.MAX_SOURCE)throw new Failure(413,"query.narrow");return payload;
     }
     public static String sqlPrompt(AiAssistant.Draft draft){
@@ -172,6 +201,7 @@ public final class OntologyInquiry {
             +"valueMeaning and labelColumn describe a column's domain/notation and same-table display-name source; they do not establish actual code matches, uniqueness or foreign-key relationships. "
             +"Explain approvedColumnDefinitions as column meaning, role, representation and usage guidance, not observed row values. "
             +"Explain the supplied paths using their RELATION evidence IDs: name intermediate tables and each recorded column mapping. Path order is traversal order, not FK direction; use source/target and from/to in the evidence for direction. "
+            +"A path may cover only part of the search concepts. Explain the supported connection and state any unmatchedConcepts in limitation; do not invent connections to them. "
             +"Do not equate multi-hop reachability with a new direct relationship. Missing business rows alone does not prevent explaining a supported schema connection. "
             +"If actual values, individual records or totals are requested, never invent them: explain only the supported structure and state in limitation that rows were not queried and those values are not answered. "
             +"Return only JSON {\"status\":\"ANSWERED|INSUFFICIENT\",\"sentences\":[{\"text\":\"short grounded sentence\",\"evidence\":[\"R1\"]}],\"limitation\":\"short note\"}. "

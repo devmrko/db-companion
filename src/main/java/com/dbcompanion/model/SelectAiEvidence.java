@@ -35,18 +35,35 @@ public final class SelectAiEvidence {
             return data;
         }
         public synchronized OntologyInquiry.Search search(String schema,String question,String anchor){
+            return search(schema,question,anchor,BusinessGlossary.Analysis.exact());
+        }
+        public synchronized OntologyInquiry.Search search(String schema,String question,String anchor,BusinessGlossary.Analysis analysis){
             invalidate();SelectAiTest.question(question);
             if(data==null||!data.schema().equals(schema)||question.codePoints().anyMatch(c->c>=0xD800&&c<=0xDFFF))throw stale();
             anchor=Objects.toString(anchor,"");String table=anchor;
             if(!anchor.isEmpty()&&data.entries().stream().noneMatch(e->e.document().source().table().equals(table)))throw stale();
             // Same bounded path finder, with the test screen's 16,000-character input contract.
-            return search=OntologyPaths.search(data,question,anchor);
+            return search=OntologyPaths.search(data,question,anchor,analysis);
         }
         public synchronized Snapshot choose(String id,String route,JsonMapper json){
             if(search==null||!search.id().equals(id))throw stale();
             var chosen=OntologyInquiry.chooseRoute(search,route);var entries=OntologyInquiry.selected(chosen,data);
             String source=OntologyInquiry.payload(chosen,entries,json);
             return selected=new Snapshot(chosen.schema(),chosen.question(),route,entries.stream().map(OntologyContext::reference).toList(),
+                    OntologyQueryService.hash(source),source,entries);
+        }
+        public synchronized Snapshot definitions(String schema,String question,List<String> tables,JsonMapper json){
+            var found=search;invalidate();SelectAiTest.question(question);
+            if(data==null||!data.schema().equals(schema)||question.codePoints().anyMatch(c->c>=0xD800&&c<=0xDFFF))throw stale();
+            if(tables!=null&&tables.isEmpty()){
+                // A verified empty lookup is not a failed lookup or permission to omit existing matches.
+                if(found==null||!found.question().equals(question)||found.limited()||found.concepts().stream().flatMap(c->c.targets().stream()).anyMatch(t->data.entries().stream().anyMatch(e->e.state().equals("APPROVED")&&e.document().source().table().equals(t.table()))))throw stale();
+                String source=json.writeValueAsString(Map.of("question",question,"mode","NO_MATCHING_APPROVED_DEFINITIONS","evidence",List.of(),"paths",List.of()));
+                return selected=new Snapshot(schema,question,"NO_MATCH",List.of(),OntologyQueryService.hash(source),source,List.of());
+            }
+            var chosen=OntologyInquiry.definitions(data,question,tables);var entries=OntologyInquiry.selected(chosen,data);
+            String source=OntologyInquiry.definitionPayload(chosen,entries,json);
+            return selected=new Snapshot(schema,question,"DEFINITIONS",entries.stream().map(OntologyContext::reference).toList(),
                     OntologyQueryService.hash(source),source,entries);
         }
         public synchronized Snapshot resolve(boolean enabled,String hash,String question){

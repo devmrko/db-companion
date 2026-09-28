@@ -16,8 +16,14 @@ import tools.jackson.databind.json.JsonMapper;
 public class OntologyQueryService {
     private final SessionDataSource source;private final OntologyRepository repository;private final AiAssistantRepository ai;private final ProfileHistoryRepository profiles;
     private final OntologyQueryRepository queries;private final PropertyGraphRepository graphs;private final JsonMapper json;private final TransactionTemplate read,generate,execute;
+    private final QuestionAnalysisService analysis;
     public record Preview(String mode,AiAssistant.Preview request){}
     public OntologyQueryService(SessionDataSource source,OntologyRepository repository,AiAssistantRepository ai,ProfileHistoryRepository profiles,OntologyQueryRepository queries,PropertyGraphRepository graphs,JsonMapper json){
+        this(source,repository,ai,profiles,queries,graphs,json,null);
+    }
+    @org.springframework.beans.factory.annotation.Autowired
+    public OntologyQueryService(SessionDataSource source,OntologyRepository repository,AiAssistantRepository ai,ProfileHistoryRepository profiles,OntologyQueryRepository queries,PropertyGraphRepository graphs,JsonMapper json,QuestionAnalysisService analysis){
+        this.analysis=analysis;
         this.source=source;this.repository=repository;this.ai=ai;this.profiles=profiles;this.queries=queries;this.graphs=graphs;this.json=json;
         var manager=new DataSourceTransactionManager(source);read=new TransactionTemplate(manager);read.setReadOnly(true);read.setTimeout(60);generate=new TransactionTemplate(manager);generate.setReadOnly(true);generate.setTimeout(120);
         var strict=new DataSourceTransactionManager(source);strict.setEnforceReadOnly(true);execute=new TransactionTemplate(strict);execute.setReadOnly(true);execute.setTimeout(60);
@@ -29,7 +35,10 @@ public class OntologyQueryService {
         var entries=repository.relationshipEntries(schema,login(s));var now=Instant.now().toString();return new OntologyInquiry.Dataset(schema,entries,OntologyRelations.analyze(s.metadata().info().database(),schema,entries,now),now);
     }));}
     public OntologyInquiry.Options options(PoolSession s,String schema,boolean refresh){synchronized(s){scope(s,schema);var d=dataset(s,schema,refresh);return new OntologyInquiry.Options(schema,d.entries().stream().map(e->new OntologyInquiry.Choice(e.document().source().table(),e.document().meaning().concept(),e.state(),e.revision())).toList(),d.checkedAt());}}
-    public OntologyInquiry.Search search(PoolSession s,String schema,String question,String anchor){synchronized(s){scope(s,schema);var state=s.metadata().inquiry();state.invalidate();var result=OntologyInquiry.search(dataset(s,schema,false),question,anchor);state.remember(result);return result;}}
+    public OntologyInquiry.Search search(PoolSession s,String schema,String question,String anchor){return search(s,schema,question,anchor,QuestionLanguage.KO);}
+    public OntologyInquiry.Search search(PoolSession s,String schema,String question,String anchor,QuestionLanguage language){synchronized(s){scope(s,schema);var state=s.metadata().inquiry();state.invalidate();
+        var data=dataset(s,schema,false);var tokens=Objects.requireNonNull(analysis).analyze(s,question,language);
+        var result=OntologyInquiry.search(data,question,anchor,tokens);state.remember(result);return result;}}
     private void verify(PoolSession s,String schema,List<Entry> entries){
         repository.require(schema,login(s));for(var e:entries){var current=repository.entry(schema,e.document().source().table(),0);if(current==null||!e.state().equals(current.state())||!PropertyGraph.sameDefinitions(List.of(e),List.of(current)))throw new Failure(409,"query.stale");}
     }

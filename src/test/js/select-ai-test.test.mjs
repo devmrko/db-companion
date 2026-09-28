@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {validQuestion,canPrepare,canSend,modeLabel,canReview,isSqlResponse} from '../../main/resources/static/js/select-ai-test.mjs';
+import {validQuestion,canPrepare,canSend,modeLabel,canReview,isSqlResponse,selectedSavePayload} from '../../main/resources/static/js/select-ai-test.mjs';
 test('question boundaries preserve Unicode without clipping',()=>{
   for(const q of ['',null,undefined,'  ','a\0b','x'.repeat(16001)])assert.equal(validQuestion(q),false);
   for(const q of ['한국어 中文 日本語','<script>','x'.repeat(16000)])assert.equal(validQuestion(q),true);
@@ -50,4 +50,32 @@ test('review consumes only server token and preserves generation separately',()=
   assert.match(source,/reviewDialog.addEventListener\('cancel'/);
   assert.match(source,/if\(outcome.text\)/); // Rejected SQL text remains available as evidence.
   assert.notEqual(modeLabel('PROMPT'),modeLabel('SQL'));
+});
+test('A/B selector contract mounts every comparison control through data-test names',()=>{
+  const html=fs.readFileSync('src/main/resources/templates/ai-test.html','utf8'),source=fs.readFileSync('src/main/resources/static/js/select-ai-test.mjs','utf8');
+  for(const name of ['comparison-left','comparison-right','comparison-preview','comparison-left-inspection','comparison-right-inspection','comparison-showprompt-preview','comparison-result','comparison-dialog','comparison-close','comparison-plan','comparison-source','comparison-consent','comparison-left-run','comparison-right-run','comparison-showprompt-dialog','comparison-showprompt-close','comparison-showprompt-source','comparison-showprompt-consent','comparison-showprompt-left-run','comparison-showprompt-right-run','comparison-ai-dialog','comparison-ai-close','comparison-ai-source','comparison-ai-consent','comparison-ai-run']){assert.match(html,new RegExp(`data-test-${name}`));assert.match(source,new RegExp(`get\\('${name}'\\)`));}
+});
+test('selected result persistence posts the immutable comparison identity and never a mutable latest result',()=>{
+  const source=fs.readFileSync('src/main/resources/static/js/select-ai-test.mjs','utf8');
+  assert.match(source,/comparison\/problem\/save-preview/);assert.match(source,/comparison\/problem/);
+  assert.match(source,/\{generation:comparison\.generation,side,resultId:outcome\.id\}/);
+  assert.match(source,/problem\/save-preview/);assert.match(source,/resultId:latest\.id/);
+  assert.match(source,/kind:'comparison',generation:comparison\.generation,side,resultId:outcome\.id,saveToken:save\.token/);
+});
+test('selected result payloads contain only the strict endpoint DTO fields',()=>{
+  const fields={description:'d',expected:'e',expectedSql:'s',status:'RECEIVED',includeSnapshots:true};
+  assert.deepEqual(selectedSavePayload({kind:'single',resultId:'r',saveToken:'t'},'',fields),{resultId:'r',saveToken:'t',...fields});
+  assert.deepEqual(selectedSavePayload({kind:'comparison',generation:'g',side:'left',resultId:'r',saveToken:'t'},{id:'p',updatedAt:'2026-09-24T00:00:00Z'},fields),{generation:'g',side:'left',resultId:'r',saveToken:'t',parentId:'p',parentUpdatedAt:'2026-09-24T00:00:00Z',includeSnapshots:true});
+});
+test('short condition confirmation requires actual values and ignores obsolete submissions',()=>{
+  const source=fs.readFileSync(new URL('../../main/resources/static/js/select-ai-test.mjs',import.meta.url),'utf8');
+  const template=fs.readFileSync(new URL('../../main/resources/templates/ai-test.html',import.meta.url),'utf8');
+  assert.match(template,/data-test-condition-choice value="period"/);
+  assert.match(template,/data-test-condition-value="period"/);
+  assert.match(template,/data-test-condition-error/);
+  assert.match(source,/if\(busy\|\|remoteRunning\)return;/);
+  assert.match(source,/key:`free-\$\{index\+1\}`/);
+  assert.match(source,/formFingerprint!==currentFingerprint/);
+  assert.match(source,/post\('cancel',\{token:value\.preview\.token\}\)/);
+  assert.doesNotMatch(source,/map\(value=>\(\{topic:'자유 입력 조건',value\}\)\)/);
 });

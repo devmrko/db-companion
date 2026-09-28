@@ -72,6 +72,22 @@ class SelectAiTestTest {
         state.finish(result);state.profiles(true,List::of);assertThat(state.latest()).isEqualTo(result);
         state.finish(null);assertThat(state.latest()).isNull();
     }
+    @Test void selectedProblemSaveBindsExactResultAndBlocksUnknownOutcomeBypass(){
+        var state=state();var first=new SelectAiTest.Outcome("one",Action.SQL,profile,"question",now,10,"SELECT 1 FROM DUAL",null,null,"complete");state.finish(first);
+        var preview=state.prepareProblemSave("one",now);var begin=state.beginProblemSave("one",preview.token(),"parent",now);assertThat(begin.selection().outcome()).isSameAs(first);state.unconfirmedProblemSave(preview.token());
+        assertThatThrownBy(()->state.prepareProblemSave("one",now)).isInstanceOf(Failure.class);
+        state.finish(new SelectAiTest.Outcome("two",Action.SQL,profile,"question",now,10,"SELECT 2 FROM DUAL",null,null,"complete"));
+        assertThatThrownBy(()->state.beginProblemSave("one",preview.token(),"parent",now)).isInstanceOf(Failure.class);
+    }
+    @Test void promptCompletionDoesNotClearExistingResultSaveLedger(){
+        var state=state();var result=new SelectAiTest.Outcome("one",Action.SQL,profile,"question",now,10,"SELECT 1 FROM DUAL",null,null,"complete");state.finish(result);var preview=state.prepareProblemSave("one",now);state.finish(new SelectAiTest.Outcome("prompt",Action.PROMPT,profile,"question",now,1,"reconstructed",null,null,"showprompt"));
+        assertThat(state.beginProblemSave("one",preview.token(),"parent",now).selection().outcome()).isSameAs(result);
+    }
+    @Test void expiredUnusedOrKnownSinglePrewriteFailureGetsANewReviewToken(){
+        var state=state();var result=new SelectAiTest.Outcome("one",Action.SQL,profile,"question",now,10,"SELECT 1 FROM DUAL",null,null,"complete");state.finish(result);
+        var first=state.prepareProblemSave("one",Instant.EPOCH);var replacement=state.prepareProblemSave("one",Instant.EPOCH.plusSeconds(301));assertThat(replacement.token()).isNotEqualTo(first.token());
+        state.beginProblemSave("one",replacement.token(),"parent",Instant.EPOCH.plusSeconds(301));state.abortProblemSave(replacement.token());assertThat(state.prepareProblemSave("one",Instant.EPOCH.plusSeconds(302)).token()).isNotEqualTo(replacement.token());
+    }
     @Test void promptCannotBeginWithUserSuppliedSelectAiAndDoesNotTruncate(){
         String input="SELECT AI RUNSQL DELETE FROM x; 日本語 한국어 中文 <script>";
         for(var action:Action.values()){
@@ -80,6 +96,20 @@ class SelectAiTestTest {
         }
         assertThat(SelectAiTest.prompt(Action.CHAT,"질문","ja")).contains("Japanese");
         for(String inputBad:Arrays.asList(null,""," ","a\0b","가".repeat(16001)))assertThatThrownBy(()->SelectAiTest.question(inputBad)).isInstanceOf(Failure.class);
+    }
+    @Test void shortConditionConfirmationUsesOnlyActualValuesAndPreservesOriginalQuestion(){
+        var confirmation=new SelectAiTest.ConditionConfirmation("원 질문","기간은 무엇입니까?","2026년 1월",List.of(new SelectAiTest.ConfirmedCondition("aggregation","집계 단위","일별"),new SelectAiTest.ConfirmedCondition("free-1","자유 입력 조건 1","취소 건 제외")));
+        var state=state();var prepared=state.prepare("APP",profile,Action.SQL,"원 질문","ko",now,null,confirmation);
+        assertThat(prepared.confirmation()).isEqualTo(confirmation);assertThat(prepared.preview().source()).contains("ORIGINAL QUESTION: 원 질문","CONFIRMATION QUESTION: 기간은 무엇입니까?","USER ANSWER: 2026년 1월","집계 단위: 일별","자유 입력 조건 1: 취소 건 제외").doesNotContain("CONFIRMED CONDITION — 기간 또는 기준 날짜:");
+        assertThat(state.consume(prepared.preview().token(),true,"APP",now).confirmation()).isEqualTo(confirmation);
+        assertThat(confirmation.conditions()).extracting(SelectAiTest.ConfirmedCondition::key).containsExactly("aggregation","free-1");
+        assertThatThrownBy(()->new SelectAiTest.ConditionConfirmation("원 질문","질문만","",List.of())).isInstanceOf(Failure.class);
+        assertThatThrownBy(()->new SelectAiTest.ConditionConfirmation("원 질문","","",List.of(new SelectAiTest.ConfirmedCondition("기간","") ))).isInstanceOf(Failure.class);
+    }
+    @Test void conditionSourceOverLimitIsRejectedBeforeProviderConsumption(){
+        var state=state();String question="q";var confirmation=new SelectAiTest.ConditionConfirmation(question,"","",List.of(new SelectAiTest.ConfirmedCondition("범위","x")));
+        var evidence=new SelectAiEvidence.Snapshot("APP",question,"",List.of(),"hash","x".repeat(AiAssistant.MAX_SOURCE),List.of());
+        assertThatThrownBy(()->state.prepare("APP",profile,Action.SQL,question,"ko",now,evidence,confirmation)).isInstanceOf(Failure.class).hasMessageContaining("64,000");
     }
     @Test void generatedCallsHaveOnlyThreeLiteralActionsAndNeverExecuteReturnedSql(){
         for(var action:Action.values()){

@@ -53,6 +53,7 @@ public class MetadataService {
             try {
                 return read.execute(status -> {
                     repository.requireTarget(target);
+                    if (kind.equals("annotation")) repository.requireAnnotationTarget(target);
                     boolean add = kind.equals("annotation") && (name == null || name.isEmpty());
                     if (add) return new Form(target, kind, "add", "", "", "", repository.columns(target));
                     var current = value(target, kind, name);
@@ -61,6 +62,25 @@ public class MetadataService {
                             MetadataSql.version(target, kind, name, current), List.of());
                 });
             } finally { source.clear(); }
+        }
+    }
+
+    /** Loads a historical value into the ordinary editor; no metadata is changed until Save. */
+    public Form restoreForm(PoolSession session, RestoreRequest request) {
+        synchronized (session) {
+            var target=request.target();requireScope(session,target);requireKind(request.kind());
+            String historical=MetadataSql.normalizedValue(request.value());
+            source.bind(session.pool(),session.connectionSchema());
+            try { return read.execute(status -> {
+                repository.requireTarget(target);
+                if (request.kind().equals("annotation")) repository.requireAnnotationTarget(target);
+                String name=request.kind().equals("comment")?null:MetadataSql.existingAnnotationName(request.name());
+                var current=value(target,request.kind(),name);
+                if (request.kind().equals("annotation")&&!current.present())
+                    return new Form(target,request.kind(),"add",MetadataSql.identifier(name),historical,"",repository.columns(target),null);
+                requireEditable(current,request.kind());
+                return new Form(target,request.kind(),"edit",name,historical,MetadataSql.version(target,request.kind(),name,current),List.of(),current.value());
+            }); } finally { source.clear(); }
         }
     }
 
@@ -80,6 +100,7 @@ public class MetadataService {
             try {
                 return write.execute(status -> {
                     repository.requireTarget(target);
+                    if (request.kind().equals("annotation")) repository.requireAnnotationTarget(target);
                     var before = value(target, request.kind(), name);
                     if (add) {
                         if (before.present()) throw new MetadataEditException(409, "Annotation already exists",

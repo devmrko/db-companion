@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {historyUpgradeRequest, historyUpgradeView} from '../../main/resources/static/js/metadata-history.mjs';
+import {historyUpgradeRequest, historyUpgradeView, canRestoreHistory} from '../../main/resources/static/js/metadata-history.mjs';
 
 test('upgrade payload supplies the required primitive boolean without enabling history', () => {
   assert.equal(JSON.stringify(historyUpgradeRequest('DEMO_APP', 'DEMO_COUNTRY')),
@@ -20,4 +20,10 @@ test('shared audit update requires an explicit complete preflight, never the old
   assert.deepEqual(historyUpgradeView({auditUpgradeRequired: true, triggerUpgradeAllowed: true}), {hidden: false, disabled: true});
   assert.deepEqual(historyUpgradeView({auditUpgradeRequired: true, codeUpgradeAllowed: false}), {hidden: false, disabled: true});
   assert.deepEqual(historyUpgradeView({auditUpgradeRequired: true, codeUpgradeAllowed: true, trackingEnabled: false}), {hidden: false, disabled: false});
+});
+test('view history restores comments but never table-only annotations', () => {
+  assert.equal(canRestoreHistory('COMMENT', 'false'), true);
+  assert.equal(canRestoreHistory('ANNOTATION', 'false'), false);
+  assert.equal(canRestoreHistory('ANNOTATION', 'true'), true);
+  assert.equal(canRestoreHistory('UNKNOWN', 'true'), false);
 });

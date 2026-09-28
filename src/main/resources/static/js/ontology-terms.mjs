@@ -33,7 +33,7 @@ const button=(text,fn)=>{const n=el('button',text,'btn app-btn app-btn-quiet');n
 export function termsViewer(data,inspect){
   const terms=vocabulary(data),root=el('div'),toolbar=el('div',undefined,'app-rdf-toolbar');
   const search=el('input',undefined,'form-control');search.type='search';search.placeholder=label('search');search.setAttribute('aria-label',label('search'));
-  const help=el('details',undefined,'app-dds-help'),summary=el('summary','?');summary.setAttribute('aria-label',label('helpTitle'));help.append(summary,el('p',label('help')));toolbar.append(search,help);root.append(toolbar);
+  const help=el('details',undefined,'app-dds-help'),summary=el('summary','?'),helpBody=el('div');summary.setAttribute('aria-label',label('helpTitle'));helpBody.append(el('p',label('help')));help.append(summary,helpBody);toolbar.append(search,help);root.append(toolbar);
   const wrap=el('div',undefined,'table-responsive'),table=el('table',undefined,'table app-table'),head=el('thead'),header=el('tr'),body=el('tbody');
   for(const key of ['preferred','aliases','source','definition']){const cell=el('th',label(key));cell.scope='col';header.append(cell);}head.append(header);table.append(head,body);wrap.append(table);root.append(wrap);
   const pages=el('div',undefined,'app-dds-pages'),count=el('span'),controls=el('div'),number=el('span');let page=1;

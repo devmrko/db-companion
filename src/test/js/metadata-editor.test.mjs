@@ -2,6 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {byteLength} from '../../main/resources/static/js/metadata-editor.mjs';
 import {formatHistoryJson, historyToggleView} from '../../main/resources/static/js/metadata-history.mjs';
+import {readFileSync} from 'node:fs';
 test('editor counts UTF-8 bytes including Korean and emoji', () => {
   assert.equal(byteLength('abc'), 3);
   assert.equal(byteLength('국가'), 6);
@@ -21,4 +22,11 @@ test('history preserves ON state for read-only users and never enables an unconf
   assert.equal(view.text, '켜짐 · 관리 계정: INSTALLER · 권한 없음');
   assert.equal(historyToggleView({enabled: false}).disabled, true);
   assert.equal(historyToggleView({enabled: false, canManage: true}).disabled, false);
+});
+test('restore displays current DB value separately from the editable historical value', () => {
+  const template=readFileSync('src/main/resources/templates/fragments/metadata-editor.html','utf8');
+  const source=readFileSync('src/main/resources/static/js/metadata-editor.mjs','utf8');
+  assert.match(template,/data-editor-current-value readonly/);
+  assert.match(source,/currentValue.value = hasCurrent \? data.currentValue : ''/);
+  assert.match(source,/data-editor-current-group/);
 });

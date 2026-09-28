@@ -5,7 +5,7 @@
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
   <main class="app-content">
     <a class="app-back-link" th:href="@{/ai-agents}" th:text="#{ui.cd637234ce24}">← Team 목록</a>
-    <div class="app-page-heading"><h1 class="app-object-title" th:text="${teamName}"></h1><div class="app-history-toolbar">
+    <div class="app-page-heading"><h1 class="app-object-title" th:text="${teamName}"></h1><button th:replace="~{fragments/common :: sqlHelp('agents', 'edit')}"></button><div class="app-history-toolbar">
       <button th:if="${teamPage != null and teamEditable == true}" type="button" class="btn app-btn app-btn-secondary" data-open-team-history th:text="#{ui.e78d03ec8597}">변경 이력</button>
       <button th:if="${teamPage != null and teamEditable == true}" type="button" class="btn app-btn app-btn-secondary" data-ai-create="TEAM" th:attr="data-source=${teamName}" th:text="#{creation.clone}">복제</button>
       <a class="btn app-btn app-btn-secondary" th:href="@{/ai-agents/team(schema=${targetSchema},team=${teamName})}" th:text="#{ui.8259f9d35351}">새로고침</a></div></div>

@@ -11,6 +11,7 @@
 </head>
 <body>
 <svg th:fragment="icon(name)" class="app-icon" aria-hidden="true" focusable="false"><use th:href="@{/icons.svg} + '#' + ${name}"></use></svg>
+<button th:fragment="sqlHelp(feature, operation)" type="button" class="btn app-btn app-btn-secondary app-sql-help-button" th:attr="data-sql-help-for=${feature},data-sql-help-operation=${operation}" th:aria-label="#{sqlHelp.open}" th:title="#{sqlHelp.open}">SQL ?</button>
 <a th:fragment="brand" class="app-brand" th:href="@{/login}" th:aria-label="#{ui.542681d48a34}">
   <span class="app-brand-mark"><svg th:replace="~{fragments/common :: icon('database')}"></svg></span>
   <span class="app-brand-name">DB<span class="app-brand-light">companion</span></span>
@@ -23,6 +24,7 @@
   </nav>
   <p class="app-nav-label app-nav-group" th:text="#{ui.e307b2f42689}">AI 데이터 관리</p>
   <nav th:aria-label="#{ui.e307b2f42689}">
+    <a class="app-nav-item" th:classappend="${activePage == 'business-glossary'} ? 'is-active'" th:href="@{/business-glossary}" th:attr="aria-current=${activePage == 'business-glossary' ? 'page' : null}" th:aria-label="#{businessGlossary.title}" th:title="#{businessGlossary.title}"><svg th:replace="~{fragments/common :: icon('search')}"></svg><span class="app-nav-text" th:text="#{businessGlossary.title}">업무 용어 사전</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'ontology'} ? 'is-active'" th:href="@{/ontology}" th:attr="aria-current=${activePage == 'ontology' ? 'page' : null}" th:aria-label="#{ontology.title}" th:title="#{ontology.title}"><svg th:replace="~{fragments/common :: icon('layers')}"></svg><span class="app-nav-text" th:text="#{ontology.title}">온톨로지</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'ontology-query'} ? 'is-active'" th:href="@{/ontology-query}" th:attr="aria-current=${activePage == 'ontology-query' ? 'page' : null}" th:aria-label="#{ontology.query.title}" th:title="#{ontology.query.title}"><svg th:replace="~{fragments/common :: icon('search')}"></svg><span class="app-nav-text" th:text="#{ontology.query.title}">온톨로지 질의</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'assistant'} ? 'is-active'" th:href="@{/ai-assistant}" th:attr="aria-current=${activePage == 'assistant' ? 'page' : null}" th:aria-label="#{assistant.title}" th:title="#{assistant.title}"><svg th:replace="~{fragments/common :: icon('layers')}"></svg><span class="app-nav-text" th:text="#{assistant.title}">AI 도우미 설정</span></a>
@@ -30,6 +32,7 @@
     <a class="app-nav-item" th:classappend="${activePage == 'tables'} ? 'is-active'" th:href="@{/tables}" th:attr="aria-current=${activePage == 'tables' ? 'page' : null}" th:aria-label="#{ui.31c660ef0b9a}" th:title="#{ui.31c660ef0b9a}"><svg th:replace="~{fragments/common :: icon('table')}"></svg><span class="app-nav-text" th:text="#{ui.31c660ef0b9a}">테이블·컬럼</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'profiles'} ? 'is-active'" th:href="@{/ai-profiles}" th:attr="aria-current=${activePage == 'profiles' ? 'page' : null}" th:aria-label="#{ui.e65249eb5f3c}" th:title="#{ui.e65249eb5f3c}"><svg th:replace="~{fragments/common :: icon('database')}"></svg><span class="app-nav-text" th:text="#{ui.e65249eb5f3c}">Select AI 프로필</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'ai-test'} ? 'is-active'" th:href="@{/ai-test}" th:attr="aria-current=${activePage == 'ai-test' ? 'page' : null}" th:aria-label="#{aitest.title}" th:title="#{aitest.title}"><svg th:replace="~{fragments/common :: icon('database')}"></svg><span class="app-nav-text" th:text="#{aitest.title}">Select AI 테스트</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'ai-problems'} ? 'is-active'" th:href="@{/ai-test/problems}" th:attr="aria-current=${activePage == 'ai-problems' ? 'page' : null}" th:aria-label="#{problemQuestion.title}" th:title="#{problemQuestion.title}"><svg th:replace="~{fragments/common :: icon('history')}"></svg><span class="app-nav-text" th:text="#{problemQuestion.title}">문제 질문</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'feedback'} ? 'is-active'" th:href="@{/ai-feedback}" th:attr="aria-current=${activePage == 'feedback' ? 'page' : null}" aria-label="Select AI Feedback" title="Select AI Feedback"><svg th:replace="~{fragments/common :: icon('table')}"></svg><span class="app-nav-text">Select AI Feedback</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'agents'} ? 'is-active'" th:href="@{/ai-agents}" th:attr="aria-current=${activePage == 'agents' ? 'page' : null}" aria-label="Select AI Agent" title="Select AI Agent"><svg th:replace="~{fragments/common :: icon('layers')}"></svg><span class="app-nav-text">Select AI Agent</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'executions'} ? 'is-active'" th:href="@{/ai-executions}" th:attr="aria-current=${activePage == 'executions' ? 'page' : null}" th:aria-label="#{ui.cf835c698541}" th:title="#{ui.cf835c698541}"><svg th:replace="~{fragments/common :: icon('history')}"></svg><span class="app-nav-text" th:text="#{ui.cf835c698541}">AI 실행 이력</span></a>
@@ -64,6 +67,41 @@
     </form>
     <form th:action="@{/logout}" method="post"><button class="btn app-btn app-btn-quiet" type="submit"><svg th:replace="~{fragments/common :: icon('logout')}"></svg><th:block th:text="#{ui.919c1b323225}">로그아웃</th:block></button></form>
   </div>
+  <dialog class="app-preview-dialog app-sql-help-dialog" data-sql-help-dialog aria-labelledby="sql-help-title">
+    <div class="app-preview-header">
+      <h2 id="sql-help-title" data-sql-help-label="title" th:text="#{sqlHelp.title}">SQL / PLSQL 도움말</h2>
+      <button type="button" class="btn app-btn app-btn-secondary" data-sql-help-close data-sql-help-label="close" th:text="#{sqlHelp.close}">닫기</button>
+    </div>
+    <div class="app-preview-body">
+      <div class="app-sql-help-picker">
+        <label for="sql-help-operation" data-sql-help-label="operation">작업 선택</label>
+        <select id="sql-help-operation" class="form-select app-select" data-sql-help-operation></select>
+        <span class="app-sql-help-risk" data-sql-help-risk></span>
+        <p class="app-muted" data-sql-help-fallback hidden></p>
+      </div>
+      <section class="app-sql-help-section"><h3 data-sql-help-label="purpose" th:text="#{sqlHelp.purpose}">목적</h3><p data-sql-help-purpose></p></section>
+      <section class="app-sql-help-section">
+        <h3 data-sql-help-label="sql" th:text="#{sqlHelp.sql}">SQL·PLSQL</h3>
+        <pre class="app-preview-source" data-sql-help-sql tabindex="0"></pre>
+        <div class="app-sql-help-actions">
+          <button type="button" class="btn app-btn app-btn-secondary" data-sql-help-copy data-sql-help-label="copy" th:text="#{sqlHelp.copy}">SQL 복사</button>
+          <p class="app-filter-message" data-sql-help-status aria-live="polite"></p>
+        </div>
+      </section>
+      <section class="app-sql-help-section"><h3 data-sql-help-label="variables" th:text="#{sqlHelp.variables}">변수</h3><p data-sql-help-variables></p></section>
+      <section class="app-sql-help-section"><h3 data-sql-help-label="permission" th:text="#{sqlHelp.permission}">권한·실행 주체</h3><p data-sql-help-permission></p></section>
+      <section class="app-sql-help-section"><h3 data-sql-help-label="effects" th:text="#{sqlHelp.effects}">읽기·쓰기·외부 호출·비용</h3><p data-sql-help-effects></p></section>
+      <section class="app-sql-help-section"><h3 data-sql-help-label="result" th:text="#{sqlHelp.result}">결과 확인</h3><p data-sql-help-result></p>
+        <div data-sql-help-verification hidden>
+          <h4 data-sql-help-label="verify">확인용 조회 SQL</h4>
+          <pre class="app-preview-source" data-sql-help-verify tabindex="0"></pre>
+          <button type="button" class="btn app-btn app-btn-secondary" data-sql-help-copy-verify data-sql-help-label="copyVerify">확인 SQL 복사</button>
+        </div>
+      </section>
+      <p class="app-sql-help-origin"><span data-sql-help-label="source">소스 근거</span>: <code data-sql-help-source></code></p>
+      <a class="app-sql-help-doc" data-sql-help-doc target="_blank" rel="noopener noreferrer" data-sql-help-label="doc" th:text="#{sqlHelp.doc}">Oracle 공식 문서</a>
+    </div>
+  </dialog>
 </header>
 <form th:fragment="language" th:action="@{/language}" method="post" class="app-language-form" data-language-form>
   <input type="hidden" name="returnTo" th:value="${languageReturn ?: '/login'}" data-language-return>

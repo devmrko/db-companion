@@ -22,7 +22,7 @@ test('old SQL or prompt cannot be used across evidence variants',()=>{
 });
 test('only explicit choice is posted, raw evidence uses safe text and no provider calls',()=>{
   const source=fs.readFileSync('src/main/resources/static/js/select-ai-evidence.mjs','utf8');
-  assert.match(source,/post\('evidence\/search'/);assert.match(source,/post\('evidence\/choose',\{searchId:search.id,route:get\('routes'\).value\}\)/);
+  assert.ok(source.includes("post(analysisEndpoint('evidence/search',analysis.language())"));assert.match(source,/post\('evidence\/choose',\{searchId:search.id,route:get\('routes'\).value\}\)/);
   assert.match(source,/pre.textContent=value.source/);assert.match(source,/cell.textContent=text/);
   assert.doesNotMatch(source,/innerHTML|localStorage|sessionStorage|setInterval|setTimeout|post\('generate'|routes\[0\]/);
   assert.match(source,/useOntology:enabled\(\),evidenceHash:/);
@@ -30,7 +30,7 @@ test('only explicit choice is posted, raw evidence uses safe text and no provide
 });
 test('main workflow uses one context and blocks stale review and execution',()=>{
   const source=fs.readFileSync('src/main/resources/static/js/select-ai-test.mjs','utf8');
-  assert.match(source,/post\('preview',\{action,question:get\('question'\).value,...evidence.request\(\)\}\)/);
+  assert.match(source,/post\('preview',\{action,question:get\('question'\).value,...evidence.request\(\),...glossary.request\(\)\}\)/);
   assert.match(source,/evidence.matches\(snapshot.evidence\)/);assert.match(source,/evidence.matches\(latest.evidence\)/);
   assert.match(source,/renderEvidence\(get\('request-evidence'\),outcome.evidence\)/);
   assert.match(source,/renderEvidence\(get\('prompt-evidence'\),value.evidence\)/);

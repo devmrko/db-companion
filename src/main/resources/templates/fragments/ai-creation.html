@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"><body><th:block th:fragment="dialog">
 <dialog class="app-preview-dialog" data-ai-creation th:attr="data-base=@{/ai-create},data-schema=${selectedSchema}" aria-labelledby="ai-creation-title">
-  <header class="app-preview-header"><h2 id="ai-creation-title" th:text="#{creation.title}">AI 객체 생성</h2><button type="button" class="btn app-btn app-btn-quiet" data-ac-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+  <header class="app-preview-header"><h2 id="ai-creation-title" th:text="#{creation.title}">AI 객체 생성</h2><button type="button" class="btn app-btn app-btn-secondary app-sql-help-button" data-ac-sql-help data-sql-help-for="profiles" data-sql-help-operation="create" th:aria-label="#{sqlHelp.open}" th:title="#{sqlHelp.open}">SQL ?</button><button type="button" class="btn app-btn app-btn-quiet" data-ac-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
   <form class="app-editor-form" data-ac-form>
     <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-ac-csrf>
     <p data-ac-target class="app-muted"></p>

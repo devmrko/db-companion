@@ -91,7 +91,7 @@ class HistorySqlTest {
     @Test void currentSourceComparisonStillRejectsAnyExecutableFilterChange() {
         var target = new Target("APP", "T", null);
         var asset = HistorySql.trigger(target, "INSTALLER", true);
-        String stored = asset.sql().replaceFirst("CREATE ", "").replace("DISABLE\n-- DB Companion metadata history v2\n", "");
+        String stored = asset.sql().replaceFirst("CREATE ", "").replace("DISABLE\n-- DB Companion metadata history v3\n", "");
         assertThat(HistorySql.triggerVersion(target, "INSTALLER", true, stored)).isEqualTo(HistorySql.TriggerVersion.CURRENT);
         for (String changed : new String[]{stored.replace("'COLUMN'", "'VIEW'"), stored.replace("v_count = 1", "v_count >= 0"),
                 stored.replace("'APP'", "'OTHER'"), stored.replace("'T'", "'T2'"), stored.replace("-20084", "-20000"),
@@ -104,5 +104,16 @@ class HistorySqlTest {
         assertThat(sql).startsWith("CREATE OR REPLACE TRIGGER \"INSTALLER\".\"" + HistorySql.triggerName(target, false) + "\"")
                 .contains("ON DATABASE\nDISABLE").doesNotContain("ALTER TABLE", "DROP ", "GRANT ");
         assertThat(HistorySql.assets(target, "INSTALLER")).allMatch(a -> !a.sql().contains("OR REPLACE"));
+    }
+    @Test void v2TableTriggersStayKnownLegacyIncludingOracleStoredHeaders() {
+        var target = new Target("APP", "V.X", null);
+        for (boolean before : new boolean[]{true, false}) {
+            var old = HistorySql.tableTriggerV2(target, "INSTALLER", before);
+            assertThat(old.sql()).contains("ora_dict_obj_type = 'TABLE'", "history v2");
+            for (String source : new String[]{old.sql(), old.sql().replaceFirst("CREATE ", "").replace("DISABLE\n-- DB Companion metadata history v2\n", "")})
+                assertThat(HistorySql.triggerVersion(target, "INSTALLER", before, source)).isEqualTo(HistorySql.TriggerVersion.LEGACY);
+            assertThat(HistorySql.triggerVersion(target, "INSTALLER", before, old.sql().replace("v_count = 1", "v_count > 0"))).isEqualTo(HistorySql.TriggerVersion.UNKNOWN);
+            assertThat(HistorySql.trigger(target, "INSTALLER", before).sql()).contains("ora_dict_obj_type IN ('TABLE', 'VIEW')", "table_name = 'V.X'", "table_name || '.' || column_name = v_name");
+        }
     }
 }

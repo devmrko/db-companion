@@ -14,7 +14,7 @@ const el=(tag,text,cls)=>{const node=document.createElement(tag);if(text!==undef
 export function valuesEditor(host,{entry,meaning,editable,lookup,run,changed}){
   const columns=eligibleColumns(entry.document.source.columns,meaning);
   const rows=meaning.valueMappings??=[];
-  const help=el('details',undefined,'app-dds-help'),summary=el('summary','?');summary.setAttribute('aria-label',label('title'));help.append(summary,el('p',label('optionalHelp')),el('p',label('help')));host.append(help);
+  const help=el('details',undefined,'app-dds-help'),summary=el('summary','?'),helpBody=el('div');summary.setAttribute('aria-label',label('title'));helpBody.append(el('p',label('optionalHelp')),el('p',label('help')));help.append(summary,helpBody);host.append(help);
   function button(text,action){const b=el('button',text,'btn app-btn app-btn-quiet');b.type='button';b.disabled=!editable;b.dataset.boundDisabled=String(!editable);b.addEventListener('click',action);return b;}
   function field(text,input,parent){const f=el('label',undefined,'app-ontology-field');f.append(el('span',text),input);parent.append(f);return input;}
   function select(text,parent,current){const s=el('select',undefined,'form-select app-select');for(const c of columns)s.add(new Option(c.name,c.name));s.value=current??columns[0]?.name??'';s.disabled=!editable;s.dataset.boundDisabled=String(!editable);return field(text,s,parent);}

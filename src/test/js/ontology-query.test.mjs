@@ -1,7 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {selectedRoute,groupedTables,columnPage,routeArrow,resultPage} from '../../main/resources/static/js/ontology-query.mjs';
+import {selectedRoute,groupedTables,columnPage,routeArrow,resultPage,analysisMissing} from '../../main/resources/static/js/ontology-query.mjs';
+
+test('missing Oracle analysis is distinct from a completed search with no matches',()=>{
+  assert.equal(analysisMissing({analysis:{mode:'ORACLE_TEXT_UNCONFIGURED'}}),true);
+  assert.equal(analysisMissing({analysis:{mode:'ORACLE_TEXT'}}),false);
+  assert.equal(analysisMissing(null),false);
+  const code=readFileSync('src/main/resources/static/js/ontology-query.mjs','utf8');
+  assert.match(code,/search\.routes\.length\|\|analysisMissing\(search\)\?'':q\('paths.noRoute'\)/);
+  assert.match(code,/get\('anchor'\)\.value\|\|analysisMissing\(search\)\?'':q\('noMatch'\)/);
+});
 
 test('route selection groups tables and preserves actual foreign key direction',()=>{
   const route={id:'P1',tables:['A','LINK','B'],relations:['R1','R2']};

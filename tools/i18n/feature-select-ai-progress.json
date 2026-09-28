@@ -1,0 +1,22 @@
+{
+  "aitest.progress.title": ["단계별 처리 시간", "Processing times by stage", "各阶段处理时间", "段階別の処理時間"],
+  "aitest.progress.help": ["현재 로그인 세션의 최근 8회입니다. 서버에서 측정한 단계 시간이며 DB 실행계획의 세부 시간이 아닙니다. SQL 실행과 결과 읽기 모두 DB 작업·네트워크 대기를 포함할 수 있습니다.", "Last eight requests in this login session. These are server-side workflow timings, not database plan timings. Both SQL execution and result fetching may include database work and network waits.", "当前登录会话最近 8 次请求。显示服务器流程时间，而非数据库执行计划时间。SQL 执行和读取结果均可能包含数据库处理和网络等待。", "現在のログインセッションの直近 8 回です。サーバー処理段階の時間であり、DB 実行計画の詳細時間ではありません。SQL 実行と結果読取りの両方に DB 処理・通信待機を含む場合があります。"],
+  "aitest.progress.definitions": ["업무 용어 확인", "Business definition check", "业务术语检查", "業務用語の確認"],
+  "aitest.progress.connection": ["DB 연결·트랜잭션 시작", "DB connection / transaction start", "数据库连接与事务开始", "DB 接続・トランザクション開始"],
+  "aitest.progress.profile": ["프로필·근거 확인", "Profile / evidence check", "配置文件与依据检查", "プロファイル・根拠の確認"],
+  "aitest.progress.ai": ["Select AI 응답 대기", "Waiting for Select AI", "等待 Select AI 响应", "Select AI 応答待機"],
+  "aitest.progress.response": ["응답·참조 정보 정리", "Response / reference processing", "整理响应与引用信息", "応答・参照情報の整理"],
+  "aitest.progress.query": ["SQL 실행", "SQL execution", "SQL 执行", "SQL 実行"],
+  "aitest.progress.fetch": ["결과 읽기", "Result fetching", "读取结果", "結果の読取り"],
+  "aitest.progress.cleanup": ["트랜잭션 정리", "Transaction cleanup", "事务清理", "トランザクション終了処理"],
+  "aitest.progress.execute": ["SQL 조회", "SQL query", "SQL 查询", "SQL 照会"],
+  "aitest.progress.processing": ["처리 중", "Processing", "处理中", "処理中"],
+  "aitest.progress.seconds": ["{0}초", "{0}s", "{0} 秒", "{0}秒"],
+  "aitest.progress.complete": ["완료", "Complete", "完成", "完了"],
+  "aitest.progress.failed": ["실패", "Failed", "失败", "失敗"],
+  "aitest.progress.running": ["진행 중", "Running", "进行中", "実行中"],
+  "aitest.progress.waiting": ["요청 처리·응답 대기", "Processing request / awaiting response", "处理请求与等待响应", "要求処理・応答待機"],
+  "aitest.progress.unconfirmed": ["진행 상태 확인이 지연되고 있습니다. 새로고침으로 확인해 주세요. 실행을 재요청하지 않았습니다.", "Progress confirmation is delayed. Refresh to check; execution has not been resubmitted.", "进度确认延迟。请刷新检查；未重新提交执行请求。", "進捗確認が遅れています。更新して確認してください。実行要求は再送していません。"],
+  "aitest.executionTimeout": ["SQL 실행 제한: {0}초. 앱 설정으로 변경하며 AI 생성 제한과는 별개입니다.", "SQL execution timeout: {0} seconds. Configured in the app, separately from AI generation.", "SQL 执行限制：{0} 秒。由应用配置，与 AI 生成限制分开。", "SQL 実行制限: {0} 秒。アプリ設定で変更し、AI 生成の制限とは別です。"],
+  "aitest.progress.cancelHint": ["작업 취소가 반환되었습니다. 앱의 SQL 실행 제한은 {0}초입니다. 제한시간에 따른 취소일 수 있으나 이 코드만으로 원인을 확정할 수 없습니다. 단계별 시간을 확인하세요.", "Oracle reported cancellation. The app SQL limit is {0} seconds. A timeout is possible, but this code alone does not confirm the cause. Check the stage timings.", "Oracle 返回操作取消。应用 SQL 执行限制为 {0} 秒。可能是超时，但仅凭此代码无法确认原因。请检查阶段时间。", "Oracle が取消しを返しました。アプリの SQL 実行制限は {0} 秒です。時間制限の可能性がありますが、このコードだけでは原因は確定できません。段階別時間を確認してください。"]
+}

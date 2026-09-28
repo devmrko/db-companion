@@ -9,6 +9,7 @@ if (typeof document !== 'undefined') {
     const column = dialog.querySelector('[data-editor-column]');
     const name = dialog.querySelector('[data-editor-name]');
     const value = dialog.querySelector('[data-editor-value]');
+    const currentValue = dialog.querySelector('[data-editor-current-value]');
     const message = dialog.querySelector('[data-editor-message]');
     const close = dialog.querySelector('[data-editor-close]');
     const save = dialog.querySelector('[data-editor-save]');
@@ -18,6 +19,15 @@ if (typeof document !== 'undefined') {
       message.className = error ? 'app-alert is-error' : 'app-alert';
     };
     const count = () => { dialog.querySelector('[data-editor-bytes]').textContent = byteLength(value.value); };
+    const updateSqlHelp = () => {
+      const help=dialog.querySelector('[data-sql-help-for="tables"]');
+      if(!help||!state)return;
+      help.dataset.sqlHelpOperation=state.kind==='comment'
+        ? (column.value?'column-comment':'comment')
+        : column.value?(state.mode==='add'?'column-annotation-add':'column-annotation')
+          :(state.mode==='add'?'annotation':'annotation-replace');
+    };
+    column.addEventListener('change', updateSqlHelp);
     const read = async (url, options) => {
       const response = await fetch(url, {cache: 'no-store', ...options});
       if (response.redirected || response.status === 401) throw new Error(t('ui.43956c4e70d1', "로그인 세션이 만료되었습니다. 입력을 복사한 뒤 다시 로그인해 주세요."));
@@ -25,33 +35,42 @@ if (typeof document !== 'undefined') {
       if (!response.ok) throw Object.assign(new Error(data.error || t('ui.8df80d2b80a6', "요청을 처리하지 못했습니다.")), {status: response.status});
       return data;
     };
-    document.querySelectorAll('[data-edit-metadata]').forEach(button => button.addEventListener('click', async () => {
+    const populate = data => {
+      state = data;
+      const targets = data.mode === 'add' ? ['', ...data.columns] : [data.target.column || ''];
+      targets.forEach(item => { const option = document.createElement('option'); option.value = item; option.textContent = item || dialog.dataset.objectLabel || t('ui.3d721f9ac601', "테이블"); column.append(option); });
+      column.value = data.target.column || ''; column.disabled = data.mode !== 'add';
+      updateSqlHelp();
+      dialog.querySelector('[data-editor-name-group]').hidden = data.kind !== 'annotation';
+      name.value = data.name || ''; name.readOnly = data.mode !== 'add';
+      value.value = data.value || ''; count();
+      const hasCurrent = data.currentValue !== null && data.currentValue !== undefined;
+      currentValue.value = hasCurrent ? data.currentValue : '';
+      dialog.querySelector('[data-editor-current-group]').hidden = !hasCurrent;
+      dialog.querySelector('[data-editor-hint]').textContent = data.currentValue !== null && data.currentValue !== undefined
+        ? t('metadataRestore.currentDifference', "현재 DB 값과 과거 값을 비교한 뒤 저장을 명시적으로 확인해 주세요.")
+        : data.kind === 'annotation'
+        ? t('ui.295a8d77a3b1', "값을 비우면 이름만 있는 Annotation으로 저장합니다. 한 항목씩 반영됩니다.")
+        : t('ui.b911ac018803', "저장하면 기존 코멘트를 교체합니다. 빈 코멘트 저장은 지원하지 않습니다.");
+      fields.disabled = false; save.disabled = false; show(''); value.focus();
+    };
+    const open = async request => {
       pending?.abort(); pending = new AbortController(); const requestVersion = ++version;
       state = null; reload = false; fields.disabled = true; save.disabled = true;
       name.value = ''; value.value = ''; column.replaceChildren(); count(); show(t('ui.8bf609c884ca', "불러오는 중…"));
       dialog.querySelector('[data-editor-object]').textContent = `${dialog.dataset.schema}.${dialog.dataset.table}`;
       dialog.showModal();
-      const url = new URL(dialog.dataset.url, window.location.href);
-      url.searchParams.set('schema', dialog.dataset.schema); url.searchParams.set('table', dialog.dataset.table);
-      url.searchParams.set('kind', button.dataset.editMetadata);
-      if (button.dataset.column) url.searchParams.set('column', button.dataset.column);
-      if (button.dataset.name) url.searchParams.set('name', button.dataset.name);
+      const url = new URL(request.restore ? dialog.dataset.url + '/restore-form' : dialog.dataset.url, window.location.href);
+      if (!request.restore) { url.searchParams.set('schema', dialog.dataset.schema); url.searchParams.set('table', dialog.dataset.table); url.searchParams.set('kind', request.kind); if (request.column) url.searchParams.set('column', request.column); if (request.name) url.searchParams.set('name', request.name); }
       try {
-        const data = await read(url, {signal: pending.signal, headers: {Accept: 'application/json'}});
+        const csrf = dialog.querySelector('[data-editor-csrf]');
+        const data = await read(url, request.restore ? {signal: pending.signal, method: 'POST', headers: {'Content-Type': 'application/json', Accept: 'application/json', [csrf.dataset.csrfHeader]: csrf.value}, body: JSON.stringify({schema: dialog.dataset.schema, table: dialog.dataset.table, ...request})} : {signal: pending.signal, headers: {Accept: 'application/json'}});
         if (requestVersion !== version || !dialog.open) return;
-        state = data;
-        const targets = data.mode === 'add' ? ['', ...data.columns] : [data.target.column || ''];
-        targets.forEach(item => { const option = document.createElement('option'); option.value = item; option.textContent = item || t('ui.3d721f9ac601', "테이블"); column.append(option); });
-        column.value = data.target.column || ''; column.disabled = data.mode !== 'add';
-        dialog.querySelector('[data-editor-name-group]').hidden = data.kind !== 'annotation';
-        name.value = data.name || ''; name.readOnly = data.mode !== 'add';
-        value.value = data.value || ''; count();
-        dialog.querySelector('[data-editor-hint]').textContent = data.kind === 'annotation'
-          ? t('ui.295a8d77a3b1', "값을 비우면 이름만 있는 Annotation으로 저장합니다. 한 항목씩 반영됩니다.")
-          : t('ui.b911ac018803', "저장하면 기존 코멘트를 교체합니다. 빈 코멘트 저장은 지원하지 않습니다.");
-        fields.disabled = false; save.disabled = false; show(''); value.focus();
+        populate(data);
       } catch (error) { if (error.name !== 'AbortError' && requestVersion === version) show(error.message, true); }
-    }));
+    };
+    document.querySelectorAll('[data-edit-metadata]').forEach(button => button.addEventListener('click', () => open({kind: button.dataset.editMetadata, column: button.dataset.column || null, name: button.dataset.name || null})));
+    document.addEventListener('metadata-history-restore', event => open({...event.detail, restore: true}));
     value.addEventListener('input', count);
     form.addEventListener('submit', async event => {
       event.preventDefault();

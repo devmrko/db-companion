@@ -40,15 +40,23 @@ public final class HistorySql {
             trigger(target, triggerOwner, false), trigger(target, triggerOwner, true));
     }
     public static Asset trigger(Target target, String triggerOwner, boolean before) {
+        return metadataTrigger(target, triggerOwner, before, false);
+    }
+    /** Exact v2 source remains recognizable for explicit OFF and migration. */
+    public static Asset tableTriggerV2(Target target, String triggerOwner, boolean before) {
+        return metadataTrigger(target, triggerOwner, before, true);
+    }
+    private static Asset metadataTrigger(Target target, String triggerOwner, boolean before, boolean tableOnly) {
         String name = triggerName(target, before);
         String table = literal(target.table()), owner = literal(target.schema());
         String sql = "CREATE TRIGGER " + qualified(triggerOwner, name) + "\n"
                 + (before ? "BEFORE" : "AFTER") + " COMMENT OR ALTER ON DATABASE\nDISABLE\n"
-                + "-- DB Companion metadata history v2\n"
+                + "-- DB Companion metadata history v" + (tableOnly ? "2" : "3") + "\n"
                 + "DECLARE\n  v_match BOOLEAN := FALSE;\n  v_count PLS_INTEGER;\n"
                 + "  v_name VARCHAR2(32767) := ora_dict_obj_name;\n  v_column VARCHAR2(32767);\nBEGIN\n"
                 + "  IF ora_dict_obj_owner = " + owner + " THEN\n"
-                + "    IF ora_dict_obj_type = 'TABLE' AND v_name = " + table + " THEN\n      v_match := TRUE;\n"
+                + "    IF " + (tableOnly ? "ora_dict_obj_type = 'TABLE'" : "ora_dict_obj_type IN ('TABLE', 'VIEW')")
+                + " AND v_name = " + table + " THEN\n      v_match := TRUE;\n"
                 + "    ELSIF ora_sysevent = 'COMMENT' AND ora_dict_obj_type = 'COLUMN'\n"
                 + "      AND SUBSTR(v_name, 1, LENGTH(" + table + ") + 1) = " + table + " || '.' THEN\n"
                 + "      SELECT COUNT(*) INTO v_count FROM sys.all_tab_columns\n"
@@ -80,6 +88,7 @@ public final class HistorySql {
     public static TriggerVersion triggerVersion(Target target, String owner, boolean before, String actual) {
         if (sourceMatches(trigger(target, owner, before), actual)) return TriggerVersion.CURRENT;
         if (sourceMatches(legacyTrigger(target, owner, before), actual)) return TriggerVersion.LEGACY;
+        if (sourceMatches(tableTriggerV2(target, owner, before), actual)) return TriggerVersion.LEGACY;
         return TriggerVersion.UNKNOWN;
     }
     public static String replaceTrigger(Target target, String owner, boolean before) {
@@ -98,6 +107,12 @@ public final class HistorySql {
         return new Asset(target.schema(), "DBC_METADATA_AUDIT", "PACKAGE BODY",
                 resource(legacy ? "audit-body-v1.sql" : "audit-body.sql", target.schema()));
     }
+    public static Asset auditBodyV2(Target target) {
+        return new Asset(target.schema(), "DBC_METADATA_AUDIT", "PACKAGE BODY", resource("audit-body-v2.sql", target.schema()));
+    }
+    public static boolean legacyAuditBodyMatches(Target target, String actual) {
+        return sourceMatches(auditBody(target, true), actual) || sourceMatches(auditBodyV2(target), actual);
+    }
     public static String replaceAuditBody(Target target) {
         return auditBody(target, false).sql().replaceFirst("\\ACREATE PACKAGE BODY ", "CREATE OR REPLACE PACKAGE BODY ");
     }
@@ -111,7 +126,7 @@ public final class HistorySql {
         String normalized = source.replace("\r\n", "\n").stripTrailing();
         if (normalized.startsWith("CREATE ")) normalized = normalized.substring("CREATE ".length());
         return normalized.replaceFirst("\\A(TRIGGER [^\\n]+\\n(?:BEFORE|AFTER) COMMENT OR ALTER ON DATABASE\\n)"
-                + "(?:(?:ENABLE|DISABLE)\\n)?(?:-- DB Companion metadata history v[12]\\n)?(?=(?:BEGIN|DECLARE)\\n)", "$1");
+                + "(?:(?:ENABLE|DISABLE)\\n)?(?:-- DB Companion metadata history v[123]\\n)?(?=(?:BEGIN|DECLARE)\\n)", "$1");
     }
     // ALL_SOURCE preserves the body after its first declaration line. Ignore only line-ending/trailing whitespace.
     public static String sourceBody(String source) {

@@ -4,6 +4,9 @@ import {mountHistoryComparison} from './history-compare.mjs';
 export function formatHistoryJson(value) {
   try { return JSON.stringify(JSON.parse(value), null, 2); } catch { return value ?? ''; }
 }
+export function canRestoreHistory(kind, annotationEditable) {
+  return kind === 'COMMENT' || (kind === 'ANNOTATION' && annotationEditable !== 'false');
+}
 export function historyToggleView(data) {
   const message = !data.enabled && installationUnconfirmed(data)
     ? t('ui.4904aa7dea58', "트리거 설치 상태 확인 불가") : data.message;
@@ -110,7 +113,7 @@ if (typeof document !== 'undefined') {
         data.entries.forEach(row => {
           const rowContainer = element('div', '', 'app-history-row');
           const item = element('details', '', 'app-history-entry');
-          item.append(element('summary', `#${row.seq} · ${row.column || t('ui.3d721f9ac601', "테이블")} · ${row.kind}${row.annotationName ? ' / ' + row.annotationName : ''}`));
+          item.append(element('summary', `#${row.seq} · ${row.column || root.dataset.objectLabel || t('ui.3d721f9ac601', "테이블")} · ${row.kind}${row.annotationName ? ' / ' + row.annotationName : ''}`));
           item.append(element('p', `${row.changedAt} · ${row.changedBy}`, 'app-muted'));
           const comparison = element('div', '', 'app-history-comparison');
           for (const [title, json] of [[t('ui.0c263cac5947', "변경 전"), row.beforeJson], [t('ui.cc34819ae36e', "변경 후"), row.afterJson]]) {
@@ -123,6 +126,10 @@ if (typeof document !== 'undefined') {
             button.setAttribute('aria-label', t('ui.e310f86eebff', "이력 #{0} {1}", row.seq, label));
             button.addEventListener('click', () => versionComparison.select(row, side, button)); actions.append(button);
           }
+          try {
+            const before = JSON.parse(row.beforeJson);
+            for (const [phase, raw] of [['before', row.beforeJson], ['after', row.afterJson]]) { const snapshot=JSON.parse(raw); if (snapshot.exists === true && typeof snapshot.value === 'string' && canRestoreHistory(row.kind, root.dataset.annotationEditable)) { const restore = element('button', t('metadataRestore.use', "이 값으로 수정하기") + ` (${phase})`, 'btn app-btn app-btn-secondary'); restore.type='button'; restore.addEventListener('click',()=>document.dispatchEvent(new CustomEvent('metadata-history-restore',{detail:{kind:row.kind.toLowerCase(),column:row.column||null,name:row.annotationName||null,value:snapshot.value}})));actions.append(restore); } }
+          } catch { /* Malformed history is display-only and cannot seed an editor. */ }
           rowContainer.append(item, actions); entries.append(rowContainer);
         });
         message.textContent = data.entries.length ? '' : t('ui.94e819855034', "저장된 변경 이력이 없습니다.");

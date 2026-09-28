@@ -71,14 +71,15 @@ public class DatabaseRepository {
 
     public List<TableInfo> tables(String schema) {
         var names = jdbc.queryForList("""
-                SELECT TABLE_NAME FROM SYS.ALL_TABLES
-                WHERE OWNER = ? ORDER BY TABLE_NAME
+                SELECT DISTINCT OBJECT_NAME FROM SYS.ALL_OBJECTS
+                WHERE OWNER = ? AND SUBOBJECT_NAME IS NULL
+                  AND OBJECT_TYPE IN ('TABLE', 'VIEW') ORDER BY OBJECT_NAME
                 """, String.class, schema);
         if (names.isEmpty()) return List.of();
         var comments = new HashMap<String, String>();
         jdbc.query("""
                 SELECT TABLE_NAME, COMMENTS FROM SYS.ALL_TAB_COMMENTS
-                WHERE OWNER = ? AND TABLE_TYPE = 'TABLE' AND COMMENTS IS NOT NULL
+                WHERE OWNER = ? AND TABLE_TYPE IN ('TABLE', 'VIEW') AND COMMENTS IS NOT NULL
                 """, (org.springframework.jdbc.core.RowCallbackHandler) row ->
                 comments.put(row.getString(1), row.getString(2)), schema);
         return names.stream().map(name -> new TableInfo(name, comments.get(name))).toList();
@@ -86,13 +87,14 @@ public class DatabaseRepository {
 
     public TableInfo table(String schema, String table) {
         var names = jdbc.queryForList("""
-                SELECT TABLE_NAME FROM SYS.ALL_TABLES
-                WHERE OWNER = ? AND TABLE_NAME = ?
+                SELECT DISTINCT OBJECT_NAME FROM SYS.ALL_OBJECTS
+                WHERE OWNER = ? AND OBJECT_NAME = ? AND SUBOBJECT_NAME IS NULL
+                  AND OBJECT_TYPE IN ('TABLE', 'VIEW')
                 """, String.class, schema, table);
         if (names.isEmpty()) return null;
         var comments = jdbc.queryForList("""
                 SELECT COMMENTS FROM SYS.ALL_TAB_COMMENTS
-                WHERE OWNER = ? AND TABLE_NAME = ? AND TABLE_TYPE = 'TABLE'
+                WHERE OWNER = ? AND TABLE_NAME = ? AND TABLE_TYPE IN ('TABLE', 'VIEW')
                 """, String.class, schema, table);
         return new TableInfo(names.getFirst(), comments.isEmpty() ? null : comments.getFirst());
     }
@@ -122,8 +124,13 @@ public class DatabaseRepository {
                 row.getString(4), comments.get(row.getString(2))), schema, table);
     }
 
+    public boolean isView(String schema, String name) {
+        return !jdbc.queryForList("SELECT VIEW_NAME FROM SYS.ALL_VIEWS WHERE OWNER = ? AND VIEW_NAME = ?",
+                String.class, schema, name).isEmpty();
+    }
+
     public List<AnnotationInfo> annotations(String schema, String table) {
-        return annotations(schema,table,"TABLE");
+        return annotations(schema,table,isView(schema,table) ? "VIEW" : "TABLE");
     }
     public record ObjectMetadata(String name,String type,String comment) {}
     public ObjectMetadata objectMetadata(String schema,String name){

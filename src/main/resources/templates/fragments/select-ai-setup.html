@@ -1,0 +1,23 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="guide" class="app-card app-setup-guide" data-select-ai-setup>
+  <details class="app-disclosure">
+    <summary th:text="#{selectAiSetup.title}">Select AI 시작 안내</summary>
+    <div class="app-disclosure-body">
+    <p th:text="#{selectAiSetup.scope}"></p>
+    <h3 th:text="#{selectAiSetup.resourcePrincipal}"></h3>
+    <p th:text="#{selectAiSetup.resourcePrincipalText}"></p>
+    <pre class="app-preview-source" tabindex="0" th:text="#{selectAiSetup.resourcePrincipalSql}"></pre>
+    <h3 th:text="#{selectAiSetup.apiKey}"></h3>
+    <p th:text="#{selectAiSetup.apiKeyText}"></p>
+    <pre class="app-preview-source" tabindex="0" th:text="#{selectAiSetup.apiKeySql}"></pre>
+    <h3 th:text="#{selectAiSetup.profile}"></h3>
+    <p th:text="#{selectAiSetup.profileText}"></p>
+    <pre class="app-preview-source" tabindex="0" th:text="#{selectAiSetup.profileSql}"></pre>
+    <p th:text="#{selectAiSetup.limits}"></p>
+    <p><a href="https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/resource-principal.html" target="_blank" rel="noopener noreferrer" th:text="#{selectAiSetup.resourcePrincipalDoc}"></a>
+      <span> · </span><a href="https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm" target="_blank" rel="noopener noreferrer" th:text="#{selectAiSetup.apiKeyDoc}"></a>
+      <span> · </span><a href="https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/create-ai-profile.html" target="_blank" rel="noopener noreferrer" th:text="#{selectAiSetup.profileDoc}"></a></p>
+    </div>
+  </details>
+</section>
+</body></html>

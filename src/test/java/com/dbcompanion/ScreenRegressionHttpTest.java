@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /** Real embedded HTTP and repository assets; no database substitution or fake authentication. */
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT,properties={"app.oracle.wallet-path=","app.oracle.wallet-paths="})
 class ScreenRegressionHttpTest {
-    static final List<String> MENUS=List.of("/","/ontology","/ontology-query","/ai-assistant","/vector-search",
-            "/tables","/ai-profiles","/ai-test","/ai-feedback","/ai-agents","/ai-executions","/db/scheduler",
+    static final List<String> MENUS=List.of("/","/business-glossary","/ontology","/ontology-query","/ai-assistant","/vector-search",
+            "/tables","/ai-profiles","/ai-test","/ai-test/problems","/ai-feedback","/ai-agents","/ai-executions","/db/scheduler",
             "/db/external-sources","/db/credentials","/db/security","/db/functions");
     @LocalServerPort int port;
     @Autowired RequestMappingHandlerMapping mappings;
@@ -25,7 +25,7 @@ class ScreenRegressionHttpTest {
     HttpResponse<String> get(String path) throws Exception {
         return client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+path)).GET().build(),HttpResponse.BodyHandlers.ofString());
     }
-    @Test void allSixteenMenusHaveARealGetHandlerAndRequireLogin() throws Exception {
+    @Test void allMenusHaveARealGetHandlerAndRequireLogin() throws Exception {
         var getPaths=new HashSet<String>();
         mappings.getHandlerMethods().forEach((mapping,handler)->{
             if(mapping.getMethodsCondition().getMethods().contains(RequestMethod.GET))getPaths.addAll(mapping.getPatternValues());

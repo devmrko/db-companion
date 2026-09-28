@@ -1,6 +1,7 @@
 package com.dbcompanion.repository;
 
 import com.dbcompanion.common.db.OntologySql;
+import com.dbcompanion.common.db.OracleTextSql;
 import com.dbcompanion.model.*;
 import com.dbcompanion.model.Ontology.*;
 import java.io.StringReader;
@@ -46,7 +47,7 @@ public class OntologyRepository {
         if(tables.size()>5000||entries.size()>5000)throw new Failure(413,"limit");return new Catalog(status,false,tables,entries,Instant.now().toString());
     }
     public List<TableInfo> tables(String schema){
-        var names=jdbc.queryForList("SELECT TABLE_NAME FROM SYS.ALL_TABLES WHERE OWNER=? AND TABLE_NAME<>? ORDER BY TABLE_NAME FETCH FIRST 5001 ROWS ONLY",String.class,schema,OntologySql.TABLE);
+        var names=jdbc.queryForList("SELECT DISTINCT OBJECT_NAME FROM SYS.ALL_OBJECTS WHERE OWNER=? AND OBJECT_NAME<>? AND SUBOBJECT_NAME IS NULL AND OBJECT_TYPE IN ('TABLE','VIEW') ORDER BY OBJECT_NAME FETCH FIRST 5001 ROWS ONLY",String.class,schema,OntologySql.TABLE);
         if(names.size()>5000)throw new Failure(413,"limit");
         // Joining these two ALL_* views exceeded even 30 seconds on the affected database.
         // Bounded, name-bound batches avoid that dictionary JOIN without losing null comments.
@@ -54,7 +55,7 @@ public class OntologyRepository {
         for(int start=0;start<names.size();start+=500){
             var batch=names.subList(start,Math.min(start+500,names.size()));
             var args=new ArrayList<Object>();args.add(schema);args.addAll(batch);
-            jdbc.query("SELECT TABLE_NAME,COMMENTS FROM SYS.ALL_TAB_COMMENTS WHERE OWNER=? AND TABLE_TYPE='TABLE' AND TABLE_NAME IN ("+String.join(",",Collections.nCopies(batch.size(),"?"))+")",r->{comments.put(r.getString(1),r.getString(2));},args.toArray());
+            jdbc.query("SELECT TABLE_NAME,COMMENTS FROM SYS.ALL_TAB_COMMENTS WHERE OWNER=? AND TABLE_TYPE IN ('TABLE','VIEW') AND TABLE_NAME IN ("+String.join(",",Collections.nCopies(batch.size(),"?"))+")",r->{comments.put(r.getString(1),r.getString(2));},args.toArray());
         }
         return names.stream().map(name->new TableInfo(name,comments.get(name))).toList();
     }
@@ -64,7 +65,42 @@ public class OntologyRepository {
         if(columns.size()>1000||keys.size()>1000)throw new Failure(413,"limit");
         String comment=info.description();
         if(comment==null){var mv=jdbc.queryForList("SELECT COMMENTS FROM SYS.ALL_MVIEW_COMMENTS WHERE OWNER=? AND MVIEW_NAME=?",String.class,schema,table);if(!mv.isEmpty())comment=mv.getFirst();}
-        return new Snapshot(database,schema,table,comment,columns,keys,Instant.now().toString());
+        try{var annotations=metadata.annotations(schema,table).stream().map(a->new Ontology.Annotation(a.column(),a.name(),a.value(),a.domainOwner(),a.domainName())).toList();return new Snapshot(database,schema,table,comment,columns,keys,Instant.now().toString(),annotations,"SUCCESS");}
+        catch(org.springframework.dao.DataAccessException ex){return new Snapshot(database,schema,table,comment,columns,keys,Instant.now().toString(),List.of(),"UNCONFIRMED");}
+    }
+    /** Capability discovery only; an unavailable dictionary is not treated as absent support. */
+    public Map<String,Boolean> textCapabilities(){
+        var result=new LinkedHashMap<String,Boolean>();
+        result.put("CONTEXT",!jdbc.queryForList("SELECT OBJECT_NAME FROM SYS.ALL_OBJECTS WHERE OWNER='CTXSYS' AND OBJECT_NAME='CONTEXT' AND OBJECT_TYPE='INDEXTYPE'",String.class).isEmpty());
+        result.put("CTX_DDL_VISIBLE",!jdbc.queryForList("SELECT OBJECT_NAME FROM SYS.ALL_OBJECTS WHERE OWNER='CTXSYS' AND OBJECT_NAME='CTX_DDL' AND OBJECT_TYPE='PACKAGE'",String.class).isEmpty());
+        result.put("CTX_THES",!jdbc.queryForList("SELECT OBJECT_NAME FROM SYS.ALL_OBJECTS WHERE OWNER='CTXSYS' AND OBJECT_NAME='CTX_THES' AND OBJECT_TYPE='PACKAGE'",String.class).isEmpty());
+        return Map.copyOf(result);
+    }
+    /** Dictionary visibility is deliberately weaker than usable Oracle Text privileges. */
+    public record TextSearchAvailability(String status,String limitation) {}
+    public record TextProjection(String table,int revision,String sourceKind,String sourceId,String term,String definition,String aliases,int score) {}
+    /** Cache payload is always regenerated from a current approved projection; no deletion or broad scope is allowed. */
+    public record TextCacheRow(String id,String table,int revision,String kind,String sourceId,String term,String definition,String aliases,String searchText) {}
+    public TextSearchAvailability textSearchAvailability(String schema,String login){
+        var table=jdbc.queryForList("SELECT TABLE_NAME FROM SYS.ALL_TABLES WHERE OWNER=? AND TABLE_NAME='DBC_GLOSSARY_TERM'",String.class,schema);
+        if(table.isEmpty())return new TextSearchAvailability("UNAVAILABLE","The owner-bound approved-term table is not visible to this login; no installation conclusion was made.");
+        var index=jdbc.queryForList("SELECT INDEX_NAME FROM SYS.ALL_INDEXES WHERE TABLE_OWNER=? AND TABLE_NAME='DBC_GLOSSARY_TERM' AND INDEX_NAME='DBC_GLT_CTX' AND INDEX_TYPE='DOMAIN'",String.class,schema);
+        if(index.isEmpty())return new TextSearchAvailability("UNAVAILABLE","The Oracle Text domain index is not visible for the approved-term table; no installation conclusion was made.");
+        return new TextSearchAvailability("READY","The term table and domain index are visible. Lexer and query EXECUTE privileges remain unconfirmed until this read-only query succeeds.");
+    }
+    /** Searches only a caller-selected, currently approved revision/profile scope; it never reads ontology RDF. */
+    public List<TextProjection> textSearch(String schema,String login,String profile,Map<String,Integer> approved,String question,int limit,List<TextCacheRow> current){require(schema,login);return new OracleGlossaryStore(jdbc,json).search(schema,login,profile,approved,question,limit,current);}
+    public String textProfileVersion(String schema,String login,String profile){return new OracleGlossaryStore(jdbc,json).profileVersion(schema,login,profile);}
+    public List<String> textActivationCheck(String schema,String login,String profile,String operation,List<TextCacheRow> rows){
+        require(schema,login);var store=new OracleGlossaryStore(jdbc,json);
+        if("INSTALL".equals(operation)){store.requireMissing(schema,login);return OracleTextSql.installPlan(schema,profile).ddl();}
+        if(!"SYNC".equals(operation))throw new Failure(400,"invalid");return store.preview(schema,login,profile,rows);
+    }
+    public void installText(String schema,String login,String profile){
+        require(schema,login);new OracleGlossaryStore(jdbc,json).install(schema,login,profile);
+    }
+    public void syncText(String schema,String login,String profile,List<TextCacheRow> rows){
+        require(schema,login);new OracleGlossaryStore(jdbc,json).sync(schema,login,profile,rows);
     }
     public GraphData graph(String database,String schema,String login){
         require(schema,login);
@@ -105,6 +141,18 @@ public class OntologyRepository {
     public List<Entry> relationshipEntries(String schema,String login){
         return relationshipEntriesQuery(schema,login,null);
     }
+    /** Glossary-specific bounded projection: never loads source comments, keys, or whole RDF documents. */
+    public record GlossaryProjection(String table,int revision,String concept,String description,String columns,String mappings) {}
+    public List<String> approvedGlossaryScopes(String schema,String login){require(schema,login);return jdbc.queryForList("SELECT OBJECT_NAME FROM (SELECT OBJECT_NAME,STATE,ROW_NUMBER() OVER (PARTITION BY OBJECT_OWNER,OBJECT_NAME ORDER BY REVISION DESC) RN FROM "+OntologySql.table(schema)+" WHERE OBJECT_OWNER=?) WHERE RN=1 AND STATE='APPROVED' ORDER BY OBJECT_NAME FETCH FIRST 101 ROWS ONLY",String.class,schema);}
+    public Map<String,Integer> approvedGlossaryRevisions(String schema,String login,List<String> tables){
+        var names=OntologyScope.names(tables);if(names.size()>100)throw new Failure(413,"limit");require(schema,login);var marks=String.join(",",Collections.nCopies(names.size(),"?"));var args=new ArrayList<Object>();args.add(schema);args.addAll(names);
+        var result=new LinkedHashMap<String,Integer>();jdbc.query("SELECT OBJECT_NAME,REVISION FROM (SELECT OBJECT_NAME,REVISION,STATE,ROW_NUMBER() OVER (PARTITION BY OBJECT_OWNER,OBJECT_NAME ORDER BY REVISION DESC) RN FROM "+OntologySql.table(schema)+" WHERE OBJECT_OWNER=? AND OBJECT_NAME IN ("+marks+")) WHERE RN=1 AND STATE='APPROVED' ORDER BY OBJECT_NAME",(org.springframework.jdbc.core.RowCallbackHandler)row->result.put(row.getString(1),row.getInt(2)),args.toArray());return Map.copyOf(result);
+    }
+    public List<GlossaryProjection> glossary(String schema,String login,List<String> tables){
+        var names=OntologyScope.names(tables);if(names.size()>100)throw new Failure(413,"limit");require(schema,login);var marks=String.join(",",Collections.nCopies(names.size(),"?"));var args=new ArrayList<Object>();args.add(schema);args.addAll(names);
+        return jdbc.query("SELECT OBJECT_NAME,REVISION,JSON_VALUE(PAYLOAD,'$.meaning.concept' RETURNING VARCHAR2(256) ERROR ON ERROR),JSON_VALUE(PAYLOAD,'$.meaning.description' RETURNING VARCHAR2(8000) ERROR ON ERROR),JSON_QUERY(PAYLOAD,'$.meaning.columns' RETURNING CLOB ERROR ON ERROR),JSON_QUERY(PAYLOAD,'$.meaning.valueMappings' RETURNING CLOB ERROR ON ERROR) FROM (SELECT OBJECT_NAME,REVISION,STATE,PAYLOAD,ROW_NUMBER() OVER (PARTITION BY OBJECT_OWNER,OBJECT_NAME ORDER BY REVISION DESC) RN FROM "+OntologySql.table(schema)+" WHERE OBJECT_OWNER=? AND OBJECT_NAME IN ("+marks+")) WHERE RN=1 AND STATE='APPROVED' ORDER BY OBJECT_NAME",(r,n)->new GlossaryProjection(r.getString(1),r.getInt(2),r.getString(3),r.getString(4),clob(r.getClob(5)),clob(r.getClob(6))),args.toArray());
+    }
+    private static String clob(java.sql.Clob value) throws java.sql.SQLException {if(value==null)return null;try{if(value.length()>100_000)throw new Failure(413,"limit");return value.getSubString(1,(int)value.length());}finally{value.free();}}
     /** Filter in SQL before reading CLOBs. A missing selection is never interpreted as the whole catalog. */
     public List<Entry> relationshipEntries(String schema,String login,List<String> tables){
         var names=OntologyScope.names(tables);var rows=relationshipEntriesQuery(schema,login,names);

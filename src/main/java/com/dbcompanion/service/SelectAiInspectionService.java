@@ -42,6 +42,29 @@ public class SelectAiInspectionService {
             });state.inspection(result);return result;
         }
     }
+    /** Read-only detached observation for A/B. It deliberately does not touch aiTest().selected or its snapshot. */
+    public Snapshot loadDetached(PoolSession session,AiAssistant.Profile profile,String question){
+        SelectAiTest.question(question);var selected=profile.selection();
+        if(!selected.owner().equals(session.metadata().info().username()))throw SelectAiInspection.stale();
+        return query(session,()->{
+            var current=ai.profile(selected);if(!profile.equals(current))throw SelectAiInspection.stale();
+            var snapshot=SelectAiInspection.create(current,question,catalog.profileAttributes(selected.owner(),true,selected.name()),Instant.now());
+            if(question.length()<=500)snapshot=SelectAiInspection.feedback(snapshot,readFeedback(snapshot,question,1));
+            else snapshot=SelectAiInspection.feedback(snapshot,new Feedback(question,1,null,false,"SEARCH_TOO_LONG",Instant.now()));
+            if(!profile.equals(ai.profile(selected)))throw SelectAiInspection.stale();return snapshot;
+        });
+    }
+    /** Detached follow-up reads retain the per-side snapshot and never switch the global selection. */
+    public Snapshot tableDetached(PoolSession session,Snapshot snapshot,String owner,String name){
+        return query(session,()->{
+            if(!snapshot.profile().selection().owner().equals(session.metadata().info().username())||!snapshot.profile().equals(ai.profile(snapshot.profile().selection())))throw SelectAiInspection.stale();
+            SelectAiInspection.requireObject(snapshot,owner,name);Table value;
+            try{var object=catalog.objectMetadata(owner,name);if(object==null)value=new Table(owner,name,"",null,List.of(),List.of(),"NOT_LOADED","NOT_VISIBLE",Instant.now());else{var columns=catalog.columns(owner,name);List<AnnotationInfo> annotations=List.of();String status="DISABLED_OR_UNSET";if(SelectAiInspection.enabled(snapshot,"annotations"))try{annotations=catalog.annotations(owner,name,object.type());status="LOADED";}catch(RuntimeException ex){status="ERROR · "+CredentialCatalogRepository.error(ex);}value=new Table(owner,name,object.type(),object.comment(),columns,annotations,status,null,Instant.now());}}catch(RuntimeException ex){value=new Table(owner,name,"",null,List.of(),List.of(),"NOT_LOADED",CredentialCatalogRepository.error(ex),Instant.now());}return SelectAiInspection.table(snapshot,value);
+        });
+    }
+    public Snapshot feedbackDetailDetached(PoolSession session,Snapshot snapshot,String rowId){
+        AiFeedback.rowId(rowId);return query(session,()->{if(!snapshot.profile().selection().owner().equals(session.metadata().info().username())||!snapshot.profile().equals(ai.profile(snapshot.profile().selection())))throw SelectAiInspection.stale();var f=snapshot.feedback();if(f==null||f.rows()==null||f.rows().items().stream().noneMatch(i->i.id().equals(rowId)))throw SelectAiInspection.stale();var p=snapshot.profile().selection();var detail=feedback.detail(new AiFeedback.Query(p.owner(),p.name(),f.search(),"",f.page()),rowId);if(detail==null)throw SelectAiInspection.stale();return SelectAiInspection.detail(snapshot,new FeedbackDetail(rowId,detail,Instant.now()));});
+    }
     private Snapshot verified(PoolSession session,String id){
         var s=session.metadata().aiTest().inspection(id);
         if(!s.profile().selection().owner().equals(session.metadata().info().username())||!s.profile().equals(ai.profile(s.profile().selection())))throw SelectAiInspection.stale();

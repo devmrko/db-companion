@@ -1,0 +1,18 @@
+{
+  "businessGlossary.history.title": ["변경 이력", "Change history", "变更历史", "変更履歴"],
+  "businessGlossary.history.scope": ["앱에서 저장한 등록·수정의 변경 전후 내용과 변경자·시각을 보관합니다. 과거 변경이나 직접 SQL 변경은 소급 수집하지 않습니다. 이력 저장 실패 시 용어 저장도 취소됩니다.", "App saves retain before/after content, actor and time. Earlier changes and direct SQL edits are not captured retroactively. If history cannot be saved, the term change is rolled back.", "保存应用中新增和修改的前后内容、修改者及时间。不追溯收集历史变更或直接 SQL 修改。历史保存失败时，术语变更也将回滚。", "アプリで保存した登録・変更の前後内容、変更者、時刻を保管します。過去の変更や直接 SQL による変更は遡及収集しません。履歴保存に失敗した場合は用語変更も取り消します。"],
+  "businessGlossary.history.setup": ["이력 저장 테이블 생성", "Create history storage table", "创建历史记录存储表", "履歴保存テーブルを作成"],
+  "businessGlossary.history.recording": ["앱 변경 이력 기록 중 · 저장소 준비 완료 (DBC_APP_RECORD)", "App change history is active · Storage ready (DBC_APP_RECORD)", "应用变更历史记录已启用 · 存储已就绪 (DBC_APP_RECORD)", "アプリの変更履歴を記録中 · 保存先の準備完了 (DBC_APP_RECORD)"],
+  "businessGlossary.history.ready": ["이력 저장소 준비 완료 · 용어 사전 준비 후 앱 변경을 기록합니다. (DBC_APP_RECORD)", "History storage ready · App changes will be recorded once the glossary is ready. (DBC_APP_RECORD)", "历史存储已就绪 · 术语表就绪后将记录应用变更。 (DBC_APP_RECORD)", "履歴保存先の準備完了 · 用語辞書の準備後にアプリの変更を記録します。 (DBC_APP_RECORD)"],
+  "businessGlossary.history.missing": ["앱 변경 이력을 기록하려면 이력 저장 테이블을 생성해 주세요. (DBC_APP_RECORD)", "Create the history storage table to record app changes. (DBC_APP_RECORD)", "请创建历史存储表以记录应用变更。 (DBC_APP_RECORD)", "アプリの変更履歴を記録するには履歴保存テーブルを作成してください。 (DBC_APP_RECORD)"],
+  "businessGlossary.history.checking": ["이력 저장소 확인 중…", "Checking history storage…", "正在检查历史存储…", "履歴保存先を確認中…"],
+  "businessGlossary.history.unavailable": ["이력 저장소 상태 확인이 필요합니다. 새로고침해 주세요. (DBC_APP_RECORD)", "History storage status needs checking. Please refresh. (DBC_APP_RECORD)", "需要确认历史存储状态。请刷新。 (DBC_APP_RECORD)", "履歴保存先の状態確認が必要です。再読み込みしてください。 (DBC_APP_RECORD)"],
+  "businessGlossary.history.guide": ["이력 조회: 아래 '등록 용어'에서 각 용어의 '변경 이력'을 누르세요.", "To view history, select 'Change history' beside a term in the list below.", "查看历史：点击下方术语列表中相应术语旁的“变更历史”。", "履歴の確認：下の用語一覧で各用語の「変更履歴」を押してください。"],
+  "businessGlossary.history.empty": ["기록된 변경 이력이 없습니다. 현재 버전 번호가 과거 변경 내용의 보관을 뜻하지는 않습니다.", "No recorded changes. A current version number does not mean earlier content was retained.", "没有变更记录。当前版本号并不表示已保存之前的内容。", "記録された変更履歴はありません。現在のバージョン番号は過去の内容の保管を意味しません。"],
+  "businessGlossary.history.more": ["이전 이력 더 보기", "Load older changes", "加载更早的变更", "以前の履歴を表示"],
+  "businessGlossary.history.created": ["등록", "Created", "新增", "登録"],
+  "businessGlossary.history.updated": ["수정", "Updated", "修改", "変更"],
+  "businessGlossary.history.before": ["변경 전", "Before", "变更前", "変更前"],
+  "businessGlossary.history.after": ["변경 후", "After", "变更后", "変更後"],
+  "businessGlossary.history.absent": ["등록 전 내용 없음", "No previous entry", "没有先前条目", "登録前の内容なし"]
+}

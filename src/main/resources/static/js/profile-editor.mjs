@@ -26,6 +26,8 @@ function mount(dialog) {
   const element=(tag,text,className)=>{const node=document.createElement(tag);if(text)node.textContent=text;if(className)node.className=className;return node;};
   function prepare(data) {
     const attr=data.target.attribute,spec=profileField(attr),host=find('control');
+    const help=dialog.querySelector('[data-sql-help-for="profiles"]');
+    if(help)help.dataset.sqlHelpOperation=attr==='model'?'model':attr==='object_list'?'objects':'options';
     let type=spec.type;
     // Keep unfamiliar existing representations intact instead of silently converting them.
     if(type==='boolean'&&booleanValue(data.value)===null)type='multiline';

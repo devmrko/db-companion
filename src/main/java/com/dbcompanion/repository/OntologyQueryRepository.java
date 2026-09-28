@@ -50,8 +50,18 @@ public class OntologyQueryRepository {
         return execute(value.search().id(),value.draft().sql(),value.draft().hash(),actor);
     }
     public OntologyInquiry.Rows execute(String id,String sql,String hash,String actor){
+        return execute(id,sql,hash,actor,15);
+    }
+    /** Statement budget supplied by the calling workflow; result limits stay unchanged. */
+    public OntologyInquiry.Rows execute(String id,String sql,String hash,String actor,int timeoutSeconds){
+        return execute(id,sql,hash,actor,timeoutSeconds,()->{});
+    }
+    /** Measures the JDBC execute/fetch boundary, not Oracle execution-plan operator times. */
+    public OntologyInquiry.Rows execute(String id,String sql,String hash,String actor,int timeoutSeconds,Runnable reading){
+        com.dbcompanion.common.config.SelectAiExecutionSettings.validate(timeoutSeconds);
         return jdbc.execute((ConnectionCallback<OntologyInquiry.Rows>)c->{try(var stmt=c.prepareStatement(sql)){
-            stmt.setQueryTimeout(15);stmt.setMaxRows(201);stmt.setFetchSize(50);try(var rs=stmt.executeQuery()){
+            stmt.setQueryTimeout(timeoutSeconds);stmt.setMaxRows(201);stmt.setFetchSize(50);try(var rs=stmt.executeQuery()){
+                reading.run();
                 var metadata=rs.getMetaData();if(metadata.getColumnCount()>40)throw new Failure(413,"query.resultLimit");var columns=new ArrayList<String>();
                 for(int i=1;i<=metadata.getColumnCount();i++){if(!ReviewedSql.scalar(metadata.getColumnTypeName(i)))throw new Failure(422,"query.resultType");columns.add(metadata.getColumnLabel(i));}
                 var rows=new ArrayList<List<OntologyInquiry.Cell>>();boolean more=false;int size=0;

@@ -1,8 +1,47 @@
-# Initial alpha validation
+# Release validation
+
+## 0.1.0-alpha.2
+
+Candidate: **0.1.0-alpha.2** / tag **v0.1.0-alpha.2**. Checked on 2026-09-28
+from an isolated copy of all public-source publication candidates.
+
+| Check | Result |
+| --- | --- |
+| `mvn -Pquality clean verify` | Passed; executable alpha.2 JAR built |
+| Java unit / integration / embedded HTTP tests | 1,016 tests, 0 failures, 0 errors, 0 skipped |
+| PMD Maven plugin 3.28.0 | 0 violations; 0 processing errors |
+| `node --test src/test/js/*.test.mjs` | 482 passed, 0 failed; 1 opt-in runtime test skipped |
+| Opt-in `app-runtime.test.mjs` with the alpha.2 JAR | 3 passed, 0 failed, 0 skipped (includes that opt-in test) |
+| Publication guard | 671 candidate files, 0 findings |
+
+Environment: macOS, JDK 25.0.2 compiling for Java 21, Maven 3.9.16, Node 26.0.0.
+The runtime suite used temporary directories/ports and did not restart the existing app.
+Test schema/object names are generic examples; customer records, Wallets, credentials,
+private validation artifacts and environment configuration are excluded.
+
+Reproduce:
+
+```sh
+mvn -Pquality clean verify
+node --test src/test/js/*.test.mjs
+RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.2.jar node --test src/test/js/app-runtime.test.mjs
+node scripts/publication-check.cjs --working-tree
+git diff --check
+```
+
+This release check did not log into a database, create or alter DB objects, or call a
+paid AI provider. Prior feature-specific UI/DB checks are not a complete live-system
+validation of this release. SQL examples, language-specific Oracle Text setup and
+provider behavior still require validation in the target database and account.
+Java 21 runtime and other operating systems were not separately exercised. Publication
+scanning is heuristic, not a complete secret/security audit or a production-readiness
+certification. A successful build does not establish generated SQL's business correctness.
+
+## 0.1.0-alpha.1 (historical)
 
 Candidate: **0.1.0-alpha.1** / tag **v0.1.0-alpha.1**. Checked on 2026-09-23.
 
-## Results
+### Results
 
 | Check | Result |
 | --- | --- |
@@ -19,7 +58,7 @@ Tests ran on macOS with JDK 25.0.2, compiling for Java 21, Maven 3.9.16 and Node
 
 The runtime test creates its own temporary directory and port. It verifies PID ownership checks, duplicate startup protection, readiness, restart and shutdown without using an existing application process or database session. It requires OS process-list access; sandbox denial is not an application assertion failure and must not be hidden by weakening the test.
 
-## Reproduce
+### Reproduce
 
 ```sh
 mvn -Pquality clean verify
@@ -30,7 +69,7 @@ node scripts/publication-check.cjs
 
 Set `JAVA_HOME` to a suitable JDK if Java is not available on the command path.
 
-## Scope and limitations
+### Scope and limitations
 
 - No live customer database login, DDL, Select AI generation, or billable model call was performed for this public-source validation.
 - Historical PoC evidence and customer-specific diagnostic utilities are intentionally excluded. Their associated private tests are not counted as public tests. A public regression test checks that the removed controllers are absent even with a diagnostic profile enabled.

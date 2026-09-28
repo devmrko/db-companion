@@ -1,6 +1,6 @@
 <!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body><th:block th:fragment="dialog">
 <dialog class="app-preview-dialog" data-feedback-editor th:attr="data-schema=${selectedSchema},data-profile=${profile},data-url=@{/ai-feedback/edit},data-install=@{/ai-create/install}" aria-labelledby="feedback-editor-title">
-<header class="app-preview-header"><h2 id="feedback-editor-title" th:text="#{feedbackEdit.title}">Feedback 등록·편집</h2><button type="button" class="btn app-btn app-btn-quiet" data-fe-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+<header class="app-preview-header"><h2 id="feedback-editor-title" th:text="#{feedbackEdit.title}">Feedback 등록·편집</h2><button th:replace="~{fragments/common :: sqlHelp('feedback', 'add')}"></button><button type="button" class="btn app-btn app-btn-quiet" data-fe-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
 <form class="app-editor-form" data-fe-form><input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-fe-csrf>
 <p class="app-muted" th:text="${selectedSchema + '.' + profile}"></p><p data-fe-message role="status" aria-live="polite"></p>
 <details><summary th:text="#{creation.helpTitle}">도움말</summary><p th:text="#{feedbackEdit.help}"></p></details>

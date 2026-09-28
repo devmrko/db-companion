@@ -5,6 +5,8 @@
   "ontology.query.paths.choose": ["연결을 선택해 주세요.", "Select a path.", "请选择路径。", "接続を選択してください。"],
   "ontology.query.paths.selected": ["{0}개 테이블 · {1}개 관계 선택", "Selected: {0} tables · {1} relationships", "已选：{0} 个表 · {1} 个关系", "選択：{0} テーブル・{1} 関係"],
   "ontology.query.paths.count": ["{0}개 테이블 · {1}개 관계", "{0} tables · {1} relationships", "{0} 个表 · {1} 个关系", "{0} テーブル・{1} 関係"],
+  "ontology.query.paths.coverage": ["검색 개념 {0}개 중 {1}개 일치", "Search concepts: {0} total, {1} matched", "搜索概念共 {0} 个，匹配 {1} 个", "検索概念 {0} 個中 {1} 個が一致"],
+  "ontology.query.paths.unmatched": ["이 경로에 포함되지 않은 개념: {0}", "Concepts not covered by this path: {0}", "此路径未包含的概念：{0}", "この経路に含まれない概念：{0}"],
   "ontology.query.paths.route": ["연결 후보 {0}", "Path {0}", "路径 {0}", "接続候補 {0}"],
   "ontology.query.paths.table": ["테이블 후보 {0}", "Table candidate {0}", "候选表 {0}", "テーブル候補 {0}"],
   "ontology.query.paths.columnFilter": ["컬럼·정의·별칭 검색", "Search columns, definitions and aliases", "搜索列、定义和别名", "列・定義・別名を検索"],

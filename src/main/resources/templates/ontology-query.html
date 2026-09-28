@@ -2,12 +2,13 @@
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/common :: head(#{ontology.query.title})}"></head>
 <body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside><div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content">
-  <div class="app-page-heading"><h1 th:text="#{ontology.query.title}"></h1><details class="app-dds-help"><summary th:aria-label="#{ontology.query.helpTitle}">?</summary><div><p th:text="#{ontology.query.help}"></p><p th:text="#{ontology.query.skos}"></p><p th:text="#{ontology.query.limits}"></p></div></details></div>
+  <div class="app-page-heading"><h1 th:text="#{ontology.query.title}"></h1><button th:replace="~{fragments/common :: sqlHelp('ontology-query', 'definitions')}"></button><details class="app-dds-help"><summary th:aria-label="#{ontology.query.helpTitle}">?</summary><div><p th:text="#{ontology.query.help}"></p><p th:text="#{ontology.query.skos}"></p><p th:text="#{ontology.query.limits}"></p></div></details></div>
   <section data-ontology-query th:attr="data-schema=${selectedSchema},data-base=@{/ontology-query},data-rdf=@{/ontology/rdf}">
     <input type="hidden" data-oq-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
     <section class="app-card">
       <div class="app-dds-toolbar"><strong th:text="${selectedSchema}"></strong><span class="app-filter-message" data-oq-checked></span><button type="button" class="btn app-btn app-btn-quiet app-icon-button" data-oq-refresh th:title="#{ui.8259f9d35351}" th:aria-label="#{ui.8259f9d35351}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg></button><a class="app-link" th:href="@{/ai-assistant}" th:text="#{assistant.title}"></a><button type="button" class="btn app-btn app-btn-quiet" data-oa-open th:text="#{ontology.archive.title}"></button></div>
       <form data-oq-form class="app-query-form">
+        <section th:replace="~{fragments/question-analysis :: settings}"></section>
         <label for="oq-question" th:text="#{ontology.query.question}"></label><textarea id="oq-question" class="form-control" rows="3" maxlength="2000" required data-oq-question th:placeholder="#{ontology.query.example}"></textarea>
         <div class="app-dds-toolbar"><label for="oq-anchor" th:text="#{ontology.query.anchor}"></label><select id="oq-anchor" class="form-select app-select" data-oq-anchor></select><button type="submit" class="btn app-btn app-btn-primary" data-oq-find th:text="#{ontology.query.find}"></button></div>
       </form>
@@ -16,6 +17,7 @@
     <section class="app-card" data-oq-evidence hidden>
       <div class="app-card-heading"><h2 th:text="#{ontology.query.paths.title}"></h2><span data-oq-selected></span></div>
       <p class="app-filter-message" data-oq-matches></p>
+      <div data-oq-tokens aria-live="polite"></div>
       <p class="app-filter-message" data-oq-path-note></p><div data-oq-routes></div>
       <details class="app-query-alternatives" data-oq-alternatives hidden><summary th:text="#{ontology.query.paths.alternatives}"></summary><div data-oq-other-routes></div></details>
       <p class="app-filter-message" th:text="#{ontology.query.paths.confirmMeaning}"></p>

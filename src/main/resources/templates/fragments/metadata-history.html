@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
 <th:block th:fragment="history">
-  <section class="app-history" data-metadata-history th:attr="data-schema=${targetSchema},data-table=${targetTable},data-url=@{/tables/history}">
+  <section class="app-history" data-metadata-history th:attr="data-schema=${targetSchema},data-table=${targetTable},data-url=@{/tables/history},data-object-label=${detail.annotationEditable ? #messages.msg('ui.3d721f9ac601') : #messages.msg('catalog.view.label')},data-annotation-editable=${detail.annotationEditable}">
     <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-history-csrf>
     <div class="app-history-toolbar">
       <button type="button" class="btn app-btn app-btn-secondary" data-history-install hidden disabled th:text="#{ui.d663d25901af}">트리거 설치·켜기</button>

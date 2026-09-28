@@ -144,6 +144,7 @@ public class DatabaseService {
         return inReadTransaction(session, () -> {
             var target = repository.table(schema, table);
             if (target == null) throw new AppException(TABLE_NOT_ACCESSIBLE);
+            boolean view = repository.isView(schema, table);
             var metadata = session.metadata();
             var dashboard = new Dashboard(metadata.info(), metadata.schemas(), metadata.selectedSchema());
             var columns = java.util.Set.of("columns", "comments").contains(tab)
@@ -152,7 +153,7 @@ public class DatabaseService {
             String annotationError = null;
             if ("annotations".equals(tab)) {
                 try {
-                    annotations = repository.annotations(schema, table);
+                    annotations = repository.annotations(schema, table, view ? "VIEW" : "TABLE");
                 } catch (DataAccessException ex) {
                     Throwable cause = ex.getMostSpecificCause();
                     int code = cause instanceof java.sql.SQLException sql ? sql.getErrorCode() : 0;
@@ -162,7 +163,7 @@ public class DatabaseService {
             }
             var constraints = "constraints".equals(tab) ? structure.constraints(schema, table) : List.<TableStructure.Constraint>of();
             var indexes = "indexes".equals(tab) ? structure.indexes(schema, table) : List.<TableStructure.Index>of();
-            return new TableDetail(dashboard, target, columns, annotations, annotationError, constraints, indexes);
+            return new TableDetail(dashboard, target, columns, annotations, annotationError, constraints, indexes, true, !view);
         });
     }
 
@@ -189,5 +190,6 @@ public class DatabaseService {
     public record TablePage(Dashboard dashboard, List<TableInfo> tables) {}
     public record TableDetail(Dashboard dashboard, TableInfo table, List<ColumnInfo> columns,
                               List<AnnotationInfo> annotations, String annotationError,
-                              List<TableStructure.Constraint> constraints, List<TableStructure.Index> indexes) {}
+                              List<TableStructure.Constraint> constraints, List<TableStructure.Index> indexes,
+                              boolean metadataEditable, boolean annotationEditable) {}
 }

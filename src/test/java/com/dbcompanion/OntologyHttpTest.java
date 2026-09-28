@@ -101,5 +101,17 @@ class OntologyHttpTest {
         assertThat(json.readValue("{\"token\":\"test\"}",Cancel.class).token()).isEqualTo("test");
         assertThat(json.readValue("{\"schema\":\"APP\",\"table\":\"T\",\"revision\":1,\"token\":\"p\"}",Apply.class).edits()).isNull();
     }
+    @Test void definitionBridgePayloadsKeepSearchAndOriginalQuestionSeparate() {
+        var request=json.readValue("{\"schema\":\"APP\",\"searchQuery\":\"term\",\"originalQuestion\":\"  original question  \",\"tables\":[\"T\"],\"profile\":\"P\",\"token\":\"scope\",\"selected\":[\"T:1:TABLE:T\"]}",DefinitionPreview.class);
+        assertThat(request.searchQuery()).isEqualTo("term");assertThat(request.originalQuestion()).isEqualTo("  original question  ");
+        assertThat(json.readValue("{\"token\":\"scope\"}",Cancel.class)).isEqualTo(new Cancel("scope"));
+    }
+    @Test void definitionBridgeWritesRequireCsrfBeforeSessionOrProviderAccess() throws Exception {
+        var client=HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();
+        for(String path:List.of("context/preview","context/generate","context/cancel")){
+            var response=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/ontology/glossary/"+path)).header("Content-Type","application/json").POST(HttpRequest.BodyPublishers.ofString("{}" )).build(),HttpResponse.BodyHandlers.ofString());
+            assertThat(response.statusCode()).isEqualTo(403);
+        }
+    }
     @Test void unauthenticatedGetsAndCsrfLessWritesAreRejected() throws Exception {var client=HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();for(String path:List.of("/ontology","/ontology/catalog?schema=APP","/ontology/detail?schema=APP&table=T","/ontology/rdf?schema=APP&table=T&revision=1","/ontology/history?schema=APP&table=T")){var r=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+path)).GET().build(),HttpResponse.BodyHandlers.ofString());assertThat(r.statusCode()).isEqualTo(302);assertThat(r.headers().firstValue("location").orElse("")).endsWith("/login");}for(String path:List.of("install","capture","capture/missing","save","ai/preview","ai/generate","ai/apply")){var r=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/ontology/"+path)).header("Content-Type","application/json").POST(HttpRequest.BodyPublishers.ofString("{}")).build(),HttpResponse.BodyHandlers.ofString());assertThat(r.statusCode()).isEqualTo(403);}}
 }

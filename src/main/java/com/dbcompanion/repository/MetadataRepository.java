@@ -14,12 +14,20 @@ public class MetadataRepository {
     public MetadataRepository(JdbcTemplate jdbc) { this.jdbc = jdbc; }
 
     public void requireTarget(Target target) {
-        var table = jdbc.queryForList("SELECT TABLE_NAME FROM SYS.ALL_TABLES WHERE OWNER = ? AND TABLE_NAME = ?",
+        var table = jdbc.queryForList("SELECT OBJECT_TYPE FROM SYS.ALL_OBJECTS o WHERE o.OWNER = ? AND o.OBJECT_NAME = ? "
+                + "AND o.SUBOBJECT_NAME IS NULL AND o.OBJECT_TYPE IN ('TABLE', 'VIEW')",
                 String.class, target.schema(), target.table());
-        if (table.isEmpty()) throw new MetadataEditException(404, "Table not accessible", UiMessages.text("ui.3093f8f809f2", "테이블이 없거나 조회 권한이 없습니다."));
+        if (table.size() != 1) throw new MetadataEditException(404, "Table or view not accessible",
+                UiMessages.text("metadata.target.unsupported", "테이블 또는 뷰가 없거나 조회 권한이 없습니다. Synonym과 다른 객체 종류는 지원하지 않습니다."));
         if (target.column() != null && jdbc.queryForList("SELECT COLUMN_NAME FROM SYS.ALL_TAB_COLUMNS WHERE OWNER = ? AND TABLE_NAME = ? AND COLUMN_NAME = ?",
                 String.class, target.schema(), target.table(), target.column()).isEmpty())
             throw new MetadataEditException(404, "Column not accessible", UiMessages.text("ui.63cc5be8c7a6", "컬럼이 없거나 조회 권한이 없습니다."));
+    }
+    public void requireAnnotationTarget(Target target) {
+        if (!jdbc.queryForList("SELECT VIEW_NAME FROM SYS.ALL_VIEWS WHERE OWNER = ? AND VIEW_NAME = ?",
+                String.class, target.schema(), target.table()).isEmpty())
+            throw new MetadataEditException(400, "View annotation editing is unsupported",
+                    UiMessages.text("metadata.view.annotationUnsupported", "뷰 Annotation 편집은 지원하지 않습니다. 뷰와 컬럼 코멘트를 편집해 주세요."));
     }
     public List<String> columns(Target target) {
         return jdbc.queryForList("SELECT COLUMN_NAME FROM SYS.ALL_TAB_COLUMNS WHERE OWNER = ? AND TABLE_NAME = ? ORDER BY COLUMN_ID",
@@ -27,7 +35,7 @@ public class MetadataRepository {
     }
     public Value comment(Target target) {
         var values = target.column() == null
-                ? jdbc.queryForList("SELECT COMMENTS FROM SYS.ALL_TAB_COMMENTS WHERE OWNER = ? AND TABLE_NAME = ? AND TABLE_TYPE = 'TABLE'",
+                ? jdbc.queryForList("SELECT COMMENTS FROM SYS.ALL_TAB_COMMENTS WHERE OWNER = ? AND TABLE_NAME = ? AND TABLE_TYPE IN ('TABLE', 'VIEW')",
                     String.class, target.schema(), target.table())
                 : jdbc.queryForList("SELECT COMMENTS FROM SYS.ALL_COL_COMMENTS WHERE OWNER = ? AND TABLE_NAME = ? AND COLUMN_NAME = ?",
                     String.class, target.schema(), target.table(), target.column());

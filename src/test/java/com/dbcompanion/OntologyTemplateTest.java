@@ -36,6 +36,11 @@ class OntologyTemplateTest {
                 "data-import-start", "data-import-stop hidden", "data-import-close", "aria-live=\"polite\"",
                 "data-import-progress", "data-import-rows").doesNotContain("onclick=", "onload=");
     }
+    @Test void ontologyKeepsDefinitionsWithoutDuplicateGlossaryUi() throws Exception {
+        String html=java.nio.file.Files.readString(java.nio.file.Path.of("src/main/resources/templates/ontology.html"));
+        assertThat(html).contains("data-on-list", "data-on-detail", "data-on-save", "data-on-approve", "ontology-relationships :: relationships")
+                .doesNotContain("data-on-glossary", "data-on-text-install", "data-on-text-sync");
+    }
     @Test void fourLanguagesRenderNoAutomaticInstallationAndEscapedSchema(){var resolver=new ClassLoaderTemplateResolver();resolver.setPrefix("templates/");resolver.setSuffix(".html");resolver.setCharacterEncoding("UTF-8");var engine=new SpringTemplateEngine();engine.setTemplateResolver(resolver);engine.setTemplateEngineMessageSource(com.dbcompanion.common.i18n.UiMessages.source());engine.setLinkBuilder(new org.thymeleaf.linkbuilder.StandardLinkBuilder(){@Override protected String computeContextPath(org.thymeleaf.context.IExpressionContext c,String b,Map<String,Object> p){return "";}});
         for(String language:List.of("ko","en","zh-CN","ja")){var c=new Context(Locale.forLanguageTag(language));c.setVariable("activePage","ontology");c.setVariable("info",new DatabaseInfo("APP","APP","LOW","DB"));c.setVariable("schemas",List.of("<schema>"));c.setVariable("selectedSchema","<schema>");c.setVariable("languageReturn","/ontology");c.setVariable("_csrf",new org.springframework.security.web.csrf.DefaultCsrfToken("X-CSRF-TOKEN","_csrf","render-only"));String html=engine.process("ontology",c);assertThat(html).contains("&lt;schema&gt;","data-on-install hidden","data-on-ready hidden","data-on-consent","data-on-tab=\"rdf\"","data-on-tab=\"history\"","data-csrf-header=\"X-CSRF-TOKEN\"").doesNotContain("??ontology.","th:","data-schema=\"<schema>");assertThat(html.split("value=\"/ontology\"",-1)).hasSize(4);}
         assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/ontology")).isEqualTo("/ontology");assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/ontology/install")).isEqualTo("/login");

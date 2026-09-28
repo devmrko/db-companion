@@ -1,5 +1,5 @@
 CREATE PACKAGE BODY {{OWNER}}."DBC_METADATA_AUDIT" AS
-  -- DB Companion metadata history v2: include materialized view comment snapshots
+  -- DB Companion metadata history v3: include view comment snapshots
   TYPE item IS RECORD (
     column_name VARCHAR2(128), kind VARCHAR2(16), annotation_name VARCHAR2(32767), value_text VARCHAR2(32767));
   TYPE snapshot IS TABLE OF item INDEX BY VARCHAR2(32767);
@@ -9,6 +9,7 @@ CREATE PACKAGE BODY {{OWNER}}."DBC_METADATA_AUDIT" AS
 
   PROCEDURE take_snapshot(p_table VARCHAR2, p_result OUT NOCOPY snapshot) IS
     v_count PLS_INTEGER := 0;
+    v_type VARCHAR2(30);
     PROCEDURE add_item(p_column VARCHAR2, p_kind VARCHAR2, p_name VARCHAR2, p_value VARCHAR2) IS
       v_key VARCHAR2(32767) := p_kind || ':' || NVL(LENGTH(p_column), 0) || ':' || p_column || ':' || p_name;
     BEGIN
@@ -22,26 +23,29 @@ CREATE PACKAGE BODY {{OWNER}}."DBC_METADATA_AUDIT" AS
     END;
   BEGIN
     p_result.DELETE;
-    FOR r IN (SELECT comments FROM sys.all_mview_comments
+    FOR r IN (SELECT comments, 'TABLE' AS table_type FROM sys.all_mview_comments
               WHERE owner = {{OWNER_LITERAL}} AND mview_name = p_table
               UNION ALL
-              SELECT c.comments FROM sys.all_tab_comments c
-              WHERE c.owner = {{OWNER_LITERAL}} AND c.table_name = p_table AND c.table_type = 'TABLE'
+              SELECT c.comments, c.table_type FROM sys.all_tab_comments c
+              WHERE c.owner = {{OWNER_LITERAL}} AND c.table_name = p_table AND c.table_type IN ('TABLE', 'VIEW')
                 AND NOT EXISTS (SELECT 1 FROM sys.all_mviews m
                   WHERE m.owner = {{OWNER_LITERAL}} AND m.mview_name = p_table)) LOOP
       add_item(NULL, 'COMMENT', NULL, r.comments);
       v_count := v_count + 1;
+      v_type := r.table_type;
     END LOOP;
-    IF v_count <> 1 THEN RAISE_APPLICATION_ERROR(-20082, 'Table metadata is not visible'); END IF;
+    IF v_count <> 1 THEN RAISE_APPLICATION_ERROR(-20082, 'Table or view metadata is not visible'); END IF;
     FOR r IN (SELECT column_name, comments FROM sys.all_col_comments
               WHERE owner = {{OWNER_LITERAL}} AND table_name = p_table) LOOP
       add_item(r.column_name, 'COMMENT', NULL, r.comments);
     END LOOP;
-    FOR r IN (SELECT column_name, annotation_name, annotation_value FROM sys.all_annotations_usage
+    IF v_type = 'TABLE' THEN
+      FOR r IN (SELECT column_name, annotation_name, annotation_value FROM sys.all_annotations_usage
               WHERE annotation_owner = {{OWNER_LITERAL}} AND object_name = p_table
                 AND object_type = 'TABLE' AND domain_name IS NULL) LOOP
-      add_item(r.column_name, 'ANNOTATION', r.annotation_name, r.annotation_value);
-    END LOOP;
+        add_item(r.column_name, 'ANNOTATION', r.annotation_name, r.annotation_value);
+      END LOOP;
+    END IF;
   END;
 
   FUNCTION value_json(p_present BOOLEAN, p_value VARCHAR2) RETURN CLOB IS

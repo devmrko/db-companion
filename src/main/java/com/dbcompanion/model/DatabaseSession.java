@@ -20,6 +20,12 @@ public final class DatabaseSession {
     public AiAssistant.State assistant() { return assistant; }
     private final SelectAiTest.State aiTest = new SelectAiTest.State();
     public SelectAiTest.State aiTest() { return aiTest; }
+    private final BusinessGlossary.State businessGlossary = new BusinessGlossary.State();
+    public BusinessGlossary.State businessGlossary(){return businessGlossary;}
+    private final SelectAiComparison.State aiComparison = new SelectAiComparison.State();
+    public SelectAiComparison.State aiComparison(){return aiComparison;}
+    private final SelectAiBatch.State aiBatch = new SelectAiBatch.State();
+    public SelectAiBatch.State aiBatch(){return aiBatch;}
     private final ExternalSources.State externalSources = new ExternalSources.State();
     public ExternalSources.State externalSources() { return externalSources; }
     private final Scheduler.State scheduler = new Scheduler.State();

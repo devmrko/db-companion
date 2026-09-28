@@ -1,5 +1,7 @@
 import {t} from './i18n.mjs';
 import {editGuard} from './edit-guard.mjs';
+import {mountSqlHelp,featureForPath} from './sql-help.mjs';
+import {mountHelpPanels} from './help-panels.mjs';
 'use strict';
 
 document.querySelectorAll('[data-language-form]').forEach(form=>{
@@ -44,3 +46,10 @@ document.querySelectorAll('[data-schema-select]').forEach((select) => {
 document.querySelectorAll('[data-query-select]').forEach((select) => {
   select.addEventListener('change', () => select.form.requestSubmit());
 });
+// Feature subflows on a shared page opt in explicitly (for example,
+// data-sql-help-feature="ontology-terms" on the glossary panel). This avoids
+// inventing URL routes for tabs, dialogs, or API-only actions.
+const helpFeature=()=>document.querySelector('[data-sql-help-feature]')?.dataset.sqlHelpFeature||
+  (document.body.querySelector('[data-ai-test]')?'ai-test':featureForPath(location.pathname));
+document.querySelectorAll('.app-topbar').forEach(root=>mountSqlHelp(root,helpFeature()));
+mountHelpPanels(document,window);
