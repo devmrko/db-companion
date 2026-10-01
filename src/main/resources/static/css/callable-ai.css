@@ -1,0 +1,12 @@
+.app-callable .app-card{padding:1.5rem;margin-block:1.25rem}
+.app-callable h2{font-size:1.15rem;margin:0 0 1rem}.app-callable p{line-height:1.6}
+.app-callable-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.app-callable-wide{grid-column:1/-1}
+.app-callable label>span{display:block;margin-bottom:.4rem}.app-callable label{min-width:0}
+.app-callable-actions,.app-callable-options{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;margin-block:1rem}
+.app-callable-options label,.app-callable-tables label{display:flex;gap:.5rem;align-items:flex-start}.app-callable-options label>span{margin:0}
+.app-callable-tables{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem;max-height:16rem;overflow:auto;padding:.8rem;border:1px solid var(--app-border,#d6d3d1);border-radius:.35rem}
+.app-callable-tables span{overflow-wrap:anywhere}.app-callable-limit{max-width:10rem}
+.app-callable pre{padding:1rem;border:1px solid var(--app-border,#d6d3d1);background:var(--app-surface,#fff);font-size:.85rem;line-height:1.5;max-height:32rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--app-text,#292724)}
+.app-callable-spinner{display:inline-block;width:1.1rem;height:1.1rem;border:2px solid #ccc;border-top-color:#226d83;border-radius:50%;animation:callable-spin .8s linear infinite}.app-callable [hidden]{display:none!important}
+@keyframes callable-spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.app-callable-spinner{animation:none}}
+@media(max-width:760px){.app-callable-grid,.app-callable-tables{grid-template-columns:minmax(0,1fr)}.app-callable .app-card{padding:1rem}}

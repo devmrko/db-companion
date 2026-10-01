@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{callable.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content app-callable" data-callable>
+  <link rel="stylesheet" th:href="@{/css/callable-ai.css}">
+  <div class="app-page-heading"><h1 th:text="#{callable.title}">사용자용 AI 함수</h1><a th:href="@{/db/functions}" th:text="#{functions.title}">함수</a></div>
+  <p th:text="#{callable.intro}">DB 패키지에서 용어·온톨로지 근거 조회 → Select AI → 결과 조회를 수행합니다. 앱 없이도 같은 함수를 호출할 수 있습니다.</p>
+  <input type="hidden" data-ca-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+  <section class="app-card">
+    <div class="app-card-heading"><h2>DBC_AI_QUERY</h2><span data-ca-status></span></div>
+    <p th:text="#{callable.scope}">호출 DB 사용자의 권한·프로필·용어사전·온톨로지를 사용합니다. MCP 연결 계정과 최종 사용자는 같지 않을 수 있습니다. 사용자별 접근 제어는 VPD·DDS 등 DB 설정이 필요합니다.</p>
+    <div class="app-callable-actions"><button class="btn app-btn" data-ca-refresh th:text="#{businessGlossary.refresh}">새로고침</button><button class="btn app-btn" data-ca-script th:text="#{callable.script}">생성 SQL 보기</button><button class="btn app-btn app-btn-primary" data-ca-install disabled th:text="#{callable.install}">패키지 생성</button></div>
+    <pre data-ca-errors hidden></pre>
+  </section>
+  <section class="app-card" data-ca-access th:if="${callableAdmin}">
+    <h2 th:text="#{callable.accessTitle}">패키지 생성 권한 · ADMIN</h2>
+    <p th:text="#{callable.accessHelp}">선택한 사용자에게 CREATE PROCEDURE만 직접 부여합니다. 다른 스키마의 코드 수정 권한이나 데이터 접근 권한은 부여하지 않습니다.</p>
+    <div class="app-callable-grid"><label><span th:text="#{callable.accessUser}">대상 사용자</span><select class="form-select" data-ca-access-user></select></label><div class="app-callable-actions"><button class="btn app-btn" data-ca-access-check th:text="#{callable.accessCheck}">권한 확인</button><button class="btn app-btn app-btn-primary" data-ca-access-grant disabled th:text="#{callable.accessGrant}">생성 권한 부여</button></div></div><p data-ca-access-status role="status"></p>
+  </section>
+  <section class="app-card">
+    <h2 th:text="#{callable.test}">DB 함수 호출 테스트</h2>
+    <div class="app-callable-grid">
+      <label><span th:text="#{aitest.profile}">프로필</span><select class="form-select" data-ca-profile></select></label>
+      <label><span th:text="#{callable.mode}">실행 모드</span><select class="form-select" data-ca-mode><option value="CONTEXT" th:text="#{callable.context}">근거만 확인 (AI 호출 없음)</option><option value="SQL" th:text="#{callable.sql}">SQL 생성 (AI 1회)</option><option value="QUERY" th:text="#{callable.query}">SQL 생성·결과 조회 (AI 1회 + 조회)</option></select></label>
+      <label class="app-callable-wide"><span th:text="#{aitest.question}">질문</span><textarea class="form-control" rows="3" maxlength="8000" data-ca-question></textarea></label>
+    </div>
+    <div class="app-callable-options"><label><input type="checkbox" data-ca-glossary checked><span th:text="#{businessGlossary.title}">업무 용어 사전</span></label><label><input type="checkbox" data-ca-ontology><span th:text="#{aitest.evEnable}">온톨로지 근거 사용</span></label></div>
+    <div data-ca-ontology-panel hidden><p th:text="#{callable.ontologyHelp}">프로필 범위 내 테이블을 최대 10개 선택하세요. 최신 승인 정의와 선택 범위 내 관계를 첨부합니다. 이 화면은 자동 연결 경로 검색이 아닙니다.</p><div class="app-callable-tables" data-ca-tables></div></div>
+    <p th:text="#{callable.prerequisites}">용어 옵션은 해당 사용자의 사전·Oracle Text 설정이 필요합니다. 온톨로지 옵션은 최신 승인 정의가 필요합니다. 꺼진 옵션의 저장소는 조회하지 않습니다.</p>
+    <label><span th:text="#{callable.rowLimit}">조회 행 한도 (1–1,000)</span><input type="number" class="form-control app-callable-limit" min="1" max="1000" value="200" data-ca-limit></label>
+    <div class="app-callable-actions"><button class="btn app-btn app-btn-primary" data-ca-test disabled th:text="#{callable.run}">선택 모드로 테스트</button><span class="app-callable-spinner" data-ca-spinner hidden aria-hidden="true"></span><span data-ca-elapsed></span></div>
+    <p data-ca-message role="status" aria-live="polite"></p>
+    <p class="app-filter-message" th:text="#{callable.noRetry}">자동 재시도하지 않습니다. 응답을 받지 못해도 AI 사용량이 발생했을 수 있습니다. QUERY는 생성된 SQL을 그대로 조회하며, 조회 권한과 함수 부작용은 DB 권한 설계에 따릅니다.</p>
+  </section>
+  <section class="app-card" data-ca-result hidden><h2 th:text="#{callable.result}">이번 호출의 근거·SQL·결과</h2><p data-ca-timing></p><div data-ca-summary></div><details><summary th:text="#{callable.payload}">실제 전송 프롬프트와 응답 JSON</summary><pre data-ca-payload></pre></details><pre data-ca-sql-result hidden></pre><div class="table-responsive" data-ca-grid></div></section>
+  <section class="app-card"><h2 th:text="#{callable.external}">앱 밖에서 호출</h2><p th:text="#{callable.externalHelp}">Database Tools MCP의 매개변수형 SQL 도구에서 아래 호출을 등록합니다. 호출 옵션은 도구 설정에 고정하고 질문만 바인드하는 구성을 권장합니다. Agent도 같은 패키지를 사용자 정의 도구로 호출할 수 있습니다. 여기서는 외부 도구·권한을 자동 등록하지 않습니다.</p>
+    <pre>-- First verify evidence without an AI request.
+SELECT DBC_AI_QUERY.ASK(
+  p_question =&gt; :question, p_profile =&gt; :profile,
+  p_use_glossary =&gt; 1, p_use_ontology =&gt; 0,
+  p_mode =&gt; 'CONTEXT') AS RESPONSE FROM DUAL;
+
+-- With ontology: JSON array of approved table/view names.
+-- Set p_mode to SQL or QUERY only when AI invocation is intended.
+SELECT DBC_AI_QUERY.ASK(
+  p_question =&gt; :question, p_profile =&gt; :profile,
+  p_use_glossary =&gt; 1, p_use_ontology =&gt; 1,
+  p_tables =&gt; :table_names_json, p_mode =&gt; 'CONTEXT') AS RESPONSE FROM DUAL;</pre>
+    <a href="https://docs.oracle.com/en-us/iaas/database-tools/doc/database-tools-mcp-toolsets.html" target="_blank" rel="noopener noreferrer">Oracle Database Tools MCP</a>
+    <a href="https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/dbms-cloud-ai-agent-package.html" target="_blank" rel="noopener noreferrer">Select AI Agent CREATE_TOOL</a>
+  </section>
+  <dialog class="app-preview-dialog" data-ca-dialog aria-labelledby="callable-dialog-title"><div class="app-preview-header"><h2 id="callable-dialog-title" data-ca-dialog-title></h2><button class="btn app-btn" data-ca-close th:text="#{businessGlossary.close}">닫기</button></div><div class="app-preview-body"><p data-ca-dialog-note></p><pre data-ca-preview></pre><div data-ca-confirm><label class="app-assistant-consent"><input type="checkbox" data-ca-consent><span data-ca-consent-label></span></label><button class="btn app-btn app-btn-primary" data-ca-apply disabled th:text="#{callable.confirm}">확인 후 실행</button></div></div></dialog>
+</main></div><script type="module" th:src="@{/js/callable-ai.mjs}"></script></body></html>
