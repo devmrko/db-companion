@@ -1,0 +1,506 @@
+{
+  "ords.test.title": ["API 테스트", "API test", "API 测试", "API テスト"],
+  "ords.test.base": ["연결에 등록된 ORDS 기본 URL", "ORDS base URL registered for this connection", "为此连接注册的 ORDS 基础 URL", "接続に登録された ORDS ベース URL"],
+  "ords.test.url": ["요청 URL", "Request URL", "请求 URL", "リクエスト URL"],
+  "ords.test.path": ["경로 변수", "Path parameters", "路径参数", "パス変数"],
+  "ords.test.query": ["Query Parameter · 한 줄에 name=value", "Query parameters · one name=value per line", "查询参数 · 每行 name=value", "クエリパラメーター · 1 行に name=value"],
+  "ords.test.headers": ["Header · 한 줄에 Name: value", "Headers · one Name: value per line", "请求头 · 每行 Name: value", "ヘッダー · 1 行に Name: value"],
+  "ords.test.auth": ["API 인증", "API authentication", "API 认证", "API 認証"],
+  "ords.test.none": ["인증 없음", "None", "无认证", "認証なし"],
+  "ords.test.timeoutLabel": ["응답 대기 제한 (초, 1~120)", "Timeout (seconds, 1–120)", "超时（秒，1–120）", "タイムアウト（秒、1–120）"],
+  "ords.test.username": ["API 사용자 이름", "API username", "API 用户名", "API ユーザー名"],
+  "ords.test.password": ["API 비밀번호", "API password", "API 密码", "API パスワード"],
+  "ords.test.token": ["Bearer Token", "Bearer Token", "Bearer Token", "Bearer Token"],
+  "ords.test.run": ["API 호출", "Send request", "发送请求", "API 呼び出し"],
+  "ords.test.curl": ["curl 복사 · 인증·입력값 제외", "Copy curl · omit auth and input values", "复制 curl · 不含认证及输入值", "curl をコピー · 認証・入力値を除外"],
+  "ords.test.response": ["응답", "Response", "响应", "レスポンス"],
+  "ords.test.responseHeaders": ["응답 헤더", "Response headers", "响应头", "レスポンスヘッダー"],
+  "ords.test.pretty": ["JSON 정렬 보기", "Format JSON", "格式化 JSON", "JSON 整形表示"],
+  "ords.test.preparing": ["호출 정보를 확인하고 있습니다…", "Preparing request…", "正在准备请求…", "リクエスト情報を確認中…"],
+  "ords.test.running": ["호출 중…", "Request in progress…", "请求中…", "呼び出し中…"],
+  "ords.test.runningTime": ["호출 중 · {0}초", "Request in progress · {0}s", "请求中 · {0} 秒", "呼び出し中 · {0} 秒"],
+  "ords.test.finished": ["응답을 받았습니다.", "Response received.", "已收到响应。", "レスポンスを受信しました。"],
+  "ords.test.noResponse": ["응답 미확인", "No response confirmed", "未确认响应", "レスポンス未確認"],
+  "ords.test.noRetry": ["앱에서 자동 재호출하지 않았습니다. 실제 처리 여부를 확인한 뒤 다시 호출하세요.", "The app did not retry. Check whether the request was processed before sending it again.", "应用未自动重试。再次发送前请确认实际处理状态。", "アプリは自動再送していません。処理状況を確認してから再実行してください。"],
+  "ords.test.writeConfirm": ["{0} 요청을 실제로 전송합니다. DB 데이터나 상태가 변경될 수 있습니다.\n{1}\n계속할까요?", "Send a real {0} request? It may change database data or state.\n{1}", "将发送真实的 {0} 请求，可能更改数据库数据或状态。\n{1}\n继续吗？", "実際に {0} を送信します。DB データや状態が変更される場合があります。\n{1}\n続行しますか？"],
+  "ords.test.copied": ["인증·입력값을 제외한 curl을 복사했습니다. PATH_VALUE·QUERY_VALUE 등의 자리를 채워 사용하세요.", "Copied curl without credentials or input values. Replace PATH_VALUE, QUERY_VALUE and other placeholders.", "已复制不含认证和输入值的 curl。请填写 PATH_VALUE、QUERY_VALUE 等占位符。", "認証・入力値を除いてコピーしました。PATH_VALUE、QUERY_VALUE などを置き換えてください。"],
+  "ords.test.copyFailed": ["복사하지 못했습니다. 브라우저의 클립보드 권한을 확인하세요.", "Copy failed. Check browser clipboard permissions.", "复制失败。请检查浏览器剪贴板权限。", "コピーできませんでした。クリップボード権限を確認してください。"],
+  "ords.test.pairsInvalid": ["Query는 name=value, Header는 Name: value 형식으로 한 줄씩 입력하세요.", "Use name=value for queries and Name: value for headers, one per line.", "查询参数使用 name=value，请求头使用 Name: value，每行一项。", "クエリは name=value、ヘッダーは Name: value を 1 行ずつ入力してください。"],
+  "ords.test.endpointMissing": ["이 DB의 ORDS 기본 URL이 등록되지 않았습니다. .env의 ORDS_TEST_ENDPOINTS에 {\"접속 정보의 DB 이름\":\"https://호스트/ords/\"} 형태로 등록한 뒤 앱을 재시작하세요.", "No ORDS base URL is registered for this DB. Set ORDS_TEST_ENDPOINTS in .env to {\"database name shown in connection info\":\"https://host/ords/\"} and restart the app.", "此数据库尚未注册 ORDS 基础 URL。请在 .env 的 ORDS_TEST_ENDPOINTS 中设置 {\"连接信息中的数据库名称\":\"https://host/ords/\"} 并重启应用。", "この DB の ORDS ベース URL が未登録です。.env の ORDS_TEST_ENDPOINTS に {\"接続情報の DB 名\":\"https://host/ords/\"} を設定し、再起動してください。"],
+  "ords.test.handlerMissing": ["선택한 핸들러를 확인하지 못했습니다. 목록을 새로 조회하세요.", "Selected handler could not be verified. Refresh the catalog.", "无法确认所选处理程序。请刷新列表。", "選択したハンドラーを確認できません。一覧を更新してください。"],
+  "ords.test.notPublished": ["스키마 REST가 활성화되고 모듈이 게시된 후 호출할 수 있습니다.", "Enable schema REST and publish the module before testing.", "启用模式 REST 并发布模块后方可测试。", "スキーマの REST を有効にし、モジュールを公開してからテストしてください。"],
+  "ords.test.routeUnsupported": ["현재는 BASE_PATH 스키마와 일반 경로·:id 형태의 경로 변수를 지원합니다. 이 경로는 직접 REST 클라이언트로 확인하세요.", "Supports BASE_PATH schemas, literal paths and :id-style named segments. Test this route in a separate REST client.", "目前支持 BASE_PATH 模式、普通路径及 :id 形式的路径参数。请使用独立 REST 客户端测试此路径。", "BASE_PATH、通常のパス、:id 形式のパス変数に対応しています。このパスは別の REST クライアントで確認してください。"],
+  "ords.test.pathInvalid": ["경로 변수 값을 확인하세요. 빈 값, 경로 이동 또는 /·\\·%·?·#·; 문자는 사용할 수 없습니다.", "Check path values. Empty values, traversal and /, \\, %, ?, #, ; are not supported.", "请检查路径变量。不支持空值、路径跳转及 /、\\、%、?、#、;。", "パス変数を確認してください。空値、パス移動、/・\\・%・?・#・; は使用できません。"],
+  "ords.test.requestInvalid": ["요청 형식·크기를 확인하세요. Query/Header 각 32개, JSON Body 256KiB, 대기 제한 1~120초입니다.", "Check request format and limits: 32 query/header entries each, 256 KiB JSON body, 1–120 second timeout.", "请检查格式及限制：查询参数和请求头各 32 项，JSON 正文 256KiB，超时 1–120 秒。", "形式・上限を確認してください。クエリ・ヘッダー各 32 件、JSON 本文 256KiB、1–120 秒です。"],
+  "ords.test.headerInvalid": ["헤더 값 또는 중복을 확인하세요. Host·Cookie·Authorization 등 전송 제어 헤더는 직접 지정할 수 없습니다. 인증은 API 인증 항목을 사용하세요.", "Check header values/duplicates. Transport headers such as Host, Cookie and Authorization cannot be entered directly; use API authentication.", "请检查请求头的值和重复项。不可直接指定 Host、Cookie、Authorization 等传输控制头；认证请使用 API 认证项。", "ヘッダー値・重複を確認してください。Host・Cookie・Authorization などは直接指定できません。API 認証を使用してください。"],
+  "ords.test.authInvalid": ["API 인증 값을 확인하세요. DB 로그인 비밀번호를 자동으로 사용하지 않습니다.", "Check API authentication values. DB login credentials are not used automatically.", "请检查 API 认证信息。不会自动使用数据库登录凭据。", "API 認証情報を確認してください。DB ログイン情報は自動使用しません。"],
+  "ords.test.jsonInvalid": ["JSON Body의 문법을 확인하세요.", "Check JSON body syntax.", "请检查 JSON 正文语法。", "JSON 本文の構文を確認してください。"],
+  "ords.test.confirmRequired": ["변경 요청의 실행 확인이 필요합니다.", "Confirm the mutation request before sending it.", "发送前需确认变更请求。", "変更リクエストの実行確認が必要です。"],
+  "ords.test.expired": ["호출 준비 정보가 만료되었거나 이미 사용되었습니다. API 테스트를 다시 열어 주세요.", "Request preparation expired or was already used. Reopen API test.", "请求准备信息已过期或已使用。请重新打开 API 测试。", "呼び出し準備情報が期限切れか使用済みです。API テストを開き直してください。"],
+  "ords.test.busy": ["현재 연결에서 다른 API 호출이 진행 중입니다.", "Another API request is running for this connection.", "此连接正在执行其他 API 请求。", "この接続で別の API 呼び出しが進行中です。"],
+  "ords.test.timeout": ["응답 대기 시간을 초과했습니다. 처리 여부는 확인되지 않았으며 앱에서 자동 재호출하지 않습니다.", "Response timeout. Processing is unconfirmed; the app does not retry.", "响应超时。处理状态未确认，应用不会自动重试。", "応答待ちがタイムアウトしました。処理状況は未確認で、自動再送しません。"],
+  "ords.test.network": ["연결·TLS·응답 수신에 실패했습니다. URL과 서버 인증서를 확인하세요. 처리 여부는 미확인이며 앱에서 자동 재호출하지 않습니다.", "Connection, TLS or response read failed. Check the endpoint and server certificate. Processing is unconfirmed; the app does not retry.", "连接、TLS 或响应读取失败。请检查端点及服务器证书。处理状态未确认，不会自动重试。", "接続・TLS・受信に失敗しました。URL と証明書を確認してください。処理状況は未確認で、自動再送しません。"],
+  "ords.test.interrupted": ["응답 확인이 중단되었습니다. 서버의 실제 처리 여부를 확인하세요.", "Response verification was interrupted. Check actual server processing.", "响应确认已中断。请检查服务器实际处理状态。", "応答確認が中断されました。サーバーの処理状況を確認してください。"],
+  "ords.test.truncated": ["응답이 1MiB를 넘어 앞부분만 표시합니다. 수신을 중단했으며 전체 응답이 아닙니다.", "Response exceeds 1 MiB. Reception stopped; only the beginning is shown.", "响应超过 1MiB，已停止接收，仅显示开头部分。", "応答が 1MiB を超えたため受信を停止し、先頭部分のみ表示しています。"],
+  "ords.test.binary": ["바이너리·압축 응답입니다. 상태 코드와 헤더만 표시합니다.", "Binary/compressed response. Only status and headers are displayed.", "二进制或压缩响应，仅显示状态码和响应头。", "バイナリ・圧縮応答です。ステータスとヘッダーのみ表示します。"],
+  "ords.test.failed": ["API 테스트를 준비하거나 실행하지 못했습니다. 자동 재호출하지 않았습니다.", "API test preparation or execution failed. No application retry was made.", "API 测试准备或执行失败，应用未自动重试。", "API テストの準備・実行に失敗しました。自動再送していません。"],
+  "ords.schemaName": ["스키마", "Schema", "模式", "スキーマ"],
+  "ords.selectModuleHint": ["모듈을 선택하면 경로·게시 상태와 URI 템플릿을 확인할 수 있습니다.", "Select a module to view its path, publication status and URI templates.", "选择模块以查看路径、发布状态及 URI 模板。", "モジュールを選択するとパス、公開状態、URI テンプレートを確認できます。"],
+  "ords.selectTemplateHint": ["URI 템플릿을 선택하면 HTTP 핸들러와 SQL 원문이 표시됩니다.", "Select a URI template to view HTTP handlers and source SQL.", "选择 URI 模板以查看 HTTP 处理程序及 SQL 源码。", "URI テンプレートを選択すると HTTP ハンドラーと SQL ソースを表示します。"],
+  "ords.handlersEmpty": ["등록된 HTTP 핸들러가 없습니다.", "No HTTP handlers are registered.", "尚未注册 HTTP 处理程序。", "HTTP ハンドラーは登録されていません。"],
+  "ords.handlerSource": ["핸들러 SQL / PL/SQL", "Handler SQL / PL/SQL", "处理程序 SQL / PL/SQL", "ハンドラー SQL / PL/SQL"],
+  "ords.routePath": ["스키마·모듈·템플릿 경로", "Schema / module / template path", "模式 / 模块 / 模板路径", "スキーマ・モジュール・テンプレートのパス"],
+  "ords.routeHelp": ["ORDS 기본 URL 뒤에 붙이는 경로입니다. :id 같은 경로 변수는 실제 값으로 바꿔 사용하세요.", "Append this path to the ORDS base URL. Replace path variables such as :id with actual values.", "将此路径附加到 ORDS 基础 URL。请将 :id 等路径变量替换为实际值。", "ORDS ベース URL に追加するパスです。:id などのパス変数は実際の値に置き換えてください。"],
+  "ords.fieldHelp": ["설정 안내", "Setting help", "设置帮助", "設定ヘルプ"],
+  "ords.statusHelp": ["새 모듈의 기본값은 NOT_PUBLISHED(미게시)입니다. PUBLISHED로 변경하면 API 요청을 받을 수 있습니다.", "New modules default to NOT_PUBLISHED. PUBLISHED allows the module to receive API requests.", "新模块默认为 NOT_PUBLISHED。改为 PUBLISHED 后可接收 API 请求。", "新規モジュールの既定値は NOT_PUBLISHED です。PUBLISHED にすると API リクエストを受け付けます。"],
+  "ords.authHelp": ["메타데이터 조회 인증 설정입니다. 개별 API의 접근 권한은 별도의 ORDS 권한 설정으로 관리합니다.", "Authentication for metadata access. Access to individual APIs is managed separately through ORDS privileges.", "此项控制元数据访问认证。单独 API 的访问由 ORDS 权限另行管理。", "メタデータ参照の認証設定です。個別 API のアクセスは ORDS 権限で別途管理します。"],
+  "ords.enableImpact": ["스키마 REST를 활성화합니다. 기존에 게시된 API 경로와 접근 권한을 확인하세요.", "This enables REST for the schema. Check existing published API routes and their access privileges.", "将启用模式 REST。请确认已有的已发布 API 路径及访问权限。", "スキーマの REST を有効化します。既存の公開 API パスとアクセス権限を確認してください。"],
+  "ords.unpublishImpact": ["모듈을 미게시로 변경하면 해당 모듈의 API 요청을 처리하지 않습니다.", "Unpublishing stops the module from serving API requests.", "取消发布后，该模块将不再处理 API 请求。", "未公開にすると、このモジュールへの API リクエストを処理しなくなります。"],
+  "ords.disableImpact": ["스키마 REST를 비활성화하면 해당 스키마의 REST API를 사용할 수 없습니다.", "Disabling schema REST makes its REST APIs unavailable.", "禁用模式 REST 后，该模式的 REST API 将不可用。", "スキーマの REST を無効化すると、その REST API は利用できなくなります。"],
+  "ords.deleteChildren": ["선택한 대상과 하위 ORDS 정의를 삭제합니다. 아래 영향 범위와 원본 설정을 확인하세요.", "Deletes the selected resource and its child ORDS definitions. Review the affected scope and original settings below.", "将删除选定资源及其下级 ORDS 定义。请确认下方影响范围及原始设置。", "選択した対象と配下の ORDS 定義を削除します。以下の影響範囲と元の設定を確認してください。"],
+  "ords.deleteHandler": ["선택한 HTTP 핸들러를 삭제합니다. 해당 경로·메서드를 사용하는 호출에 영향을 줍니다.", "Deletes this HTTP handler, affecting calls to its path and method.", "将删除此 HTTP 处理程序，影响使用其路径和方法的调用。", "この HTTP ハンドラーを削除します。該当パス・メソッドへの呼び出しに影響します。"],
+  "ords.title": [
+    "ORDS 관리",
+    "ORDS management",
+    "ORDS 管理",
+    "ORDS 管理"
+  ],
+  "ords.scope": [
+    "현재 로그인 사용자 본인의 스키마만 관리합니다. 스키마 → 모듈 → URI 템플릿 → HTTP 핸들러 순서로 선택하세요.",
+    "Manage only the current login schema. Select schema → module → URI template → HTTP handler.",
+    "仅管理当前登录用户的模式。依次选择模式 → 模块 → URI 模板 → HTTP 处理程序。",
+    "現在のログインスキーマのみ管理します。スキーマ → モジュール → URI テンプレート → HTTP ハンドラーの順に選択します。"
+  ],
+  "ords.exposure": [
+    "모듈을 게시합니다. 인증 없이 호출 가능한 API가 있는지 접근 권한을 확인하세요.",
+    "This publishes the module. Check whether any API can be called without authentication.",
+    "将发布模块。请确认是否存在可未经认证调用的 API。",
+    "モジュールを公開します。認証なしで呼び出せる API がないかアクセス権限を確認してください。"
+  ],
+  "ords.supportTitle": [
+    "지원 범위",
+    "Supported scope",
+    "支持范围",
+    "対応範囲"
+  ],
+  "ords.support": [
+    "로그인 스키마의 ORDS_METADATA.ORDS API와 USER_ORDS 뷰만 사용합니다. 다른 스키마·권한·OAuth·역할·자동 REST 객체 편집은 지원하지 않습니다. 하위 템플릿이 있는 모듈은 경로·게시 상태만 변경할 수 있습니다. ORDS 버전에 없는 API는 차단합니다. 최대 뷰당 2,000행·전체 2MB를 넘으면 잘라내지 않고 중단합니다.",
+    "Uses ORDS_METADATA.ORDS and USER_ORDS views for the login schema. Other schemas, privileges, OAuth, roles and auto-REST object editing are unsupported. Modules with templates support path and publication changes only. Missing APIs are blocked. More than 2,000 rows per view or 2 MB of metadata blocks editing without truncation.",
+    "使用登录模式的 ORDS_METADATA.ORDS 和 USER_ORDS 视图。不支持其他模式、权限、OAuth、角色或自动 REST 对象编辑。有模板的模块只能更改路径和发布状态。缺少 API 时阻止操作。每个视图超过 2,000 行或总元数据超过 2MB 时停止，不截断。",
+    "ログインスキーマの ORDS_METADATA.ORDS と USER_ORDS ビューを使用します。他スキーマ、権限、OAuth、ロール、自動 REST オブジェクトの編集は対象外です。テンプレートがあるモジュールはパスと公開状態のみ変更できます。API 不在、各ビュー 2,000 行超、全体 2MB 超の場合は切り捨てず停止します。"
+  ],
+  "ords.schemaDelete": [
+    "스키마 삭제는 ORDS REST 등록과 모든 관련 메타데이터 삭제입니다. DB 사용자·테이블은 삭제하지 않습니다(DROP USER 아님). 표시된 개수 외에도 자동 REST 설정, 보안·OAuth 관련 연결 등이 삭제될 수 있습니다. 전체 ORDS 내보내기 백업을 확인하세요.",
+    "Schema deletion removes ORDS registration and all related REST metadata, not the DB user or tables (no DROP USER). Auto-REST settings and security/OAuth relationships may also be removed beyond the displayed counts. Check a complete ORDS export backup first.",
+    "删除模式表示删除 ORDS 注册及全部相关 REST 元数据，不删除数据库用户或表（不是 DROP USER）。除显示数量外，自动 REST 设置及安全/OAuth 关系也可能被删除。请先确认完整 ORDS 导出备份。",
+    "スキーマ削除は ORDS 登録と関連 REST メタデータの削除です。DB ユーザーやテーブルは削除しません（DROP USER ではありません）。表示件数以外に自動 REST 設定やセキュリティ/OAuth の関連も削除される場合があります。完全な ORDS エクスポートを確認してください。"
+  ],
+  "ords.sourceNotice": [
+    "저장은 SQL/PLSQL 원문을 핸들러 정의로 등록하는 작업입니다. 실제 호출은 별도의 API 테스트 버튼에서 실행합니다.",
+    "Saving registers SQL/PLSQL as the handler definition. Invoke it separately using API test.",
+    "保存会将 SQL/PLSQL 注册为处理程序定义。实际调用请使用独立的 API 测试按钮。",
+    "保存は SQL/PLSQL をハンドラー定義として登録する操作です。実際の呼び出しは API テストで行います。"
+  ],
+  "ords.reviewWarning": [
+    "변경 내용과 실행할 SQL을 확인하세요. 미리보기는 5분 동안 유효하며, 외부 변경이 감지되면 다시 확인해야 합니다.",
+    "Review the changes and SQL. Preview is valid for five minutes; detected external changes require a new review.",
+    "请确认更改内容及 SQL。预览有效期为五分钟；检测到外部更改时需重新确认。",
+    "変更内容と SQL を確認してください。プレビューは 5 分間有効で、外部変更の検出時は再確認が必要です。"
+  ],
+  "ords.noRetry": [
+    "자동 재시도하지 않습니다. 실제 상태를 새로 조회한 후 새 미리보기를 만드세요.",
+    "No automatic retry. Refresh actual state before creating a new preview.",
+    "不会自动重试。请刷新实际状态后创建新预览。",
+    "自動再試行は行いません。実際の状態を更新してから新しいプレビューを作成してください。"
+  ],
+  "ords.APPLIED": [
+    "변경을 적용했습니다.",
+    "Change applied.",
+    "更改已应用。",
+    "変更を適用しました。"
+  ],
+  "ords.NOT_DETECTED": [
+    "ORDS API를 감지하지 못했습니다. 미설치 또는 현재 사용자에게 보이지 않는 상태입니다.",
+    "ORDS APIs were not detected: not installed or not visible to this user.",
+    "未检测到 ORDS API：未安装或对当前用户不可见。",
+    "ORDS API を検出できません。未インストール、または現在のユーザーから参照できません。"
+  ],
+  "ords.ACCESS_REQUIRED": [
+    "ORDS 메타데이터 조회/변경 권한이 부족합니다.",
+    "Insufficient permission for ORDS metadata.",
+    "ORDS 元数据权限不足。",
+    "ORDS メタデータへの権限が不足しています。"
+  ],
+  "ords.METADATA_UNAVAILABLE": [
+    "ORDS API는 있으나 필수 USER_ORDS 뷰를 조회할 수 없습니다. 설치 상태와 SELECT 권한을 확인하세요.",
+    "ORDS APIs are present but required USER_ORDS views are unavailable. Check installation and SELECT privileges.",
+    "存在 ORDS API，但必需的 USER_ORDS 视图不可用。请检查安装及 SELECT 权限。",
+    "ORDS API はありますが、必要な USER_ORDS ビューを参照できません。インストールと SELECT 権限を確認してください。"
+  ],
+  "ords.UNSUPPORTED": [
+    "설치된 ORDS 버전의 API 또는 메타데이터 형식이 이 변경을 지원하지 않습니다.",
+    "The installed ORDS API or metadata format does not support this change.",
+    "已安装 ORDS API 或元数据格式不支持此更改。",
+    "インストール済み ORDS API またはメタデータ形式がこの変更に対応していません。"
+  ],
+  "ords.LIMIT": [
+    "메타데이터 조회 한도를 넘었습니다. 일부 내용만으로 변경하지 않습니다.",
+    "Metadata exceeds the review limit. Changes cannot use a partial snapshot.",
+    "元数据超出审查限制，不使用部分快照更改。",
+    "メタデータが確認上限を超えています。不完全な情報で変更は行いません。"
+  ],
+  "ords.ownSchema": [
+    "현재 로그인 사용자 본인의 스키마를 선택하세요.",
+    "Select the current login user’s own schema.",
+    "请选择当前登录用户自己的模式。",
+    "現在のログインユーザー自身のスキーマを選択してください。"
+  ],
+  "ords.stale": [
+    "조회 이후 대상 또는 스키마가 변경되었습니다. 새로고침 후 다시 미리보기를 만드세요.",
+    "The target or schema changed. Refresh and create a new preview.",
+    "目标或模式已更改，请刷新并重新预览。",
+    "対象またはスキーマが変更されました。更新して再度プレビューしてください。"
+  ],
+  "ords.expired": [
+    "로그인 또는 미리보기 확인이 만료되었습니다. 새로 조회해 주세요.",
+    "The login or preview has expired. Refresh the page.",
+    "登录或预览已过期，请刷新。",
+    "ログインまたはプレビューが期限切れです。更新してください。"
+  ],
+  "ords.failed": [
+    "ORDS 작업 결과를 확인하지 못했습니다. 상세 DB 오류나 소스는 로그에 출력하지 않습니다. 상태를 재조회하세요.",
+    "The ORDS operation could not be confirmed. Refresh the database state before another attempt.",
+    "无法确认 ORDS 操作结果。再次尝试前请刷新数据库状态。",
+    "ORDS 操作の結果を確認できません。再実行前に DB 状態を更新してください。"
+  ],
+  "ords.invalid": [
+    "필수 값·길이·타입·HTTP 메서드를 확인해 주세요.",
+    "Check required values, lengths, types and HTTP method.",
+    "请检查必填值、长度、类型和 HTTP 方法。",
+    "必須値、長さ、型、HTTP メソッドを確認してください。"
+  ],
+  "ords.exists": [
+    "대상이 이미 존재합니다. 수정 작업을 선택하세요.",
+    "The target already exists. Choose Edit.",
+    "目标已存在，请选择编辑。",
+    "対象は既に存在します。編集を選択してください。"
+  ],
+  "ords.missing": [
+    "대상 또는 상위 자원을 찾지 못했습니다.",
+    "The target or parent resource was not found.",
+    "未找到目标或上级资源。",
+    "対象または親リソースが見つかりません。"
+  ],
+  "ords.moduleChildren": [
+    "하위 템플릿이 있는 모듈은 경로·게시 상태만 수정할 수 있습니다. 페이지 크기·설명은 원래 값을 유지하세요.",
+    "For modules with templates, only path and publication can change. Keep pagination and comments unchanged.",
+    "有模板的模块只能更改路径和发布状态。请保留分页和注释。",
+    "テンプレートがあるモジュールはパスと公開状態のみ変更できます。ページ件数とコメントは元の値を保持してください。"
+  ],
+  "ords.templateChildren": [
+    "핸들러가 있는 템플릿의 교체는 지원하지 않습니다. 기존 핸들러 유실을 방지하기 위해 중단했습니다.",
+    "Replacement of a template with handlers is unsupported to prevent losing handlers.",
+    "不支持替换包含处理程序的模板，以防丢失处理程序。",
+    "ハンドラーがあるテンプレートの置換は、定義の消失を防ぐため対応していません。"
+  ],
+  "ords.sourceType": [
+    "응답 소스 유형",
+    "Response source type",
+    "响应源码类型",
+    "応答ソース種別"
+  ],
+  "ords.confirmationRequired": [
+    "미리보기에 표시된 확인 문구를 정확히 입력해 주세요.",
+    "Enter the exact confirmation phrase from the preview.",
+    "请输入预览中显示的完整确认文字。",
+    "プレビューに表示された確認文を正確に入力してください。"
+  ],
+  "ords.verifyFailed": [
+    "적용 후 메타데이터가 요청과 일치하지 않아 롤백을 요청했습니다. 실제 상태를 새로 조회하세요.",
+    "Metadata did not match after application; rollback was requested. Refresh actual state.",
+    "应用后的元数据不匹配，已请求回滚。请刷新实际状态。",
+    "適用後のメタデータが一致しないためロールバックを要求しました。実際の状態を更新してください。"
+  ],
+  "ords.refresh": [
+    "새로고침",
+    "Refresh",
+    "刷新",
+    "更新"
+  ],
+  "ords.SCHEMA": [
+    "스키마 REST 등록",
+    "Schema REST registration",
+    "模式 REST 注册",
+    "スキーマ REST 登録"
+  ],
+  "ords.MODULE": [
+    "모듈",
+    "Modules",
+    "模块",
+    "モジュール"
+  ],
+  "ords.TEMPLATE": [
+    "URI 템플릿",
+    "URI templates",
+    "URI 模板",
+    "URI テンプレート"
+  ],
+  "ords.HANDLER": [
+    "HTTP 핸들러",
+    "HTTP handlers",
+    "HTTP 处理程序",
+    "HTTP ハンドラー"
+  ],
+  "ords.CREATE": [
+    "등록",
+    "Create",
+    "创建",
+    "登録"
+  ],
+  "ords.UPDATE": [
+    "수정",
+    "Edit",
+    "编辑",
+    "編集"
+  ],
+  "ords.DELETE": [
+    "삭제",
+    "Delete",
+    "删除",
+    "削除"
+  ],
+  "ords.PUBLISH": [
+    "게시 상태 변경",
+    "Change publication",
+    "更改发布状态",
+    "公開状態の変更"
+  ],
+  "ords.preview": [
+    "변경 미리보기",
+    "Preview change",
+    "预览更改",
+    "変更のプレビュー"
+  ],
+  "ords.cancel": [
+    "닫기",
+    "Close",
+    "关闭",
+    "閉じる"
+  ],
+  "ords.original": [
+    "원문 메타데이터",
+    "Original metadata",
+    "原始元数据",
+    "元のメタデータ"
+  ],
+  "ords.changes": [
+    "변경 비교",
+    "Changes",
+    "更改比较",
+    "変更の比較"
+  ],
+  "ords.sql": [
+    "실행 PLSQL과 바인딩",
+    "PLSQL and bindings",
+    "PLSQL 及绑定",
+    "PLSQL とバインド"
+  ],
+  "ords.confirmHelp": [
+    "다음 문구를 입력해 확인하세요: ",
+    "Type this phrase to confirm: ",
+    "输入以下文字确认：",
+    "次の確認文を入力してください："
+  ],
+  "ords.apply": [
+    "확인한 변경 적용",
+    "Apply reviewed change",
+    "应用已确认更改",
+    "確認済みの変更を適用"
+  ],
+  "ords.bindings": [
+    "순서대로 바인딩되는 값",
+    "Values bound in order",
+    "按顺序绑定的值",
+    "順番にバインドする値"
+  ],
+  "ords.reviewReady": [
+    "미리보기를 확인한 뒤 적용할 수 있습니다.",
+    "Review the preview before applying.",
+    "请确认预览后应用。",
+    "プレビュー確認後に適用できます。"
+  ],
+  "ords.loading": [
+    "조회 중…",
+    "Loading…",
+    "加载中…",
+    "読み込み中…"
+  ],
+  "ords.empty": [
+    "등록된 모듈이 없습니다.",
+    "No modules registered.",
+    "没有已注册模块。",
+    "登録済みモジュールはありません。"
+  ],
+  "ords.notRegistered": [
+    "ORDS REST에 등록되지 않은 스키마입니다.",
+    "This schema is not registered with ORDS REST.",
+    "此模式未注册 ORDS REST。",
+    "ORDS REST に未登録のスキーマです。"
+  ],
+  "ords.select": [
+    "선택",
+    "Select",
+    "选择",
+    "選択"
+  ],
+  "ords.selectModule": [
+    "모듈 선택",
+    "Select module",
+    "选择模块",
+    "モジュールを選択"
+  ],
+  "ords.selectTemplate": [
+    "템플릿 선택",
+    "Select template",
+    "选择模板",
+    "テンプレートを選択"
+  ],
+  "ords.createModule": [
+    "모듈 등록",
+    "Create module",
+    "创建模块",
+    "モジュール登録"
+  ],
+  "ords.createTemplate": [
+    "템플릿 등록",
+    "Create template",
+    "创建模板",
+    "テンプレート登録"
+  ],
+  "ords.createHandler": [
+    "핸들러 등록",
+    "Create handler",
+    "创建处理程序",
+    "ハンドラー登録"
+  ],
+  "ords.modules": [
+    "모듈",
+    "Modules",
+    "模块",
+    "モジュール"
+  ],
+  "ords.templates": [
+    "템플릿",
+    "Templates",
+    "模板",
+    "テンプレート"
+  ],
+  "ords.handlers": [
+    "핸들러",
+    "Handlers",
+    "处理程序",
+    "ハンドラー"
+  ],
+  "ords.parameters": [
+    "파라미터",
+    "Parameters",
+    "参数",
+    "パラメーター"
+  ],
+  "ords.module": [
+    "모듈 이름",
+    "Module name",
+    "模块名称",
+    "モジュール名"
+  ],
+  "ords.pattern": [
+    "URI 패턴",
+    "URI pattern",
+    "URI 模式",
+    "URI パターン"
+  ],
+  "ords.method": [
+    "HTTP 메서드",
+    "HTTP method",
+    "HTTP 方法",
+    "HTTP メソッド"
+  ],
+  "ords.enabled": [
+    "REST 활성화",
+    "REST enabled",
+    "启用 REST",
+    "REST 有効化"
+  ],
+  "ords.mappingType": [
+    "URL 매핑 유형",
+    "URL mapping type",
+    "URL 映射类型",
+    "URL マッピング種別"
+  ],
+  "ords.mappingPattern": [
+    "URL 매핑 값",
+    "URL mapping value",
+    "URL 映射值",
+    "URL マッピング値"
+  ],
+  "ords.autoRestAuth": [
+    "메타데이터 카탈로그 인증 요구",
+    "Require metadata catalog authentication",
+    "要求元数据目录认证",
+    "メタデータカタログ認証を要求"
+  ],
+  "ords.basePath": [
+    "모듈 기본 경로 (/로 끝남)",
+    "Module base path (ends with /)",
+    "模块基础路径（以 / 结尾）",
+    "モジュールの基本パス（末尾は /）"
+  ],
+  "ords.itemsPerPage": [
+    "페이지당 행 수 (핸들러 공란: 모듈 상속)",
+    "Rows per page (blank handler: inherit module)",
+    "每页行数（处理程序留空：继承模块）",
+    "ページ件数（ハンドラー空欄：モジュール継承）"
+  ],
+  "ords.status": [
+    "게시 상태",
+    "Publication status",
+    "发布状态",
+    "公開状態"
+  ],
+  "ords.comments": [
+    "설명",
+    "Comments",
+    "注释",
+    "説明"
+  ],
+  "ords.priority": [
+    "우선순위 (0–9)",
+    "Priority (0–9)",
+    "优先级（0–9）",
+    "優先度（0–9）"
+  ],
+  "ords.etagType": [
+    "ETag 유형",
+    "ETag type",
+    "ETag 类型",
+    "ETag 種別"
+  ],
+  "ords.etagQuery": [
+    "ETag 쿼리 원문",
+    "ETag query source",
+    "ETag 查询源码",
+    "ETag クエリ原文"
+  ],
+  "ords.source": [
+    "SQL/PLSQL 원문",
+    "SQL/PLSQL source",
+    "SQL/PLSQL 源码",
+    "SQL/PLSQL 原文"
+  ],
+  "ords.mimesAllowed": [
+    "허용 MIME 유형 (POST/PUT)",
+    "Allowed MIME types (POST/PUT)",
+    "允许的 MIME 类型（POST/PUT）",
+    "許可 MIME 型（POST/PUT）"
+  ]
+}

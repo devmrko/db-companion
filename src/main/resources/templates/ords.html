@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ords.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content">
+  <div class="app-page-heading"><h1 th:text="#{ords.title}"></h1><button th:replace="~{fragments/common :: sqlHelp('ords', 'list')}"></button></div>
+  <section class="app-ords" data-ords th:attr="data-schema=${selectedSchema},data-base=@{/db/ords}">
+    <input type="hidden" data-ords-csrf th:value="${_csrf?.token}" th:attr="data-csrf-header=${_csrf?.headerName}">
+    <div class="app-card app-ords-intro"><div class="app-ords-heading"><div><span class="app-ords-eyebrow" th:text="#{ords.SCHEMA}"></span><strong th:text="${selectedSchema}"></strong></div><button type="button" class="btn app-btn app-btn-secondary" data-ords-refresh th:text="#{ords.refresh}"></button></div><p th:text="#{ords.scope}"></p>
+      <details class="app-ords-details"><summary th:text="#{ords.supportTitle}"></summary><p th:text="#{ords.support}"></p>
+        <a href="https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.3/orddg/ORDS-reference.html" target="_blank" rel="noopener noreferrer" th:text="#{sqlHelp.doc}"></a>
+      </details>
+      <p role="status" aria-live="polite" data-ords-message></p>
+    </div>
+    <div class="app-ords-catalog" data-ords-catalog hidden>
+      <section class="app-card app-ords-panel app-ords-wide"><h2 th:text="#{ords.SCHEMA}"></h2><div data-ords-schema></div></section>
+      <section class="app-card app-ords-panel"><h2><span class="app-ords-step">1</span><span th:text="#{ords.MODULE}"></span></h2><div data-ords-modules></div></section>
+      <section class="app-card app-ords-panel"><h2><span class="app-ords-step">2</span><span th:text="#{ords.TEMPLATE}"></span></h2><div data-ords-templates></div></section>
+      <section class="app-card app-ords-panel app-ords-wide"><h2><span class="app-ords-step">3</span><span th:text="#{ords.HANDLER}"></span></h2><div data-ords-handlers></div></section>
+    </div>
+    <section class="app-card app-ords-panel app-ords-api-test" data-ords-test hidden aria-labelledby="ords-test-title">
+      <div class="app-ords-heading"><h2 id="ords-test-title" data-ords-test-heading th:text="#{ords.test.title}"></h2><button type="button" class="btn app-btn app-btn-quiet" data-ords-test-close th:text="#{ords.cancel}"></button></div>
+      <form data-ords-test-form autocomplete="off"><fieldset data-ords-test-fields>
+        <div class="app-ords-inputs">
+          <label class="app-ords-wide"><span th:text="#{ords.test.base}"></span><input class="form-control" data-ords-test-base readonly></label>
+          <div class="app-ords-wide app-ords-request-url"><span class="app-badge" data-ords-test-method></span><label><span th:text="#{ords.test.url}"></span><input class="form-control" data-ords-test-url readonly></label></div>
+          <section class="app-ords-wide" data-ords-test-path-section hidden><h3 th:text="#{ords.test.path}"></h3><div class="app-ords-inputs" data-ords-test-parameters></div></section>
+          <label><span th:text="#{ords.test.query}"></span><textarea class="form-control" rows="3" data-ords-test-query placeholder="name=value"></textarea></label>
+          <label><span th:text="#{ords.test.headers}"></span><textarea class="form-control" rows="3" data-ords-test-headers placeholder="Accept: application/json"></textarea></label>
+          <label><span th:text="#{ords.test.auth}"></span><select class="form-select" data-ords-test-auth><option value="NONE" th:text="#{ords.test.none}"></option><option value="BEARER">Bearer Token</option><option value="BASIC">Basic</option></select></label>
+          <label><span th:text="#{ords.test.timeoutLabel}"></span><input type="number" class="form-control" data-ords-test-timeout min="1" max="120" value="30" required></label>
+          <label data-ords-test-username-field hidden><span th:text="#{ords.test.username}"></span><input class="form-control" data-ords-test-username maxlength="256" autocomplete="off"></label>
+          <label data-ords-test-secret-field hidden><span data-ords-test-secret-label></span><input type="password" class="form-control" data-ords-test-secret maxlength="8192" autocomplete="new-password"></label>
+          <label class="app-ords-wide" data-ords-test-body-field hidden><span>JSON Body</span><textarea class="form-control" rows="8" maxlength="262144" data-ords-test-body spellcheck="false"></textarea></label>
+        </div>
+        <button class="btn app-btn app-btn-primary" type="submit" data-ords-test-run disabled th:text="#{ords.test.run}"></button>
+        <button class="btn app-btn app-btn-secondary" type="button" data-ords-test-curl disabled th:text="#{ords.test.curl}"></button>
+      </fieldset></form>
+      <p role="status" aria-live="polite" data-ords-test-message></p>
+      <section data-ords-test-result hidden>
+        <div class="app-ords-heading"><h3 th:text="#{ords.test.response}"></h3><div><span class="app-badge" data-ords-test-response-status></span> <span data-ords-test-response-time></span></div></div>
+        <label class="app-ords-pretty"><input type="checkbox" data-ords-test-pretty checked><span th:text="#{ords.test.pretty}"></span></label>
+        <pre class="app-preview-source" data-ords-test-response-body tabindex="0"></pre>
+        <details class="app-ords-details"><summary th:text="#{ords.test.responseHeaders}"></summary><pre class="app-preview-source" data-ords-test-response-headers tabindex="0"></pre></details>
+      </section>
+    </section>
+    <section class="app-card app-ords-panel app-ords-editor" data-ords-editor hidden><h2 data-ords-target></h2>
+      <form data-ords-form><fieldset data-ords-fields><div data-ords-inputs class="app-ords-inputs"></div>
+        <button type="submit" class="btn app-btn app-btn-secondary" data-ords-preview th:text="#{ords.preview}"></button>
+        <button type="button" class="btn app-btn app-btn-quiet" data-ords-cancel th:text="#{ords.cancel}"></button>
+      </fieldset></form>
+      <section class="app-ords-review" data-ords-review hidden><h3 th:text="#{ords.preview}"></h3>
+        <p class="app-filter-message" th:text="#{ords.reviewWarning}"></p><div data-ords-warnings></div><p data-ords-impact></p>
+        <details class="app-ords-details"><summary th:text="#{ords.original}"></summary><pre class="app-preview-source" data-ords-original></pre></details>
+        <h4 th:text="#{ords.changes}"></h4><pre class="app-preview-source" data-ords-changes></pre>
+        <h4 th:text="#{ords.sql}"></h4><pre class="app-preview-source" data-ords-sql></pre>
+        <label><span th:text="#{ords.confirmHelp}"></span><code data-ords-phrase></code><input class="form-control" data-ords-confirm autocomplete="off"></label>
+        <button type="button" class="btn app-btn app-btn-primary" data-ords-apply disabled th:text="#{ords.apply}"></button>
+      </section>
+    </section>
+  </section>
+</main></div><script type="module" th:src="@{/js/ords.mjs}"></script></body></html>
