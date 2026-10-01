@@ -1,0 +1,18 @@
+{
+  "ontology.import.filterTitle": ["가져오기 대상 필터", "Import filters", "导入筛选", "取込みフィルター"],
+  "ontology.import.excludeOracle": ["Oracle 내부 객체 제외", "Exclude Oracle internal objects", "排除 Oracle 内部对象", "Oracle 内部オブジェクトを除外"],
+  "ontology.import.excludeApp": ["앱 저장소 제외", "Exclude app storage", "排除应用存储", "アプリの保存用テーブルを除外"],
+  "ontology.import.filterHelp": ["이번 가져오기에만 적용합니다. 기존 테이블·저장된 온톨로지는 변경하지 않습니다. 이름 규칙으로 분류한 항목은 아래 이유에서 확인하고, 필요한 경우 필터를 해제하세요. 실험용 등 나머지 항목은 개별 선택을 해제할 수 있습니다.", "Applies only to this import; existing tables and saved ontologies are unchanged. Review name-based classifications below and turn off a filter if needed. Deselect other items, such as experiment tables, individually.", "仅应用于本次导入，不修改现有表和已保存的本体。请在下方查看按名称规则分类的原因，必要时关闭筛选。实验表等其他项可逐项取消选择。", "今回の取込みだけに適用し、既存のテーブルや保存済みのオントロジーは変更しません。名前の規則による分類理由を確認し、必要ならフィルターを解除してください。実験用などの項目は個別に選択解除できます。"],
+  "ontology.import.excludedCount": ["제외 {0}개", "{0} excluded", "已排除 {0} 项", "除外 {0} 件"],
+  "ontology.import.excludedDetails": ["제외된 객체 {0}개 · 목록과 이유", "{0} excluded objects · names and reasons", "已排除 {0} 个对象 · 名称与原因", "除外オブジェクト {0} 件・一覧と理由"],
+  "ontology.import.selectTable": ["가져올 테이블·뷰 선택", "Select tables and views to import", "选择要导入的表和视图", "取り込むテーブル・ビューを選択"],
+  "ontology.import.empty": ["가져올 대상이 없습니다", "No objects selected for import", "没有选择导入对象", "取込み対象がありません"],
+  "ontology.import.omitted": ["선택 제외", "Deselected", "已取消选择", "選択解除"],
+  "ontology.import.reason.MANUAL": ["개별 선택 해제", "Individually deselected", "逐项取消选择", "個別に選択解除"],
+  "ontology.import.reason.APP_STORE": ["앱 전용 저장소 이름과 일치", "Known app storage name", "匹配已知应用存储名称", "アプリ保存用の既知の名前と一致"],
+  "ontology.import.reason.ORACLE_MAINTAINED": ["Oracle 관리 객체 · ORACLE_MAINTAINED=Y", "Oracle-maintained object · ORACLE_MAINTAINED=Y", "Oracle 管理对象 · ORACLE_MAINTAINED=Y", "Oracle 管理オブジェクト・ORACLE_MAINTAINED=Y"],
+  "ontology.import.reason.SECONDARY": ["인덱스 보조 객체 · SECONDARY=Y", "Index secondary object · SECONDARY=Y", "索引辅助对象 · SECONDARY=Y", "索引の補助オブジェクト・SECONDARY=Y"],
+  "ontology.import.reason.TEXT_NAME": ["Oracle Text 내부 테이블 이름 규칙", "Oracle Text internal table naming pattern", "Oracle Text 内部表名称规则", "Oracle Text 内部テーブルの名前規則"],
+  "ontology.import.reason.VECTOR_NAME": ["벡터 인덱스 보조 테이블 이름 규칙", "Vector index auxiliary table naming pattern", "向量索引辅助表名称规则", "ベクトル索引補助テーブルの名前規則"],
+  "ontology.import.reason.FEEDBACK_NAME": ["Select AI Feedback 벡터 저장소 이름 규칙", "Select AI Feedback vector storage naming pattern", "Select AI Feedback 向量存储名称规则", "Select AI Feedback ベクトル保存用の名前規則"]
+}

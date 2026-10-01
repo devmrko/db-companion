@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.*;
 
 class OntologyCatalogRepositoryTest {
     List<String> names=List.of("A","B","C");
+    List<List<String>> internals=List.of();
     final Map<String,String> comments=Map.of("A","한글 코멘트","C","comment");
     final List<String> sqls=new ArrayList<>();
     final List<List<Object>> bindings=new ArrayList<>();
@@ -38,6 +39,7 @@ class OntologyCatalogRepositoryTest {
             case "setQueryTimeout" -> {timeouts.add((int)a[0]);yield null;}
             case "executeQuery" -> {
                 bindings.add(new ArrayList<>(args.values()));
+                if(sql.contains("SELECT OBJECT_NAME,SECONDARY"))yield result(internals,3);
                 if(sql.contains("SYS.ALL_OBJECTS"))yield result(names.stream().map(List::of).toList(),1);
                 var rows=new ArrayList<List<String>>();
                 for(var arg:args.tailMap(2).values())if(comments.containsKey(arg))rows.add(List.of((String)arg,comments.get(arg)));
@@ -74,6 +76,16 @@ class OntologyCatalogRepositoryTest {
         assertThat(sqls).hasSize(1);
     }
     @Test void emptySchemaDoesNotIssueEmptyInClause(){names=List.of();assertThat(repository.tables("APP")).isEmpty();assertThat(sqls).hasSize(1);}
+    @Test void importHintsAreBoundToVisibleCatalogAndNeverRemoveUserTables(){
+        internals=List.of(List.of("A","Y","N"),List.of("B","N","Y"),List.of("INVISIBLE","Y","N"));
+        var tables=repository.tables("Mixed'Owner");
+        var hints=repository.importExclusions("Mixed'Owner",tables);
+        assertThat(hints).containsExactlyInAnyOrderEntriesOf(Map.of("A","SECONDARY","B","ORACLE_MAINTAINED"));
+        assertThat(tables).extracting("name").containsExactly("A","B","C");
+        assertThat(bindings.getLast()).containsExactly("Mixed'Owner");
+        assertThat(sqls.getLast()).contains("OWNER=?","SUBOBJECT_NAME IS NULL","SECONDARY='Y'","ORACLE_MAINTAINED='Y'").doesNotContain("Mixed'Owner","JOIN");
+    }
+    @Test void noExtraDictionaryRequestForEmptyImportCatalog(){assertThat(repository.importExclusions("APP",List.of())).isEmpty();assertThat(sqls).isEmpty();}
     @Test void glossaryProjectionUsesBoundScopeAndErrorsOnMalformedJson(){
         var scoped=new OntologyRepository(jdbc,new JsonMapper(),new DatabaseRepository(jdbc),new TableStructureRepository(jdbc)){@Override public void require(String schema,String login) { }};
         assertThat(scoped.glossary("APP","LOGIN",List.of("T'NAME"))).isEmpty();

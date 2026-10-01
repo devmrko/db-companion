@@ -12,6 +12,7 @@
       <div class="app-ontology-viewbar" data-on-views hidden>
         <div class="app-dds-tabs"><button type="button" data-on-view="list" aria-pressed="true" th:text="#{ontology.erd.list}"></button><button type="button" data-on-view="erd" aria-pressed="false">ERD</button><button type="button" data-on-view="relationships" aria-pressed="false" th:text="#{ontology.relationships.title}"></button></div>
         <button type="button" class="btn app-btn app-btn-primary" data-on-analyze aria-controls="ontology-relationships" th:text="#{ontology.relationships.analyze}"></button>
+        <button type="button" class="btn app-btn app-btn-secondary" data-on-native th:text="#{ontology.native.title}"></button>
       </div>
       <div data-on-ready hidden>
         <div class="app-dds-toolbar"><select class="form-select app-select" data-on-source th:aria-label="#{ontology.sourceTable}"></select><button type="button" class="btn app-btn app-btn-secondary" data-on-capture th:text="#{ontology.capture}">메타데이터 가져오기</button><button type="button" class="btn app-btn app-btn-secondary" data-on-import-all th:text="#{ontology.import.all}">전체 메타데이터 가져오기</button></div>
@@ -19,11 +20,31 @@
         <div data-on-list></div><div class="app-dds-pages"><span data-on-count></span><div><button type="button" class="btn app-btn app-btn-quiet" data-on-prev th:text="#{ui.da7e61c67cc5}">이전</button><span data-on-page></span><button type="button" class="btn app-btn app-btn-quiet" data-on-next th:text="#{ui.aef613c6612d}">다음</button></div></div>
       </div>
     </div>
+    <dialog class="app-preview-dialog app-ontology-dialog app-native-dialog" data-on-native-dialog aria-labelledby="ontology-native-title">
+      <div class="app-preview-header"><h2 id="ontology-native-title" th:text="#{ontology.native.title}"></h2><button type="button" class="btn app-btn app-btn-quiet" data-sql-help-for="ontology-native">SQL ?</button><button type="button" class="btn app-btn app-btn-quiet" data-native-close th:text="#{ontology.close}"></button></div>
+      <p th:text="#{ontology.native.help}"></p><p data-native-storage></p>
+      <p role="status" aria-live="polite" data-native-status></p><progress data-native-progress hidden th:aria-label="#{ontology.native.working}"></progress>
+      <button type="button" class="btn app-btn app-btn-secondary" data-native-install hidden th:text="#{ontology.native.install}"></button>
+      <h3 th:text="#{ontology.native.objects}"></h3><p class="app-filter-message" th:text="#{ontology.native.scopeHelp}"></p>
+      <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-quiet" data-native-all th:text="#{ontology.native.all}"></button><button type="button" class="btn app-btn app-btn-quiet" data-native-none th:text="#{ontology.native.none}"></button><span data-native-count></span></div>
+      <div class="app-native-list" data-native-objects></div>
+      <label class="app-ontology-consent"><input type="checkbox" data-native-consent><span th:text="#{ontology.native.captureConsent}"></span></label>
+      <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-secondary" data-native-capture th:text="#{ontology.native.capture}"></button><button type="button" class="btn app-btn app-btn-primary" data-native-preview th:text="#{ontology.native.preview}"></button></div>
+      <details data-native-column-details><summary th:text="#{ontology.native.columns}"></summary><pre class="app-preview-source" data-native-columns></pre></details>
+      <section data-native-result hidden><h3 th:text="#{ontology.native.candidates}"></h3><p th:text="#{ontology.native.candidateHelp}"></p><p data-native-candidate-count></p>
+        <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-quiet" data-native-choose-all th:text="#{ontology.native.all}"></button><button type="button" class="btn app-btn app-btn-quiet" data-native-choose-none th:text="#{ontology.native.none}"></button></div>
+        <div class="app-native-list" data-native-candidates></div>
+        <label class="app-ontology-consent"><input type="checkbox" data-native-save-consent><span th:text="#{ontology.native.saveConsent}"></span></label>
+        <button type="button" class="btn app-btn app-btn-primary" data-native-save th:text="#{ontology.native.save}"></button>
+      </section>
+    </dialog>
     <section th:replace="~{fragments/ontology-erd :: erd}"></section>
     <section th:replace="~{fragments/ontology-relationships :: relationships}"></section>
     <dialog class="app-preview-dialog app-ontology-dialog" data-on-pipeline-dialog aria-labelledby="ontology-pipeline-title">
       <div class="app-preview-header"><h2 id="ontology-pipeline-title" data-pipeline-title></h2><button type="button" class="btn app-btn app-btn-quiet" data-pipeline-close th:text="#{ontology.close}"></button></div>
-      <p role="status" aria-live="polite" data-pipeline-status></p><div data-pipeline-body></div>
+      <p role="status" aria-live="polite" data-pipeline-status></p>
+      <details data-pipeline-diagnostic hidden><summary th:text="#{ontology.context.rawResponse}"></summary><p data-pipeline-diagnostic-path></p><p class="app-filter-message" th:text="#{ontology.context.rawHelp}"></p><pre class="app-preview-source" data-pipeline-raw></pre></details>
+      <div data-pipeline-body></div>
       <button type="button" class="btn app-btn app-btn-secondary" data-pipeline-stop hidden th:text="#{ontology.discovery.stop}"></button>
     </dialog>
     <section class="app-card app-dds-detail" data-on-detail hidden>
@@ -36,11 +57,22 @@
     <dialog class="app-preview-dialog app-ontology-dialog app-ontology-import" data-on-import-dialog aria-labelledby="ontology-import-title">
       <div class="app-preview-header"><h2 id="ontology-import-title" th:text="#{ontology.import.all}">전체 메타데이터 가져오기</h2><button type="button" class="btn app-btn app-btn-quiet" data-import-close th:text="#{ontology.close}">닫기</button></div>
       <p data-import-scope></p><p class="app-filter-message" th:text="#{ontology.import.help}"></p>
+      <fieldset class="app-ontology-import-filters" data-import-filters>
+        <legend th:text="#{ontology.import.filterTitle}"></legend>
+        <label class="app-ontology-import-profile"><span th:text="#{ontology.import.profile}"></span><select class="form-select app-select" data-import-profile></select></label>
+        <p class="app-filter-message" th:text="#{ontology.import.profileHelp}"></p>
+        <label><input type="checkbox" data-import-exclude-oracle checked><span th:text="#{ontology.import.excludeOracle}"></span></label>
+        <label><input type="checkbox" data-import-exclude-app checked><span th:text="#{ontology.import.excludeApp}"></span></label>
+        <p class="app-filter-message" th:text="#{ontology.import.filterHelp}"></p>
+      </fieldset>
+      <details data-import-excluded><summary data-import-excluded-count></summary><ul data-import-excluded-list></ul></details>
+      <p class="app-filter-message" th:text="#{ontology.import.refreshHelp}"></p>
       <p role="status" aria-live="polite" data-import-status></p>
       <progress data-import-progress th:aria-label="#{ontology.import.progress}" max="1" value="0"></progress>
-      <div class="app-ontology-import-list"><table class="table app-table"><thead><tr><th scope="col" th:text="#{ontology.table}"></th><th scope="col" th:text="#{ontology.state}"></th><th scope="col" th:text="#{ontology.version}"></th><th scope="col" th:text="#{ontology.import.triples}"></th></tr></thead><tbody data-import-rows></tbody></table></div>
+      <div class="app-ontology-import-list"><table class="table app-table"><thead><tr><th scope="col" th:text="#{ontology.import.selectTable}"></th><th scope="col" th:text="#{ontology.state}"></th><th scope="col" th:text="#{ontology.version}"></th><th scope="col" th:text="#{ontology.import.triples}"></th></tr></thead><tbody data-import-rows></tbody></table></div>
+      <div class="app-ontology-import-changes" data-import-changes></div>
       <p class="app-alert is-error" role="alert" data-import-error hidden></p>
-      <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-primary" data-import-start th:text="#{ontology.import.start}">가져오기 시작</button><button type="button" class="btn app-btn app-btn-secondary" data-import-stop hidden th:text="#{ontology.import.stop}">현재 테이블 후 중단</button></div>
+      <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-secondary" data-import-check th:text="#{ontology.import.check}"></button><button type="button" class="btn app-btn app-btn-primary" data-import-start th:text="#{ontology.import.saveSelected}"></button><button type="button" class="btn app-btn app-btn-secondary" data-import-stop hidden th:text="#{ontology.import.stop}">현재 테이블 후 중단</button></div>
     </dialog>
     <dialog class="app-preview-dialog app-assistant-dialog app-ontology-dialog" data-on-dialog aria-labelledby="ontology-ai-title">
       <div class="app-preview-header"><h2 id="ontology-ai-title" th:text="#{ontology.ai}">AI 초안</h2><button type="button" class="btn app-btn app-btn-quiet" data-on-close th:text="#{ontology.close}">닫기</button></div>

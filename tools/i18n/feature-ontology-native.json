@@ -1,0 +1,224 @@
+{
+  "ontology.native.title": [
+    "Oracle RDF",
+    "Oracle RDF",
+    "Oracle RDF",
+    "Oracle RDF"
+  ],
+  "ontology.native.help": [
+    "Oracle SQL/PLSQL로 메타데이터를 RDF에 저장하고 컬럼 연결 후보를 찾습니다. AI·업무 데이터 조회 없이 동작하며 기존 온톨로지 가져오기와는 별도입니다.",
+    "Store metadata as RDF and find column-link hypotheses using Oracle SQL/PLSQL. No AI or business-row reads; separate from ontology import.",
+    "使用 Oracle SQL/PLSQL 保存 RDF 元数据并查找列连接候选。不调用 AI 或读取业务行，与本体导入分开。",
+    "Oracle SQL/PLSQL でメタデータを RDF に保存し列の接続候補を検索します。AI・業務行の取得はなく、既存の取込とは別です。"
+  ],
+  "ontology.native.objects": [
+    "1. 수집할 테이블·뷰",
+    "1. Tables and views",
+    "1. 表和视图",
+    "1. テーブル・ビュー"
+  ],
+  "ontology.native.scopeHelp": [
+    "로그인 소유 스키마의 저장된 온톨로지만 표시합니다. 최대 50개를 선택하며, 관계 조회에는 수집된 객체 2개 이상이 필요합니다.",
+    "Saved ontology objects in the login schema only. Select up to 50; candidate search needs at least two captured objects.",
+    "仅显示登录模式中已保存的本体对象。最多选择 50 个，候选搜索需要至少两个已采集对象。",
+    "ログインスキーマの保存済み定義のみ。最大 50 件、候補検索には収集済みの 2 件以上が必要です。"
+  ],
+  "ontology.native.install": [
+    "RDF 저장소 생성",
+    "Create RDF storage",
+    "创建 RDF 存储",
+    "RDF 保存領域を作成"
+  ],
+  "ontology.native.installConfirm": [
+    "로그인 스키마에 DBC_META_RDF 네트워크와 DBC_METADATA 그래프를 생성합니다. DDL은 자동 커밋되며 중간 실패 시 생성된 객체가 남을 수 있습니다. 계속할까요?",
+    "Create the DBC_META_RDF network and DBC_METADATA graph in the login schema? DDL commits implicitly; partial objects may remain on failure.",
+    "在登录模式创建 DBC_META_RDF 网络和 DBC_METADATA 图？DDL 隐式提交，失败可能留下部分对象。",
+    "ログインスキーマに DBC_META_RDF と DBC_METADATA を作成しますか？DDL は暗黙コミットされ、失敗時に一部が残る場合があります。"
+  ],
+  "ontology.native.installed": [
+    "RDF 저장소 생성 완료",
+    "RDF storage created",
+    "RDF 存储已创建",
+    "RDF 保存領域を作成しました"
+  ],
+  "ontology.native.all": [
+    "전체 선택",
+    "Select all",
+    "全选",
+    "すべて選択"
+  ],
+  "ontology.native.none": [
+    "선택 해제",
+    "Clear selection",
+    "清除选择",
+    "選択解除"
+  ],
+  "ontology.native.selected": [
+    "선택 {0} / 최대 50개",
+    "Selected {0} / maximum 50",
+    "已选 {0} / 最多 50",
+    "選択 {0} / 最大 50"
+  ],
+  "ontology.native.capture": [
+    "선택 메타데이터 RDF 수집",
+    "Capture selected metadata as RDF",
+    "将所选元数据采集为 RDF",
+    "選択メタデータを RDF 収集"
+  ],
+  "ontology.native.captureConsent": [
+    "선택 객체의 이름·자료형·코멘트를 새 RDF 스냅샷으로 저장합니다. 기존 스냅샷과 업무 정의는 유지합니다.",
+    "Save selected names, types and comments as new RDF snapshots, preserving prior snapshots and definitions.",
+    "将所选名称、类型和注释保存为新 RDF 快照，保留原有快照和定义。",
+    "名前・型・コメントを新規 RDF スナップショットに保存し、既存の定義とスナップショットは保持します。"
+  ],
+  "ontology.native.captured": [
+    "수집됨",
+    "Captured",
+    "已采集",
+    "収集済み"
+  ],
+  "ontology.native.notCaptured": [
+    "RDF 미수집",
+    "Not captured",
+    "未采集 RDF",
+    "RDF 未収集"
+  ],
+  "ontology.native.capturing": [
+    "RDF 수집 {0}/{1} · {2}",
+    "Capturing RDF {0}/{1} · {2}",
+    "采集 RDF {0}/{1} · {2}",
+    "RDF 収集 {0}/{1} · {2}"
+  ],
+  "ontology.native.captureDone": [
+    "{0}개 RDF 수집 완료",
+    "Captured {0} objects",
+    "已采集 {0} 个对象",
+    "{0} 件収集しました"
+  ],
+  "ontology.native.columns": [
+    "수집된 RDF 컬럼 조회",
+    "Read captured RDF columns",
+    "查看已采集 RDF 列",
+    "収集済み RDF 列を表示"
+  ],
+  "ontology.native.readDone": [
+    "Oracle SEM_MATCH 조회 완료",
+    "Oracle SEM_MATCH read complete",
+    "Oracle SEM_MATCH 查询完成",
+    "Oracle SEM_MATCH 取得完了"
+  ],
+  "ontology.native.preview": [
+    "2. Oracle SQL로 후보 찾기",
+    "2. Find candidates with Oracle SQL",
+    "2. 用 Oracle SQL 查找候选",
+    "2. Oracle SQL で候補検索"
+  ],
+  "ontology.native.previewDone": [
+    "후보 조회 완료 · 아직 저장하지 않았습니다.",
+    "Candidate search complete; not saved yet.",
+    "候选查询完成，尚未保存。",
+    "候補検索完了・未保存です。"
+  ],
+  "ontology.native.candidates": [
+    "3. 관계 후보 저장",
+    "3. Save relationship candidates",
+    "3. 保存关系候选",
+    "3. 関係候補を保存"
+  ],
+  "ontology.native.candidateHelp": [
+    "같은 컬럼명·자료형의 단일 컬럼 후보입니다. FK·고유성·복합 조인 전체 조건을 검증한 것이 아닙니다. 저장 후 관계 화면에서 검토·승인하며, 승인 전에는 질의·Property Graph 근거로 쓰지 않습니다. 미리보기는 10분간 유효합니다.",
+    "Single-column hypotheses with equal names/types; not proof of an FK, uniqueness or a complete composite join. Review and approve in Relationships before query/Property Graph use. Preview expires in 10 minutes.",
+    "同名同类型的单列假设，并非外键、唯一性或完整复合连接的证明。在关系页面审核批准后才用于查询或 Property Graph。预览有效期 10 分钟。",
+    "同名・同型の単一列候補です。FK・一意性・複合結合の証明ではありません。関係画面で承認するまで照会・Property Graph に使いません。有効期限は 10 分です。"
+  ],
+  "ontology.native.candidateCount": [
+    "조회 후보 {0}개 · 이미 저장된 연결 {1}개 제외",
+    "Candidates {0} · excluded {1} stored links",
+    "候选 {0} · 已排除 {1} 个已保存连接",
+    "候補 {0} 件・保存済み {1} 件除外"
+  ],
+  "ontology.native.saveConsent": [
+    "선택한 연결을 미승인 후보로 새 온톨로지 초안 버전에 저장합니다. 기존 정의·승인 관계·이력은 유지합니다.",
+    "Append selected links as unapproved candidates in new ontology draft revisions, preserving definitions, approved links and history.",
+    "将所选连接作为未批准候选添加到本体新草稿版本，保留定义、已批准关系和历史。",
+    "選択した接続を未承認候補として新しい草稿版に保存し、定義・承認済み関係・履歴は保持します。"
+  ],
+  "ontology.native.save": [
+    "선택 후보 저장",
+    "Save selected candidates",
+    "保存所选候选",
+    "選択候補を保存"
+  ],
+  "ontology.native.saved": [
+    "미승인 후보 {0}개 저장 완료 · 관계 화면에서 확인하세요.",
+    "Saved {0} unapproved candidates. Review in Relationships.",
+    "已保存 {0} 个未批准候选，请在关系页面查看。",
+    "未承認候補 {0} 件保存。関係画面で確認してください。"
+  ],
+  "ontology.native.working": [
+    "Oracle RDF 처리 중…",
+    "Processing Oracle RDF…",
+    "正在处理 Oracle RDF…",
+    "Oracle RDF 処理中…"
+  ],
+  "ontology.native.ready": [
+    "수집 대상과 저장 상태를 확인해 주세요.",
+    "Review selection and storage status.",
+    "请确认选择和存储状态。",
+    "対象と保存状態を確認してください。"
+  ],
+  "ontology.native.error": [
+    "Oracle RDF 요청을 완료하지 못했습니다.",
+    "Oracle RDF request failed.",
+    "Oracle RDF 请求失败。",
+    "Oracle RDF 処理に失敗しました。"
+  ],
+  "ontology.native.scope": [
+    "테이블·뷰 2~50개를 중복 없이 선택해 주세요.",
+    "Select 2–50 distinct objects.",
+    "请选择 2–50 个不同对象。",
+    "2〜50 件を重複せず選択してください。"
+  ],
+  "ontology.native.mismatch": [
+    "RDF 저장소·스냅샷 구성이 예상과 다릅니다. 기존 객체를 덮어쓰지 않았습니다.",
+    "RDF storage/snapshot mismatch; existing objects were not replaced.",
+    "RDF 存储或快照不匹配，未覆盖现有对象。",
+    "RDF 構成が一致しません。既存オブジェクトは上書きしていません。"
+  ],
+  "ontology.native.notReady": [
+    "RDF 저장소를 먼저 준비해 주세요.",
+    "Prepare RDF storage first.",
+    "请先准备 RDF 存储。",
+    "先に RDF 保存領域を準備してください。"
+  ],
+  "ontology.native.limit": [
+    "조회 한도를 초과했습니다. 선택 범위를 줄여 주세요.",
+    "Read limit exceeded; narrow the selection.",
+    "超过查询限制，请缩小范围。",
+    "取得上限を超えました。対象を絞ってください。"
+  ],
+  "ontology.native.captureFirst": [
+    "선택한 모든 객체를 먼저 RDF로 수집해 주세요.",
+    "Capture all selected objects as RDF first.",
+    "请先采集所有所选对象的 RDF。",
+    "選択した全対象を先に RDF 収集してください。"
+  ],
+  "ontology.native.metadataChanged": [
+    "RDF와 저장된 온톨로지 컬럼이 다릅니다. 메타데이터를 갱신하고 다시 수집해 주세요.",
+    "RDF columns differ from saved ontology. Refresh metadata and recapture.",
+    "RDF 列与已保存本体不同，请更新元数据并重新采集。",
+    "RDF と保存済み定義の列が異なります。更新後に再収集してください。"
+  ],
+  "ontology.relationships.evidence.ORACLE_RDF": [
+    "Oracle 네이티브 RDF 메타데이터",
+    "Oracle native RDF metadata",
+    "Oracle 原生 RDF 元数据",
+    "Oracle ネイティブ RDF メタデータ"
+  ],
+  "ontology.relationships.evidence.UNVERIFIED_JOIN": [
+    "미검증 단일 컬럼 연결",
+    "Unverified single-column link",
+    "未经验证的单列连接",
+    "未検証の単一列接続"
+  ]
+}

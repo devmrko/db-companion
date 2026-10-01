@@ -44,7 +44,16 @@ public class OntologyRepository {
         String status=readiness(schema,login);if(!status.equals("READY"))return new Catalog(status,schema.equals(login)&&status.equals("MISSING"),List.of(),List.of(),Instant.now().toString());
         var tables=tableMetadata.get();
         var entries=jdbc.query("SELECT OBJECT_NAME,REVISION,STATE,ACTOR,RECORDED_AT FROM (SELECT OBJECT_NAME,REVISION,STATE,ACTOR,RECORDED_AT,ROW_NUMBER() OVER (PARTITION BY OBJECT_OWNER,OBJECT_NAME ORDER BY REVISION DESC) RN FROM "+OntologySql.table(schema)+" WHERE OBJECT_OWNER=?) WHERE RN=1 ORDER BY OBJECT_NAME FETCH FIRST 5001 ROWS ONLY",(r,n)->new Summary(r.getString(1),r.getInt(2),r.getString(3),r.getString(4),r.getString(5)),schema);
-        if(tables.size()>5000||entries.size()>5000)throw new Failure(413,"limit");return new Catalog(status,false,tables,entries,Instant.now().toString());
+        if(tables.size()>5000||entries.size()>5000)throw new Failure(413,"limit");return new Catalog(status,false,tables,entries,Instant.now().toString(),importExclusions(schema,tables));
+    }
+    public Map<String,String> importExclusions(String schema,List<TableInfo> tables){
+        var result=new HashMap<String,String>();var names=new HashSet<String>();
+        for(var table:tables){names.add(table.name());String reason=OntologyImportPolicy.reason(table.name(),null,null);if(reason!=null)result.put(table.name(),reason);}
+        if(names.isEmpty())return Map.of();
+        // One schema-bound dictionary read, not a per-object probe or a business-data read.
+        jdbc.query("SELECT OBJECT_NAME,SECONDARY,ORACLE_MAINTAINED FROM SYS.ALL_OBJECTS WHERE OWNER=? AND SUBOBJECT_NAME IS NULL AND OBJECT_TYPE IN ('TABLE','VIEW') AND (SECONDARY='Y' OR ORACLE_MAINTAINED='Y')",
+            (org.springframework.jdbc.core.RowCallbackHandler)r->{String name=r.getString(1);if(names.contains(name)){String reason=OntologyImportPolicy.reason(name,r.getString(2),r.getString(3));if(reason!=null)result.put(name,reason);}},schema);
+        return Map.copyOf(result);
     }
     public List<TableInfo> tables(String schema){
         var names=jdbc.queryForList("SELECT DISTINCT OBJECT_NAME FROM SYS.ALL_OBJECTS WHERE OWNER=? AND OBJECT_NAME<>? AND SUBOBJECT_NAME IS NULL AND OBJECT_TYPE IN ('TABLE','VIEW') ORDER BY OBJECT_NAME FETCH FIRST 5001 ROWS ONLY",String.class,schema,OntologySql.TABLE);

@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class OntologyController {
     private final OntologyService service;private final com.dbcompanion.service.OntologyValuesService values;private final com.dbcompanion.service.OntologyGovernanceService governance;private final com.dbcompanion.service.OntologyDefinitionGenerationService definitionGeneration;
-    public OntologyController(OntologyService service,com.dbcompanion.service.OntologyValuesService values,com.dbcompanion.service.OntologyGovernanceService governance,com.dbcompanion.service.OntologyDefinitionGenerationService definitionGeneration){this.service=service;this.values=values;this.governance=governance;this.definitionGeneration=definitionGeneration;}
+    private final com.dbcompanion.service.OntologyImportService imports;
+    public OntologyController(OntologyService service,com.dbcompanion.service.OntologyValuesService values,com.dbcompanion.service.OntologyGovernanceService governance,com.dbcompanion.service.OntologyDefinitionGenerationService definitionGeneration,com.dbcompanion.service.OntologyImportService imports){this.service=service;this.values=values;this.governance=governance;this.definitionGeneration=definitionGeneration;this.imports=imports;}
     @PostMapping("/ontology/values/lookup") @ResponseBody public ResponseEntity<?> values(@RequestBody com.dbcompanion.model.OntologyValues.Lookup v,HttpServletRequest r){return run(r,"loadError",()->values.lookup(session(r),v));}
     @GetMapping("/ontology") public String page(HttpServletRequest request,Model model){var s=session(request);if(s==null)return "redirect:/login";synchronized(s){var m=s.metadata();model.addAttribute("info",m.info());model.addAttribute("schemas",m.schemas());model.addAttribute("selectedSchema",m.selectedSchema());}model.addAttribute("activePage","ontology");model.addAttribute("languageReturn","/ontology");return "ontology";}
     @GetMapping("/ontology/catalog") @ResponseBody public ResponseEntity<?> catalog(@RequestParam String schema,@RequestParam(defaultValue="false") boolean refresh,HttpServletRequest r){return run(r,"loadError",()->service.catalog(session(r),schema,refresh));}
@@ -45,6 +46,7 @@ public class OntologyController {
     public record Install(String schema,boolean confirmed){}
     public record Capture(String schema,String table){}
     public record CaptureMissing(String schema,String table,boolean confirmed){}
+    public record ImportApply(String schema,String table,String token,boolean confirmed){}
     public record PreviewRequest(String schema,String table,int revision){}
     public record Save(String schema,String table,int revision,Meaning meaning,String state){}
     public record Generate(String token,boolean consent){}
@@ -54,6 +56,8 @@ public class OntologyController {
     @PostMapping("/ontology/install") @ResponseBody public ResponseEntity<?> install(@RequestBody Install v,HttpServletRequest r){return run(r,"installError",()->service.install(session(r),v.schema(),v.confirmed()));}
     @PostMapping("/ontology/capture") @ResponseBody public ResponseEntity<?> capture(@RequestBody Capture v,HttpServletRequest r){return run(r,"saveError",()->service.capture(session(r),v.schema(),v.table()));}
     @PostMapping("/ontology/capture/missing") @ResponseBody public ResponseEntity<?> captureMissing(@RequestBody CaptureMissing v,HttpServletRequest r){return run(r,"saveError",()->service.captureMissing(session(r),v.schema(),v.table(),v.confirmed()));}
+    @PostMapping("/ontology/import/preview") @ResponseBody public ResponseEntity<?> importPreview(@RequestBody Capture v,HttpServletRequest r){return run(r,"loadError",()->imports.preview(session(r),v.schema(),v.table()));}
+    @PostMapping("/ontology/import/apply") @ResponseBody public ResponseEntity<?> importApply(@RequestBody ImportApply v,HttpServletRequest r){return run(r,"saveError",()->imports.apply(session(r),v.schema(),v.table(),v.token(),v.confirmed()));}
     @PostMapping("/ontology/save") @ResponseBody public ResponseEntity<?> save(@RequestBody Save v,HttpServletRequest r){return run(r,"saveError",()->service.save(session(r),v.schema(),v.table(),v.revision(),v.meaning(),v.state()));}
     @PostMapping("/ontology/ai/preview") @ResponseBody public ResponseEntity<?> preview(@RequestBody PreviewRequest v,Locale locale,HttpServletRequest r){return run(r,"loadError",()->service.preview(session(r),v.schema(),v.table(),v.revision(),locale));}
     @PostMapping("/ontology/ai/generate") @ResponseBody public ResponseEntity<?> generate(@RequestBody Generate v,HttpServletRequest r){return run(r,"aiError",()->service.suggest(session(r),v.token(),v.consent()));}

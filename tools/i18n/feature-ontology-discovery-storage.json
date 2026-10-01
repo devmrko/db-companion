@@ -1,0 +1,14 @@
+{
+  "ontology.discovery.savedRuns": ["저장된 관계 분석","Saved relationship analyses","已保存的关系分析","保存された関係分析"],
+  "ontology.discovery.durableHelp": ["검증된 매핑은 온톨로지·RDF에 후보로 자동 저장됩니다. 분석 계획과 호출 결과는 DBC_APP_RECORD에 저장되며 재접속 후 불러올 수 있습니다. 승인은 별도입니다.","Validated mappings are automatically saved as candidates in ontology/RDF. Plans and call receipts are stored in DBC_APP_RECORD and can be reopened after signing in. Approval remains separate.","通过验证的映射会自动作为候选保存到本体/RDF。计划和调用结果保存在DBC_APP_RECORD中，重新登录后可加载。批准为独立操作。","検証済みマッピングは候補としてオントロジー・RDFに自動保存します。計画と呼び出し結果はDBC_APP_RECORDに保存し、再ログイン後に読み込めます。承認は別操作です。"],
+  "ontology.discovery.olderRuns": ["이전 분석 더 보기","More previous analyses","更多历史分析","以前の分析を表示"],
+  "ontology.discovery.restore": ["진행 불러오기","Load progress","加载进度","進捗を読み込む"],
+  "ontology.discovery.savedCalls": ["호출별 저장 결과","Saved call results","各次调用的保存结果","呼び出し別の保存結果"],
+  "ontology.discovery.noSavedRuns": ["저장된 분석이 없습니다. 새 실행부터 기록됩니다.","No saved analyses. Recording starts with new runs.","没有已保存的分析。从新运行开始记录。","保存された分析はありません。新しい実行から記録します。"],
+  "ontology.discovery.callReceipt": ["{0}회 · {1} · {2} · 저장 후보 {3}개","Call {0} · {1} · {2} · {3} saved candidates","第{0}次 · {1} · {2} · 已保存候选{3}个","{0}回 · {1} · {2} · 保存候補 {3}件"],
+  "ontology.discovery.noResponse": ["보관된 응답 원문이 없습니다. 응답 불명 호출은 자동 재시도하지 않습니다.","No retained response. Calls with unknown outcomes are not retried automatically.","没有保留的响应原文。结果未知的调用不会自动重试。","保存された応答原文はありません。結果不明の呼び出しは自動再試行しません。"],
+  "ontology.discovery.recoverConsent": ["받아 둔 응답으로 후보 저장만 다시 시도합니다. AI를 호출하지 않습니다.","Retry saving candidates from the retained response only. No AI call.","仅使用保留的响应重试保存候选。不调用AI。","保存済み応答から候補の保存のみ再試行します。AIは呼び出しません。"],
+  "ontology.discovery.recover": ["후보 저장 다시 시도","Retry candidate save","重试保存候选","候補の保存を再試行"],
+  "ontology.discovery.recovered": ["후보 저장이 완료되었습니다. 실행을 이어가려면 진행을 다시 불러오세요.","Candidates saved. Reload progress before continuing.","候选已保存。继续前请重新加载进度。","候補を保存しました。続行するには進捗を再読み込みしてください。"],
+  "ontology.discovery.all": ["남은 전체 {0}회 연속 실행","Run all {0} remaining calls","连续执行剩余全部{0}次","残り全{0}回を連続実行"]
+}

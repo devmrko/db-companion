@@ -1,6 +1,6 @@
 {
   "ontology.import.all": ["전체 메타데이터 가져오기", "Import all metadata", "导入全部元数据", "全メタデータを取り込む"],
-  "ontology.import.help": ["미수집 테이블만 초안으로 저장합니다. AI 호출이나 업무 데이터 조회는 하지 않습니다. 중단해도 완료된 항목은 유지됩니다.", "Only missing tables are saved as drafts. No AI calls or business-row reads. Completed items are retained if you stop.", "仅将尚未采集的表保存为草稿。不调用 AI，不读取业务行。停止后保留已完成项。", "未取得のテーブルだけを草案として保存します。AI 呼出しや業務データの読取りは行いません。中断しても完了項目は残ります。"],
+  "ontology.import.help": ["테이블·뷰를 새로 수집하거나 기존 메타데이터를 갱신합니다. AI 호출이나 업무 데이터 조회는 하지 않습니다. 중단해도 완료된 항목은 유지됩니다.", "Capture tables and views or refresh existing metadata. No AI calls or business-row reads. Completed items are retained if you stop.", "采集表和视图或刷新现有元数据。不调用 AI，不读取业务行。停止后保留已完成项。", "テーブル・ビューを新規取得または既存メタデータを更新します。AI 呼出しや業務データの読取りは行いません。中断しても完了項目は残ります。"],
   "ontology.import.progress": ["가져오기 진행률", "Import progress", "导入进度", "取込みの進捗"],
   "ontology.import.triples": ["RDF 트리플", "RDF triples", "RDF 三元组", "RDF トリプル"],
   "ontology.import.start": ["가져오기 시작", "Start import", "开始导入", "取込み開始"],

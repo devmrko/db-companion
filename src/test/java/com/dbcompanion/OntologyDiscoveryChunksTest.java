@@ -74,7 +74,7 @@ class OntologyDiscoveryChunksTest {
     }
     @Test void resumeAndPayloadAreReadOnlyAndProfileChangesAreRejectedBeforeAi(){
         var fixture=new OntologyScopeServiceTest();try(var s=fixture.session()){
-            s.metadata().assistant().select(f.profile.selection());var service=new OntologyPipelineService(fixture.source,fixture.repository,fixture.ai,null,null,json);
+            s.metadata().assistant().select(f.profile.selection());var service=new OntologyPipelineService(fixture.source,fixture.repository,fixture.ai,null,null,json,new OntologyDiscoveryStorageTest.MemoryArchive(fixture.jdbc,json));
             var preview=service.preview(s,"APP",List.of("ORDERS","CUSTOMER"));String token=preview.token();
             assertThat(service.status(s,"APP").token()).isEqualTo(token);assertThat(service.payload(s,token,0).tables()).contains("ORDERS","CUSTOMER");
             assertThatThrownBy(()->service.generate(s,token,0,true,Locale.KOREAN)).isInstanceOf(Failure.class);
@@ -97,7 +97,7 @@ class OntologyDiscoveryChunksTest {
             @Override public String explain(String owner,String profile,String prompt){calls[0]++;return "{\"relations\":[]}";}
         };
         var profiles=new ProfileHistoryRepository(fixture.jdbc,json,null){@Override public String packageOwner(String user){return "CLOUD";}};
-        var service=new OntologyPipelineService(fixture.source,repository,ai,profiles,null,json);
+        var service=new OntologyPipelineService(fixture.source,repository,ai,profiles,null,json,new OntologyDiscoveryStorageTest.MemoryArchive(fixture.jdbc,json));
         try(var s=fixture.session()){
             s.metadata().assistant().select(f.profile.selection());var preview=service.preview(s,"APP",List.of("CUSTOMER","ORDERS"));
             service.resume(s,preview.token(),0,true);assertThat(service.generate(s,preview.token(),0,true,Locale.KOREAN).completed()).isEqualTo(1);

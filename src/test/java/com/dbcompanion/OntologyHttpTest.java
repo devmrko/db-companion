@@ -15,6 +15,15 @@ import static org.assertj.core.api.Assertions.*;
 class OntologyHttpTest {
     @LocalServerPort int port;
     @Autowired JsonMapper json;
+    @Test void importPreviewAndApplyRequireCsrf() throws Exception {
+        var client=HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();
+        for(String path:List.of("preview","apply")){
+            var response=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/ontology/import/"+path)).header("Content-Type","application/json").POST(HttpRequest.BodyPublishers.ofString("{}")).build(),HttpResponse.BodyHandlers.ofString());
+            assertThat(response.statusCode()).isEqualTo(403);
+        }
+        assertThat(json.readValue("{\"schema\":\"APP\",\"table\":\"V\",\"token\":\"checked\",\"confirmed\":true}",ImportApply.class)).isEqualTo(new ImportApply("APP","V","checked",true));
+        assertThatThrownBy(()->json.readValue("{\"schema\":\"APP\",\"table\":\"V\",\"token\":\"checked\"}",ImportApply.class)).isInstanceOf(tools.jackson.core.JacksonException.class);
+    }
 
     @Test void graphRequiresLoginAndRendererIsServedLocally() throws Exception {
         var client=HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();

@@ -1,7 +1,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {pipelineSummary,runDiscovery} from '../../main/resources/static/js/ontology-pipeline.mjs';
+import {pipelineSummary,runDiscovery,discoveryDiagnostic} from '../../main/resources/static/js/ontology-pipeline.mjs';
+test('relationship diagnostics keep bounded raw text and exact paths without interpreting markup',()=>{
+  const d={code:'COLUMN',path:'$.relations[1].sourceColumns[0]',rawResponse:'<script>alert(1)</script>'};
+  assert.deepEqual(discoveryDiagnostic({diagnostic:d}),d);
+  for(const bad of [{...d,code:'UNKNOWN'},{...d,path:'x'.repeat(161)},{...d,rawResponse:'x'.repeat(200001)},{...d,rawResponse:null}])assert.equal(discoveryDiagnostic({diagnostic:bad}),null);
+  assert.equal(discoveryDiagnostic(new Error('transport')),null);
+});
+test('diagnostic is shown on generation failure and cleared when closing or replacing the plan',()=>{
+  const code=readFileSync('src/main/resources/static/js/ontology-pipeline.mjs','utf8');
+  assert.match(code,/diagnostic\(ex\);status\(ex.message/);assert.match(code,/diagnostic\(\);dialog.close\(\)/);
+  assert.match(code,/const invalidate=\(\)=>\{diagnostic\(\)/);assert.ok(code.includes("get('raw').textContent=d?.rawResponse??''"));
+  const html=readFileSync('src/main/resources/templates/ontology.html','utf8');assert.ok(html.includes('data-pipeline-diagnostic hidden'));assert.ok(html.includes('data-pipeline-raw'));
+});
+test('relationship diagnostic messages are translated without placeholder drift',()=>{
+  const labels=JSON.parse(readFileSync('tools/i18n/feature-ontology-discovery-diagnostics.json','utf8'));
+  assert.equal(Object.keys(labels).length,14);for(const values of Object.values(labels)){assert.equal(values.length,4);assert.ok(values.every(v=>v.trim()));}
+});
 test('preview summaries account for exclusions',()=>assert.deepEqual(pipelineSummary({items:[{status:'INCLUDED'},{status:'EXCLUDED'}]}),{included:1,excluded:1}));
 test('batch runner is sequential and stops after current call',async()=>{const calls=[];let stopped=false;const count=await runDiscovery({progress:{nextIndex:0,authorizedUntil:3}},{call:async i=>{calls.push(i);stopped=true;return {};},stop:()=>stopped,progress:()=>{}});assert.equal(count,1);assert.deepEqual(calls,[0]);});
 test('failed AI calls never retry or advance silently',async()=>{let count=0;await assert.rejects(runDiscovery({progress:{nextIndex:0,authorizedUntil:2}},{call:async()=>{count++;throw new Error('provider error');},stop:()=>false,progress:()=>{}}),/provider error/);assert.equal(count,1);});

@@ -46,8 +46,9 @@ public final class Ontology {
                 throw new Failure(413,"erd.limit");
         }
     }
-    public record Catalog(String status,boolean canInstall,List<TableInfo> tables,List<Summary> entries,String checkedAt){
-        public Catalog {tables=List.copyOf(tables);entries=List.copyOf(entries);}
+    public record Catalog(String status,boolean canInstall,List<TableInfo> tables,List<Summary> entries,String checkedAt,Map<String,String> importExclusions){
+        public Catalog {tables=List.copyOf(tables);entries=List.copyOf(entries);importExclusions=Map.copyOf(importExclusions);}
+        public Catalog(String status,boolean canInstall,List<TableInfo> tables,List<Summary> entries,String checkedAt){this(status,canInstall,tables,entries,checkedAt,Map.of());}
     }
     public record Version(String seq,int revision,String state,String actor,String recordedAt){}
     public record History(List<Version> items,String next){public History {items=List.copyOf(items);}}
@@ -106,6 +107,10 @@ public final class Ontology {
         }catch(Failure ex){throw ex;}catch(RuntimeException ex){throw new Failure(422,"aiInvalid");}
     }
     public static final class State {
+        private final MetadataGraph.State metadataGraph=new MetadataGraph.State();
+        public MetadataGraph.State metadataGraph(){return metadataGraph;}
+        private final NativeMetadata.State nativeMetadata=new NativeMetadata.State();
+        public NativeMetadata.State nativeMetadata(){return nativeMetadata;}
         private final OntologyPipeline.State pipeline=new OntologyPipeline.State();
         public OntologyPipeline.State pipeline(){return pipeline;}
         private final OntologyWizard.State wizard=new OntologyWizard.State();
@@ -120,7 +125,7 @@ public final class Ontology {
         public synchronized List<TableInfo> tables(String schema,Supplier<List<TableInfo>> load){if(!tableMetadata.containsKey(schema))tableMetadata.put(schema,List.copyOf(load.get()));return tableMetadata.get(schema);}
         public synchronized GraphData graph(String schema,boolean refresh,Supplier<GraphData> load){if(refresh)graphs.remove(schema);if(!graphs.containsKey(schema))graphs.put(schema,load.get());return graphs.get(schema);}
         public synchronized OntologyRelations.Analysis relationships(String schema,Supplier<OntologyRelations.Analysis> load){if(!relationships.containsKey(schema))relationships.put(schema,load.get());return relationships.get(schema);}
-        public synchronized void clearReview(String schema){catalogs.remove(schema);graphs.remove(schema);relationships.remove(schema);preview=null;suggestion=null;wizard.clear();}
+        public synchronized void clearReview(String schema){catalogs.remove(schema);graphs.remove(schema);relationships.remove(schema);preview=null;suggestion=null;wizard.clear();nativeMetadata.clear();metadataGraph.clear();}
         public synchronized void clear(String schema){clearReview(schema);pipeline.clear();}
         public synchronized void prepare(Preview value){preview=value;suggestion=null;}
         public synchronized Preview consume(String token){if(preview==null||!preview.token().equals(token))throw new Failure(409,"stale");var result=preview;preview=null;return result;}

@@ -4,6 +4,7 @@ import {assistantApi,assistantPost} from './ai-assistant.mjs';
 import {pageOf} from './table-list.mjs';
 import {rdfViewer,meaningChanges} from './ontology-rdf.mjs';
 import {metadataImporter} from './ontology-import.mjs';
+import {ontologyNative} from './ontology-native.mjs';
 import {ontologyErd} from './ontology-erd.mjs';
 import {ontologyRelationships} from './ontology-relationships.mjs';
 import {ontologyPipeline} from './ontology-pipeline.mjs';
@@ -14,7 +15,7 @@ const label=key=>t('ontology.'+key,key);
 export const entriesPage=(entries,query,page)=>pageOf(entries.map(e=>({...e,description:[e.state,e.actor].join(' ')})),query,page);
 export const editable=(entry,latest)=>entry?.revision===latest;
 export const readOnlyPanel=(entry,latest,tab)=>!editable(entry,latest)&&['definition','columns','relations','values'].includes(tab);
-export function captureChoices(tables,entries){const names=new Set(entries.map(e=>e.name));return tables.filter(t=>!names.has(t.name));}
+export function captureChoices(tables){return [...tables];}
 export function savePayload(schema,entry,meaning,state){return {schema,table:entry.document.source.table,revision:entry.revision,meaning,state};}
 const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text??'—';if(cls)e.className=cls;return e;};
 const button=(text,fn,cls='app-credential-link')=>{const b=el('button',text,cls);b.type='button';b.addEventListener('click',fn);return b;};
@@ -39,7 +40,9 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology]').fo
   function aiDiagnostic(error=null){const d=responseDiagnostic(error);get('ai-diagnostic').hidden=!d;get('ai-diagnostic').open=false;get('ai-diagnostic-path').textContent=d?`${d.code} · ${d.path}`:'';get('ai-raw').textContent=d?.rawResponse??'';}
   function url(path,params={}){return root.dataset.base+path+'?'+new URLSearchParams({schema,...params});}
   const post=(path,data)=>assistantApi(root.dataset.base+path,assistantPost(get('csrf'),data));
-  function lock(value){busy=value;root.querySelectorAll('button,input,textarea,select').forEach(e=>{if(!dialog.contains(e)&&!get('import-dialog').contains(e)&&!get('wizard-dialog').contains(e)&&!get('pipeline-dialog').contains(e))e.disabled=value||e.dataset.boundDisabled==='true';});get('prev').disabled=value||page<=1;get('next').disabled=value||page>=entriesPage(catalog?.entries??[],get('filter').value,page).pages;get('capture').disabled=value||!get('source').value;const edit=editable(entry,latest);['save','approve','ai','wizard'].forEach(k=>get(k).disabled=value||!edit);get('ai').disabled=value||!edit||dirty;get('wizard').disabled=value||!edit||dirty;if(!value){if(entry&&readOnlyPanel(entry,latest,tab))get('panel').querySelectorAll('input,textarea,select').forEach(e=>e.disabled=true);}}
+  const native=ontologyNative(get('native-dialog'),{schema,base:root.dataset.base,post,entries:()=>catalog?.entries||[],canOpen:()=>{if(busy||dirty||relationships.dirty()){message(label('import.saveFirst'),true);return false;}return true;},saved:reloadSaved});
+  get('native').addEventListener('click',()=>native.open());
+  function lock(value){busy=value;root.querySelectorAll('button,input,textarea,select').forEach(e=>{if(!dialog.contains(e)&&!get('import-dialog').contains(e)&&!get('wizard-dialog').contains(e)&&!get('pipeline-dialog').contains(e)&&!get('native-dialog').contains(e))e.disabled=value||e.dataset.boundDisabled==='true';});get('prev').disabled=value||page<=1;get('next').disabled=value||page>=entriesPage(catalog?.entries??[],get('filter').value,page).pages;get('capture').disabled=value||!get('source').value;const edit=editable(entry,latest);['save','approve','ai','wizard'].forEach(k=>get(k).disabled=value||!edit);get('ai').disabled=value||!edit||dirty;get('wizard').disabled=value||!edit||dirty;if(!value){if(entry&&readOnlyPanel(entry,latest,tab))get('panel').querySelectorAll('input,textarea,select').forEach(e=>e.disabled=true);}}
   async function work(fn){if(busy)return;lock(true);message(loading());try{await fn();message('');}catch(ex){message(ex.message,true);}finally{lock(false);}}
   function leave(){return !dirty&&!relationships.dirty()||window.confirm(label('discard'));}
   function list(){const result=entriesPage(catalog?.entries??[],get('filter').value,page);page=result.page;get('list').replaceChildren(grid(['table','version','state','actor','recordedAt'].map(label),result.items.map(e=>[button(e.name,()=>{if(leave())work(()=>open(e.name));}),String(e.revision),label(e.state),e.actor,e.recordedAt])));get('count').textContent=t('ui.f32c9f13d498','{0}–{1} / {2}개',result.from,result.to,result.total);get('page').textContent=`${result.pages?page:0} / ${result.pages}`;lock(busy);}
@@ -79,16 +82,16 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology]').fo
   get('analyze').addEventListener('click',()=>work(async()=>{view='relationships';applyView();await relationships.all();}));
   async function reloadSaved(){erd.invalidate();relationships.invalidate();await load();}
   get('install').addEventListener('click',()=>{if(window.confirm(label('installConfirm')+'\n'+schema+'.DBC_ONTOLOGY_CATALOG'))work(async()=>{await post('/install',{schema,confirmed:true});await reloadSaved();});});
-  const importer=metadataImporter(get('import-dialog'),{schema,post,completed:reloadSaved});
+  const importer=metadataImporter(get('import-dialog'),{schema,post,completed:reloadSaved,profiles:profile=>assistantApi(get('erd').dataset.profilesUrl+'?'+new URLSearchParams(profile===undefined?{schema}:{schema,profile}))});
   const wizard=ontologyWizard(get('wizard-dialog'),{schema,post,getOptions:value=>assistantApi(url('/wizard/options',{table:value.document.source.table,revision:value.revision})),saved:async table=>{await reloadSaved();await open(table);}});
   get('wizard').addEventListener('click',()=>{if(!busy&&!dirty&&editable(entry,latest))wizard.open(entry);});
   function importPreview(table=null){
     if(dirty){message(label('import.saveFirst'),true);return;}
     work(async()=>{
-      await load();
+      await load(true);
       if(catalog.status!=='READY')throw new Error(label('notReady'));
       const pending=captureChoices(catalog.tables,catalog.entries),names=pending.filter(i=>table===null||i.name===table).map(i=>i.name);
-      importer.open(names,catalog.tables.length,catalog.tables.length-pending.length);
+      await importer.open(names,catalog.tables.length,catalog.entries,catalog.importExclusions??{},table===null);
     });
   }
   get('capture').addEventListener('click',()=>{const table=get('source').value;if(table)importPreview(table);});

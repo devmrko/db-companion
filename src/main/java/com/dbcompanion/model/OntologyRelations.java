@@ -9,7 +9,7 @@ import java.util.*;
 /** Reviewed metadata mappings, not database constraints or executable join expressions. */
 public final class OntologyRelations {
     private OntologyRelations(){}
-    public static final int MAX_COLUMNS=20_000,MAX_LINKS=2_000,MAX_JSON=20_000_000;
+    public static final int MAX_COLUMNS=20_000,MAX_LINKS=10_000,MAX_JSON=20_000_000;
     public record Link(String id,String targetDocumentId,int sourceRevision,int targetRevision,
                        String targetSchema,String targetTable,List<String> sourceColumns,List<String> targetColumns,
                        String label,String condition,String status,String origin,List<String> evidence,String actor,String reviewedAt){
@@ -38,7 +38,7 @@ public final class OntologyRelations {
         for(var v:links){
             if(v==null||v.id()==null||!v.id().matches("[0-9a-f]{64}")||!ids.add(v.id()))throw new Failure(409,"mismatch");
             try{if(!UUID.fromString(v.targetDocumentId()).toString().equals(v.targetDocumentId()))throw new IllegalArgumentException();}catch(RuntimeException ex){throw new Failure(409,"mismatch");}
-            if(v.sourceRevision()<1||v.targetRevision()<1||!Set.of("APPROVED","REJECTED").contains(v.status())||!Set.of("RULE","USER","AI").contains(v.origin()))throw new Failure(409,"mismatch");
+            if(v.sourceRevision()<1||v.targetRevision()<1||!Set.of("CANDIDATE","APPROVED","REJECTED").contains(v.status())||!Set.of("RULE","USER","AI","RDF").contains(v.origin()))throw new Failure(409,"mismatch");
             Ontology.name(v.targetSchema());Ontology.name(v.targetTable());pairs(v.sourceColumns(),v.targetColumns());
             text(v.label(),80);text(v.condition(),1000);text(v.actor(),128);text(v.reviewedAt(),80);
             if(v.evidence().size()>10)throw new Failure(409,"mismatch");v.evidence().forEach(e->text(e,160));
@@ -160,5 +160,16 @@ public final class OntologyRelations {
     public static Document merge(Entry source,Link link){
         var d=source.document();var links=new ArrayList<>(d.links());links.removeIf(v->v.id().equals(link.id()));links.add(link);validate(links);
         return new Document(d.format(),d.source(),d.meaning(),d.origin(),d.profile(),d.analysis(),links);
+    }
+    /** Save a hypothesis without approving it or changing business definitions. */
+    public static Document candidates(Entry source,Map<String,Entry> entries,List<Relation> candidates,String actor,String now){
+        var d=source.document();var links=new ArrayList<>(d.links());var ids=new HashSet<String>();links.forEach(l->ids.add(l.id()));
+        for(var r:candidates){
+            if(!r.source().equals(d.source().table())||!r.targetSchema().equals(d.source().schema())||!r.status().equals("CANDIDATE")||!Set.of("AI","RDF").contains(r.origin()))throw new Failure(409,"mismatch");
+            if(!ids.add(r.id()))continue;var target=entries.get(r.target());if(target==null)throw new Failure(409,"stale");
+            var proof=new ArrayList<>(r.evidence());proof.add("SOURCE_DEFINITION:"+definitionHash(d));proof.add("TARGET_DEFINITION:"+definitionHash(target.document()));
+            links.add(new Link(r.id(),target.documentId(),source.revision()+1,target.revision(),r.targetSchema(),r.target(),r.sourceColumns(),r.targetColumns(),r.label(),r.condition(),"CANDIDATE",r.origin(),proof,actor,now));
+        }
+        validate(links);return new Document(d.format(),d.source(),d.meaning(),d.origin(),d.profile(),d.analysis(),links);
     }
 }

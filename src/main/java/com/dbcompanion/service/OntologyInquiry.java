@@ -118,7 +118,7 @@ public final class OntologyInquiry {
             boolean usable=confirmed(r)&&r.condition().isBlank();
             String title=r.origin().equals("FK")?Objects.toString(r.key().name(),""):r.label();
             String description=r.origin().equals("FK")&&!"APPROVED".equals(a.state())?"":r.label();
-            var basis=new ArrayList<String>();basis.add(r.origin().equals("FK")?"DATABASE_CONSTRAINT":r.review()!=null?"REVIEWED_MAPPING":r.origin().equals("AI")?"AI_CANDIDATE":"RULE_CANDIDATE");
+            var basis=new ArrayList<String>();basis.add(r.origin().equals("FK")?"DATABASE_CONSTRAINT":r.review()!=null&&!r.review().status().equals("CANDIDATE")?"REVIEWED_MAPPING":r.origin().equals("AI")?"AI_CANDIDATE":"RULE_CANDIDATE");
             if(r.key()!=null){basis.add(r.key().status());basis.add(r.key().validated());}
             if(!r.condition().isBlank())basis.add("CONDITIONAL");
             evidence.add(new Evidence("R"+(++n),"RELATION",r.source(),r.target(),r.sourceColumns(),r.targetColumns(),title,description,r.status(),usable,basis,List.of(OntologyContext.reference(a),OntologyContext.reference(b)),a.document().source().capturedAt()));

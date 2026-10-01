@@ -6,7 +6,7 @@ import com.dbcompanion.service.OntologyDiscovery;
 import java.time.Instant;
 import java.util.*;
 
-/** Per-login pending plans and unapproved suggestions. No credentials or persisted settings. */
+/** Per-login execution cursor. Durable plans, receipts and RDF candidates are stored separately. */
 public final class OntologyPipeline {
     private OntologyPipeline(){}
     public static final class State {
@@ -20,10 +20,13 @@ public final class OntologyPipeline {
         public synchronized List<OntologyAnalysis.Reference> references(){return references;}
         public synchronized OntologyDiscovery.Preview preview(){return plan==null?null:new OntologyDiscovery.Preview(plan.token(),plan.schema(),plan.profile(),plan.tables(),expires,plan.budget(),progress(),OntologyDiscovery.GROUP_CALLS);}
         public synchronized void authorize(String token,int index,boolean consent,String schema,Instant now){
+            authorize(token,index,consent,schema,now,false);
+        }
+        public synchronized void authorize(String token,int index,boolean consent,String schema,Instant now,boolean all){
             if(!consent)throw new Failure(400,"confirmRequired");if(running)throw new Failure(409,"discovery.busy");
             if(plan==null||!plan.token().equals(token)||!plan.schema().equals(schema)||index!=nextIndex||index>=plan.batches().size())throw new Failure(409,"stale");
             if(candidates.size()>=OntologyDiscovery.MAX_CANDIDATES)throw new Failure(413,"discovery.resultLimit");
-            authorizedUntil=Math.min(nextIndex+OntologyDiscovery.GROUP_CALLS,plan.batches().size());expires=now.plusSeconds(1200);
+            authorizedUntil=all?plan.batches().size():Math.min(nextIndex+OntologyDiscovery.GROUP_CALLS,plan.batches().size());expires=now.plusSeconds(1200);
         }
         public synchronized OntologyDiscovery.Batch begin(String token,int index,boolean consent,String schema,Instant now){
             if(!consent)throw new Failure(400,"confirmRequired");if(running)throw new Failure(409,"discovery.busy");
@@ -36,6 +39,21 @@ public final class OntologyPipeline {
             completed++;for(var row:result)candidates.putIfAbsent(row.id(),row);
             // Preserve the entire last response, rather than silently dropping overflow suggestions.
             if(candidates.size()>=OntologyDiscovery.MAX_CANDIDATES)authorizedUntil=nextIndex;
+        }
+        /** Only the durable workflow may continue past an individually recorded failure. */
+        public synchronized void recorded(List<Relation> rows,boolean complete){
+            if(!running)return;running=false;if(plan==null)return;
+            if(complete)completed++;else failed.add(nextIndex);
+            for(var row:rows)candidates.putIfAbsent(row.id(),row);
+            expires=Instant.now().plusSeconds(1200);
+            if(candidates.size()>=OntologyDiscovery.MAX_CANDIDATES)authorizedUntil=nextIndex;
+        }
+        public synchronized void persisted(List<Entry> entries){references=entries.stream().map(com.dbcompanion.service.OntologyContext::reference).toList();graph=null;}
+        public synchronized void restore(OntologyDiscovery.Plan value,List<Entry> entries,List<OntologyDiscoveryArchive.Call> calls){
+            prepare(value,entries.stream().map(com.dbcompanion.service.OntologyContext::reference).toList());
+            for(var call:calls){var receipt=call.receipt();if(receipt.index()!=nextIndex||receipt.index()>=value.batches().size())throw new Failure(409,"mismatch");
+                running=true;nextIndex++;recorded("SUCCEEDED".equals(call.state())?receipt.relations():List.of(),"SUCCEEDED".equals(call.state())&&receipt.issues().isEmpty());}
+            authorizedUntil=nextIndex;
         }
         public synchronized void stop(String token){if(plan!=null&&plan.token().equals(token))authorizedUntil=nextIndex;}
         public synchronized void reviewed(Entry before,Entry after){

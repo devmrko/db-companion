@@ -110,7 +110,7 @@ public final class OntologyRdf {
         }
         com.dbcompanion.model.OntologyRelations.validate(entry.document().links());
         for(var link:entry.document().links()){
-            String id=version+"/relationship/"+link.id();g.iri(root,"dbc:relationshipReview",id);g.type(id,"dbc:RelationshipReview");
+            String id=version+"/relationship/"+link.id();g.iri(root,"dbc:relationshipReview",id);g.type(id,link.status().equals("CANDIDATE")?"dbc:RelationshipCandidate":"dbc:RelationshipReview");
             g.value(id,"dbc:state",link.status());g.value(id,"rdfs:label",link.label());g.value(id,"dbc:conditionNote",link.condition());
             g.value(id,"dbc:origin",link.origin());g.value(id,"dbc:actor",link.actor());g.value(id,"dbc:reviewedAt",link.reviewedAt());
             g.iri(id,"dbc:sourceVersion",document+"/revision/"+link.sourceRevision());

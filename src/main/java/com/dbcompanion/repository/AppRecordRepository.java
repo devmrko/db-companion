@@ -37,7 +37,7 @@ public class AppRecordRepository {
     public void install(String schema,String login){QueryArchive.owner(schema,login);var state=status(schema,login);if(state.equals("READY"))return;if(!state.equals("MISSING"))throw new Ontology.Failure(409,"mismatch");jdbc.execute(AppRecordSql.create(schema));require(schema,login);}
     private String encode(JsonNode payload){String value=json.writeValueAsString(payload);if(!payload.isObject()||value.length()>QueryArchive.MAX_JSON)throw new Ontology.Failure(413,"archive.limit");return value;}
     public void begin(String schema,String id,String type,JsonNode payload){
-        QueryArchive.id(id);if(!Set.of(QueryArchive.TYPE,QueryArchive.STORE,OntologyScope.TYPE,ProblemQuestion.TYPE,ProblemQuestion.ATTEMPT_TYPE).contains(type))throw new Ontology.Failure(400,"archive.invalid");var value=encode(payload);
+        QueryArchive.id(id);if(!Set.of(QueryArchive.TYPE,QueryArchive.STORE,OntologyScope.TYPE,ProblemQuestion.TYPE,ProblemQuestion.ATTEMPT_TYPE,OntologyDiscoveryArchive.PLAN,OntologyDiscoveryArchive.CALL).contains(type))throw new Ontology.Failure(400,"archive.invalid");var value=encode(payload);
         jdbc.update("INSERT INTO "+AppRecordSql.table(schema)+" (RECORD_ID,RECORD_TYPE,STATE,PAYLOAD) VALUES (?,?,'REQUESTED',?)",s->{s.setString(1,id);s.setString(2,type);s.setCharacterStream(3,new StringReader(value),value.length());});
     }
     /** Only transition a pending record; a late failure must never overwrite a committed success. */
