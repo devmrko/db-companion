@@ -1,5 +1,39 @@
 # Release validation
 
+## 0.1.0-alpha.3
+
+Candidate: **0.1.0-alpha.3** / tag **v0.1.0-alpha.3**. Checked on 2026-10-01
+from an isolated copy of the integrated public source, preserving existing work.
+
+| Check | Result |
+| --- | --- |
+| `mvn -Pquality clean verify` | Passed; executable alpha.3 JAR built |
+| Java unit / integration / embedded HTTP tests | 1,242 tests, 0 failures, 0 errors, 0 skipped |
+| PMD Maven plugin 3.28.0 | Passed; 0 violations |
+| Complete JS suite with opt-in runtime test enabled | 599 passed, 0 failed, 0 skipped |
+| Publication guard | 860 candidate files, 0 findings |
+
+Environment: macOS, JDK 25.0.2 compiling for Java 21, Maven 3.9.16, Node 26.
+An initial sandboxed JS run could not inspect processes for two lifecycle tests;
+the full suite was rerun with process access and the real alpha.3 JAR, without
+changing the tests. Runtime checks used temporary directories/ports; the existing
+8080 app and database sessions were not restarted.
+
+```sh
+mvn -Pquality clean verify
+RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.3.jar node --test src/test/js/*.test.mjs
+node scripts/publication-check.cjs --working-tree
+git diff --check
+```
+
+Set `JAVA_HOME` before the runtime test. The release checks made no database changes
+or paid AI calls. Prior feature-specific DB/UI checks do not validate all production
+environments. Help-catalog content review is a separate audit; a passing test suite
+does not certify every SQL example, database privilege configuration or generated
+business answer. Publication scanning is heuristic and not a complete security audit.
+The version tag identifies the final integrated, tested tree; intermediate feature
+commits are not separately released or certified.
+
 ## 0.1.0-alpha.2
 
 Candidate: **0.1.0-alpha.2** / tag **v0.1.0-alpha.2**. Checked on 2026-09-28

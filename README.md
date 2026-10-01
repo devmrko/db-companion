@@ -1,6 +1,6 @@
 # DB Companion
 
-**Version: 0.1.0-alpha.2** · Java 21+ · Spring Boot · MIT
+**Version: 0.1.0-alpha.3** · Java 21+ · Spring Boot · MIT
 
 A self-hosted workbench for inspecting Oracle database metadata, Select AI configuration,
 feedback, execution information, and governed business definitions.
@@ -31,6 +31,17 @@ vendor support commitment. Product names identify the systems with which it work
 - Profile readiness checks and per-operation SQL/PLSQL help, including credential setup
   guidance and the distinction between saved ontology evidence and live data queries.
 - Read-only Deep Data Security, scheduler, credential metadata, and infrastructure views.
+- ORDS module/template/handler management and explicit REST endpoint testing with
+  connection-specific trusted destinations and separate HTTP authentication.
+- VPD policy inspection, supported changes, table/view permission filters, and policy-function source viewing.
+- Explicit SQL-cache and DDS audit archiving with Oracle Scheduler, source/archive
+  queries and separately authorized setup and privilege workflows.
+- Callable glossary/optional-ontology query package setup and testing for external callers.
+- Metadata import filters, profile-scoped refresh, persistent relationship discovery,
+  native Oracle RDF collection, and metadata property graph creation.
+- Profile/object-scoped metadata history setup and separate history access management.
+- Optional post-execution AI explanation/review of captured question, SQL and evidence.
+  Result cell values are not sent; the review does not certify numerical correctness.
 - Korean, English, Japanese, and Simplified Chinese interfaces.
 - Business glossary app saves retain before/after snapshots, actor and time in
   `DBC_APP_RECORD` and expose per-term change history. Saving a term and its history
@@ -129,7 +140,7 @@ An optional runtime integration suite starts and stops isolated app instances on
 ports (never your already running app):
 
 ```sh
-RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.2.jar node --test src/test/js/app-runtime.test.mjs
+RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.3.jar node --test src/test/js/app-runtime.test.mjs
 ```
 
 Translation sources are public development assets under `tools/i18n`, not private
