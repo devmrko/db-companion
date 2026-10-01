@@ -1,0 +1,134 @@
+{
+  "history.setup.audit": [
+    "공통 패키지 업데이트 필요",
+    "Shared package update required",
+    "需要更新共用程序包",
+    "共通パッケージの更新が必要です"
+  ],
+  "history.setup.trigger": [
+    "이 테이블·뷰의 트리거 업데이트 필요",
+    "This table/view needs a trigger update",
+    "需要更新此表/视图的触发器",
+    "この表・ビューのトリガー更新が必要です"
+  ],
+  "history.setup.install": [
+    "이력 초기 설정 필요",
+    "History setup required",
+    "需要初始化历史记录",
+    "履歴の初期設定が必要です"
+  ],
+  "history.setup.enable": [
+    "이력 수집이 꺼져 있습니다",
+    "History collection is off",
+    "历史记录采集已关闭",
+    "履歴収集がオフです"
+  ],
+  "history.setup.admin": [
+    "관리자 설정 필요",
+    "Administrator setup required",
+    "需要管理员设置",
+    "管理者による設定が必要です"
+  ],
+  "history.setup.unconfirmed": [
+    "관리 권한·설치 상태 확인 필요",
+    "Check management privileges and installation",
+    "需要确认管理权限和安装状态",
+    "管理権限・インストール状態の確認が必要です"
+  ],
+  "history.setup.review": [
+    "이력 설정 확인 필요",
+    "Review history setup",
+    "需要确认历史记录设置",
+    "履歴設定の確認が必要です"
+  ],
+  "history.setup.auditNext": [
+    "‘설치 확인 열기’ → ‘공통 패키지 업데이트 → v3’를 확인하세요. 스키마 공통 작업이며, 이후 이 테이블·뷰의 트리거 설치 상태를 확인합니다.",
+    "Open Installation check → Update shared package → v3. This is a schema-wide operation; then check this table/view's triggers.",
+    "打开安装检查 → 更新共用程序包 → v3。这是模式级操作，之后检查此表/视图的触发器。",
+    "「インストール確認を開く」→「共通パッケージを更新 → v3」を確認してください。スキーマ全体の作業後、この表・ビューのトリガーを確認します。"
+  ],
+  "history.setup.triggerNext": [
+    "‘설치 확인 열기’ → ‘이 테이블·뷰의 트리거 업데이트 → v3’를 확인하세요. 업데이트 후 이력 수집은 별도로 켭니다.",
+    "Open Installation check → Update this table/view's triggers → v3. Enable history collection separately after the update.",
+    "打开安装检查 → 更新此表/视图的触发器 → v3。更新后另行启用历史记录采集。",
+    "「インストール確認を開く」→「この表・ビューのトリガーを更新 → v3」を確認してください。更新後、履歴収集を別途オンにします。"
+  ],
+  "history.setup.installNext": [
+    "‘설치 확인 열기’로 준비 상태를 확인한 뒤, 창을 닫고 ‘트리거 설치·켜기’를 누르세요. 권한·기존 객체 검증을 통과한 경우에만 설치합니다.",
+    "Open Installation check to review readiness, then close it and choose Install and enable triggers. Installation proceeds only after privilege and existing-object checks pass.",
+    "打开安装检查确认准备状态，然后关闭窗口并选择安装并启用触发器。仅在权限和现有对象检查通过后安装。",
+    "「インストール確認を開く」で準備状態を確認し、閉じてから「トリガーをインストールして有効化」を選択します。権限・既存オブジェクトの検証に合格した場合のみ実行します。"
+  ],
+  "history.setup.enableNext": [
+    "이력 수집을 시작하려면 ‘이력 관리’를 켜세요. 이전에 저장된 이력은 유지됩니다.",
+    "Turn on History management to start collecting changes. Previously stored history is retained.",
+    "启用历史记录管理以开始采集变更。已保存的历史记录会保留。",
+    "変更履歴の収集を開始するには「履歴管理」をオンにします。保存済みの履歴は保持されます。"
+  ],
+  "history.setup.activeNext": [
+    "이력 수집은 켜져 있습니다. 현재 계정의 관리 권한은 ON/OFF 등 설정 변경에 필요합니다.",
+    "History collection is on. Management privileges are needed only to change settings such as ON/OFF.",
+    "历史记录采集已开启。管理权限仅用于更改开关等设置。",
+    "履歴収集はオンです。管理権限はオン・オフなどの設定変更に必要です。"
+  ],
+  "history.setup.reviewNext": [
+    "‘설치 확인 열기’에서 권한·코드·객체 상태와 다음 작업을 확인하세요. 확인되지 않은 설정은 자동 변경하지 않습니다.",
+    "Open Installation check to review privileges, code, objects and next steps. Unverified settings are not changed automatically.",
+    "打开安装检查，查看权限、代码、对象状态和后续操作。不会自动更改未确认的设置。",
+    "「インストール確認を開く」で権限・コード・オブジェクト状態と次の作業を確認してください。未確認の設定は自動変更しません。"
+  ],
+  "history.setup.target": [
+    "설정 대상: {0}.{1}",
+    "Setup target: {0}.{1}",
+    "设置目标：{0}.{1}",
+    "設定対象: {0}.{1}"
+  ],
+  "history.setup.login": [
+    "같은 DB/Wallet에 ADMIN 또는 필요한 권한을 가진 관리 계정으로 로그인하세요. 현재 계정의 권한을 자동으로 높이지 않습니다.",
+    "Sign in to the same DB/Wallet as ADMIN or a management account with the required privileges. This app does not elevate the current account automatically.",
+    "使用 ADMIN 或具有所需权限的管理账户登录同一 DB/Wallet。应用不会自动提升当前账户的权限。",
+    "同じ DB/Wallet に ADMIN または必要な権限を持つ管理アカウントでログインしてください。現在のアカウントの権限を自動で昇格させません。"
+  ],
+  "history.setup.route": [
+    "스키마 {0} 선택 → 테이블·뷰·컬럼 → {1} → 설치 확인",
+    "Select schema {0} → Tables, views and columns → {1} → Installation check",
+    "选择模式 {0} → 表、视图和列 → {1} → 安装检查",
+    "スキーマ {0} を選択 → 表・ビュー・列 → {1} → インストール確認"
+  ],
+  "history.setup.order": [
+    "공통 패키지 업데이트는 스키마당 한 번, 트리거 설치·업데이트는 대상 테이블·뷰별로 진행합니다. 각 작업의 사전 검사를 통과한 뒤 이력 수집을 켭니다.",
+    "Update the shared package once per schema; install or update triggers per target table/view. Enable history collection after the required preflight checks pass.",
+    "共用程序包按模式更新一次；触发器按目标表/视图安装或更新。通过各项预检查后启用历史记录采集。",
+    "共通パッケージはスキーマごとに一度更新し、トリガーは対象の表・ビューごとにインストールまたは更新します。必要な事前検証を通過してから履歴収集をオンにします。"
+  ],
+  "history.setup.open": [
+    "설치 확인 열기",
+    "Open installation check",
+    "打开安装检查",
+    "インストール確認を開く"
+  ],
+  "history.setup.copy": [
+    "설정 안내 복사",
+    "Copy setup instructions",
+    "复制设置说明",
+    "設定手順をコピー"
+  ],
+  "history.setup.adminGuide": [
+    "관리자 작업 안내",
+    "Administrator instructions",
+    "管理员操作说明",
+    "管理者向けの作業手順"
+  ],
+  "history.setup.copied": [
+    "대상과 관리자 작업 안내를 복사했습니다.",
+    "Target and administrator instructions copied.",
+    "已复制目标和管理员操作说明。",
+    "対象と管理者向けの作業手順をコピーしました。"
+  ],
+  "history.setup.copyFailed": [
+    "자동 복사를 사용할 수 없습니다. 아래 안내를 직접 복사하세요.",
+    "Automatic copying is unavailable. Copy the instructions below manually.",
+    "无法自动复制。请手动复制下方说明。",
+    "自動コピーを利用できません。下の手順を手動でコピーしてください。"
+  ]
+}

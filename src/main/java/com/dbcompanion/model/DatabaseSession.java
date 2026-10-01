@@ -40,6 +40,7 @@ public final class DatabaseSession {
     public AiSqlHistory.State sqlHistory() { return sqlHistory; }
     private record HistoryKey(String schema,String table) {}
     private final java.util.Map<HistoryKey,MetadataHistory.State> historyStates = new java.util.HashMap<>();
+    private final java.util.Map<HistoryKey,java.time.Instant> historyChecked = new java.util.HashMap<>();
     private final java.util.Map<HistoryKey,TableRowHistory.State> rowHistoryStates = new java.util.HashMap<>();
     private final java.util.Map<String,List<VectorSearch.Table>> vectorTables = new java.util.HashMap<>();
     private final java.util.Map<String,List<FunctionCatalog.Entry>> functions = new java.util.HashMap<>();
@@ -140,15 +141,16 @@ public final class DatabaseSession {
     public synchronized MetadataHistory.State historyState(String schema,String table,boolean refresh,
             java.util.function.Supplier<MetadataHistory.State> loader) {
         var key = new HistoryKey(schema,table);
-        if (refresh || !historyStates.containsKey(key)) {
-            try { historyStates.put(key,Objects.requireNonNull(loader.get())); }
+        if (refresh || !historyStates.containsKey(key) || historyChecked.getOrDefault(key,java.time.Instant.MIN).plusSeconds(30).isBefore(java.time.Instant.now())) {
+            try { historyStates.put(key,Objects.requireNonNull(loader.get())); historyChecked.put(key,java.time.Instant.now()); }
             catch(RuntimeException ex) { uncertainHistoryState(schema,table);throw ex; }
         }
         return historyStates.get(key);
     }
     public synchronized MetadataHistory.State rememberHistoryState(String schema,String table,MetadataHistory.State state) {
-        historyStates.put(new HistoryKey(schema,table),Objects.requireNonNull(state));return state;
+        var key=new HistoryKey(schema,table);historyStates.put(key,Objects.requireNonNull(state));historyChecked.put(key,java.time.Instant.now());return state;
     }
+    public synchronized void forgetHistorySchema(String schema) { historyStates.keySet().removeIf(key -> key.schema().equals(schema));historyChecked.keySet().removeIf(key -> key.schema().equals(schema)); }
     public synchronized void uncertainHistoryState(String schema,String table) {
         var key=new HistoryKey(schema,table);var previous=historyStates.get(key);
         if(previous!=null)historyStates.put(key,new MetadataHistory.State(previous.installed(),previous.enabled(),false,

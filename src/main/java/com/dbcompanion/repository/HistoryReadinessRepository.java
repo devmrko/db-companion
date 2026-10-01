@@ -18,6 +18,30 @@ public class HistoryReadinessRepository {
     public record Preparation(Configuration configuration, String triggerOwner, List<HistorySql.Asset> missing,
                               HistoryPermissions.Access access, HistoryPermissions.Decision decision, boolean auditCompileRequired,
                               List<HistorySql.Asset> legacyTriggers, boolean auditUpgradeRequired) {}
+    public record AuditUpgrade(HistorySql.CodeVersion version, boolean upgradeRequired, boolean allowed, List<String> blockers) {}
+    /** No trigger-create/manage privilege is needed to replace only the shared package body. */
+    public AuditUpgrade prepareAuditUpgrade(Target target) {
+        var version = HistorySql.auditVersion(target, history.source(HistorySql.auditBody(target, false)));
+        boolean required = version == HistorySql.CodeVersion.V1 || version == HistorySql.CodeVersion.V2;
+        var blockers = new ArrayList<String>();
+        if (version == HistorySql.CodeVersion.UNKNOWN || version == HistorySql.CodeVersion.MISSING)
+            blockers.add(UiMessages.text("history.code.unrecognized", "패키지가 없거나 원문을 확인하지 못했습니다. 자동 교체하지 않습니다."));
+        if (required) {
+            try {
+                history.validateSharedAuditAssets(target);
+                String user = jdbc.queryForObject("SELECT SYS_CONTEXT('USERENV','SESSION_USER') FROM SYS.DUAL", String.class);
+                var privileges = new HashSet<>(jdbc.queryForList("SELECT PRIVILEGE FROM SESSION_PRIVS", String.class));
+                if (!privileges.contains("CREATE ANY PROCEDURE") && !(target.schema().equals(user) && privileges.contains("CREATE PROCEDURE")))
+                    blockers.add(target.schema().equals(user) ? "CREATE PROCEDURE / CREATE ANY PROCEDURE" : "CREATE ANY PROCEDURE");
+                blockers.addAll(history.auditUpgradeBlockers(target));
+            } catch (com.dbcompanion.common.exception.MetadataEditException ex) {
+                blockers.add(ex.userMessage());
+            } catch (org.springframework.dao.DataAccessException ex) {
+                blockers.add(UiMessages.text("history.code.verifyFailed", "공통 패키지와 의존 객체의 상태를 확인하지 못했습니다. 조회 권한과 연결을 확인해 주세요."));
+            }
+        }
+        return new AuditUpgrade(version, required, required && blockers.isEmpty(), List.copyOf(blockers));
+    }
     public Preparation prepare(Target target, boolean enabling) {
         return prepare(target, enabling, true);
     }
@@ -73,6 +97,10 @@ public class HistoryReadinessRepository {
         return new HistoryPermissions.Access(user, Set.copyOf(session), direct == null ? null : Set.copyOf(direct), Set.copyOf(tracking), canExecute, checkError);
     }
     public Map<String, Object> readiness(Target target) {
+        var delegated = history.delegatedState(target);
+        if (delegated != null) return Map.of("schema",target.schema(),"table",target.table(),
+                "delegatedState",delegated,"triggerOwner",delegated.triggerOwner(),"trackingEnabled",delegated.enabled(),
+                "note",UiMessages.text("history.access.scoped","객체별 위임 권한 · 설치·코드 교체 권한은 포함하지 않습니다."));
         var config = history.configuration(target, false);
         var ready = prepare(target, !config.enabled(), false);
         var result = new LinkedHashMap<String, Object>();
@@ -83,18 +111,22 @@ public class HistoryReadinessRepository {
         result.put("trackingEnabled", config.enabled());
         result.put("auditCompileRequired", ready.auditCompileRequired());
         result.put("auditUpgradeRequired", ready.auditUpgradeRequired());
-        List<String> blockers = List.of();
-        if (ready.auditUpgradeRequired()) {
-            try { blockers = history.auditUpgradeBlockers(target); }
-            catch (RuntimeException ex) { blockers = List.of(UiMessages.text("ui.6c2235ac1f35", "공유 패키지 교체 조건 조회: ") + databaseError(ex)); }
-        }
-        result.put("auditUpgradeBlockers", blockers);
+        var audit = prepareAuditUpgrade(target);
+        result.put("sharedAudit", audit);
+        result.put("auditUpgradeBlockers", audit.blockers());
+        result.put("auditUpgradeAllowed", audit.allowed());
+        result.put("latestCodeVersion", "V3");
+        result.put("triggerVersions", java.util.stream.Stream.of(true, false).map(before -> {
+            var asset = HistorySql.trigger(target, ready.triggerOwner(), before);
+            return Map.of("name", asset.name(), "owner", asset.owner(), "version",
+                    HistorySql.triggerCodeVersion(target, asset.owner(), before, history.source(asset)));
+        }).toList());
         result.put("triggerUpgradeRequired", !ready.legacyTriggers().isEmpty());
         result.put("triggerUpgradeAllowed", !config.enabled() && !config.needsUpgrade() && !ready.auditCompileRequired()
-                && ready.missing().isEmpty() && !ready.legacyTriggers().isEmpty() && ready.decision().allowed());
+                && ready.missing().isEmpty() && !ready.legacyTriggers().isEmpty() && audit.version() == HistorySql.CodeVersion.V3 && ready.decision().allowed());
         result.put("codeUpgradeAllowed", !config.enabled() && !config.needsUpgrade() && !ready.auditCompileRequired()
-                && ready.missing().isEmpty() && (!ready.legacyTriggers().isEmpty() || ready.auditUpgradeRequired())
-                && blockers.isEmpty() && ready.decision().allowed());
+                && ready.missing().isEmpty() && !ready.legacyTriggers().isEmpty()
+                && audit.version() == HistorySql.CodeVersion.V3 && ready.decision().allowed());
         result.put("targetObjects", jdbc.queryForList("SELECT OBJECT_TYPE, STATUS FROM SYS.ALL_OBJECTS WHERE OWNER=? "
                 + "AND OBJECT_NAME=? AND OBJECT_TYPE IN ('TABLE','VIEW','MATERIALIZED VIEW') ORDER BY OBJECT_TYPE", target.schema(), target.table()));
         result.put("targetCommentSources", jdbc.queryForList("SELECT 'ALL_TAB_COMMENTS' SOURCE_VIEW, TABLE_TYPE OBJECT_TYPE FROM SYS.ALL_TAB_COMMENTS "

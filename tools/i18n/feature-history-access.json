@@ -1,0 +1,249 @@
+{
+  "history.access.verifyOnApply": ["설치·코드·권한은 적용 전에 재검증합니다.","Installation, code and privileges are rechecked before applying.","应用前将重新验证安装、代码和权限。","適用前にインストール・コード・権限を再検証します。"],
+  "history.access.button": [
+    "이력 일괄·권한 설정",
+    "Bulk history & access",
+    "批量历史与权限设置",
+    "履歴の一括・権限設定"
+  ],
+  "history.access.description": [
+    "선택한 객체의 변경은 변경자와 함께 모두 기록합니다. 프로필은 대상 선택에만 사용하며, 같은 객체의 수집 설정과 권한은 모든 프로필에서 공유됩니다.",
+    "All changes include the actual DB user. Profiles select objects; collection and access settings are shared per object.",
+    "所有变更均记录实际数据库用户。配置文件仅用于选择对象；收集与权限设置按对象共享。",
+    "変更者を含めてすべての変更を記録します。プロファイルは対象の選択に使用し、収集設定と権限はオブジェクト単位で共有します。"
+  ],
+  "history.access.ownership": [
+    "이 설정은 앱 전용 이력 권한입니다. 객체 소유권·기존 DB 권한은 회수하지 않으며, 업무 데이터 조회 권한도 추가하지 않습니다.",
+    "These are scoped history permissions. Object ownership and existing DB privileges remain; business-data access is not granted.",
+    "这些是专用历史权限。不撤销对象所有权或已有数据库权限，也不授予业务数据查询权限。",
+    "履歴専用の権限です。所有権や既存のDB権限は取り消さず、業務データの参照権限も追加しません。"
+  ],
+  "history.access.targets": [
+    "대상 테이블·뷰",
+    "Target tables and views",
+    "目标表与视图",
+    "対象テーブル・ビュー"
+  ],
+  "history.access.operation": [
+    "작업",
+    "Operation",
+    "操作",
+    "操作"
+  ],
+  "history.access.enable": [
+    "수집 설치·켜기",
+    "Install / enable collection",
+    "安装并启用收集",
+    "収集のインストール・有効化"
+  ],
+  "history.access.disable": [
+    "수집 끄기",
+    "Disable collection",
+    "关闭收集",
+    "収集を無効化"
+  ],
+  "history.access.read": [
+    "조회 허용",
+    "Allow history read",
+    "允许查询历史",
+    "履歴の参照を許可"
+  ],
+  "history.access.manage": [
+    "조회·수집 ON/OFF 허용",
+    "Allow read and collection ON/OFF",
+    "允许查询及收集开关",
+    "参照・収集の切替を許可"
+  ],
+  "history.access.deny": [
+    "조회·관리 제외",
+    "Deny history read and management",
+    "禁止查询及管理",
+    "参照・管理を除外"
+  ],
+  "history.access.inherit": [
+    "개별 설정 해제 (전체 설정 적용)",
+    "Remove override (use global setting)",
+    "移除个别设置（使用全局设置）",
+    "個別設定を解除（全体設定を適用）"
+  ],
+  "history.access.users": [
+    "권한 대상 사용자",
+    "Users receiving access",
+    "权限目标用户",
+    "権限の対象ユーザー"
+  ],
+  "history.access.all": [
+    "전체 사용자 (PUBLIC)",
+    "All users (PUBLIC)",
+    "所有用户（PUBLIC）",
+    "全ユーザー（PUBLIC）"
+  ],
+  "history.access.exclusions": [
+    "개별 설정이 전체 설정보다 우선합니다. 권한 부여 후에도 수집 대상 사용자는 제한하지 않습니다.",
+    "Individual overrides take precedence over PUBLIC. Access settings never filter whose changes are recorded.",
+    "个别设置优先于PUBLIC。权限设置不会筛选被记录的变更用户。",
+    "個別設定がPUBLICより優先されます。権限設定によって記録対象の変更者を制限しません。"
+  ],
+  "history.access.details": [
+    "적용 범위와 DB 변경 내용",
+    "Scope and database changes",
+    "范围及数据库变更",
+    "適用範囲とDBの変更内容"
+  ],
+  "history.access.installInfo": [
+    "권한 설정 시 관리 계정에 전용 테이블 2개와 패키지를 생성합니다(미설치 시). 지정 사용자에게 패키지 실행과 설치자 확인용 설정 테이블 READ 권한을 부여합니다. 이력 원본·업무 테이블 접근이나 광범위한 트리거 권한은 부여하지 않습니다. 관리 권한은 검증된 기존 이력의 ON/OFF만 허용합니다.",
+    "Access setup creates two tables and a package in the administrator schema if missing. Grantees receive package EXECUTE and READ on installer-discovery tracking metadata, not history data tables, business data, or broad trigger privileges. Management only switches verified existing collection ON/OFF.",
+    "权限设置将在管理员模式中创建两个专用表及一个程序包（如未安装）。授权用户获得程序包执行及安装者查询设置表的READ权限，不获得原始历史表、业务表或广泛的触发器权限。管理仅允许切换已验证的现有收集状态。",
+    "未導入の場合、管理スキーマに専用テーブル2個とパッケージを作成します。対象ユーザーにはパッケージのEXECUTEと設置者確認用設定テーブルのREADを付与し、履歴原本・業務テーブルや広範なトリガー権限は付与しません。管理は検証済みの既存収集のON/OFFのみです。"
+  ],
+  "history.access.partial": [
+    "DDL·권한 작업은 일부 적용되어 있을 수 있습니다. 다시 조회해 확인하세요. 자동 재시도하지 않습니다.",
+    "DDL and grants may be partially applied. Refresh to verify. No automatic retries.",
+    "DDL或授权可能已部分生效。请重新查询确认，不会自动重试。",
+    "DDL・権限操作が一部反映されている可能性があります。再取得して確認してください。自動再試行はしません。"
+  ],
+  "history.access.confirm": [
+    "선택한 객체·사용자와 작업 범위를 확인했으며 적용에 동의합니다.",
+    "I checked the objects, users and operation, and approve applying these changes.",
+    "我已确认对象、用户及操作范围，同意应用更改。",
+    "対象・ユーザー・操作範囲を確認し、適用に同意します。"
+  ],
+  "history.access.apply": [
+    "선택 대상에 적용",
+    "Apply to selected objects",
+    "应用到所选对象",
+    "選択対象に適用"
+  ],
+  "history.access.denied": [
+    "이 대상의 이력 조회·관리 권한이 없습니다.",
+    "History read or management access is not granted for this object.",
+    "没有此对象的历史查询或管理权限。",
+    "この対象の履歴参照・管理権限がありません。"
+  ],
+  "history.access.changed": [
+    "이력 설정이 변경되었습니다. 관리 계정으로 다시 확인해 주세요.",
+    "History configuration changed. Ask its administrator to verify it.",
+    "历史配置已变更，请管理员重新确认。",
+    "履歴設定が変更されました。管理アカウントで再確認してください。"
+  ],
+  "history.access.scoped": [
+    "객체별 위임 권한 · 설치·코드 교체 권한은 포함하지 않습니다.",
+    "Object-scoped delegation; installation and code replacement are not included.",
+    "对象级委托权限，不包含安装或代码替换权限。",
+    "オブジェクト単位の委任権限です。インストール・コード置換は含みません。"
+  ],
+  "history.access.incompatible": [
+    "권한 관리 객체가 앱 정의와 다릅니다. 자동 교체하지 않습니다.",
+    "Access-control assets differ from the app definition. They are not replaced automatically.",
+    "权限管理对象与应用定义不同，不会自动替换。",
+    "権限管理オブジェクトがアプリの定義と異なります。自動置換しません。"
+  ],
+  "history.access.switch": [
+    "위임된 이력 수집 설정 변경",
+    "Changing delegated history collection",
+    "更改委托的历史收集设置",
+    "委任された履歴収集設定を変更"
+  ],
+  "history.access.owner": [
+    "기록된 트리거 소유 계정으로 로그인해 주세요.",
+    "Sign in as the recorded trigger owner.",
+    "请以已记录的触发器所有者登录。",
+    "記録されたトリガー所有者でログインしてください。"
+  ],
+  "history.access.stale": [
+    "프로필 또는 선택 범위가 변경되었습니다. 다시 확인해 주세요.",
+    "The profile or selection changed. Preview it again.",
+    "配置文件或选择范围已变更，请重新确认。",
+    "プロファイルまたは選択範囲が変わりました。再確認してください。"
+  ],
+  "history.access.user": [
+    "현재 DB에 존재하는 사용자를 선택해 주세요.",
+    "Select users that exist in this database.",
+    "请选择当前数据库中的用户。",
+    "現在のDBに存在するユーザーを選択してください。"
+  ],
+  "history.access.self": [
+    "관리 패키지 소유자의 고유 권한은 이 화면에서 회수할 수 없습니다.",
+    "The gateway owner's native privileges cannot be revoked here.",
+    "无法在此撤销管理程序包所有者的固有权限。",
+    "管理パッケージ所有者の固有権限はここでは取り消せません。"
+  ],
+  "history.access.upgrade": [
+    "일괄 적용 전에 설치 확인에서 구버전 코드를 업데이트해 주세요.",
+    "Update legacy code in installation inspection before applying in bulk.",
+    "批量应用前，请在安装检查中更新旧版代码。",
+    "一括適用の前にインストール確認で旧コードを更新してください。"
+  ],
+  "history.access.installFirst": [
+    "먼저 대상의 이력 수집을 설치·설정한 뒤 권한을 부여해 주세요.",
+    "Set up history collection for these objects before granting access.",
+    "请先为目标安装并设置历史收集，再授予权限。",
+    "対象の履歴収集を導入・設定してから権限を付与してください。"
+  ],
+  "history.access.notRun": [
+    "앞선 오류로 실행하지 않았습니다.",
+    "Not run because an earlier operation failed.",
+    "因前序错误未执行。",
+    "先行操作の失敗により実行しませんでした。"
+  ],
+  "history.access.applied": [
+    "적용 완료",
+    "Applied",
+    "已应用",
+    "適用済み"
+  ],
+  "history.access.failed": [
+    "DB 작업을 확인하지 못했습니다.",
+    "The database operation could not be verified.",
+    "无法确认数据库操作。",
+    "DB操作を確認できませんでした。"
+  ],
+  "history.access.internal": [
+    "이력 관리 객체는 수집 대상으로 선택할 수 없습니다.",
+    "History-management assets cannot track themselves.",
+    "不能将历史管理对象本身设为收集目标。",
+    "履歴管理オブジェクト自体は収集対象にできません。"
+  ],
+  "history.access.profile": [
+    "Select AI 프로필을 선택해 주세요.",
+    "Select a Select AI profile.",
+    "请选择Select AI配置文件。",
+    "Select AIプロファイルを選択してください。"
+  ],
+  "history.access.crossSchema": [
+    "다른 스키마의 객체가 포함되어 있습니다. 스키마별 개별 설정을 사용하세요. 일부만 자동 적용하지 않습니다.",
+    "The profile includes other schemas. Use individual setup per schema; no subset is applied silently.",
+    "配置文件包含其他模式的对象。请按模式单独设置，不会静默应用部分对象。",
+    "他スキーマの対象が含まれます。スキーマごとに個別設定してください。一部だけの自動適用はしません。"
+  ],
+  "history.access.limit": [
+    "한 번에 1~50개 테이블·뷰를 설정할 수 있습니다. 프로필 범위를 좁혀 주세요.",
+    "Select 1–50 tables or views per operation. Narrow the profile scope.",
+    "每次可设置1至50个表或视图，请缩小配置文件范围。",
+    "1回に1〜50個のテーブル・ビューを設定できます。範囲を絞ってください。"
+  ],
+  "history.access.invalidList": [
+    "object_list의 객체를 모두 확인하지 못했습니다. 프로필과 객체 조회 권한을 확인해 주세요.",
+    "Not all object_list entries could be verified. Check the profile and catalog access.",
+    "无法验证object_list中的全部对象。请检查配置文件和对象查询权限。",
+    "object_listの全対象を確認できませんでした。プロファイルと参照権限を確認してください。"
+  ],
+  "history.access.selection": [
+    "확인한 목록에서 대상 객체를 선택해 주세요.",
+    "Select target objects from the preview.",
+    "请从已确认的列表中选择目标对象。",
+    "確認済み一覧から対象を選択してください。"
+  ],
+  "history.access.loading": [
+    "대상과 현재 권한을 확인하고 있습니다…",
+    "Checking objects and current access…",
+    "正在检查对象及当前权限…",
+    "対象と現在の権限を確認中…"
+  ],
+  "history.access.running": [
+    "적용 중… 창을 닫지 마세요.",
+    "Applying… Please keep this window open.",
+    "正在应用…请勿关闭窗口。",
+    "適用中…この画面を閉じないでください。"
+  ]
+}

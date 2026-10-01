@@ -11,12 +11,39 @@
       <button type="button" class="btn app-btn app-btn-quiet" data-history-inspect th:text="#{ui.542ee3de69a8}">설치 확인</button>
     </div>
     <p class="app-muted app-history-status" role="status" data-history-status th:text="#{ui.b919ac7bb74b}">이력 상태 확인 중…</p>
+    <th:block th:replace="~{fragments/history-access :: access(${targetSchema}, ${targetTable})}"></th:block>
+    <details class="app-history-setup" data-history-setup hidden aria-labelledby="history-setup-title">
+      <summary th:text="#{history.inline.details}">설정 안내</summary>
+      <div class="app-history-setup-body">
+      <h3 id="history-setup-title" data-history-setup-title></h3>
+      <p class="app-muted" data-history-setup-reason></p>
+      <p data-history-setup-next></p>
+      <div class="app-history-toolbar">
+        <button type="button" class="btn app-btn app-btn-secondary" data-history-setup-open th:text="#{history.setup.open}">설치 확인 열기</button>
+        <button type="button" class="btn app-btn app-btn-quiet" data-history-setup-copy th:text="#{history.setup.copy}">설정 안내 복사</button>
+      </div>
+      <details data-history-admin-guide>
+        <summary th:text="#{history.setup.adminGuide}">관리자 작업 안내</summary>
+        <p th:text="#{history.setup.login}"></p>
+        <p class="app-history-setup-target" th:text="#{history.setup.target(${targetSchema},${targetTable})}"></p>
+        <ol>
+          <li th:text="#{history.setup.route(${targetSchema},${targetTable})}"></li>
+          <li th:text="#{history.setup.order}"></li>
+        </ol>
+      </details>
+      <p role="status" class="app-muted" data-history-copy-result></p>
+      <textarea class="form-control" readonly hidden rows="6" data-history-copy-value th:aria-label="#{history.setup.adminGuide}"></textarea>
+      </div>
+    </details>
     <dialog class="app-preview-dialog" aria-labelledby="metadata-history-title" data-history-dialog>
       <header class="app-preview-header"><h2 id="metadata-history-title" th:text="#{ui.e78d03ec8597}">변경 이력</h2><button type="button" class="btn app-btn app-btn-quiet" data-history-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
       <div class="app-history-content">
         <p class="app-muted" th:text="${targetSchema + '.' + targetTable}"></p>
         <div role="status" data-history-message></div><div data-history-entries></div>
-        <button type="button" class="btn app-btn app-btn-secondary" data-history-upgrade hidden disabled th:text="#{ui.81368da9f2ff}">이력 코드 업데이트</button>
+        <div class="app-history-toolbar">
+          <button type="button" class="btn app-btn app-btn-secondary" data-history-audit-upgrade hidden disabled th:text="#{history.code.auditButton}">공통 패키지 업데이트 → v3</button>
+          <button type="button" class="btn app-btn app-btn-secondary" data-history-upgrade hidden disabled th:text="#{history.code.triggerButton}">이 테이블·뷰의 트리거 업데이트 → v3</button>
+        </div>
         <div class="app-history-pagination"><button type="button" class="btn app-btn app-btn-quiet" data-history-prev disabled th:text="#{ui.da7e61c67cc5}">이전</button><span data-history-page></span><button type="button" class="btn app-btn app-btn-quiet" data-history-next disabled th:text="#{ui.aef613c6612d}">다음</button></div>
       </div>
     </dialog>

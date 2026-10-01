@@ -1,0 +1,44 @@
+{
+  "history.summary.active": [
+    "이력 수집 중",
+    "History collection is on",
+    "正在收集历史记录",
+    "履歴を収集中"
+  ],
+  "history.summary.ready": [
+    "준비 완료",
+    "Ready",
+    "已就绪",
+    "準備完了"
+  ],
+  "history.summary.review": [
+    "상태 확인 필요",
+    "Status check needed",
+    "需要检查状态",
+    "状態の確認が必要"
+  ],
+  "history.summary.update": [
+    "업데이트 필요",
+    "Update needed",
+    "需要更新",
+    "更新が必要"
+  ],
+  "history.summary.install": [
+    "설치 필요",
+    "Installation needed",
+    "需要安装",
+    "インストールが必要"
+  ],
+  "history.summary.off": [
+    "준비 완료 · 수집 꺼짐",
+    "Ready · Collection off",
+    "已就绪 · 收集已关闭",
+    "準備完了 · 収集停止中"
+  ],
+  "history.summary.auditNext": [
+    "먼저 공통 패키지를 업데이트하세요.",
+    "Update the shared package first.",
+    "请先更新共用程序包。",
+    "先に共通パッケージを更新してください。"
+  ]
+}

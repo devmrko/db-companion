@@ -1,0 +1,12 @@
+.history-access-dialog { width: min(900px, calc(100vw - 32px)); }
+.history-access-dialog fieldset { border: 1px solid var(--app-border, #d5d4d2); border-radius: 6px; padding: 16px; min-width: 0; margin: 16px 0; }
+.history-access-dialog legend { font-size: 1rem; font-weight: 600; float: none; width: auto; padding: 0 4px; }
+.history-access-targets { max-height: 300px; overflow: auto; display: grid; gap: 12px; }
+.history-access-targets label { display: flex; gap: 10px; align-items: flex-start; overflow-wrap: anywhere; }
+.history-access-targets small { display: block; font-size: .875rem; color: var(--app-muted, #666); margin-top: 4px; }
+.history-access-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+.history-access-fields > label { display: grid; gap: 8px; margin-top: 16px; }
+.history-access-fields select { width: 100%; min-width: 0; }
+.history-access-confirm { display: flex; align-items: flex-start; gap: 8px; margin: 20px 0; }
+[data-access-results] { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media(max-width: 620px) { .history-access-fields { grid-template-columns: 1fr; gap: 0; } }

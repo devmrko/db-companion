@@ -35,6 +35,10 @@ public class MetadataController {
     public ResponseEntity<?> upgradeHistory(@RequestBody com.dbcompanion.model.MetadataHistory.Toggle body, HttpServletRequest request) {
         return invoke(request, () -> history.upgradeCode(session(request), new Target(body.schema(), body.table(), null)));
     }
+    @PostMapping("/tables/history/audit-upgrade")
+    public ResponseEntity<?> upgradeAudit(@RequestBody com.dbcompanion.model.MetadataHistory.Toggle body, HttpServletRequest request) {
+        return invoke(request, () -> history.upgradeAudit(session(request), new Target(body.schema(), body.table(), null)));
+    }
 
     @GetMapping("/tables/history/readiness")
     public ResponseEntity<?> historyReadiness(@RequestParam String schema, @RequestParam String table,

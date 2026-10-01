@@ -1,6 +1,7 @@
 package com.dbcompanion.service;
 
 import com.dbcompanion.common.i18n.UiMessages;
+import com.dbcompanion.common.i18n.UiNotice;
 
 import com.dbcompanion.common.db.*;
 import com.dbcompanion.common.exception.MetadataEditException;
@@ -38,20 +39,29 @@ public class MetadataHistoryService {
     }
     private State stateWithAccess(Target target) {
         var state = repository.state(target);
+        if (state.setup() != null) return state;
         try {
             var ready = readiness.prepare(target, !state.enabled(), false);
             var decision = ready.decision();
+            var access = ready.access() != null && ready.access().ownerCheckError() != null ? SetupAccess.UNCONFIRMED
+                    : decision.allowed() ? SetupAccess.ALLOWED : SetupAccess.REQUIRED;
             if (!state.enabled() && ready.auditUpgradeRequired())
-                return state.withAccess(false, com.dbcompanion.common.i18n.UiNotice.message("ui.b4eb38fa061b", "설치 확인에서 감사 패키지 업데이트가 필요합니다."));
+                return state.withSetup(SetupStep.AUDIT_UPDATE, access).withAccess(false, UiNotice.concat(
+                        UiNotice.message("ui.b4eb38fa061b", "설치 확인에서 감사 패키지 업데이트가 필요합니다."),
+                        decision.allowed() ? UiNotice.raw("") : UiNotice.concat(UiNotice.raw(" · "), decision.notice())));
             if (!state.enabled() && !ready.legacyTriggers().isEmpty())
-                return state.withAccess(false, com.dbcompanion.common.i18n.UiNotice.message("ui.634bda175ae5", "설치 확인에서 트리거 업데이트가 필요합니다."));
-            return state.withAccess(decision.allowed(), decision.notice());
+                return state.withSetup(SetupStep.TRIGGER_UPDATE, access).withAccess(false, UiNotice.concat(
+                        UiNotice.message("ui.634bda175ae5", "설치 확인에서 트리거 업데이트가 필요합니다."),
+                        decision.allowed() ? UiNotice.raw("") : UiNotice.concat(UiNotice.raw(" · "), decision.notice())));
+            var step = !state.healthy() ? SetupStep.INSPECT : !state.installed() ? SetupStep.INSTALL
+                    : state.enabled() ? SetupStep.NONE : SetupStep.ENABLE;
+            return state.withSetup(step, access).withAccess(decision.allowed(), decision.notice());
         } catch (MetadataEditException ex) {
-            return state.withAccess(false, ex.userMessage());
+            return state.withSetup(SetupStep.INSPECT, SetupAccess.UNCONFIRMED).withAccess(false, ex.userMessage());
         } catch (org.springframework.dao.DataAccessException ex) {
             Throwable cause = ex;
             while (cause.getCause() != null && !(cause instanceof java.sql.SQLException)) cause = cause.getCause();
-            return state.withAccess(false,com.dbcompanion.common.i18n.UiNotice.concat(com.dbcompanion.common.i18n.UiNotice.message("ui.de1e3f73010f", "관리 권한 조회 오류: "),com.dbcompanion.common.i18n.UiNotice.raw(cause instanceof java.sql.SQLException sql ? sql.getMessage() : cause.getClass().getSimpleName())));
+            return state.withSetup(SetupStep.INSPECT, SetupAccess.UNCONFIRMED).withAccess(false,UiNotice.concat(UiNotice.message("ui.de1e3f73010f", "관리 권한 조회 오류: "),UiNotice.raw(cause instanceof java.sql.SQLException sql ? sql.getMessage() : cause.getClass().getSimpleName())));
         }
     }
     public Page history(PoolSession session, Target target, int page) {
@@ -63,6 +73,13 @@ public class MetadataHistoryService {
         return bound(session, target, () -> {
             String stage = UiMessages.text("ui.f3b7242cce41", "설치 전 확인");
             try {
+                var delegated = read.execute(s -> repository.state(target));
+                if (delegated.setup() != null) {
+                    if (!delegated.canManage()) throw HistoryAccessRepository.denied();
+                    stage = UiMessages.text("history.access.switch", "위임된 이력 수집 설정 변경");
+                    write.executeWithoutResult(s -> repository.delegatedToggle(target,enabled));
+                    return remember(session,target,read.execute(s -> stateWithAccess(target)));
+                }
                 var ready = read.execute(s -> readiness.prepare(target, enabled));
                 if (enabled && (ready.auditUpgradeRequired() || !ready.legacyTriggers().isEmpty()))
                     throw new MetadataEditException(409, "Legacy history code requires an explicit update", UiMessages.text("ui.dba2a54339c9", "설치 확인에서 이력 코드를 업데이트한 뒤 이력을 켜 주세요. DB 객체는 변경하지 않았습니다."));
@@ -136,12 +153,44 @@ public class MetadataHistoryService {
             }
         });
     }
-    /** Explicit migration only. Normal GET/ON never replaces existing triggers. */
+    /** Explicit schema-wide body migration: no selected-table trigger requirement or mutation. */
+    public synchronized State upgradeAudit(PoolSession session, Target target) {
+        return bound(session, target, () -> {
+            boolean attempted = false;
+            try {
+                var initial = read.execute(s -> readiness.prepareAuditUpgrade(target));
+                if (!initial.allowed()) throw new MetadataEditException(409, "Shared audit update not allowed",
+                        String.join(" · ", initial.blockers()) + " " + UiMessages.text("history.code.noChange", "공통 패키지를 변경하지 않았습니다. 설치 확인에서 현재 상태를 확인해 주세요."));
+                read.executeWithoutResult(s -> {
+                    var current = readiness.prepareAuditUpgrade(target);
+                    if (!current.allowed() || current.version() != initial.version())
+                        throw new MetadataEditException(409, "Shared audit state changed", UiMessages.text("history.code.changed", "패키지 또는 의존 객체 상태가 변경되었습니다. 다시 확인해 주세요."));
+                });
+                attempted = true;
+                write.executeWithoutResult(s -> repository.execute(HistorySql.replaceAuditBody(target)));
+                read.executeWithoutResult(s -> repository.validateAsset(target, HistorySql.auditBody(target, false)));
+                return read.execute(s -> stateWithAccess(target));
+            } catch (MetadataEditException ex) {
+                if (attempted) throw new MetadataEditException(ex.status(), "Shared audit update not verified",
+                        ex.userMessage() + " " + UiMessages.text("history.code.uncertain", "공통 패키지 업데이트 결과를 확인하지 못했습니다. 설치 확인에서 다시 확인해 주세요. 트리거와 이력 ON/OFF 설정은 변경하지 않았습니다."));
+                throw ex;
+            } catch (RuntimeException ex) {
+                throw new MetadataEditException(503, "Shared audit update verification failed",
+                        UiMessages.text("history.code.uncertain", "공통 패키지 업데이트 결과를 확인하지 못했습니다. 설치 확인에서 다시 확인해 주세요. 트리거와 이력 ON/OFF 설정은 변경하지 않았습니다."));
+            } finally {
+                // A body is shared by all tracked objects in this schema; do not retain their old cached status.
+                session.metadata().forgetHistorySchema(target.schema());
+            }
+        });
+    }
+    /** Selected-table trigger migration only. GET/ON never replaces existing code. */
     public synchronized State upgradeCode(PoolSession session, Target target) {
         return bound(session, target, () -> {
             String stage = UiMessages.text("ui.a95dcfa4ce35", "이력 코드 업데이트 사전 검사");
             try {
                 var ready = read.execute(s -> readiness.prepare(target, true));
+                if (ready.auditUpgradeRequired()) throw new MetadataEditException(409, "Shared audit update required",
+                        UiMessages.text("history.code.auditFirst", "먼저 공통 패키지를 업데이트한 뒤 이 테이블·뷰의 트리거를 업데이트해 주세요."));
                 if (!ready.configuration().installed() || ready.configuration().enabled() || ready.configuration().needsUpgrade()
                         || !ready.missing().isEmpty() || ready.auditCompileRequired())
                     throw new MetadataEditException(409, "History update requires an intact OFF installation",
@@ -150,24 +199,6 @@ public class MetadataHistoryService {
                 String owner = ready.triggerOwner();
                 for (boolean before : new boolean[]{false, true})
                     read.executeWithoutResult(s -> repository.validateKnownTrigger(target, HistorySql.trigger(target, owner, before), true));
-                if (ready.auditUpgradeRequired()) {
-                    stage = target.schema() + UiMessages.text("ui.b7134805601b", ".DBC_METADATA_AUDIT 공유 본문 교체 전 검사");
-                    read.executeWithoutResult(s -> {
-                        repository.validateKnownAuditBody(target, true);
-                        var blockers = repository.auditUpgradeBlockers(target);
-                        if (!blockers.isEmpty()) throw new MetadataEditException(409, "Shared audit package is in use", String.join(" · ", blockers));
-                        var config = repository.configuration(target);
-                        if (config.enabled() || !owner.equals(config.triggerOwner()))
-                            throw new MetadataEditException(409, "History state changed during update", UiMessages.text("ui.3fe6f17ac822", "이력 설정 또는 소유자가 변경되어 중단했습니다."));
-                    });
-                    stage = target.schema() + UiMessages.text("ui.17713e017b72", ".DBC_METADATA_AUDIT 본문 교체");
-                    write.executeWithoutResult(s -> repository.execute(HistorySql.replaceAuditBody(target)));
-                    read.executeWithoutResult(s -> repository.validateAsset(target, HistorySql.auditBody(target, false)));
-                    read.executeWithoutResult(s -> {
-                        var blockers = repository.auditUpgradeBlockers(target);
-                        if (!blockers.isEmpty()) throw new MetadataEditException(409, "History state changed after update", String.join(" · ", blockers));
-                    });
-                }
                 for (boolean before : new boolean[]{false, true}) {
                     var trigger = HistorySql.trigger(target, owner, before);
                     stage = trigger.owner() + "." + trigger.name() + UiMessages.text("ui.172c816f2bde", " 원문 재검사 및 교체");

@@ -26,6 +26,8 @@ public class MetadataHistoryRepository {
     public State state(Target target) {
         var objects = objects(target);
         var config = configuration(target, false);
+        var delegated = delegatedState(target, config);
+        if (delegated != null) return delegated;
         String before = HistorySql.triggerName(target, true), after = HistorySql.triggerName(target, false);
         if (objects.isEmpty()) return new State(false, false, true, com.dbcompanion.common.i18n.UiNotice.message("ui.c9b6b3d43ae9", "트리거 미설치"), before, after, null, false, "");
         if (!exists(objects, "DBC_METADATA_TRACKING", "TABLE"))
@@ -45,6 +47,36 @@ public class MetadataHistoryRepository {
         return new State(baseReady && installedTriggers == 2, enabled, healthy, enabled
                 ? healthy ? com.dbcompanion.common.i18n.UiNotice.message("ui.6646678dcf45", "켜짐 · 변경 이력을 수집합니다.") : com.dbcompanion.common.i18n.UiNotice.message("ui.e4f0a092f019", "수집 중단 · 트리거 또는 관리 객체 상태를 확인해 주세요.")
                 : installedTriggers < 2 ? com.dbcompanion.common.i18n.UiNotice.message("ui.e3411a26bf5a", "트리거 설치 필요") : healthy ? com.dbcompanion.common.i18n.UiNotice.message("ui.406325e31e14", "트리거 꺼짐 · 저장된 이력은 유지됩니다.") : com.dbcompanion.common.i18n.UiNotice.message("ui.f4bbcd66ee5f", "설치가 완료되지 않았습니다. 다시 켜기 전에 객체 상태를 확인해 주세요."), before, after, config.triggerOwner(), false, "");
+    }
+    public State delegatedState(Target target) { return delegatedState(target, configuration(target, false)); }
+    private State delegatedState(Target target, Configuration config) {
+        // Same-schema installations retain the existing path. Cross-owner status is verified by the
+        // installer, not inferred from a tracking flag or an empty ALL_TRIGGERS result.
+        String owner = config.triggerOwner();
+        if (owner == null) return null;
+        var access = new HistoryAccessRepository(jdbc);
+        if (owner.equals(access.user()) || !access.exists(owner)) return null;
+        State state;
+        try {
+            var inspected=access.inspect(owner,target);
+            if(inspected==null) return null;
+            state = access.state(inspected);
+        }
+        catch (org.springframework.dao.DataAccessException ex) {
+            Throwable cause=ex;
+            while(cause.getCause()!=null && !(cause instanceof java.sql.SQLException)) cause=cause.getCause();
+            // NO_DATA_FOUND means this target has not been enrolled in scoped access. Never suppress a
+            // permission failure, changed-owner failure, invalid package, or connection error.
+            if(cause instanceof java.sql.SQLException sql && sql.getErrorCode()==1403) return null;
+            throw ex;
+        }
+        return state.withSetup(!state.healthy()?SetupStep.INSPECT:state.enabled()?SetupStep.NONE:SetupStep.ENABLE,
+                state.canManage()?SetupAccess.ALLOWED:SetupAccess.REQUIRED);
+    }
+    public void delegatedToggle(Target target, boolean enabled) {
+        var state = delegatedState(target);
+        if (state == null || !state.canManage()) throw HistoryAccessRepository.denied();
+        new HistoryAccessRepository(jdbc).toggle(state.triggerOwner(),target,enabled);
     }
     public Configuration configuration(Target target) {
         return configuration(target, true);
@@ -164,6 +196,14 @@ public class MetadataHistoryRepository {
         var legacy = HistorySql.auditBody(target, true);
         return HistorySql.legacyAuditBodyMatches(target, source(legacy));
     }
+    /** Schema-wide package validation does not depend on any selected table's triggers. */
+    public void validateSharedAuditAssets(Target target) {
+        for (var asset : HistorySql.assets(target, target.schema())) {
+            if (asset.type().equals("TRIGGER")) continue;
+            if (asset.type().equals("PACKAGE BODY")) validateKnownAuditBody(target, true);
+            else validateAsset(target, asset);
+        }
+    }
     public void validateKnownAuditBody(Target target, boolean valid) {
         var asset = HistorySql.auditBody(target, false);
         String actual = source(asset);
@@ -251,6 +291,8 @@ public class MetadataHistoryRepository {
         if (updated != 1) throw incompatible(target.table(), UiMessages.text("ui.26788bc93f9e", "트리거 소유자 설정이 변경되었습니다. 다시 확인해 주세요."));
     }
     public Page history(Target target, int page) {
+        var delegated = delegatedState(target);
+        if (delegated != null) return new HistoryAccessRepository(jdbc).history(delegated.triggerOwner(),target,page);
         if (!exists(objects(target), "DBC_METADATA_HISTORY", "TABLE")) return new Page(List.of(), page, false);
         validateTable(target.schema(), "DBC_METADATA_HISTORY");
         var rows = jdbc.query("SELECT SEQ, RAWTOHEX(EVENT_ID), TO_CHAR(CHANGED_AT, 'YYYY-MM-DD HH24:MI:SS.FF3 TZH:TZM'), CHANGED_BY, SCHEMA_NAME, TABLE_NAME, COLUMN_NAME, CHANGE_KIND, ANNOTATION_NAME, BEFORE_JSON, AFTER_JSON "

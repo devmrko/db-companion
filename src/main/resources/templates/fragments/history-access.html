@@ -1,0 +1,37 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<th:block th:fragment="access(schema, table)">
+  <section data-history-access th:attr="data-schema=${schema},data-table=${table},data-url=@{/tables/history/access}">
+    <input type="hidden" data-access-csrf th:value="${_csrf.token}" th:attr="data-header=${_csrf.headerName}">
+    <button type="button" class="btn app-btn app-btn-secondary" data-access-open th:text="#{history.access.button}">이력 일괄·권한 설정</button>
+    <dialog class="app-preview-dialog history-access-dialog" data-access-dialog aria-labelledby="history-access-title">
+      <header class="app-preview-header"><h2 id="history-access-title" th:text="#{history.access.button}"></h2><button type="button" class="btn app-btn app-btn-quiet" data-access-close th:text="#{ui.1e8c10206f5b}">닫기</button></header>
+      <div class="app-history-content">
+        <p th:text="#{history.access.description}"></p>
+        <p class="app-muted" th:text="#{history.access.ownership}"></p>
+        <p role="status" aria-live="polite" data-access-message></p>
+        <form data-access-form hidden>
+          <fieldset><legend th:text="#{history.access.targets}"></legend><div data-access-targets class="history-access-targets"></div></fieldset>
+          <div class="history-access-fields">
+            <label><span th:text="#{history.access.operation}"></span><select class="form-select" data-access-operation>
+              <option value="ENABLE" th:text="#{history.access.enable}"></option><option value="DISABLE" th:text="#{history.access.disable}"></option>
+              <option value="READ" th:text="#{history.access.read}"></option><option value="MANAGE" th:text="#{history.access.manage}"></option>
+              <option value="DENY" th:text="#{history.access.deny}"></option><option value="INHERIT" th:text="#{history.access.inherit}"></option>
+            </select></label>
+            <fieldset data-access-principals hidden><legend th:text="#{history.access.users}"></legend>
+              <label><input type="checkbox" data-access-all> <span th:text="#{history.access.all}"></span></label>
+              <select class="form-select" multiple size="6" data-access-users th:aria-label="#{history.access.users}"></select>
+              <p class="app-muted" th:text="#{history.access.exclusions}"></p>
+            </fieldset>
+          </div>
+          <details><summary th:text="#{history.access.details}"></summary><p th:text="#{history.access.installInfo}"></p><p th:text="#{history.access.partial}"></p></details>
+          <label class="history-access-confirm"><input type="checkbox" required data-access-confirm> <span th:text="#{history.access.confirm}"></span></label>
+          <div class="app-history-toolbar"><button type="submit" class="btn app-btn app-btn-primary" data-access-apply th:text="#{history.access.apply}"></button></div>
+        </form>
+        <div data-access-results></div>
+      </div>
+    </dialog>
+  </section>
+  <link rel="stylesheet" th:href="@{/css/history-access.css}">
+  <script type="module" th:src="@{/js/history-access.mjs}"></script>
+</th:block>
+</body></html>

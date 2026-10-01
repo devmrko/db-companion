@@ -1,0 +1,26 @@
+{
+  "history.inline.unconfigured": [
+    "이력 수집 미설정",
+    "History collection not set up",
+    "尚未设置历史记录收集",
+    "履歴収集が未設定"
+  ],
+  "history.inline.installPrivilege": [
+    "설치 권한 필요",
+    "Installation privileges needed",
+    "需要安装权限",
+    "インストール権限が必要"
+  ],
+  "history.inline.managePrivilege": [
+    "관리 권한 필요",
+    "Management privileges needed",
+    "需要管理权限",
+    "管理権限が必要"
+  ],
+  "history.inline.details": [
+    "설정 안내",
+    "Setup instructions",
+    "设置说明",
+    "設定手順"
+  ]
+}

@@ -85,6 +85,21 @@ public final class HistorySql {
                 + (before ? ".capture_before(" : ".capture_after(") + literal(target.table()) + ");\n  END IF;\nEND;");
     }
     public enum TriggerVersion { CURRENT, LEGACY, UNKNOWN }
+    public enum CodeVersion { V1, V2, V3, MISSING, UNKNOWN }
+    public static CodeVersion auditVersion(Target target, String actual) {
+        if (actual == null || actual.isBlank()) return CodeVersion.MISSING;
+        if (sourceMatches(auditBody(target, false), actual)) return CodeVersion.V3;
+        if (sourceMatches(auditBodyV2(target), actual)) return CodeVersion.V2;
+        if (sourceMatches(auditBody(target, true), actual)) return CodeVersion.V1;
+        return CodeVersion.UNKNOWN;
+    }
+    public static CodeVersion triggerCodeVersion(Target target, String owner, boolean before, String actual) {
+        if (actual == null || actual.isBlank()) return CodeVersion.MISSING;
+        if (sourceMatches(trigger(target, owner, before), actual)) return CodeVersion.V3;
+        if (sourceMatches(tableTriggerV2(target, owner, before), actual)) return CodeVersion.V2;
+        if (sourceMatches(legacyTrigger(target, owner, before), actual)) return CodeVersion.V1;
+        return CodeVersion.UNKNOWN;
+    }
     public static TriggerVersion triggerVersion(Target target, String owner, boolean before, String actual) {
         if (sourceMatches(trigger(target, owner, before), actual)) return TriggerVersion.CURRENT;
         if (sourceMatches(legacyTrigger(target, owner, before), actual)) return TriggerVersion.LEGACY;

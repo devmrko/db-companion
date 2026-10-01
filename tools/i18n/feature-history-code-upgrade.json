@@ -1,0 +1,176 @@
+{
+  "history.code.unrecognized": [
+    "패키지가 없거나 원문을 확인하지 못했습니다. 자동 교체하지 않습니다.",
+    "The package is missing or its source is unrecognized. It will not be replaced automatically.",
+    "包不存在或无法识别源码。不会自动替换。",
+    "パッケージが存在しないか、ソースを識別できません。自動置換しません。"
+  ],
+  "history.code.verifyFailed": [
+    "공통 패키지와 의존 객체의 상태를 확인하지 못했습니다. 조회 권한과 연결을 확인해 주세요.",
+    "Could not verify the shared package and its dependencies. Check read permissions and connectivity.",
+    "无法确认共用包及其依赖对象的状态。请检查查询权限和连接。",
+    "共通パッケージと依存オブジェクトの状態を確認できません。参照権限と接続を確認してください。"
+  ],
+  "history.code.noChange": [
+    "공통 패키지를 변경하지 않았습니다. 설치 확인에서 현재 상태를 확인해 주세요.",
+    "The shared package was not changed. Check its current installation status.",
+    "未修改共用包。请检查当前安装状态。",
+    "共通パッケージは変更していません。現在のインストール状態を確認してください。"
+  ],
+  "history.code.changed": [
+    "패키지 또는 의존 객체 상태가 변경되었습니다. 다시 확인해 주세요.",
+    "The package or dependency state changed. Check again.",
+    "包或依赖对象的状态已改变。请重新检查。",
+    "パッケージまたは依存オブジェクトの状態が変わりました。再確認してください。"
+  ],
+  "history.code.uncertain": [
+    "공통 패키지 업데이트 결과를 확인하지 못했습니다. 설치 확인에서 다시 확인해 주세요. 트리거와 이력 ON/OFF 설정은 변경하지 않았습니다.",
+    "Could not verify the shared package update. Inspect its installation again. Triggers and history ON/OFF settings were not changed.",
+    "无法确认共用包更新结果。请重新检查安装状态。未修改触发器和历史记录开关。",
+    "共通パッケージの更新結果を確認できません。インストール状態を再確認してください。トリガーと履歴のON/OFF設定は変更していません。"
+  ],
+  "history.code.auditFirst": [
+    "먼저 공통 패키지를 업데이트한 뒤 이 테이블·뷰의 트리거를 업데이트해 주세요.",
+    "Update the shared package first, then update this table/view's triggers.",
+    "请先更新共用包，再更新此表或视图的触发器。",
+    "共通パッケージを先に更新し、その後この表・ビューのトリガーを更新してください。"
+  ],
+  "history.code.v1": [
+    "v1 · 테이블 이력",
+    "v1 · Table history",
+    "v1 · 表历史记录",
+    "v1 · 表の履歴"
+  ],
+  "history.code.v2": [
+    "v2 · Materialized View 코멘트 지원",
+    "v2 · Materialized view comment support",
+    "v2 · 支持物化视图注释",
+    "v2 · マテリアライズド・ビューのコメント対応"
+  ],
+  "history.code.v3": [
+    "v3 · 일반 View 코멘트 지원",
+    "v3 · Regular view comment support",
+    "v3 · 支持普通视图注释",
+    "v3 · 通常のビューのコメント対応"
+  ],
+  "history.code.missing": [
+    "미설치 또는 원문 조회 불가",
+    "Not installed or source not visible",
+    "未安装或无法查看源码",
+    "未インストールまたはソース参照不可"
+  ],
+  "history.code.unknown": [
+    "확인되지 않은 코드 · 자동 교체 안 함",
+    "Unrecognized code · No automatic replacement",
+    "无法识别的代码 · 不自动替换",
+    "未確認のコード · 自動置換なし"
+  ],
+  "history.code.shared": [
+    "스키마 공통 패키지",
+    "Schema-wide shared package",
+    "模式共用包",
+    "スキーマ共通パッケージ"
+  ],
+  "history.code.guide": [
+    "v1·v2 원본은 기존 설치본 식별에 사용합니다. 새 설치와 업데이트는 v3이며, 구버전으로 되돌리지는 않습니다.",
+    "The original v1/v2 code identifies existing installations. New installations and updates use v3; downgrades are not provided.",
+    "v1/v2 原始代码用于识别现有安装。新安装和更新均使用 v3，不提供降级。",
+    "v1・v2の原本は既存インストールの識別用です。新規インストールと更新はv3を使用し、ダウングレードは行いません。"
+  ],
+  "history.code.triggers": [
+    "현재 테이블·뷰의 트리거",
+    "Triggers for this table/view",
+    "当前表或视图的触发器",
+    "現在の表・ビューのトリガー"
+  ],
+  "history.code.triggerNext": [
+    "이 테이블·뷰의 이력을 끈 뒤 트리거를 업데이트하세요. 자동으로 켜지지 않습니다.",
+    "Turn off history for this table/view, then update its triggers. They will not be enabled automatically.",
+    "请关闭此表或视图的历史记录，再更新触发器。不会自动启用。",
+    "この表・ビューの履歴をOFFにしてからトリガーを更新してください。自動でONにはなりません。"
+  ],
+  "history.code.installNext": [
+    "트리거가 아직 없습니다. 설치 확인 창을 닫고 ‘트리거 설치·켜기’를 사용하세요. 설치 권한은 별도로 필요합니다.",
+    "Triggers are missing. Close the inspection dialog and use Install and enable triggers. Installation privileges are required separately.",
+    "触发器尚未安装。请关闭检查窗口并使用“安装并启用触发器”。安装权限须单独具备。",
+    "トリガーが未インストールです。確認画面を閉じて「トリガーをインストールして有効化」を使用してください。別途インストール権限が必要です。"
+  ],
+  "history.code.current": [
+    "확인된 코드가 최신입니다. 이력 ON/OFF 상태는 별도로 확인하세요.",
+    "The recognized code is current. Check the history ON/OFF state separately.",
+    "已识别的代码为最新版本。请另行确认历史记录开关状态。",
+    "識別されたコードは最新です。履歴のON/OFF状態は別途確認してください。"
+  ],
+  "history.code.triggerPrivileges": [
+    "트리거 작업에 필요한 권한",
+    "Privileges required for trigger operations",
+    "触发器操作所需权限",
+    "トリガー操作に必要な権限"
+  ],
+  "history.code.diagnostics": [
+    "검사 상세",
+    "Inspection details",
+    "检查详情",
+    "検査の詳細"
+  ],
+  "history.code.scope": [
+    "공통 패키지는 같은 스키마 전체에 적용됩니다. 모든 이력과 의존 트리거가 OFF여야 하며, 선택한 테이블의 트리거가 없어도 업데이트할 수 있습니다.",
+    "The shared package applies across this schema. All history tracking and dependent triggers must be OFF. The selected table does not need its own triggers for this update.",
+    "共用包适用于整个模式。所有历史记录和依赖触发器必须关闭。所选表无需已有触发器即可更新此包。",
+    "共通パッケージはスキーマ全体に適用されます。全履歴と依存トリガーがOFFである必要があります。選択した表にトリガーがなくても更新できます。"
+  ],
+  "history.code.confirm": [
+    "{0} 스키마의 공통 감사 패키지를 v3로 업데이트할까요? 트리거 생성·교체, 권한 부여, 이력 켜기는 수행하지 않습니다.",
+    "Update the shared audit package in schema {0} to v3? This does not create or replace triggers, grant privileges, or enable history.",
+    "将模式 {0} 的共用审计包更新为 v3？不会创建或替换触发器、授予权限或启用历史记录。",
+    "{0}スキーマの共通監査パッケージをv3に更新しますか？トリガーの作成・置換、権限付与、履歴の有効化は行いません。"
+  ],
+  "history.code.updating": [
+    "공통 패키지 원문·권한·의존 객체를 확인하고 업데이트하고 있습니다…",
+    "Checking source, privileges, and dependencies, then updating the shared package…",
+    "正在检查源码、权限和依赖对象，并更新共用包…",
+    "共通パッケージのソース・権限・依存オブジェクトを確認して更新しています…"
+  ],
+  "history.code.updated": [
+    "공통 패키지를 v3로 업데이트했습니다. 트리거와 이력 ON/OFF 설정은 변경하지 않았습니다. 아래에서 다음 작업을 확인하세요.",
+    "The shared package was updated to v3. Triggers and history ON/OFF settings were not changed. Review the next step below.",
+    "共用包已更新为 v3。未修改触发器和历史记录开关。请在下方查看下一步操作。",
+    "共通パッケージをv3に更新しました。トリガーと履歴のON/OFF設定は変更していません。次の操作を確認してください。"
+  ],
+  "history.code.auditButton": [
+    "공통 패키지 업데이트 → v3",
+    "Update shared package → v3",
+    "更新共用包 → v3",
+    "共通パッケージを更新 → v3"
+  ],
+  "history.code.triggerButton": [
+    "이 테이블·뷰의 트리거 업데이트 → v3",
+    "Update this table/view's triggers → v3",
+    "更新此表或视图的触发器 → v3",
+    "この表・ビューのトリガーを更新 → v3"
+  ],
+  "history.code.review": [
+    "코드 호환성과 설치 상태를 검사 상세에서 확인하세요.",
+    "Review code compatibility and installation status in the inspection details.",
+    "请在检查详情中确认代码兼容性和安装状态。",
+    "コードの互換性とインストール状態は検査の詳細で確認してください。"
+  ],
+  "history.code.triggerV1": [
+    "v1 · 테이블 이벤트",
+    "v1 · Table events",
+    "v1 · 表事件",
+    "v1 · 表イベント"
+  ],
+  "history.code.triggerV2": [
+    "v2 · 컬럼 코멘트 이벤트 지원",
+    "v2 · Column comment event support",
+    "v2 · 支持列注释事件",
+    "v2 · 列コメントイベント対応"
+  ],
+  "history.code.triggerV3": [
+    "v3 · 테이블·뷰·컬럼 코멘트 이벤트 지원",
+    "v3 · Table, view and column comment events",
+    "v3 · 表、视图和列注释事件",
+    "v3 · 表・ビュー・列コメントイベント対応"
+  ]
+}
