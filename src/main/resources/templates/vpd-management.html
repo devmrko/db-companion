@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{vpd.title})}"></head>
+<body class="app-shell"><link rel="stylesheet" th:href="@{/css/management-workbench.css}"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content app-management-workbench" data-vpd th:attr="data-schema=${selectedSchema},data-base=@{/db/vpd},data-source-url=@{/db/functions/detail}">
+  <div class="app-page-heading"><h1 th:text="#{vpd.title}">VPD 정책</h1><button th:replace="~{fragments/common :: sqlHelp('vpd', 'list')}"></button></div>
+  <p class="workbench-intro" th:text="#{vpd.help}"></p><p class="app-alert is-error" th:if="${schemaError}" th:text="${schemaError}"></p>
+  <input type="hidden" data-vpd-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+  <section class="app-card">
+    <div class="workbench-heading"><h2 th:text="#{workbench.vpd.target}">대상 선택</h2></div>
+    <div class="app-vpd-filters">
+      <label for="vpd-kind"><span th:text="#{vpd.objectType}"></span><select id="vpd-kind" class="form-select" data-vpd-kind><option value="ALL" th:text="#{vpd.allTypes}"></option><option value="TABLE" th:text="#{vpd.typeTable}"></option><option value="VIEW" th:text="#{vpd.typeView}"></option></select></label>
+      <label for="vpd-access"><span th:text="#{vpd.accessFilter}"></span><select id="vpd-access" class="form-select" data-vpd-access><option value="ALL" th:text="#{vpd.accessAll}"></option><option value="OWNED" th:text="#{vpd.accessOwned}"></option><option value="GRANTED" th:text="#{vpd.accessGranted}"></option><option value="SELECT" th:text="#{vpd.accessSelect}"></option><option value="INSERT">INSERT</option><option value="UPDATE">UPDATE</option><option value="DELETE">DELETE</option></select></label>
+      <label for="vpd-search"><span th:text="#{vpd.objectSearch}"></span><input id="vpd-search" class="form-control" type="search" data-vpd-search autocomplete="off"></label>
+    </div>
+    <details class="app-context-help"><summary th:text="#{vpd.accessHelpTitle}"></summary><p th:text="#{vpd.accessHelp}"></p></details>
+    <p data-vpd-object-count role="status" aria-live="polite"></p>
+    <div class="app-vpd-target-bar"><label for="vpd-table"><span th:text="#{vpd.table}"></span><select id="vpd-table" class="form-select" data-vpd-table></select></label><button type="button" class="btn app-btn app-btn-secondary" data-vpd-refresh th:text="#{vpd.refresh}"></button><button type="button" class="btn app-btn app-btn-primary" data-vpd-new disabled th:text="#{vpd.add}"></button></div>
+    <p data-vpd-object-access class="app-filter-message"></p>
+  </section>
+  <section class="app-card">
+    <div class="workbench-heading"><h2 th:text="#{workbench.vpd.policies}">정책 목록</h2></div>
+    <p data-vpd-status role="status" aria-live="polite"></p><div data-vpd-list class="workbench-table-wrap"></div>
+  </section>
+  <section class="app-card" data-vpd-editor hidden>
+    <h2 data-vpd-heading></h2><p data-vpd-reason class="app-filter-message"></p>
+    <p data-vpd-policy-function hidden></p>
+    <details data-vpd-properties hidden><summary th:text="#{vpd.properties}"></summary><pre class="app-preview-source" data-vpd-raw></pre></details>
+    <form data-vpd-form>
+      <fieldset data-vpd-fields><div class="app-vpd-fields">
+        <label><span th:text="#{vpd.policy}"></span><input class="form-control" data-vpd-policy maxlength="128" required pattern="[A-Z][A-Z0-9_$#]{0,127}"></label>
+        <label><span th:text="#{workbench.vpd.type}">정책 유형</span><select class="form-select" data-vpd-type><option>DYNAMIC</option><option>STATIC</option><option>SHARED_STATIC</option><option>CONTEXT_SENSITIVE</option><option>SHARED_CONTEXT_SENSITIVE</option></select></label>
+        <div><div class="workbench-inline-control"><label><span th:text="#{workbench.vpd.functionOwner}">함수 소유자</span><input class="form-control" data-vpd-function-schema maxlength="128" required pattern="[A-Z][A-Z0-9_$#]{0,127}"></label><button type="button" class="btn app-btn app-btn-secondary" data-vpd-functions th:text="#{vpd.loadFunctions}"></button></div><p data-vpd-function-status role="status"></p></div>
+        <div><label><span th:text="#{workbench.vpd.function}">정책 함수</span><select class="form-select" data-vpd-function required></select></label><details class="app-context-help"><summary th:text="#{vpd.functionHelpTitle}"></summary><p th:text="#{vpd.functionHelp}"></p></details></div>
+        <label class="workbench-wide"><span th:text="#{workbench.vpd.columns}">보안 적용 컬럼</span><select class="form-select" data-vpd-columns multiple size="5"></select><small th:text="#{vpd.columnsHelp}"></small></label>
+      </div>
+      <fieldset class="app-vpd-flags"><legend th:text="#{workbench.vpd.statements}">적용 작업</legend><label th:each="statement : ${ {'SELECT','INSERT','UPDATE','DELETE','INDEX'} }"><input type="checkbox" data-vpd-statement th:value="${statement}"><span th:text="${statement}"></span></label></fieldset>
+      <div class="app-vpd-flags"><label><input type="checkbox" data-vpd-update-check><span th:text="#{workbench.vpd.updateCheck}">변경 후 검사</span></label><label><input type="checkbox" data-vpd-enabled><span th:text="#{workbench.vpd.enabled}">활성</span></label><label><input type="checkbox" data-vpd-long><span th:text="#{workbench.vpd.long}">긴 조건식</span></label><label><input type="checkbox" data-vpd-all-rows><span th:text="#{workbench.vpd.allRows}">컬럼 마스킹 (ALL_ROWS)</span></label></div>
+      <details class="app-context-help"><summary th:text="#{vpd.optionsHelpTitle}"></summary><p th:text="#{vpd.optionsHelp}"></p></details>
+      </fieldset>
+      <div class="app-vpd-actions"><button class="btn app-btn app-btn-primary" type="submit" data-vpd-preview disabled th:text="#{vpd.preview}"></button><button class="btn app-btn app-btn-secondary" type="button" data-vpd-toggle hidden></button><button class="btn app-btn app-btn-danger" type="button" data-vpd-delete hidden th:text="#{vpd.delete}"></button></div>
+    </form>
+    <p data-vpd-form-status role="alert"></p>
+  </section>
+  <dialog class="app-preview-dialog app-vpd-dialog" data-vpd-dialog aria-labelledby="vpd-preview-title">
+    <header class="app-preview-header"><h2 id="vpd-preview-title" th:text="#{vpd.preview}"></h2><button type="button" class="btn app-btn app-btn-quiet" data-vpd-close th:text="#{vpd.close}"></button></header>
+    <div class="app-preview-body"><p data-vpd-target></p><p class="app-alert is-error" th:text="#{vpd.impact}"></p>
+      <p data-vpd-gap-warning class="app-alert is-error" th:text="#{vpd.gapWarning}" hidden></p><pre class="app-preview-source" data-vpd-sql tabindex="0"></pre>
+      <details open><summary th:text="#{vpd.recovery}"></summary><p th:text="#{vpd.recoveryHelp}"></p><pre class="app-preview-source" data-vpd-recovery tabindex="0"></pre></details>
+      <label><span th:text="#{vpd.targetConfirm}"></span><input class="form-control" data-vpd-confirm-target autocomplete="off"></label>
+      <label class="app-assistant-consent"><input type="checkbox" data-vpd-consent><span th:text="#{vpd.consent}"></span></label>
+      <label class="app-assistant-consent" data-vpd-gap-label hidden><input type="checkbox" data-vpd-gap-consent><span th:text="#{vpd.gapConsent}"></span></label>
+      <p data-vpd-result role="alert" aria-live="polite"></p><button type="button" class="btn app-btn app-btn-danger" data-vpd-run disabled th:text="#{vpd.execute}"></button>
+    </div>
+  </dialog>
+  <dialog class="app-preview-dialog app-vpd-source-dialog" data-vpd-source-dialog aria-labelledby="vpd-source-title">
+    <header class="app-preview-header"><h2 id="vpd-source-title" th:text="#{vpd.functionSource}"></h2><button type="button" class="btn app-btn app-btn-quiet" data-vpd-source-close autofocus th:text="#{vpd.close}"></button></header>
+    <div class="app-preview-body">
+      <p class="app-object-title" data-vpd-source-target></p>
+      <p class="app-filter-message" th:text="#{vpd.sourceReadOnly}"></p>
+      <p class="app-filter-message" data-vpd-source-scope hidden th:text="#{functions.packageSource}"></p>
+      <p role="status" aria-live="polite" data-vpd-source-status></p>
+      <div data-vpd-source-code aria-busy="false"></div>
+    </div>
+  </dialog>
+</main></div><script type="module" th:src="@{/js/vpd-management.mjs}"></script></body></html>

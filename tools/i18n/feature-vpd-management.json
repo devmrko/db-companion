@@ -1,0 +1,377 @@
+{
+  "vpd.accessHelpTitle": ["? 권한 필터 기준", "? Access filter criteria", "? 权限筛选依据", "? 権限フィルターの基準"],
+  "vpd.functionHelpTitle": ["? 함수 선택 기준", "? Function selection", "? 函数选择依据", "? 関数の選択基準"],
+  "vpd.optionsHelpTitle": ["? 옵션 적용 기준", "? Option requirements", "? 选项应用条件", "? オプションの適用条件"],
+  "vpd.title": [
+    "VPD 정책",
+    "VPD policies",
+    "VPD 策略",
+    "VPD ポリシー"
+  ],
+  "vpd.table": [
+    "테이블·뷰",
+    "Table / view",
+    "表／视图",
+    "テーブル・ビュー"
+  ],
+  "vpd.policy": [
+    "정책 이름",
+    "Policy name",
+    "策略名称",
+    "ポリシー名"
+  ],
+  "vpd.refresh": [
+    "다시 조회",
+    "Refresh",
+    "刷新",
+    "再読込"
+  ],
+  "vpd.add": [
+    "정책 등록",
+    "Add policy",
+    "添加策略",
+    "ポリシー登録"
+  ],
+  "vpd.delete": [
+    "삭제 미리보기",
+    "Preview deletion",
+    "预览删除",
+    "削除の確認"
+  ],
+  "vpd.enable": [
+    "활성화 미리보기",
+    "Preview enable",
+    "预览启用",
+    "有効化の確認"
+  ],
+  "vpd.disable": [
+    "비활성화 미리보기",
+    "Preview disable",
+    "预览禁用",
+    "無効化の確認"
+  ],
+  "vpd.preview": [
+    "변경 SQL 확인",
+    "Review change SQL",
+    "检查变更 SQL",
+    "変更 SQL を確認"
+  ],
+  "vpd.execute": [
+    "확인한 변경 실행",
+    "Execute confirmed change",
+    "执行已确认的变更",
+    "確認した変更を実行"
+  ],
+  "vpd.close": [
+    "닫기",
+    "Close",
+    "关闭",
+    "閉じる"
+  ],
+  "vpd.loading": [
+    "조회·처리 중…",
+    "Loading / processing…",
+    "正在读取／处理…",
+    "読込・処理中…"
+  ],
+  "vpd.properties": [
+    "전체 정책·컬럼·컨텍스트 속성",
+    "All policy, column and context properties",
+    "全部策略、列及上下文属性",
+    "全ポリシー・列・コンテキスト属性"
+  ],
+  "vpd.help": [
+    "선택한 스키마의 테이블·뷰에 설정된 VPD 정책을 조회합니다. 변경은 로그인 계정 소유 객체와 확인 가능한 DBMS_RLS 실행 권한이 있을 때만 지원합니다.",
+    "Inspect VPD policies on tables and views in the selected schema. Changes require ownership and a visible DBMS_RLS EXECUTE grant.",
+    "查看选定方案中表和视图的 VPD 策略。变更要求拥有对象并可确认 DBMS_RLS EXECUTE 权限。",
+    "選択スキーマのテーブル・ビューの VPD ポリシーを表示します。変更には所有権と確認可能な DBMS_RLS EXECUTE 権限が必要です。"
+  ],
+  "vpd.loadFunctions": [
+    "유효 함수 조회",
+    "Load valid functions",
+    "读取有效函数",
+    "有効な関数を取得"
+  ],
+  "vpd.functionHelp": [
+    "기존의 유효한 (VARCHAR2, VARCHAR2) RETURN VARCHAR2 함수만 선택합니다. 함수 소스를 만들거나 직접 실행하지 않습니다. 서명 확인은 조건식의 업무·보안 정합성을 보장하지 않습니다.",
+    "Select an existing valid (VARCHAR2, VARCHAR2) RETURN VARCHAR2 function. No source is created or invoked directly. A valid signature does not establish business or security correctness.",
+    "仅选择现有有效的 (VARCHAR2, VARCHAR2) RETURN VARCHAR2 函数。不创建源码或直接调用。有效签名不代表业务或安全逻辑正确。",
+    "既存の有効な (VARCHAR2, VARCHAR2) RETURN VARCHAR2 関数を選択します。ソース作成や直接実行はしません。シグネチャ確認は業務・セキュリティの正しさを保証しません。"
+  ],
+  "vpd.columnsHelp": [
+    "선택하지 않으면 모든 컬럼에 적용합니다. Cmd/Ctrl 클릭으로 선택을 해제할 수 있습니다.",
+    "No selection means all columns. Cmd/Ctrl-click to deselect.",
+    "未选择时适用于所有列。可使用 Cmd/Ctrl 点击取消选择。",
+    "未選択の場合は全列が対象です。Cmd/Ctrl クリックで選択を解除できます。"
+  ],
+  "vpd.optionsHelp": [
+    "INSERT에는 update_check가 필요합니다. ALL_ROWS는 SELECT와 지정 컬럼이 필요하며 행을 제거하지 않고 민감한 컬럼을 NULL로 마스킹합니다.",
+    "INSERT requires update_check. ALL_ROWS requires SELECT and selected columns; it masks sensitive values as NULL instead of filtering rows.",
+    "INSERT 要求 update_check。ALL_ROWS 要求 SELECT 和指定列，将敏感值掩码为 NULL，而非过滤行。",
+    "INSERT には update_check が必要です。ALL_ROWS は SELECT と指定列が必要で、行の除外ではなく機密値を NULL にします。"
+  ],
+  "vpd.supported": [
+    "지원 범위: 대문자 일반 식별자, 로컬 SYS_DEFAULT 정책. 그룹·namespace/attribute·상속·알 수 없는 속성은 변경을 차단합니다.",
+    "Supported: uppercase unquoted identifiers and local SYS_DEFAULT policies. Groups, namespace/attribute links, inheritance and unknown fields block changes.",
+    "支持范围：大写普通标识符及本地 SYS_DEFAULT 策略。分组、namespace/attribute、继承及未知属性将阻止变更。",
+    "対応範囲: 大文字の通常識別子とローカル SYS_DEFAULT ポリシー。グループ、namespace/attribute、継承、未知の属性は変更不可です。"
+  ],
+  "vpd.impact": [
+    "실제 DB 데이터 접근 보안이 변경됩니다. 등록·활성화는 조회·DML을 차단할 수 있고 삭제·비활성화는 보호를 해제할 수 있습니다. Oracle이 COMMIT하며 롤백을 보장할 수 없습니다. 모든 접속 사용자의 영향 범위를 확인하세요.",
+    "This changes database access security. Add/enable can block queries or DML; delete/disable can remove protection. Oracle commits these calls; rollback is not guaranteed. Review effects on all users.",
+    "这将更改数据库访问安全性。添加或启用可能阻止查询或 DML；删除或禁用可能移除保护。Oracle 会提交，无法保证回滚。请检查对所有用户的影响。",
+    "DB アクセスのセキュリティを変更します。登録・有効化は問合せや DML を遮断し、削除・無効化は保護を解除する可能性があります。Oracle は COMMIT し、ロールバックは保証されません。全利用者への影響を確認してください。"
+  ],
+  "vpd.gapWarning": [
+    "수정은 DROP_POLICY → ADD_POLICY입니다. 원자적이지 않아 두 호출 사이 보안 공백이 생기며 등록 실패 시 정책이 사라질 수 있습니다. 외부 관리자의 동시 변경도 완전히 막을 수 없습니다. 승인된 점검 시간에 애플리케이션 트래픽을 중단하고 진행하세요.",
+    "Replacement is DROP_POLICY then ADD_POLICY. It is not atomic: a security gap exists between calls and failed ADD can leave no policy. External administrative races cannot be eliminated. Stop application traffic during an approved maintenance window.",
+    "修改使用 DROP_POLICY → ADD_POLICY，非原子操作；调用之间存在安全空窗，添加失败可能导致策略缺失。无法完全阻止外部管理员并发变更。请在批准的维护窗口停止应用流量。",
+    "変更は DROP_POLICY → ADD_POLICY です。非原子的なため保護の空白が発生し、登録失敗でポリシーが消失する可能性があります。外部管理者の競合も完全には防げません。承認済み保守時間にアプリのトラフィックを停止してください。"
+  ],
+  "vpd.recovery": [
+    "복구 검토용 SQL",
+    "SQL for recovery review",
+    "恢复审查 SQL",
+    "復旧検討用 SQL"
+  ],
+  "vpd.recoveryHelp": [
+    "실행 전 원본 설정을 보관하세요. 실패하면 현재 ALL_POLICIES 상태를 먼저 확인한 뒤 DBA가 이 SQL을 검토합니다. 기존 정책이 있으면 ADD를 재실행하지 마세요. 자동 복구·재시도는 하지 않습니다.",
+    "Keep the original definition before execution. On failure, inspect ALL_POLICIES first and have a DBA review this SQL. Do not rerun ADD if the policy exists. Recovery and retries are never automatic.",
+    "执行前保存原始定义。失败时先检查 ALL_POLICIES，再由 DBA 审查此 SQL。策略存在时不要重试 ADD。不自动恢复或重试。",
+    "実行前に元の定義を保管してください。失敗時は ALL_POLICIES を先に確認し、DBA がこの SQL を検討します。ポリシーが存在する場合は ADD を再実行しないでください。自動復旧・再試行はありません。"
+  ],
+  "vpd.targetConfirm": [
+    "위 대상(schema.table.policy)을 정확히 입력",
+    "Type the exact target (schema.table.policy) above",
+    "准确输入上述目标 (schema.table.policy)",
+    "上記の対象 (schema.table.policy) を正確に入力"
+  ],
+  "vpd.consent": [
+    "대상·SQL·모든 사용자에 대한 보안 영향을 확인하고 이 변경을 승인합니다.",
+    "I reviewed the target, SQL and security impact on all users and approve this change.",
+    "我已确认目标、SQL 及对所有用户的安全影响，并批准此变更。",
+    "対象、SQL、全利用者への影響を確認し、この変更を承認します。"
+  ],
+  "vpd.gapConsent": [
+    "점검 시간과 트래픽 중단을 확인했으며, 삭제 후 재등록의 보안 공백·부분 실패·수동 복구 위험을 승인합니다.",
+    "I confirmed the maintenance window and stopped traffic, and accept the security gap, partial failure and manual recovery risks of replacement.",
+    "我已确认维护窗口并停止流量，接受替换操作的安全空窗、部分失败及手动恢复风险。",
+    "保守時間とトラフィック停止を確認し、削除・再登録の保護空白、部分失敗、手動復旧のリスクを承認します。"
+  ],
+  "vpd.empty": [
+    "이 객체에서 조회된 VPD 정책이 없습니다.",
+    "No visible VPD policies on this object.",
+    "此对象没有可见的 VPD 策略。",
+    "このオブジェクトに参照可能な VPD ポリシーはありません。"
+  ],
+  "vpd.noTables": [
+    "선택한 스키마에 조회 가능한 테이블·뷰가 없습니다.",
+    "No visible tables or views in this schema.",
+    "此方案没有可见的表或视图。",
+    "このスキーマに参照可能なテーブル・ビューはありません。"
+  ],
+  "vpd.noFunctions": [
+    "유효한 함수 서명을 찾지 못했습니다. 소유자·함수/패키지 유효성·조회 권한을 확인하세요.",
+    "No valid function signature found. Check owner, function/package status and visibility.",
+    "未找到有效的函数签名。请检查所有者、函数或包状态及访问权限。",
+    "有効な関数シグネチャがありません。所有者、関数・パッケージの状態と参照権限を確認してください。"
+  ],
+  "vpd.ownerOnly": [
+    "다른 스키마는 읽기 전용입니다. 변경은 로그인 계정 소유 테이블·뷰에서만 지원합니다.",
+    "Other schemas are read-only. Changes are limited to tables and views owned by the login.",
+    "其他方案为只读。仅支持更改登录用户拥有的表和视图。",
+    "他のスキーマは参照専用です。変更はログイン所有のテーブル・ビューのみです。"
+  ],
+  "vpd.executeRequired": [
+    "정책 조회는 가능하지만 DBMS_RLS EXECUTE 권한을 확인하지 못해 변경을 차단했습니다. DBA에게 확인하세요. 권한은 자동 부여하지 않습니다.",
+    "Policies can be inspected, but changes are blocked because a DBMS_RLS EXECUTE grant could not be confirmed. Ask your DBA; no grants are applied automatically.",
+    "可查看策略，但未确认 DBMS_RLS EXECUTE 权限，因此禁止变更。请联系 DBA；不会自动授予权限。",
+    "ポリシーは参照できますが、DBMS_RLS EXECUTE 権限を確認できないため変更を停止しました。DBA に確認してください。権限は自動付与しません。"
+  ],
+  "vpd.unsupported": [
+    "그룹·namespace/attribute·상속·추가 속성 또는 현재 폼으로 보존할 수 없는 설정입니다. 전체 속성을 조회할 수 있으나 변경·삭제는 DBA 도구에서 검토해야 합니다.",
+    "Groups, namespace/attribute links, inheritance, extra fields or unsupported settings cannot be preserved by this form. Inspect the full properties and have a DBA review changes/deletion.",
+    "此表单无法保留分组、namespace/attribute、继承、额外字段或不支持的设置。可查看完整属性；变更和删除需由 DBA 审查。",
+    "グループ、namespace/attribute、継承、追加属性または未対応設定をこのフォームでは保持できません。全属性を参照し、変更・削除は DBA が検討してください。"
+  ],
+  "vpd.stale": [
+    "정책·테이블·함수 또는 스키마가 변경되었거나 확인이 만료되었습니다. 다시 조회하고 새 SQL을 확인하세요.",
+    "Policy, table, function or schema changed, or confirmation expired. Refresh and review new SQL.",
+    "策略、表、函数或方案已变化，或确认已过期。请刷新并重新检查 SQL。",
+    "ポリシー、テーブル、関数、スキーマの変更または確認期限切れです。再読込して新しい SQL を確認してください。"
+  ],
+  "vpd.duplicate": [
+    "같은 이름의 정책이 이미 있습니다.",
+    "A policy with this name already exists.",
+    "同名策略已存在。",
+    "同名のポリシーが既に存在します。"
+  ],
+  "vpd.invalid": [
+    "입력값을 확인하세요. 대문자 일반 식별자만 지원하며 INSERT에는 update_check, ALL_ROWS에는 SELECT와 지정 컬럼이 필요합니다.",
+    "Check inputs. Use uppercase unquoted identifiers; INSERT requires update_check, and ALL_ROWS requires SELECT with selected columns.",
+    "请检查输入。仅支持大写普通标识符；INSERT 要求 update_check，ALL_ROWS 要求 SELECT 和指定列。",
+    "入力を確認してください。大文字の通常識別子のみ対応し、INSERT は update_check、ALL_ROWS は SELECT と指定列が必要です。"
+  ],
+  "vpd.functionRequired": [
+    "현재 유효한 정책 함수 서명을 확인하지 못했습니다. 함수 목록을 다시 조회하세요.",
+    "The policy function is not currently valid/visible with the required signature. Reload functions.",
+    "无法确认函数当前具有所需的有效签名。请重新读取函数列表。",
+    "必要なシグネチャの有効な関数を確認できません。関数一覧を再読込してください。"
+  ],
+  "vpd.confirmRequired": [
+    "정확한 대상 입력과 보안 영향 동의가 필요합니다. 수정은 점검·보안 공백 동의도 필요합니다.",
+    "Exact target and security consent are required. Replacement also requires maintenance/security-gap consent.",
+    "必须准确输入目标并同意安全影响。替换还需确认维护及安全空窗风险。",
+    "正確な対象とセキュリティ影響への同意が必要です。変更には保守・保護空白への同意も必要です。"
+  ],
+  "vpd.uncertain": [
+    "변경 호출 결과를 확정하지 못했습니다. 일부 변경이 COMMIT되었을 수 있습니다. 자동 재시도하지 않으며 이 로그인에서 추가 변경을 막았습니다. 목록을 다시 조회하고 DBA가 원본 복구 SQL과 실제 상태를 확인한 뒤 재로그인하세요.",
+    "The result of the change could not be confirmed. Partial changes may have committed. No automatic retry; further changes in this login are blocked. Refresh the list and have a DBA inspect actual state and original recovery SQL before logging in again.",
+    "无法确认变更结果。部分变更可能已提交。不自动重试，并已阻止本次登录的后续变更。请刷新列表，由 DBA 检查实际状态和原始恢复 SQL 后再重新登录。",
+    "変更結果を確定できません。部分的に COMMIT された可能性があります。自動再試行せず、このログインでの追加変更を停止しました。一覧を再読込し、DBA が実状態と復旧 SQL を確認してから再ログインしてください。"
+  ],
+  "vpd.blocked": [
+    "이 로그인은 이전 변경 결과 확인이 필요해 추가 변경이 차단되었습니다. DBA 확인 후 다시 로그인하세요.",
+    "Further changes are blocked in this login pending investigation of a previous change. Ask your DBA before logging in again.",
+    "此前的变更结果有待检查，当前登录已禁止后续变更。请在 DBA 确认后重新登录。",
+    "以前の変更結果の確認が必要なため追加変更を停止しました。DBA 確認後に再ログインしてください。"
+  ],
+  "vpd.success": [
+    "변경 호출 후 정책 메타데이터 일치를 확인했습니다. 실제 사용자별 행 접근과 함수 업무 정합성은 별도 검증이 필요합니다.",
+    "The resulting policy metadata matches the confirmed operation. Row access for real users and function semantics require separate validation.",
+    "变更后的策略元数据与确认操作一致。实际用户的行访问及函数业务语义仍需单独验证。",
+    "変更後のポリシーメタデータが一致しました。実際の利用者別アクセスと関数の業務的正しさは別途検証が必要です。"
+  ],
+  "vpd.accessRequired": [
+    "VPD 카탈로그 조회 권한 또는 DB 지원을 확인하세요. 권한 부족을 정책 없음으로 표시하지 않습니다.",
+    "Check VPD dictionary access and database support. Missing access is not an empty policy list.",
+    "请检查 VPD 字典访问权限和数据库支持。权限不足不代表没有策略。",
+    "VPD カタログの参照権限と DB 対応を確認してください。権限不足をポリシーなしとは表示しません。"
+  ],
+  "vpd.readError": [
+    "VPD 메타데이터를 완전히 조회하지 못했습니다. 정책 없음으로 판단하거나 변경하지 마세요.",
+    "Complete VPD metadata could not be read. Do not infer absence or apply changes.",
+    "无法完整读取 VPD 元数据。请勿推断策略不存在或执行变更。",
+    "VPD メタデータを完全に取得できません。ポリシーなしと判断したり変更したりしないでください。"
+  ],
+  "vpd.limit": [
+    "카탈로그 조회 한도를 초과했습니다. 부분 정보로 변경하지 않습니다.",
+    "Dictionary row limit exceeded; changes cannot use partial metadata.",
+    "字典行数超过上限，不允许依据部分元数据执行变更。",
+    "カタログ取得上限を超えました。部分的な情報では変更できません。"
+  ],
+  "vpd.tableMissing": [
+    "선택한 테이블·뷰를 현재 카탈로그에서 확인하지 못했습니다.",
+    "The selected table or view is not visible in the current dictionary.",
+    "无法在当前字典中确认选定的表或视图。",
+    "選択したテーブル・ビューを現在のカタログで確認できません。"
+  ],
+  "vpd.objectType": [
+    "객체 유형",
+    "Object type",
+    "对象类型",
+    "オブジェクト種別"
+  ],
+  "vpd.allTypes": [
+    "테이블·뷰 전체",
+    "Tables and views",
+    "全部表和视图",
+    "テーブル・ビューすべて"
+  ],
+  "vpd.typeTable": [
+    "테이블",
+    "Table",
+    "表",
+    "テーブル"
+  ],
+  "vpd.typeView": [
+    "뷰",
+    "View",
+    "视图",
+    "ビュー"
+  ],
+  "vpd.accessFilter": [
+    "소유·객체 권한 필터",
+    "Ownership / object grants",
+    "所有权／对象授权筛选",
+    "所有権・オブジェクト権限"
+  ],
+  "vpd.accessAll": [
+    "카탈로그에 보이는 전체",
+    "All visible in dictionary",
+    "字典中可见的全部对象",
+    "カタログで参照可能なすべて"
+  ],
+  "vpd.accessOwned": [
+    "내 소유 객체",
+    "Owned by login",
+    "登录用户拥有的对象",
+    "ログイン所有オブジェクト"
+  ],
+  "vpd.accessGranted": [
+    "객체 권한 부여받음",
+    "Object grants received",
+    "已获对象授权",
+    "オブジェクト権限付与あり"
+  ],
+  "vpd.accessSelect": [
+    "SELECT / READ",
+    "SELECT / READ",
+    "SELECT / READ",
+    "SELECT / READ"
+  ],
+  "vpd.objectSearch": [
+    "객체명 검색",
+    "Search object name",
+    "搜索对象名称",
+    "オブジェクト名を検索"
+  ],
+  "vpd.accessHelp": [
+    "권한 필터는 로그인 계정의 소유권과 직접·활성 역할·PUBLIC 객체 권한 기준입니다. SELECT ANY TABLE 등 시스템 권한과 컬럼별 권한은 합산하지 않습니다. 목록 표시는 실제 데이터 접근이나 VPD 변경 권한을 보장하지 않습니다.",
+    "Filters use ownership and object grants to the login, enabled roles and PUBLIC. System privileges such as SELECT ANY TABLE and column grants are not included. Listing does not guarantee data access or VPD management permission.",
+    "筛选依据为所有权及授予登录用户、已启用角色和 PUBLIC 的对象权限。不计入 SELECT ANY TABLE 等系统权限及列级授权。列表不保证数据访问或 VPD 管理权限。",
+    "所有権とログイン・有効ロール・PUBLIC へのオブジェクト権限で絞り込みます。SELECT ANY TABLE 等のシステム権限と列権限は合算しません。表示はデータ参照や VPD 変更権限を保証しません。"
+  ],
+  "vpd.objectCount": [
+    "표시 {0} / 전체 {1}개",
+    "Showing {0} / {1} objects",
+    "显示 {0}／共 {1} 个对象",
+    "表示 {0}／全 {1} 件"
+  ],
+  "vpd.noMatches": [
+    "필터에 맞는 테이블·뷰가 없습니다. 유형·권한·검색어를 확인해 주세요.",
+    "No tables or views match these filters. Check type, grants and search text.",
+    "没有符合筛选条件的表或视图。请检查类型、权限及搜索词。",
+    "条件に一致するテーブル・ビューがありません。種別・権限・検索語を確認してください。"
+  ],
+  "vpd.grantDIRECT": [
+    "직접 부여",
+    "Direct grant",
+    "直接授权",
+    "直接付与"
+  ],
+  "vpd.grantROLE": [
+    "활성 역할",
+    "Enabled role",
+    "已启用角色",
+    "有効ロール"
+  ],
+  "vpd.grantPUBLIC": [
+    "PUBLIC",
+    "PUBLIC",
+    "PUBLIC",
+    "PUBLIC"
+  ],
+  "vpd.functionSource": [
+    "함수 원문",
+    "Function source",
+    "函数源码",
+    "関数ソース"
+  ],
+  "vpd.sourceReadOnly": [
+    "읽기 전용 · 현재 로그인 권한으로 조회한 함수 원문입니다.",
+    "Read only · Function source visible to the current login.",
+    "只读 · 当前登录用户可查看的函数源码。",
+    "読み取り専用 · 現在のログイン権限で参照できる関数ソースです。"
+  ]
+}
