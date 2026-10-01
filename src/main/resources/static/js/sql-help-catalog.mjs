@@ -1,4 +1,6 @@
 // Copy-only, source-backed recipes. Values are placeholders, never session/customer data.
+import {nativeRdfHelp} from './sql-help-native-rdf.mjs';
+import {metadataGraphHelp} from './sql-help-metadata-graph.mjs';
 // Each recipe is a DB operation, not a claim that SQL reproduces Java validation or UI state.
 const aiDoc='https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/dbms-cloud-ai-package.html';
 const dbDoc='https://docs.oracle.com/en/database/oracle/oracle-database/26/refrn/';
@@ -109,6 +111,118 @@ const feedbackList=`SELECT ROWIDTOCHAR(f.ROWID) ROW_ID, f.CONTENT,
 FROM "<SCHEMA>"."<FEEDBACK_TABLE>" f
 FETCH FIRST 20 ROWS ONLY;`;
 export const sqlHelpCatalog={
+  'ontology-native':nativeRdfHelp,
+  'metadata-graph':metadataGraphHelp,
+  ords:[
+    recipe('list','ORDS 등록 계층 조회','Read ORDS registration hierarchy',`SELECT * FROM USER_ORDS_SCHEMAS;
+SELECT * FROM USER_ORDS_MODULES ORDER BY ID;
+SELECT * FROM USER_ORDS_TEMPLATES ORDER BY ID;
+SELECT * FROM USER_ORDS_HANDLERS ORDER BY ID;
+SELECT * FROM USER_ORDS_PARAMETERS ORDER BY ID;`,'repository/OrdsManagementRepository',{doc:'https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.3/orddg/ORDS-reference.html'}),
+    recipe('schema','스키마 REST 등록·활성화·URL 수정','Register or change schema REST mapping',`BEGIN
+  ORDS.ENABLE_SCHEMA(p_enabled => TRUE, p_schema => USER,
+    p_url_mapping_type => 'BASE_PATH', p_url_mapping_pattern => '<SCHEMA_ALIAS>',
+    p_auto_rest_auth => TRUE);
+END;
+/`,'service/OrdsManagementService',{risk:'write',doc:'https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.3/orddg/ORDS-reference.html',verify:'SELECT * FROM USER_ORDS_SCHEMAS;',note:pair('비활성화는 p_enabled => FALSE입니다. metadata catalog 인증은 개별 핸들러를 보호하지 않습니다. 기존 공개 API가 노출될 수 있습니다.','Use p_enabled => FALSE to disable. Metadata catalog authentication does not protect individual handlers; existing public APIs may become reachable.')}),
+    recipe('module','미게시 모듈 등록','Create an unpublished module',`BEGIN
+  ORDS.DEFINE_MODULE(p_module_name => '<MODULE>', p_base_path => '<BASE_PATH>',
+    p_items_per_page => 25, p_status => 'NOT_PUBLISHED', p_comments => NULL);
+END;
+/`,'service/OrdsManagementService',{risk:'write',doc:'https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.3/orddg/ORDS-reference.html',note:pair('기존 모듈에 DEFINE_MODULE을 호출하면 하위 템플릿이 교체될 수 있습니다. 앱은 하위 템플릿이 있으면 경로 변경에 RENAME_MODULE, 게시 상태 변경에 PUBLISH_MODULE을 사용합니다.','DEFINE_MODULE can replace descendants of an existing module. For populated modules the app uses RENAME_MODULE for paths and PUBLISH_MODULE for publication.')}),
+    recipe('template','URI 템플릿 등록','Create a URI template',`BEGIN
+  ORDS.DEFINE_TEMPLATE(p_module_name => '<MODULE>', p_pattern => '<PATTERN>',
+    p_priority => 0, p_etag_type => 'HASH', p_etag_query => NULL, p_comments => NULL);
+END;
+/`,'service/OrdsManagementService',{risk:'write',doc:'https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.3/orddg/ORDS-reference.html',note:pair('기존 템플릿을 재정의하면 핸들러가 교체될 수 있습니다. 앱은 기존 핸들러가 있는 템플릿 편집을 차단합니다.','Redefining a template can replace handlers. The app blocks template edits when handlers exist.')}),
+    recipe('handler','핸들러 등록·수정','Create or edit a handler',`BEGIN
+  ORDS.DEFINE_HANDLER(p_module_name => '<MODULE>', p_pattern => '<PATTERN>',
+    p_method => 'GET', p_source_type => ORDS.source_type_collection_feed,
+    p_source => :handler_source, p_items_per_page => NULL,
+    p_mimes_allowed => NULL, p_comments => NULL);
+END;
+/`,'service/OrdsManagementService',{risk:'write',doc:'https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.3/orddg/ORDS-reference.html',note:pair('원문은 바인딩한 정의 텍스트이며 이 화면에서 실행하지 않습니다. 앱은 기존 파라미터를 DEFINE_PARAMETER로 보존합니다.','Source is bound definition text, never executed here. The app preserves existing parameters with DEFINE_PARAMETER.')}),
+    recipe('delete','선택 계층 삭제 (각 구문은 별도 작업)','Delete a selected level (separate operations)',`BEGIN ORDS.DELETE_HANDLER(p_module_name => '<MODULE>', p_uri_template => '<PATTERN>', p_method => 'GET'); END;
+/
+BEGIN ORDS.DELETE_TEMPLATE(p_module_name => '<MODULE>', p_uri_template => '<PATTERN>'); END;
+/
+BEGIN ORDS.DELETE_MODULE(p_module_name => '<MODULE>'); END;
+/
+BEGIN ORDS.DROP_REST_FOR_SCHEMA; END;
+/`,'service/OrdsManagementService',{risk:'write',doc:'https://docs.oracle.com/en/database/oracle/oracle-rest-data-services/25.3/orddg/ORDS-reference.html',note:pair('원하는 작업 하나만 선택하세요. 하위 자원도 삭제됩니다. DROP_REST_FOR_SCHEMA는 모든 ORDS 관련 메타데이터를 제거하지만 DB 사용자·테이블을 삭제하지 않습니다. ORDS 25.3 이전 버전에 DELETE_HANDLER/DELETE_TEMPLATE가 없을 수 있습니다.','Choose exactly one operation. Descendants are removed. DROP_REST_FOR_SCHEMA removes all related ORDS metadata, not the DB user or tables. DELETE_HANDLER/DELETE_TEMPLATE may be unavailable before ORDS 25.3.')})
+  ],
+  vpd:[
+    recipe('objects','테이블·뷰 목록과 객체 권한 필터','Table/view list and object-grant filters',`SELECT OBJECT_NAME, OBJECT_TYPE
+FROM SYS.ALL_OBJECTS
+WHERE OWNER = '<SCHEMA>'
+  AND OBJECT_TYPE IN ('TABLE', 'VIEW')
+  AND SUBOBJECT_NAME IS NULL
+ORDER BY OBJECT_NAME, OBJECT_TYPE;
+
+SELECT TABLE_NAME, PRIVILEGE, GRANTEE
+FROM SYS.ALL_TAB_PRIVS
+WHERE TABLE_SCHEMA = '<SCHEMA>'
+  AND (GRANTEE IN (SYS_CONTEXT('USERENV', 'SESSION_USER'), 'PUBLIC')
+       OR GRANTEE IN (SELECT ROLE FROM SYS.SESSION_ROLES))
+ORDER BY TABLE_NAME, PRIVILEGE, GRANTEE;`,'repository/VpdManagementRepository',{doc:'https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/ALL_TAB_PRIVS.html',note:pair('선택한 스키마의 테이블·뷰와 로그인 계정·활성 역할·PUBLIC에 부여된 객체 권한을 조회합니다. 소유권은 별도로 표시합니다. 시스템 ANY 권한과 컬럼별 권한을 합산한 실효 권한 검사가 아니며, VPD 변경 권한은 별도로 확인합니다.','Lists tables/views and object grants to the login, enabled roles and PUBLIC. Ownership is shown separately. This is not an effective-access check incorporating ANY system privileges or column grants. VPD management permission is checked separately.')}),
+    recipe('list','테이블별 정책과 보존할 속성 조회','Read table policies and preserved properties',`SELECT * FROM SYS.ALL_POLICIES
+WHERE OBJECT_OWNER = '<SCHEMA>' AND OBJECT_NAME = '<TABLE_NAME>'
+ORDER BY POLICY_GROUP, POLICY_NAME;
+SELECT * FROM SYS.ALL_SEC_RELEVANT_COLS
+WHERE OBJECT_OWNER = '<SCHEMA>' AND OBJECT_NAME = '<TABLE_NAME>'
+ORDER BY POLICY_GROUP, POLICY_NAME, SEC_REL_COLUMN;
+SELECT * FROM SYS.ALL_POLICY_ATTRIBUTES
+WHERE OBJECT_OWNER = '<SCHEMA>' AND OBJECT_NAME = '<TABLE_NAME>'
+ORDER BY POLICY_GROUP, POLICY_NAME, NAMESPACE, ATTRIBUTE;`,'repository/VpdManagementRepository',{
+      doc:'https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/ALL_POLICIES.html',
+      note:pair('정책 없음과 조회 권한 부족은 다릅니다. 그룹, namespace/attribute, 알 수 없는 속성이 있으면 앱에서 변경을 차단합니다.','An empty list differs from missing access. The app blocks changes for grouped policies, namespace/attribute associations and unknown fields.')}),
+    recipe('add','기존 함수로 VPD 정책 등록','Register a VPD policy using an existing function',`BEGIN
+  SYS.DBMS_RLS.ADD_POLICY(
+    object_schema => '<SCHEMA>', object_name => '<TABLE_NAME>',
+    policy_name => '<POLICY_NAME>', function_schema => '<FUNCTION_SCHEMA>',
+    policy_function => '<FUNCTION_OR_PACKAGE_FUNCTION>',
+    statement_types => 'SELECT', update_check => FALSE, enable => TRUE,
+    policy_type => SYS.DBMS_RLS.DYNAMIC, long_predicate => FALSE,
+    sec_relevant_cols => NULL, sec_relevant_cols_opt => NULL);
+END;
+/`,'repository/VpdManagementRepository',{risk:'ddl',doc:'https://docs.oracle.com/en/database/oracle/oracle-database/19/arpls/DBMS_RLS.html',
+      note:pair('로그인 소유 테이블과 DBMS_RLS EXECUTE 권한이 필요합니다. 기존 함수의 업무·보안 정합성을 검토하세요. INSERT는 update_check=TRUE가 필요하고 ALL_ROWS는 SELECT 컬럼 마스킹입니다. 실제 값은 화면의 변경 SQL 확인에서 봅니다.','Requires an owner table and DBMS_RLS EXECUTE. Review existing function semantics. INSERT requires update_check=TRUE; ALL_ROWS is SELECT column masking. Review actual values in the application preview.')}),
+    recipe('replace','수정: 삭제 후 재등록의 실제 두 단계','Replacement: the actual drop/add sequence',`-- Stop application traffic in an approved maintenance window.
+-- First retain the COMPLETE original ADD_POLICY from the application recovery preview.
+-- These calls COMMIT and are NOT atomic. Failure can leave the table unprotected.
+BEGIN
+  SYS.DBMS_RLS.DROP_POLICY(object_schema => '<SCHEMA>',
+    object_name => '<TABLE_NAME>', policy_name => '<POLICY_NAME>');
+END;
+/
+-- Replace EVERY option below with the complete confirmed application preview.
+BEGIN
+  SYS.DBMS_RLS.ADD_POLICY(
+    object_schema => '<SCHEMA>', object_name => '<TABLE_NAME>',
+    policy_name => '<POLICY_NAME>', function_schema => '<FUNCTION_SCHEMA>',
+    policy_function => '<FUNCTION_OR_PACKAGE_FUNCTION>',
+    statement_types => '<STATEMENT_TYPES>', update_check => <TRUE_OR_FALSE>,
+    enable => <TRUE_OR_FALSE>, policy_type => SYS.DBMS_RLS.<POLICY_TYPE>,
+    long_predicate => <TRUE_OR_FALSE>, sec_relevant_cols => <QUOTED_COLUMN_LIST_OR_NULL>,
+    sec_relevant_cols_opt => <NULL_OR_SYS_DBMS_RLS_ALL_ROWS>);
+END;
+/
+-- Never retry automatically. Inspect ALL_POLICIES before any manual recovery.`,'repository/VpdManagementRepository',{risk:'ddl',doc:'https://docs.oracle.com/en/database/oracle/oracle-database/19/arpls/DBMS_RLS.html',
+      note:pair('ALTER_POLICY는 임의 속성 변경 API가 아닙니다. 위 DROP만 단독 실행하면 보호가 사라집니다. 화면의 완전한 교체·복구 SQL과 대상 확인을 사용하고, 부분 실패는 DBA가 현재 상태를 확인한 뒤 복구하세요.','ALTER_POLICY is not a general property update API. Running DROP alone removes protection. Use the complete replacement and recovery SQL in the application preview. A DBA must inspect actual state before recovery.')}),
+    recipe('delete','선택 정책 삭제','Delete the selected policy',`BEGIN
+  SYS.DBMS_RLS.DROP_POLICY(object_schema => '<SCHEMA>',
+    object_name => '<TABLE_NAME>', policy_name => '<POLICY_NAME>');
+END;
+/`,'repository/VpdManagementRepository',{risk:'ddl',doc:'https://docs.oracle.com/en/database/oracle/oracle-database/19/arpls/DBMS_RLS.html',
+      note:pair('정책을 제거하면 행 접근 보호가 해제될 수 있습니다. 원본 등록 SQL과 영향 범위를 확인해야 하며 자동 재시도하지 않습니다.','Removing a policy can remove row-access protection. Retain original registration SQL, review affected users and never retry automatically.')}),
+    recipe('enable','정책 활성화·비활성화','Enable or disable a policy',`BEGIN
+  SYS.DBMS_RLS.ENABLE_POLICY(object_schema => '<SCHEMA>',
+    object_name => '<TABLE_NAME>', policy_name => '<POLICY_NAME>',
+    enable => TRUE); -- FALSE disables protection from this policy.
+END;
+/`,'repository/VpdManagementRepository',{risk:'ddl',doc:'https://docs.oracle.com/en/database/oracle/oracle-database/19/arpls/DBMS_RLS.html',
+      note:pair('활성화도 사용자 접근 결과를 바꾸는 보안 변경입니다. 변경 전 ENABLE 상태를 보관하고 변경 후 카탈로그와 실제 사용자별 접근을 검증하세요.','Enabling also changes user access. Retain the original ENABLE value and verify the catalog and real user access after the change.')})
+  ],
   profiles:[
     recipe('list','프로필 목록·속성 조회','Read Profile list and attributes',profileList+'\n\n'+attributes,'repository/DatabaseRepository',{doc:aiDoc}),
     recipe('create','프로필 생성','Create a Profile',`DECLARE
@@ -218,11 +332,33 @@ END;
 FROM USER_CLOUD_AI_CONVERSATION_PROMPTS
 WHERE CREATED >= TO_TIMESTAMP_TZ('<FROM_ISO_OFFSET>', 'YYYY-MM-DD"T"HH24:MI:SSTZH:TZM')
   AND CREATED < TO_TIMESTAMP_TZ('<TO_EXCLUSIVE_ISO_OFFSET>', 'YYYY-MM-DD"T"HH24:MI:SSTZH:TZM')
-ORDER BY CREATED DESC FETCH FIRST 20 ROWS ONLY;`,'repository/AiExecutionHistoryRepository'),
-    recipe('mapping','Select AI SQL 매핑 조회','Read Select AI SQL mappings',`SELECT SQL_ID, MAPPED_SQL_ID, TRANSLATION_TIMESTAMP, SQL_FULLTEXT, MAPPED_SQL_FULLTEXT
+ORDER BY CREATED DESC FETCH FIRST 20 ROWS ONLY;`,'repository/AiExecutionHistoryRepository',{
+      doc:'https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/dbms-cloud-ai-views.html',
+      purpose:pair('저장된 대화 탭의 원천입니다. 로그인 사용자가 소유한 장기 대화의 질문·응답을 조회하며, SYS.V_$MAPPED_SQL 권한은 필요하지 않습니다.','Source for the Saved conversations tab. Reads prompts and responses in long-term conversations owned by the login user; does not require SYS.V_$MAPPED_SQL access.'),
+      note:pair('conversation=true만 켜는 세션 단기 대화와 다릅니다. 장기 대화를 만들고 conversation_id를 연결한 호출이 보관 기간 내에 있어야 합니다. 과거 미저장 호출을 소급 수집하지 않으며, 응답 내용은 action에 따라 다릅니다. 현재 Select AI 테스트는 GENERATE에 conversation=false를 전달하고 활성 conversation_id를 허용하지 않으므로 이 저장 경로를 사용하지 않습니다. 대화를 연결하면 이전 질문·응답이 후속 AI 요청에 포함될 수 있어 단순 로그 옵션처럼 켜면 안 됩니다.','Unlike session-only conversation=true, this requires a long-term conversation ID attached to calls and retained within its retention period. It cannot recover unsaved past calls; response content depends on the action. Current Select AI tests pass conversation=false to GENERATE and reject an active conversation ID, so they do not use this storage path. Attaching a conversation can include earlier prompts/responses in subsequent AI requests; it is not merely a logging switch.')}),
+    recipe('mapping','Select AI SQL 매핑 조회','Read Select AI SQL mappings',`-- Prerequisite only; run separately as ADMIN after approval:
+-- GRANT READ ON SYS.V_$MAPPED_SQL TO "<LOGIN_USER>";
+-- Query below runs as the login user, not the selected schema.
+SELECT SQL_ID, MAPPED_SQL_ID, TRANSLATION_TIMESTAMP, SQL_FULLTEXT, MAPPED_SQL_FULLTEXT
 FROM SYS.V_$MAPPED_SQL
 WHERE REGEXP_LIKE(SQL_TEXT, '^[[:space:]]*select[[:space:]]+ai([[:space:]]|$)', 'i')
-ORDER BY TRANSLATION_TIMESTAMP DESC NULLS LAST FETCH FIRST 20 ROWS ONLY;`,'repository/AiMappedSqlRepository'),
+ORDER BY TRANSLATION_TIMESTAMP DESC NULLS LAST FETCH FIRST 20 ROWS ONLY;`,'repository/AiMappedSqlRepository',{
+      doc:'https://docs.oracle.com/en/database/oracle/oracle-database/26/refrn/V-MAPPED_SQL.html',
+      purpose:pair('SQL 매핑 조회에는 로그인 계정의 SYS.V_$MAPPED_SQL 읽기 권한이 필요합니다. 없으면 ADMIN이 아래 주석의 GRANT를 별도로 실행합니다. 실행할 권한 SQL은 작업 선택의 「SQL 매핑 읽기 권한 부여」에도 있습니다.','Requires login-user READ access to SYS.V_$MAPPED_SQL. If missing, ADMIN runs the commented GRANT separately. Choose Grant SQL mapping read access for the executable privilege SQL.'),
+      note:pair('ORA-00942는 뷰 미지원 또는 접근 권한 부족일 수 있습니다. ADMIN으로 뷰 존재·접근을 먼저 확인하세요. 권한은 선택 스키마가 아니라 로그인 계정별이며 새 계정에 자동 상속되지 않습니다. 부여 후 화면 새로고침으로 다시 확인하며 앱 재시작은 필요 없습니다. 이 권한은 본인 스키마만 보도록 제한하지 않으므로 다른 계정 SQL도 보일 수 있습니다. 매핑은 메모리에서 사라질 수 있고 실행 성공·결과 전체·모든 GENERATE 호출을 보장하는 이력이 아닙니다. 대안: 저장된 대화는 장기 대화 기록, 문제 질문은 앱에서 선택 저장한 테스트, 공유 SQL·AWR·감사 로그는 각기 다른 범위의 실행 흔적입니다.','ORA-00942 may mean an unavailable view or missing access. First check the view as ADMIN. Grants apply to the login user, not a selected schema, and are not inherited by a new account. Refresh after granting; no application restart is needed. This grant does not restrict access to the user’s own schema, so other users’ SQL may be visible. In-memory mappings can disappear and do not guarantee execution success, full results or coverage of every GENERATE call. Alternatives: Saved conversations holds long-term conversation prompts; Problem questions holds selected app tests; shared SQL, AWR and audit logs each cover different execution evidence.')}),
+    recipe('mapping-access','SQL 매핑 읽기 권한 부여 · ADMIN','Grant SQL mapping read access · ADMIN',`-- Run as ADMIN (or an authorized grantor), only after reviewing scope.
+-- Replace <LOGIN_USER> with the database login account, not CURRENT_SCHEMA.
+GRANT READ ON SYS.V_$MAPPED_SQL TO "<LOGIN_USER>";`,'model/AiMappedSql',{
+      risk:'ddl',doc:'https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/select-ai-feedback.html',
+      verify:`-- Reconnect as <LOGIN_USER>; success with 0 proves access, not saved history.
+SELECT COUNT(*) AS ACCESS_CHECK FROM SYS.V_$MAPPED_SQL WHERE 1 = 0;`,
+      note:pair('SQL 매핑 조회에 필요한 대상 뷰 한 개의 읽기 권한 예제입니다. SELECT ANY DICTIONARY, SELECT_CATALOG_ROLE, V_$SESSION 권한을 함께 부여하지 않습니다. 다른 계정 SQL이 노출될 수 있으므로 범위를 검토하세요. 앱은 이 GRANT를 실행하지 않습니다. 권한 변경은 DDL이며 암시적 COMMIT이 발생할 수 있습니다. 부여 후 조회할 계정에서 확인 SQL을 실행하고 화면을 새로고침하세요.','Grants read access to this one view only; does not add SELECT ANY DICTIONARY, SELECT_CATALOG_ROLE or V_$SESSION privileges. Review exposure of other accounts’ SQL. The app never executes this GRANT. Privilege changes are DDL and can implicitly commit. Run verification as the intended login user, then refresh the screen.')}),
+    recipe('saved-tests','앱에서 선택 저장한 테스트 조회','Read tests explicitly saved by the app',`SELECT SEQ, RECORD_ID, ACTOR, RECORDED_AT, PAYLOAD
+FROM "<SCHEMA>"."DBC_APP_RECORD"
+WHERE RECORD_TYPE = 'SELECT_AI_ATTEMPT'
+  AND JSON_VALUE(PAYLOAD, '$.parentId') = '<QUESTION_UUID>'
+ORDER BY RECORDED_AT DESC, SEQ DESC FETCH FIRST 20 ROWS ONLY;`,'repository/AppRecordRepository',{
+      note:pair('문제 질문 메뉴에 선택 저장한 질문별 실행 기록입니다. 질문·프로필·생성 응답 SQL·오류와 선택한 참고자료 스냅샷을 확인합니다. SYS.V_$MAPPED_SQL 권한이나 대화 컨텍스트를 사용하지 않습니다. 자동으로 모든 실행을 저장하거나 별도 SQL 조회의 결과 행 전체를 보관하는 기능은 아닙니다. 저장하지 않은 과거 실행은 여기서 복원할 수 없습니다.','Selected per-question test records in Problem questions: input, profile, generated response SQL, errors and selected context snapshots. Uses neither SYS.V_$MAPPED_SQL access nor conversation context. It does not automatically capture every execution or all rows from a separate SQL execution. Unsaved historical runs cannot be recovered here.')}),
     recipe('cache','공유 SQL 조회','Read shared SQL',`SELECT SQL_ID, CHILD_NUMBER, CON_ID, PARSING_SCHEMA_NAME, LAST_ACTIVE_TIME,
        EXECUTIONS, SQL_FULLTEXT
 FROM SYS.V_$SQL
@@ -312,6 +448,8 @@ WHERE t."<VECTOR_COLUMN>" IS NOT NULL
 ORDER BY DBC_DISTANCE, t.ROWID FETCH EXACT FIRST 10 ROWS ONLY;`,'repository/VectorSearchRepository')
   ],
   ontology:[
+    ...nativeRdfHelp,
+    ...metadataGraphHelp,
     recipe('current','저장된 업무 정의·관계 조회','Read saved business definitions and relationships',ontologyLatest,'repository/OntologyRepository',{
       note:pair('PAYLOAD에 원본 메타데이터와 업무 정의·컬럼·관계가 저장됩니다. 문서 구조 해석과 화면 그래프 배치는 Java/브라우저에서 수행합니다.','PAYLOAD stores source metadata, business definitions, columns and relationships; Java/browser code interprets the document and lays out the graph.')}),
     recipe('history','정의 버전·이력 조회','Read definition revisions',ontologyVersions,'repository/OntologyRepository'),ontologyAppend,

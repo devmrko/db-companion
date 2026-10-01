@@ -17,7 +17,7 @@ test('all recipes have actual SQL, a real source, localized titles, effects and 
     assert.equal(new Set(ops.map(op=>op.id)).size,ops.length,feature);
     for(const op of ops){
       assert.ok(existsSync(op.source),op.source);
-      assert.match(op.sql,/\b(SELECT|BEGIN|INSERT|UPDATE|ALTER|COMMENT|CREATE)\b/,feature+':'+op.id);
+      assert.match(op.sql,/\b(SELECT|BEGIN|INSERT|UPDATE|ALTER|COMMENT|CREATE|GRANT)\b/,feature+':'+op.id);
       for(const lang of ['ko','en','ja','zh-CN','fr']){
         const help=helpFor(feature,lang,op.id);
         for(const key of ['title','purpose','variables','permission','effects','result','source'])assert.ok(help[key],feature+':'+key);

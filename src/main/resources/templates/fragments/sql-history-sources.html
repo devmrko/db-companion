@@ -2,5 +2,6 @@
 <nav th:fragment="sources(current)" class="app-tabs" th:aria-label="#{sqlh.sources}">
   <a th:href="@{/ai-executions/sql}" th:classappend="${current == 'mapping'} ? 'is-active'" th:attr="aria-current=${current == 'mapping' ? 'page' : null}" th:text="#{sqlh.mapping}">SQL 매핑</a>
   <a th:each="name : ${ {'cache','awr','audit'} }" th:href="@{/ai-executions/sql/sources(source=${name})}" th:classappend="${current == name} ? 'is-active'" th:attr="aria-current=${current == name ? 'page' : null}" th:text="${#messages.msg('sqlh.' + name)}"></a>
+  <a th:href="@{/ai-executions/sql/archive}" th:classappend="${current == 'archive'} ? 'is-active'" th:attr="aria-current=${current == 'archive' ? 'page' : null}" th:text="#{sqlh.archive}">저장된 SQL</a>
 </nav>
 </body></html>

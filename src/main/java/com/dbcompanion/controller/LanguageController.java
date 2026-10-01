@@ -25,12 +25,13 @@ public class LanguageController {
     }
     /** Only known read-only page routes; never redirect to a write endpoint or external site. */
     public static String safeReturn(String target) {
-        if("/business-glossary".equals(target)||"/ontology".equals(target)||"/ontology-query".equals(target)||"/ai-test".equals(target)||"/ai-test/problems".equals(target))return target;
+        if("/db/audit".equals(target))return target;
+        if("/db/functions/ai-query".equals(target)||"/db/vpd".equals(target)||"/business-glossary".equals(target)||"/ontology".equals(target)||"/ontology-query".equals(target)||"/ai-test".equals(target)||"/ai-test/problems".equals(target))return target;
         if(target==null || target.contains("\\") || target.contains("\r") || target.contains("\n") || target.contains("#"))return "/login";
         String route=target.split("\\?",2)[0];
-        return java.util.Set.of("/db/scheduler","/db/external-sources","/ai-assistant","/db/credentials","/db/security","/db/functions","/","/login","/tables","/tables/detail","/ai-profiles","/ai-profiles/detail",
+        return java.util.Set.of("/db/ords","/db/scheduler","/db/external-sources","/ai-assistant","/db/credentials","/db/security","/db/functions","/","/login","/tables","/tables/detail","/ai-profiles","/ai-profiles/detail",
                 "/ai-agents","/ai-agents/team","/ai-agents/task","/ai-agents/object","/ai-agents/objects","/ai-executions","/ai-executions/agents",
-                "/ai-executions/agents/run","/ai-executions/sql","/ai-executions/sql/sources","/ai-feedback","/ai-feedback/detail","/vector-search",
+                "/ai-executions/agents/run","/ai-executions/sql","/ai-executions/sql/sources","/ai-executions/sql/archive","/ai-feedback","/ai-feedback/detail","/vector-search",
                 "/tables/history/probe","/ai-profiles/audit-probe","/ai-profiles/long-instruction-probe",
                 "/ai-feedback/probe","/ai-executions/sql/access-setup").contains(route)?target:"/login";
     }

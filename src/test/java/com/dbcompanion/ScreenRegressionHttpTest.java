@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ScreenRegressionHttpTest {
     static final List<String> MENUS=List.of("/","/business-glossary","/ontology","/ontology-query","/ai-assistant","/vector-search",
             "/tables","/ai-profiles","/ai-test","/ai-test/problems","/ai-feedback","/ai-agents","/ai-executions","/db/scheduler",
-            "/db/external-sources","/db/credentials","/db/security","/db/functions");
+            "/db/external-sources","/db/credentials","/db/security","/db/functions","/db/ords");
     @LocalServerPort int port;
     @Autowired RequestMappingHandlerMapping mappings;
     final HttpClient client=HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();
@@ -48,6 +48,12 @@ class ScreenRegressionHttpTest {
                 var imports=Pattern.compile("(?:from\\s*|import\\s*)['\"](\\./[^'\"]+)['\"]").matcher(Files.readString(file));
                 while(imports.find())assertThat(Files.isRegularFile(file.getParent().resolve(imports.group(1)))).as(file+" -> "+imports.group(1)).isTrue();
             }
+        }
+    }
+    @Test void ordsMutationsRequireCsrfBeforeControllerOrDatabaseWork() throws Exception {
+        for(String route:List.of("/db/ords/preview","/db/ords/apply")){
+            var request=HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+route)).header("Content-Type","application/json").POST(HttpRequest.BodyPublishers.ofString("{}"));
+            assertThat(client.send(request.build(),HttpResponse.BodyHandlers.ofString()).statusCode()).isEqualTo(403);
         }
     }
     @Test void everyTemplateScriptAndStylesheetHasARealLocalResource() throws Exception {

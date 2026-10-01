@@ -107,7 +107,7 @@ public class WorkspaceController {
 
     private String safeReturn(String path) {
         if("/ontology".equals(path)||"/ontology-query".equals(path))return path;
-        if("/db/scheduler".equals(path))return path;
+        if("/db/scheduler".equals(path)||"/db/ords".equals(path)||"/db/vpd".equals(path))return path;
         if(ExternalSourcesController.safeReturn(path))return path;
         return java.util.Set.of("/db/external-sources", "/ai-assistant", "/db/credentials", "/db/security", "/db/functions", "/tables", "/ai-profiles", "/ai-feedback", "/ai-agents", "/ai-executions", "/ai-executions/agents", "/vector-search").contains(path) ? path : "/";
     }
