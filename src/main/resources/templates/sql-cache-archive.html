@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{ui.cf835c698541})}"></head>
+<body class="app-shell">
+<aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content" data-sql-archive>
+  <link rel="stylesheet" th:href="@{/css/sql-cache-archive.css}">
+  <input type="hidden" data-ar-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+  <div class="app-page-heading"><h1 th:text="#{ui.cf835c698541}"></h1><div class="archive-actions">
+    <button type="button" class="btn app-btn app-btn-secondary" data-ar-help>SQL ?</button>
+    <button type="button" class="btn app-btn app-btn-secondary" data-ar-refresh th:text="#{ui.8259f9d35351}"></button>
+  </div></div>
+  <nav th:replace="~{fragments/execution-tabs :: tabs('sql')}"></nav>
+  <nav th:replace="~{fragments/sql-history-sources :: sources('archive')}"></nav>
+  <p role="status" aria-live="polite" data-ar-message></p>
+  <section th:if="${archiveAdmin}" class="app-card archive-card" data-ar-access>
+    <h2 th:text="#{archive.access.title}"></h2>
+    <p class="app-muted" th:text="#{archive.access.scope}"></p>
+    <div class="archive-actions">
+      <label><span th:text="#{archive.access.target}"></span><select class="form-select app-input" data-ar-access-user><option value="" th:text="#{archive.access.choose}"></option></select></label>
+      <button type="button" class="btn app-btn app-btn-secondary" data-ar-access-check disabled th:text="#{archive.access.check}"></button>
+      <button type="button" class="btn app-btn app-btn-secondary" data-ar-access-grant disabled th:text="#{archive.access.grant}"></button>
+    </div>
+    <p aria-live="polite" data-ar-access-status th:text="#{archive.access.choose}"></p>
+  </section>
+  <section class="app-card archive-card">
+    <h2 th:text="#{archive.setup}"></h2>
+    <p th:text="#{archive.scope}"></p>
+    <p class="app-muted" th:text="#{archive.callNote}"></p>
+    <dl class="archive-status" data-ar-status></dl>
+    <div class="archive-actions">
+      <label><span th:text="#{archive.interval}"></span><input class="form-control app-input" data-ar-seconds type="number" min="10" max="3600" step="1" value="60"></label>
+      <button type="button" class="btn app-btn app-btn-secondary" data-ar-op="INSTALL" disabled th:text="#{archive.install}"></button>
+      <button type="button" class="btn app-btn app-btn-secondary" data-ar-op="CONFIGURE" disabled th:text="#{archive.configure}"></button>
+      <button type="button" class="btn app-btn app-btn-secondary" data-ar-op="PAUSE" disabled th:text="#{archive.pause}"></button>
+      <button type="button" class="btn app-btn app-btn-secondary" data-ar-op="RESUME" disabled th:text="#{archive.resume}"></button>
+      <button type="button" class="btn app-btn app-btn-secondary" data-ar-op="RUN" disabled th:text="#{archive.run}"></button>
+      <a class="app-link" th:href="@{/db/scheduler}" th:text="#{archive.scheduler}"></a>
+    </div>
+    <p class="app-muted" th:text="#{archive.scheduleNote}"></p>
+    <details><summary th:text="#{archive.limitsTitle}"></summary><p th:text="#{archive.limits}"></p><p th:text="#{archive.privacy}"></p></details>
+  </section>
+  <section class="app-card archive-card">
+    <h2 th:text="#{sqlh.archive}"></h2>
+    <p class="app-muted" th:text="#{archive.savedNote}"></p>
+    <form data-ar-filters class="archive-filters">
+      <label><span th:text="#{archive.from}"></span><input class="form-control app-input" name="from" type="date" th:value="${from}" required></label>
+      <label><span th:text="#{archive.to}"></span><input class="form-control app-input" name="to" type="date" th:value="${today}" required></label>
+      <label><span th:text="#{sqlh.match}"></span><select name="match" class="form-select app-input"><option value="all" th:text="#{archive.all}"></option><option value="ai" th:text="#{archive.ai}"></option><option value="select_ai">SELECT AI</option><option value="generate">DBMS_CLOUD_AI.GENERATE</option></select></label>
+      <label>SQL ID<input class="form-control app-input" type="search" name="sqlId" maxlength="13"></label>
+      <label><span th:text="#{ui.bc407b78f233}"></span><input class="form-control app-input" type="search" name="text" maxlength="500"></label>
+      <button type="submit" class="btn app-btn app-btn-secondary" data-ar-search disabled th:text="#{ui.4b8d541ebe6d}"></button>
+    </form>
+    <div class="table-responsive"><table class="table app-table archive-table"><thead><tr>
+      <th th:text="#{archive.lastSeen}"></th><th>SQL ID</th><th th:text="#{archive.cursor}"></th><th th:text="#{archive.executions}"></th><th th:text="#{ui.bc407b78f233}"></th>
+    </tr></thead><tbody data-ar-rows></tbody></table></div>
+    <p data-ar-empty></p>
+    <div class="app-pagination"><span data-ar-page></span><div class="archive-actions"><button class="btn app-btn app-btn-secondary" data-ar-prev disabled th:text="#{ui.da7e61c67cc5}"></button><button class="btn app-btn app-btn-secondary" data-ar-next disabled th:text="#{ui.aef613c6612d}"></button></div></div>
+  </section>
+  <dialog class="app-preview-dialog archive-dialog" data-ar-dialog aria-labelledby="archive-dialog-title">
+    <header class="app-preview-header"><h2 id="archive-dialog-title" data-ar-title></h2><button type="button" class="btn app-btn app-btn-secondary" data-ar-close th:text="#{ui.1e8c10206f5b}"></button></header>
+    <div class="archive-dialog-body"><p data-ar-note></p><pre data-ar-sql></pre>
+      <div data-ar-confirm hidden><p th:text="#{archive.ddlNote}"></p><label><input type="checkbox" data-ar-consent><span th:text="#{archive.consent}"></span></label><button type="button" class="btn app-btn app-btn-primary" data-ar-apply disabled th:text="#{archive.apply}"></button></div>
+    </div>
+  </dialog>
+</main></div><script type="module" th:src="@{/js/sql-cache-archive.mjs}"></script>
+</body></html>

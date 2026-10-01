@@ -1,0 +1,24 @@
+[data-sql-archive] { min-width: 0; }
+.archive-card { padding: 1.25rem; margin-bottom: 1.25rem; }
+.archive-card h2 { font-size: 1.15rem; margin: 0 0 .75rem; }
+.archive-actions { display: flex; flex-wrap: wrap; align-items: end; gap: .65rem; }
+.archive-actions .app-btn { white-space: nowrap; flex: 0 0 auto; }
+.archive-actions input[type=number] { width: 9rem; }
+.archive-actions select { width: min(24rem, 100%); max-width: 100%; }
+.archive-actions label, .archive-filters label { display: grid; gap: .4rem; min-width: 0; }
+.archive-status { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: .7rem; margin: 1rem 0; }
+.archive-status dt { font-size: .85rem; color: var(--app-muted, #666); }
+.archive-status dd { margin: .25rem 0 0; overflow-wrap: anywhere; }
+.archive-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); align-items: end; gap: .75rem; margin: 1rem 0; }
+.archive-table { min-width: 800px; }
+.archive-table td { vertical-align: top; }
+.archive-table td:last-child { max-width: 30rem; }
+.archive-table .app-inline-link { white-space: pre-wrap; overflow-wrap: anywhere; text-align: start; }
+.archive-dialog { width: min(64rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); padding: 0; }
+.archive-dialog-body { padding: 1.25rem; overflow: auto; }
+.archive-dialog pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .85rem; }
+.archive-dialog [data-ar-confirm] label { display: flex; align-items: baseline; gap: .5rem; margin-bottom: 1rem; }
+.archive-dialog [hidden] { display: none; }
+[data-sql-archive][aria-busy=true] [data-ar-message]::before { content: ''; display: inline-block; width: .85rem; height: .85rem; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; margin-inline-end: .5rem; animation: archive-spin 1s linear infinite; }
+@keyframes archive-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { [data-sql-archive][aria-busy=true] [data-ar-message]::before { animation: none; } }
