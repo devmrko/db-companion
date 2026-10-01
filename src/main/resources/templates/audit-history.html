@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{audit.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content" data-audit>
+ <link rel="stylesheet" th:href="@{/css/audit-history.css}">
+ <input type="hidden" data-au-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+ <div class="app-page-heading"><div><h1 th:text="#{audit.title}"></h1><p class="app-muted" th:text="#{audit.intro}"></p></div><div class="audit-actions">
+  <button type="button" class="btn app-btn app-btn-secondary" data-au-help>SQL ?</button>
+  <button type="button" class="btn app-btn app-btn-secondary" data-au-refresh th:text="#{ui.8259f9d35351}"></button>
+ </div></div>
+ <p role="status" aria-live="polite" data-au-message></p>
+ <section class="app-card audit-card">
+  <form class="audit-filters" data-au-filters>
+   <label><span th:text="#{audit.source}"></span><select name="source" class="form-select"><option value="original" th:text="#{audit.original}"></option><option value="archive" th:text="#{audit.archive}"></option></select></label>
+   <label><span th:text="#{audit.from}"></span><input class="form-control" name="from" type="date" th:value="${from}" required></label>
+   <label><span th:text="#{audit.to}"></span><input class="form-control" name="to" type="date" th:value="${today}" required></label>
+   <label><span th:text="#{audit.scope}"></span><select name="scope" class="form-select"><option value="dds" th:text="#{audit.dds}"></option><option value="all" th:text="#{audit.all}"></option></select></label>
+   <label><span th:text="#{audit.dbUser}"></span><input class="form-control" name="dbUser" maxlength="128"></label>
+   <label><span th:text="#{audit.endUser}"></span><input class="form-control" name="endUser" maxlength="256"></label>
+   <label><span th:text="#{audit.objectOwner}"></span><input class="form-control" name="objectOwner" maxlength="128"></label>
+   <label><span th:text="#{audit.objectName}"></span><input class="form-control" name="objectName" maxlength="128"></label>
+   <label><span th:text="#{audit.outcome}"></span><select name="outcome" class="form-select"><option value="all" th:text="#{audit.all}"></option><option value="success" th:text="#{audit.success}"></option><option value="failure" th:text="#{audit.failure}"></option></select></label>
+   <label class="audit-context"><span>Security context ID</span><input class="form-control" name="context" maxlength="128"></label>
+   <button type="submit" class="btn app-btn app-btn-primary" th:text="#{ui.4b8d541ebe6d}"></button>
+  </form>
+  <p class="app-muted" th:text="#{audit.queryNote}"></p>
+  <div class="table-responsive"><table class="table app-table audit-table"><thead><tr>
+   <th th:text="#{audit.time}"></th><th th:text="#{audit.endUser}"></th><th th:text="#{audit.dbUser}"></th><th th:text="#{audit.objectName}"></th><th th:text="#{audit.action}"></th><th th:text="#{audit.outcome}"></th><th>SQL</th>
+  </tr></thead><tbody data-au-rows></tbody></table></div>
+  <p data-au-empty></p><div class="audit-actions"><button class="btn app-btn app-btn-secondary" data-au-prev disabled th:text="#{ui.da7e61c67cc5}"></button><span data-au-page></span><button class="btn app-btn app-btn-secondary" data-au-next disabled th:text="#{ui.aef613c6612d}"></button></div>
+ </section>
+ <section class="app-card audit-card">
+  <div class="audit-actions"><h2 th:text="#{audit.collection}"></h2><a th:href="@{/db/scheduler}" th:text="#{audit.scheduler}"></a></div>
+  <p th:text="#{audit.collectionNote}"></p><dl class="audit-status" data-au-status></dl>
+  <div class="audit-actions">
+   <label><span th:text="#{audit.minutes}"></span><input class="form-control" type="number" min="5" max="1440" value="60" data-au-minutes></label>
+   <label><span th:text="#{audit.retention}"></span><input class="form-control" type="number" min="0" max="3650" value="0" data-au-retention></label>
+   <button class="btn app-btn app-btn-primary" data-au-op="INSTALL" th:text="#{audit.install}" disabled></button>
+   <button class="btn app-btn app-btn-secondary" data-au-op="CONFIGURE" th:text="#{audit.configure}" disabled></button>
+   <button class="btn app-btn app-btn-secondary" data-au-op="RUN" th:text="#{audit.run}" disabled></button>
+   <button class="btn app-btn app-btn-secondary" data-au-op="PAUSE" th:text="#{audit.pause}" disabled></button>
+   <button class="btn app-btn app-btn-secondary" data-au-op="RESUME" th:text="#{audit.resume}" disabled></button>
+  </div>
+  <p class="app-muted" th:text="#{audit.retentionNote}"></p>
+  <details><summary th:text="#{audit.limitsTitle}"></summary><p th:text="#{audit.limits}"></p><p th:text="#{audit.privacy}"></p><a href="https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/adb-audit.html" target="_blank" rel="noopener noreferrer" th:text="#{audit.oracleDoc}"></a></details>
+ </section>
+ <dialog class="app-preview-dialog audit-dialog" data-au-dialog aria-labelledby="audit-dialog-title">
+  <header class="app-preview-header"><h2 id="audit-dialog-title" data-au-title></h2><button class="btn app-btn app-btn-secondary" data-au-close th:text="#{ui.1e8c10206f5b}"></button></header>
+  <div class="audit-dialog-body" data-au-detail></div>
+  <div class="audit-dialog-body" data-au-confirm hidden><p class="app-alert" data-au-warning></p><label><input type="checkbox" data-au-consent><span th:text="#{audit.consent}"></span></label><button class="btn app-btn app-btn-primary" data-au-apply disabled th:text="#{audit.apply}"></button></div>
+ </dialog>
+</main></div><script type="module" th:src="@{/js/audit-history.mjs}"></script></body></html>
