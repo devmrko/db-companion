@@ -282,6 +282,7 @@ class HttpFlowTest {
         assertThat(get("/tables/history?schema=APP&table=T").statusCode()).isEqualTo(302);
         assertThat(post("/tables/history/toggle", "").statusCode()).isEqualTo(403);
         assertThat(post("/tables/history/upgrade", "").statusCode()).isEqualTo(403);
+        assertThat(post("/tables/history/audit-upgrade", "").statusCode()).isEqualTo(403);
         assertThat(get("/tables").statusCode()).isEqualTo(302);
         assertThat(get("/tables/profiles?schema=APP").statusCode()).isEqualTo(302);
         assertThat(get("/ai-profiles").statusCode()).isEqualTo(302);

@@ -18,6 +18,7 @@
         <input id="table-filter" class="form-control app-table-filter" type="search" th:placeholder="#{ui.4559ca572093}" autocomplete="off" data-table-filter>
       </div>
       <p class="app-filter-message" data-profile-message role="status" hidden></p>
+      <div class="app-table-toolbar"><th:block th:replace="~{fragments/history-access :: access(${selectedSchema}, ${null})}"></th:block></div>
       <div class="table-responsive">
         <table class="table app-table app-summary-table">
           <colgroup><col class="app-name-column"><col></colgroup>

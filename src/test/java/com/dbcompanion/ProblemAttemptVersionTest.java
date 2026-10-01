@@ -18,7 +18,7 @@ class ProblemAttemptVersionTest {
         var source=new SessionDataSource(){@Override public Connection getConnection(){return proxy(Connection.class,(p,m,a)->switch(m.getName()){case "getAutoCommit"->true;case "getTransactionIsolation"->Connection.TRANSACTION_READ_COMMITTED;case "equals"->p==a[0];case "hashCode"->System.identityHashCode(p);default->empty(m.getReturnType());});}};
         String id="11111111-1111-4111-8111-111111111111";Instant original=Instant.parse("2026-01-01T00:00:00Z");var json=new JsonMapper();int[] inserts={0},locks={0};
         var records=new AppRecordRepository(new JdbcTemplate(source),json){
-            @Override public void require(String schema,String login){}
+            @Override public String status(String schema,String login){return "READY";}
             @Override public ProblemQuestion.Parent lockProblem(String schema,String key){locks[0]++;return new ProblemQuestion.Parent(1,id,"q","d","e","",ProblemQuestion.Status.RECEIVED,false,original,original.plusSeconds(1));}
             @Override public void begin(String schema,String key,String type,JsonNode payload){inserts[0]++;}
             @Override public boolean finish(String schema,String key,String status,JsonNode payload){return true;}

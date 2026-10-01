@@ -40,7 +40,7 @@ public class VectorSearchService {
     public List<Table> tables(PoolSession session,boolean refresh) {
         synchronized(session) {
             var state=session.metadata(); String schema=state.selectedSchema();
-            return state.vectorTables(schema,refresh,()->transaction(session,false,()->repository.tables(schema)));
+            return state.vectorTables(schema,refresh,()->transaction(session,false,()->repository.tables(schema,state.info().username())));
         }
     }
     public record Metadata(List<Column> columns,Options options) {}

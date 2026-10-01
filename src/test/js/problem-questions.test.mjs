@@ -1,7 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {redactDiagnostic,diagnosticMarkdown} from '../../main/resources/static/js/problem-questions.mjs';
+import {redactDiagnostic,diagnosticMarkdown,problemStorageView} from '../../main/resources/static/js/problem-questions.mjs';
+
+test('storage states distinguish absent, incompatible, unavailable, and ready',()=>{
+  assert.deepEqual([problemStorageView('READY').ready,problemStorageView('READY').canSetup],[true,false]);
+  const missing=problemStorageView('MISSING');assert.equal(missing.ready,false);assert.equal(missing.canSetup,true);assert.match(missing.message,/DBC_APP_RECORD/);assert.doesNotMatch(missing.message,/RDF/);
+  for(const state of ['MISMATCH','UNAVAILABLE','UNKNOWN',undefined]){const view=problemStorageView(state);assert.equal(view.ready,false);assert.equal(view.canSetup,false);assert.doesNotMatch(view.message,/아직 없습니다/);}
+});
+test('storage messages use separate localized keys instead of the optional error label',()=>{
+  globalThis.DB_COMPANION_MESSAGES={'problemQuestion.storageUnavailable':'Storage unavailable','problemQuestion.error':'Error (optional)'};
+  try{assert.equal(problemStorageView('UNAVAILABLE').message,'Storage unavailable');}finally{delete globalThis.DB_COMPANION_MESSAGES;}
+});
+test('initial list waits for ready storage and save remains disabled until readiness is confirmed',()=>{
+  const source=fs.readFileSync('src/main/resources/static/js/problem-questions.mjs','utf8'),html=fs.readFileSync('src/main/resources/templates/ai-problems.html','utf8');
+  assert.match(source,/if\(storageReady\)await list\(\)/);assert.doesNotMatch(source,/status\(\);list\(\)/);
+  assert.match(source,/if\(!storageReady\)return/);assert.match(html,/data-problem-save disabled/);assert.match(html,/data-problem-storage-setup hidden/);assert.match(html,/data-problem-storage-refresh/);
+});
 
 test('diagnostic export redacts credentials and contains only selected attempt fields',()=>{
   const result=diagnosticMarkdown({parent:{status:'RECEIVED',createdAt:'2026-09-23T00:00:00Z',question:'q',description:'password=hidden',expected:'e',expectedSql:''},attempts:[{capturedAt:'2026-09-23T00:00:01Z',availability:'CAPTURED',input:'i',sql:'select 1',error:'',metadata:'wallet: value'}]});

@@ -1,0 +1,10 @@
+{
+  "problemQuestion.storageChecking": ["문제 질문 저장소 확인 중…", "Checking problem-question storage…", "正在检查问题提问存储…", "問題の質問ストレージを確認中…"],
+  "problemQuestion.storageReady": ["문제 질문 저장소 준비 완료 (DBC_APP_RECORD)", "Problem-question storage is ready (DBC_APP_RECORD)", "问题提问存储已就绪（DBC_APP_RECORD）", "問題の質問ストレージは準備済みです (DBC_APP_RECORD)"],
+  "problemQuestion.storageMissing": ["문제 질문 저장소(DBC_APP_RECORD)가 아직 없습니다. 저장소를 준비한 후 다시 확인해 주세요.", "Problem-question storage (DBC_APP_RECORD) has not been created. Set it up, then check again.", "尚未创建问题提问存储（DBC_APP_RECORD）。请先完成设置，然后重新检查。", "問題の質問ストレージ (DBC_APP_RECORD) は未作成です。準備してから再確認してください。"],
+  "problemQuestion.storageMismatch": ["DBC_APP_RECORD의 구조가 앱 요구사항과 다릅니다. 기존 테이블을 변경하지 않았습니다. 관리자에게 확인해 주세요.", "The DBC_APP_RECORD structure does not match the app requirements. The existing table was not changed. Ask an administrator to review it.", "DBC_APP_RECORD 的结构不符合应用要求。未更改现有表。请联系管理员检查。", "DBC_APP_RECORD の構造がアプリの要件と異なります。既存の表は変更していません。管理者に確認してください。"],
+  "problemQuestion.storageUnavailable": ["문제 질문 저장소의 상태를 확인하지 못했습니다. 연결과 조회 권한을 확인한 뒤 다시 시도해 주세요.", "Could not verify problem-question storage. Check the connection and read permissions, then try again.", "无法确认问题提问存储的状态。请检查连接和查询权限，然后重试。", "問題の質問ストレージの状態を確認できませんでした。接続と参照権限を確認してから再試行してください。"],
+  "problemQuestion.storageGuide": ["업무 용어 사전 화면의 ‘이력 저장 테이블 생성’에서 공용 저장소를 준비할 수 있습니다. 문제 질문에는 용어 사전이나 RDF 저장소가 필요하지 않습니다.", "Open Business dictionary and choose ‘Create history storage table’ to prepare the shared storage. Problem questions do not require a dictionary or RDF store.", "在业务术语词典页面选择“创建历史存储表”以准备共用存储。问题提问不需要术语词典或 RDF 存储。", "業務用語辞書画面の「履歴保存テーブルを作成」で共通ストレージを準備できます。問題の質問には辞書や RDF ストアは不要です。"],
+  "problemQuestion.storageSetup": ["저장소 설정 열기", "Open storage setup", "打开存储设置", "ストレージ設定を開く"],
+  "problemQuestion.storageRefresh": ["저장소 다시 확인", "Check storage again", "重新检查存储", "ストレージを再確認"]
+}

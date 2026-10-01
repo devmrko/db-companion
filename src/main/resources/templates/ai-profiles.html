@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/common :: head(#{ui.e65249eb5f3c})}"></head>
-<body class="app-shell">
+<body class="app-shell" th:classappend="${profileName != null} ? 'app-profile-detail-page'">
 <aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main">
   <header th:replace="~{fragments/common :: topbar}"></header>
   <main class="app-content">
     <a class="app-back-link" th:if="${profileName != null}" th:href="@{/ai-profiles}" th:text="#{ui.ab881c31afb0}">← 프로필 목록</a>
-    <div class="app-page-heading"><h1 th:text="${profileName == null ? #messages.msg('ui.e65249eb5f3c') : profileName}"></h1><button th:replace="~{fragments/common :: sqlHelp('profiles', 'list')}"></button><a class="btn app-btn app-btn-secondary" th:href="${profileName == null} ? @{/ai-profiles} : @{/ai-profiles(profile=${profileName})}" th:text="#{ui.8259f9d35351}">새로고침</a></div>
+    <div class="app-page-heading">
+      <h1 th:text="${profileName == null ? #messages.msg('ui.e65249eb5f3c') : profileName}"></h1>
+      <div class="app-profile-heading-actions"><button th:replace="~{fragments/common :: sqlHelp('profiles', 'list')}"></button><a class="btn app-btn app-btn-secondary" th:href="${profileName == null} ? @{/ai-profiles} : @{/ai-profiles(profile=${profileName})}" th:text="#{ui.8259f9d35351}">새로고침</a></div>
+    </div>
     <th:block th:replace="~{fragments/select-ai-setup :: guide}"></th:block>
     <div class="app-history-toolbar" th:if="${info != null and info.username == selectedSchema}"><button type="button" class="btn app-btn app-btn-secondary" data-ai-create="PROFILE" th:text="#{creation.newProfile}">프로필 생성</button><button th:replace="~{fragments/common :: sqlHelp('profiles', 'create')}"></button><button th:if="${profileName != null}" type="button" class="btn app-btn app-btn-secondary" data-ai-create="PROFILE" th:attr="data-source=${profileName}" th:text="#{creation.clone}">복제</button></div>
     <div class="app-alert is-error" role="alert" th:if="${schemaError}" th:text="${schemaError}"></div>

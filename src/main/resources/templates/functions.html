@@ -5,6 +5,7 @@
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
 <main class="app-content">
   <div class="app-page-heading"><h1 th:text="#{functions.title}">함수</h1><button th:replace="~{fragments/common :: sqlHelp('functions', 'list')}"></button></div>
+  <p><a class="app-inline-link" th:href="@{/db/functions/ai-query}" th:text="#{callable.title}">사용자용 AI 함수</a></p>
   <p class="app-alert is-error" th:if="${schemaError}" th:text="${schemaError}"></p>
   <p class="app-alert is-error" th:if="${loadError}" th:text="${loadError}"></p>
   <div class="app-function-layout" th:if="${loadError == null}" data-functions

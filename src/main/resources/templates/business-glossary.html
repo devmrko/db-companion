@@ -5,6 +5,7 @@
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
 <main class="app-content" data-glossary-manager>
   <div class="app-page-heading"><h1 th:text="#{businessGlossary.title}">업무 용어 사전</h1><a th:href="@{/ai-test}" th:text="#{businessGlossary.goTest}">Select AI 테스트</a></div>
+  <p><a class="app-inline-link" th:href="@{/db/functions/ai-query}" th:text="#{callable.title}">사용자용 AI 함수</a></p>
   <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-glossary-csrf>
   <section class="app-card app-glossary-card">
     <h2 th:text="#{businessGlossary.storage}">저장소와 검색 설정</h2>

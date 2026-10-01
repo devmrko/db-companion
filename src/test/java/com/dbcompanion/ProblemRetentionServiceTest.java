@@ -20,6 +20,7 @@ class ProblemRetentionServiceTest {
         var source=new SessionDataSource(){@Override public Connection getConnection(){return proxy(Connection.class,(p,m,a)->switch(m.getName()){case "getAutoCommit"->true;case "getTransactionIsolation"->Connection.TRANSACTION_READ_COMMITTED;case "prepareStatement"->throw new AssertionError("No physical SQL should be attempted by a retained delete");case "equals"->p==a[0];case "hashCode"->System.identityHashCode(p);default->empty(m.getReturnType());});}};
         var json=new JsonMapper();
         var records=new AppRecordRepository(new JdbcTemplate(source),json){
+            @Override public String status(String schema,String login){return "READY";}
             @Override public ProblemQuestion.Parent lockProblem(String schema,String key){assertThat(key).isEqualTo(id);return current.get();}
             @Override public void updateProblem(String schema,ProblemQuestion.Parent next,Instant expected){assertThat(expected).isEqualTo(time);current.set(next);}
             @Override public ProblemQuestion.DeletePreview problemDeletePreview(String schema,List<String> ids){return new ProblemQuestion.DeletePreview(ids,1,0,"synthetic-fingerprint");}

@@ -41,6 +41,7 @@ export function mountBatch(root){
   const message=(value,error=false)=>{get('message').textContent=value;get('message').className=error?'app-alert is-error':'app-filter-message';};
   function controls(){
     get('selection').textContent=t('aitest.batch.selection','선택 질문 {0} / 최대 20',selected.size);
+    const summary=get('selection-summary');if(summary)summary.textContent=get('selection').textContent;
     for(const name of ['profiles','profile','restore'])get(name).disabled=busy;
     get('prepare').disabled=busy||!selected.size||!get('profile').value;
     get('run').disabled=busy||!plan?.profile?.selection?.name||!get('consent').checked||!plan.items.some(i=>i.status==='PENDING');

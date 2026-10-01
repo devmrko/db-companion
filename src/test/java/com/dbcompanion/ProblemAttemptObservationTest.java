@@ -21,7 +21,7 @@ class ProblemAttemptObservationTest {
         Instant parentVersion=Instant.parse("2026-01-01T00:00:00Z"),requestedAt=parentVersion.plusSeconds(60);
         var json=new JsonMapper();var payloads=new ArrayList<JsonNode>();
         var records=new AppRecordRepository(new JdbcTemplate(source),json){
-            @Override public void require(String schema,String login){}
+            @Override public String status(String schema,String login){return "READY";}
             @Override public ProblemQuestion.Parent lockProblem(String schema,String key){return new ProblemQuestion.Parent(1,id,"q","d","e","",ProblemQuestion.Status.RECEIVED,false,parentVersion,parentVersion);}
             @Override public void begin(String schema,String key,String type,JsonNode payload){payloads.add(payload);}
             @Override public boolean finish(String schema,String key,String status,JsonNode payload){return true;}
@@ -39,7 +39,7 @@ class ProblemAttemptObservationTest {
         String id="11111111-1111-4111-8111-111111111111";Instant version=Instant.parse("2026-01-01T00:00:00Z");
         var json=new JsonMapper();var payloads=new ArrayList<JsonNode>();
         var records=new AppRecordRepository(new JdbcTemplate(source),json){
-            @Override public void require(String schema,String login){}
+            @Override public String status(String schema,String login){return "READY";}
             @Override public ProblemQuestion.Parent lockProblem(String schema,String key){return new ProblemQuestion.Parent(1,id,"q","d","e","",ProblemQuestion.Status.RECEIVED,false,version,version);}
             @Override public void begin(String schema,String key,String type,JsonNode payload){payloads.add(payload);}
             @Override public boolean finish(String schema,String key,String status,JsonNode payload){return true;}

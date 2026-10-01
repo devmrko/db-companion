@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/common :: head(#{ui.cb3678a61172})}"></head>
-<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<body class="app-shell app-task-detail-page"><aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
   <main class="app-content">
     <a class="app-back-link" th:href="@{/ai-agents/team(schema=${targetSchema},team=${teamName})}">← <span th:text="${teamName}"></span></a>

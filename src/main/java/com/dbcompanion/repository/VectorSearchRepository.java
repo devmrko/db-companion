@@ -21,19 +21,29 @@ public class VectorSearchRepository {
         this.jdbc=new JdbcTemplate(source); this.jdbc.setQueryTimeout(10);
         this.searchJdbc=new JdbcTemplate(source); this.searchJdbc.setQueryTimeout(30);
     }
-    public List<Table> tables(String schema) {
+    public List<Table> tables(String schema,String login) {
         var vectors=new LinkedHashMap<String,List<String>>(); var comments=new HashMap<String,String>();
-        jdbc.query("""
+        // CURRENT_SCHEMA does not change the authenticated user's USER_* dictionary scope.
+        boolean ownSchema=schema.equals(login);
+        String sql=ownSchema ? """
+                SELECT c.TABLE_NAME, c.COLUMN_NAME, x.COMMENTS
+                FROM SYS.USER_TAB_COLUMNS c
+                JOIN SYS.USER_TABLES t ON t.TABLE_NAME=c.TABLE_NAME
+                LEFT JOIN SYS.USER_TAB_COMMENTS x ON x.TABLE_NAME=t.TABLE_NAME AND x.TABLE_TYPE='TABLE'
+                WHERE c.DATA_TYPE='VECTOR'
+                ORDER BY c.TABLE_NAME, c.COLUMN_ID
+                """ : """
                 SELECT c.TABLE_NAME, c.COLUMN_NAME, x.COMMENTS
                 FROM SYS.ALL_TAB_COLUMNS c
                 JOIN SYS.ALL_TABLES t ON t.OWNER=c.OWNER AND t.TABLE_NAME=c.TABLE_NAME
                 LEFT JOIN SYS.ALL_TAB_COMMENTS x ON x.OWNER=t.OWNER AND x.TABLE_NAME=t.TABLE_NAME AND x.TABLE_TYPE='TABLE'
                 WHERE c.OWNER=? AND c.DATA_TYPE='VECTOR'
                 ORDER BY c.TABLE_NAME, c.COLUMN_ID
-                """, (org.springframework.jdbc.core.RowCallbackHandler) r -> {
+                """;
+        jdbc.query(sql, (org.springframework.jdbc.core.RowCallbackHandler) r -> {
                     vectors.computeIfAbsent(r.getString(1),key->new ArrayList<>()).add(r.getString(2));
                     comments.put(r.getString(1),r.getString(3));
-                },schema);
+                },ownSchema ? new Object[0] : new Object[]{schema});
         return vectors.entrySet().stream().map(e->new Table(e.getKey(),comments.get(e.getKey()),e.getValue())).toList();
     }
     public List<Column> columns(String schema,String table) {

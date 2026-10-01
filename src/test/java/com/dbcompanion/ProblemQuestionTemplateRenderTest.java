@@ -32,6 +32,8 @@ class ProblemQuestionTemplateRenderTest {
         assertThat(test).contains("Profile A/B SQL comparison","Review transmission plan","Confirm A/B SQL generation","Generate Profile A","Confirm A/B SHOWPROMPT","This adds two SHOWPROMPT calls","Confirm AI comparison","Request AI comparison")
                 .doesNotContain("프로필 A/B SQL 비교","전송 계획 보기","A/B SQL 생성 확인","프로필 A 생성","A/B SHOWPROMPT 확인","추가 AI 비교 호출 1회입니다.");
         assertThat(problems).contains("data-problem-question","data-attempt-input","data-problem-export-preview");
+        assertThat(problems).contains("/css/management-workbench.css", "Batch generation settings", "data-batch-selection-summary")
+                .doesNotContain("??workbench.");
     }
     private String renderLabels(String template) throws Exception {
         String page=Files.readString(Path.of("src/main/resources/templates/"+template));

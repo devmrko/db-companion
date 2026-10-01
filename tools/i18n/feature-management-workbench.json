@@ -1,0 +1,20 @@
+{
+  "workbench.batchSettings": ["일괄 생성 설정", "Batch generation settings", "批量生成设置", "一括生成の設定"],
+  "workbench.pick": ["선택", "Select", "选择", "選択"],
+  "workbench.attempts": ["실행 기록", "Attempts", "执行记录", "実行記録"],
+  "workbench.attemptSummary": ["{0} · 실행 기록 {1}건", "{0} · {1} attempts", "{0} · {1} 条执行记录", "{0} · 実行記録 {1} 件"],
+  "workbench.vpd.target": ["대상 선택", "Select target", "选择对象", "対象の選択"],
+  "workbench.vpd.policies": ["정책 목록", "Policies", "策略列表", "ポリシー一覧"],
+  "workbench.vpd.functionOwner": ["함수 소유자", "Function owner", "函数所有者", "関数の所有者"],
+  "workbench.vpd.function": ["정책 함수", "Policy function", "策略函数", "ポリシー関数"],
+  "workbench.vpd.group": ["정책 그룹", "Policy group", "策略组", "ポリシーグループ"],
+  "workbench.vpd.type": ["정책 유형", "Policy type", "策略类型", "ポリシー種別"],
+  "workbench.vpd.columns": ["보안 적용 컬럼", "Security-relevant columns", "安全相关列", "セキュリティ対象列"],
+  "workbench.vpd.statements": ["적용 작업", "Statement types", "适用操作", "適用操作"],
+  "workbench.vpd.status": ["상태", "Status", "状态", "状態"],
+  "workbench.vpd.enabled": ["활성", "Enabled", "启用", "有効"],
+  "workbench.vpd.disabled": ["비활성", "Disabled", "禁用", "無効"],
+  "workbench.vpd.updateCheck": ["변경 후 검사 (update_check)", "Check after update (update_check)", "更新后检查 (update_check)", "更新後の検査 (update_check)"],
+  "workbench.vpd.long": ["긴 조건식 (long_predicate)", "Long predicate (long_predicate)", "长谓词 (long_predicate)", "長い述語 (long_predicate)"],
+  "workbench.vpd.allRows": ["컬럼 마스킹 (ALL_ROWS)", "Column masking (ALL_ROWS)", "列掩码 (ALL_ROWS)", "列マスキング (ALL_ROWS)"]
+}

@@ -29,7 +29,8 @@ class AiFeedbackTemplateTest {
     }
     @Test void firstVisitOnlyOffersProfilesAndNoEmptyResultClaim() {
         String html = render(new Result(profiles, false, null, null), false, "", null);
-        assertThat(html).contains("Select AI Feedback", "프로필을 선택하세요.", "value=\"P\"", "value=\"/ai-feedback\"", "data-query-select")
+        assertThat(html).contains("Select AI Feedback", "프로필을 선택하세요.", "value=\"P\"", "value=\"/ai-feedback\"", "data-query-select",
+                "app-shell app-feedback-page", "app-feedback-profile-filter", "app-feedback-type-filter")
                 .doesNotContain("조회된 Feedback이 없습니다.", "th:", "<script>q</script>");
     }
     @Test void listHasEscapedPreviewsAndPreservesFiltersAndPages() {
@@ -58,5 +59,12 @@ class AiFeedbackTemplateTest {
         assertThat(html).contains("data-feedback-tracking","data-profile=\"P\"","트리거 설치·켜기","공통 이력 준비","data-ft-state", "data-ft-action=\"install\" hidden disabled")
                 .doesNotContain("트리거 켜짐","th:");
         assertThat(render(new Result(profiles,false,null,null),false,"",null)).doesNotContain("data-feedback-tracking");
+    }
+    @Test void longProfileNamesRemainCompleteInDetailAndDialogs() {
+        String name = "APP_" + "LONG_PROFILE_".repeat(6);
+        var detail = new Detail("합성 질문", "positive", "SELECT 1 FROM DUAL", "합성 설명", "sql-id", "select ai 합성 질문", "{}");
+        String html = render(new Result(profiles, false, null, detail), true, name, null);
+        assertThat(html).contains("app-shell app-feedback-page", "<h2>" + name + "</h2>",
+                "data-ft-dialog", "data-feedback-editor", "APP." + name, "SELECT 1 FROM DUAL");
     }
 }
