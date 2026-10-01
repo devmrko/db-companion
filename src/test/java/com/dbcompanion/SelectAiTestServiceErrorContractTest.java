@@ -26,6 +26,8 @@ class SelectAiTestServiceErrorContractTest {
     private int expectedTimeout = 300;
     private int expectedGenerationTimeout = 300;
     private int generationCalls;
+    private String lastPrompt;
+    private Action lastAction;
     private boolean generationSuccess;
     private boolean rollbackFails;
     private int executionCalls;
@@ -60,6 +62,7 @@ class SelectAiTestServiceErrorContractTest {
             assertThat(holder).isNotNull();
             assertThat(holder.getTimeToLiveInSeconds()).isBetween(expectedGenerationTimeout+55,expectedGenerationTimeout+60);
             generationCalls++;
+            lastPrompt=prompt;lastAction=action;
             if(generationSuccess)return "SELECT 1 FROM DUAL";
             throw failure;
         }
@@ -115,6 +118,38 @@ class SelectAiTestServiceErrorContractTest {
             assertContract(result.code(), result.error(), "AI review request");
             assertThat(networkTimeout).isEqualTo(15_000);
             assertThat(generationCalls).isEqualTo(1);
+        }
+    }
+    private SelectAiTest.ExecutionResult prepareExecutedResult(PoolSession session){
+        String sql="SELECT 1 FROM DUAL";
+        session.metadata().aiTest().finish(new SelectAiTest.Outcome("result",Action.SQL,profile,"q",Instant.now(),1,sql,null,null,"complete"));
+        var result=new SelectAiTest.ExecutionResult("result",new OntologyInquiry.Rows("result",sql,com.dbcompanion.service.OntologyQueryService.hash(sql),"APP",Instant.now().toString(),List.of("N"),List.of(List.of(new OntologyInquiry.Cell("PRIVATE_CELL",false))),false),null,null,1);
+        session.metadata().aiTest().finishExecution(result);session.metadata().assistant().select(selection);return result;
+    }
+    @Test void resultReviewCallsChatExactlyOnceAndNeverExecutesOrReplacesSql(){
+        generationSuccess=true;
+        try(var session=session()){
+            var rowsBefore=prepareExecutedResult(session);var original=session.metadata().aiTest().latest();
+            var preview=service.resultReviewPreview(session,"result","count unique users",java.util.Locale.ENGLISH);
+            assertThat(generationCalls).isZero();assertThat(preview.source()).doesNotContain("PRIVATE_CELL");
+            var result=service.resultReview(session,preview.token(),true);
+            assertThat(result.error()).isNull();assertThat(result.sqlHash()).isEqualTo(rowsBefore.data().hash());
+            assertThat(lastAction).isEqualTo(Action.CHAT);assertThat(lastPrompt).isEqualTo(preview.source());
+            assertThat(session.metadata().aiTest().latest()).isSameAs(original);
+            assertThat(session.metadata().aiTest().executionResult()).isSameAs(rowsBefore);
+            assertThat(session.metadata().aiTest().running()).isFalse();assertThat(networkTimeout).isEqualTo(15000);
+            assertThatThrownBy(()->service.resultReview(session,preview.token(),true)).isInstanceOf(AiAssistant.Failure.class);
+            assertThat(generationCalls).isEqualTo(1);assertThat(executionCalls).isZero();
+        }
+    }
+    @Test void resultReviewFailurePreservesSafeErrorWithoutRetryOrSqlExecution(){
+        try(var session=session()){
+            prepareExecutedResult(session);
+            var preview=service.resultReviewPreview(session,"result","",java.util.Locale.ENGLISH);
+            var result=service.resultReview(session,preview.token(),true);
+            assertContract(result.code(),result.error(),"AI result review request");
+            assertThat(session.metadata().aiTest().running()).isFalse();assertThat(networkTimeout).isEqualTo(15000);
+            assertThat(generationCalls).isEqualTo(1);assertThat(executionCalls).isZero();
         }
     }
     @Test void generationBudgetCoversEveryTestActionAndRestoresConnection(){

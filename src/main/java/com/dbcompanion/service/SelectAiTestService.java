@@ -11,6 +11,7 @@ import com.dbcompanion.model.SelectAiProgress;
 import com.dbcompanion.model.SelectAiProgress.Stage;
 import com.dbcompanion.model.SelectAiComparison;
 import com.dbcompanion.model.SelectAiReview;
+import com.dbcompanion.model.SelectAiResultReview;
 import com.dbcompanion.model.SelectAiEvidence;
 import com.dbcompanion.model.SelectAiInspection;
 import com.dbcompanion.model.OntologyRelations;
@@ -69,7 +70,7 @@ public class SelectAiTestService {
     public Options options(PoolSession session,boolean refresh){
         var state=session.metadata().aiTest();synchronized(state){
             var choices=state.profiles(refresh,()->query(session,false,ai::profiles));
-            return new Options(session.metadata().info().username(),state.selected(),choices,state.running(),state.latest(),state.executionResult(),state.prompt(),state.review().result(),session.metadata().schemas(),session.metadata().selectedSchema(),state.evidence().selected(),state.inspection());
+            return new Options(session.metadata().info().username(),state.selected(),choices,state.running(),state.latest(),state.executionResult(),state.prompt(),state.review().result(),session.metadata().schemas(),session.metadata().selectedSchema(),state.evidence().selected(),state.inspection(),state.resultReview().result());
         }
     }
     public void select(PoolSession session,String name){
@@ -230,6 +231,45 @@ public class SelectAiTestService {
                     "응답을 확인하지 못했습니다. 사용량이 발생했을 수 있으며 자동 재시도하지 않았습니다.":"호출 전 프로필 확인 단계에서 중단했습니다. 프로필을 새로고침해 주세요.");
             result=new SelectAiReview.Result(prepared.prompt().id(),before,started,elapsed(nanos),null,error(message,stage,ex),code(ex));
         }finally{synchronized(state){state.review().finish(result);state.finishReview();}}
+        return result;
+    }
+    public AiAssistant.Preview resultReviewPreview(PoolSession session,String resultId,String baseline,Locale locale){
+        var state=session.metadata().aiTest();synchronized(state){
+            var outcome=state.executable(resultId);SelectAiResultReview.verify(outcome,state.executionResult());
+            var selection=session.metadata().assistant().selected();
+            if(selection==null)throw new AiAssistant.Failure(409,"assistant.chooseFirst","AI 도우미 설정에서 프로필을 먼저 선택해 주세요.");
+            var reviewer=query(session,false,()->ai.profile(selection));
+            state.invalidateRequests();
+            // Review the captured definitions, not a reconstructed current glossary/catalog.
+            return state.resultReview().prepare(session.metadata().info().username(),outcome,state.executionResult(),reviewer,
+                    baseline,UiMessages.supported(locale).getLanguage(),Instant.now());
+        }
+    }
+    public SelectAiResultReview.Result resultReview(PoolSession session,String token,boolean consent){
+        var state=session.metadata().aiTest();final SelectAiResultReview.Prepared prepared;
+        synchronized(state){
+            state.idle();if(state.latest()==null)throw AiAssistant.stale();state.executable(state.latest().id());
+            prepared=state.resultReview().consume(token,consent,session.metadata().info().username(),
+                    session.metadata().assistant().selected(),state.latest(),state.executionResult(),Instant.now());
+            state.beginReview();
+        }
+        var reviewer=prepared.preview().profile();var started=Instant.now();long nanos=System.nanoTime();
+        boolean[] called={false};SelectAiResultReview.Result result=null;
+        try{
+            String text=query(session,true,()->{
+                if(!Objects.equals(session.metadata().assistant().selected(),reviewer.selection())
+                        ||!reviewer.equals(ai.profile(reviewer.selection())))throw AiAssistant.stale();
+                String owner=packages.packageOwner(reviewer.selection().owner());called[0]=true;
+                return ai.explain(owner,reviewer.selection().name(),prepared.preview().source(),executionSettings.generateTimeoutSeconds());
+            });
+            if(text==null||text.isBlank())throw new AiAssistant.Failure(502,"aitest.resultReview.empty","AI 검토 응답이 비어 있습니다. 자동 재시도하지 않았습니다.");
+            result=new SelectAiResultReview.Result(prepared.preview().reference(),prepared.sqlHash(),prepared.executedAt(),reviewer,started,elapsed(nanos),text,null,null);
+        }catch(RuntimeException ex){
+            String message=!called[0]&&ex instanceof AiAssistant.Failure?ex.getMessage():UiMessages.text(called[0]?"aitest.callError":"aitest.preflightError",called[0]?
+                    "응답을 확인하지 못했습니다. 사용량이 발생했을 수 있으며 자동 재시도하지 않았습니다.":"호출 전 프로필 확인 단계에서 중단했습니다. 프로필을 새로고침해 주세요.");
+            result=new SelectAiResultReview.Result(prepared.preview().reference(),prepared.sqlHash(),prepared.executedAt(),reviewer,started,elapsed(nanos),null,
+                    error(message,called[0]?"AI result review request":"result review profile preflight",ex),code(ex));
+        }finally{synchronized(state){state.resultReview().finish(result);state.finishReview();}}
         return result;
     }
     public ExecutionPreview executionPreview(PoolSession session,String id){

@@ -64,6 +64,13 @@ public class SelectAiTestController {
     public ResponseEntity<?> conditionPreview(@RequestBody ConditionPreview v,Locale locale,HttpServletRequest r){return respond(r,()->{if(!Objects.equals(v.question(),v.originalQuestion()))throw AiAssistant.stale();return service.conditionPreview(session(r),v.action(),v.question(),new SelectAiTest.ConditionConfirmation(v.originalQuestion(),v.confirmationQuestion(),v.confirmationAnswer(),v.conditions()),v.useOntology(),v.evidenceHash(),locale,v.glossary());});}
     public record Run(String token,boolean consent) {}
     public record ReviewPrepare(String promptId) {}
+    public record ResultReviewPrepare(String resultId,String baseline) {
+        @com.fasterxml.jackson.annotation.JsonAnySetter public void reject(String key,Object value){throw new IllegalArgumentException("Unexpected request field");}
+    }
+    @PostMapping("/ai-test/result-review/preview") @ResponseBody
+    public ResponseEntity<?> resultReviewPreview(@RequestBody ResultReviewPrepare v,Locale locale,HttpServletRequest r){return respond(r,()->service.resultReviewPreview(session(r),v.resultId(),v.baseline(),locale));}
+    @PostMapping("/ai-test/result-review") @ResponseBody
+    public ResponseEntity<?> resultReview(@RequestBody Run v,HttpServletRequest r){return respond(r,()->service.resultReview(session(r),v.token(),v.consent()));}
     @PostMapping("/ai-test/review/preview") @ResponseBody
     public ResponseEntity<?> reviewPreview(@RequestBody ReviewPrepare v,Locale locale,HttpServletRequest r){return respond(r,()->service.reviewPreview(session(r),v.promptId(),locale));}
     @PostMapping("/ai-test/review") @ResponseBody

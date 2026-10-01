@@ -6,6 +6,7 @@ import {mountEvidence,renderEvidence} from './select-ai-evidence.mjs';
 import {mountInspection,renderPromptInspection,renderSqlReferences} from './select-ai-inspection.mjs';
 import {mountBusinessGlossary,renderGlossarySnapshot} from './business-glossary.mjs';
 import {mountProgress} from './select-ai-progress.mjs';
+import {mountResultReview} from './select-ai-result-review.mjs';
 
 export const validQuestion=value=>typeof value==='string'&&value.trim().length>0&&value.length<=16000&&!value.includes('\0');
 export const canPrepare=(selected,question,busy)=>Boolean(selected)&&validQuestion(question)&&!busy;
@@ -40,12 +41,15 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ai-test]').for
     try{return await assistantApi('/ai-test/'+path,options);}finally{await progress.settle(id);}
   };
   const message=(value,error=false)=>{get('message').textContent=value;get('message').className=error?'app-alert is-error':'app-filter-message';};
+  const resultReview=mountResultReview(root,{post,latest:()=>latest,selected:()=>selected,isBusy:()=>busy||remoteRunning,
+    setBusy:value=>{busy=value;controls();},uncertain:()=>{remoteRunning=true;},message});
   const evidence=mountEvidence(root,{post,isBusy:()=>busy||remoteRunning,setBusy:value=>{busy=value;controls();},changed:()=>{prepared=null;controls();},message,question:()=>get('question').value});
   const glossary=mountBusinessGlossary(root,{csrf:get('csrf'),question:()=>get('question').value,profile:()=>selected,busy:()=>busy||remoteRunning,setBusy:value=>{busy=value;controls();},changed:()=>{prepared=null;controls();},message});
   const inspection=mountInspection(root,{post,isBusy:()=>busy||remoteRunning,setBusy:value=>{busy=value;controls();},selected:()=>selected,question:()=>get('question').value,prompt:()=>snapshot,promptCompatible:()=>evidence.ready()&&evidence.matches(snapshot?.evidence)&&glossary.matches(snapshot?.glossary),generated:()=>latest,generatedCompatible:()=>evidence.ready()&&evidence.matches(latest?.evidence)&&glossary.matches(latest?.glossary),message});
   function controls(){
     const pending=busy||remoteRunning;
     progress.setBusy(pending);
+    resultReview.controls();
     get('profile').disabled=pending;get('question').disabled=pending;get('refresh').disabled=busy;
     evidence.controls(pending);
     glossary.controls();
@@ -93,6 +97,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ai-test]').for
   get('problem-close').addEventListener('click',()=>problemDialog.close());
   get('problem-run').addEventListener('click',async()=>{if(!problemSave)return;const parentOption=get('problem-parent').selectedOptions[0],parent=parentOption?.value?{id:parentOption.value,updatedAt:parentOption.dataset.updatedAt}:null;if(!parent&&(!get('problem-description').value.trim()||!get('problem-expected').value.trim()))return;busy=true;controls();try{const base=problemSave.kind==='comparison'?'comparison/problem':'problem',payload=selectedSavePayload(problemSave,parent,{description:get('problem-description').value,expected:get('problem-expected').value,expectedSql:get('problem-sql').value,status:'RECEIVED',includeSnapshots:get('problem-snapshots').checked});const result=await post(parent?base+'/attempt':base,payload);problemSave=null;problemDialog.close();message(t('problemQuestion.saved','문제 질문에 저장했습니다: {0}',result.id));}catch(ex){message(ex.message,true);}finally{busy=false;controls();}});
   function render(outcome){
+    resultReview.clear();
     latest=outcome;get('execute').hidden=!outcome||outcome.action!=='SQL'||Boolean(outcome.error)||!isSqlResponse(outcome.text);
     get('sql-references').hidden=outcome?.action!=='SQL';renderSqlReferences(get('sql-references'),outcome);
     get('rows').replaceChildren();get('execute-message').textContent='';
@@ -135,7 +140,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ai-test]').for
       for(const item of data.profiles)select.append(new Option(profileLabel(item),item.name));
       if(get('comparison-left')){for(const name of ['comparison-left','comparison-right']){const target=get(name);target.replaceChildren();for(const item of data.profiles)target.append(new Option(profileLabel(item),item.name));}get('comparison-left').value=selected;get('comparison-right').value=data.profiles.find(p=>p.name!==selected)?.name||selected;}
       if(selected&&!data.profiles.some(p=>p.name===selected))select.append(new Option(selected,selected));
-      select.value=selected;render(data.latest);renderRows(data.execution);renderPrompt(data.prompt);renderReview(data.review);
+      select.value=selected;render(data.latest);renderRows(data.execution);renderPrompt(data.prompt);renderReview(data.review);resultReview.render(data.resultReview);
       if(!get('question').value)get('question').value=[data.prompt,data.latest].filter(Boolean).sort((a,b)=>new Date(b.requestedAt)-new Date(a.requestedAt))[0]?.question||'';
       const evidenceError=await evidence.restore(data,refresh);
       await glossary.load();
@@ -203,6 +208,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ai-test]').for
   get('close').addEventListener('click',close);dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
   get('consent').addEventListener('change',controls);
   function renderRows(result){
+    resultReview.setExecution(result);
     const host=get('rows');host.replaceChildren();if(!result)return;
     get('execute-message').textContent=result.error?[result.error,result.code,t('aitest.progress.seconds','{0}초',(result.elapsedMillis/1000).toFixed(2))].filter(Boolean).join(' · '):t('aitest.rowCount','{0}행 · {1}초',result.data.rows.length,(result.elapsedMillis/1000).toFixed(2));
     if(result.code==='ORA-01013')get('execute-message').textContent+='\n'+t('aitest.progress.cancelHint','작업 취소가 반환되었습니다. 앱의 SQL 실행 제한은 {0}초입니다. 제한시간에 따른 취소일 수 있으나 이 코드만으로 원인을 확정할 수 없습니다. 단계별 시간을 확인하세요.',root.dataset.executionTimeoutSeconds||'—');
@@ -230,7 +236,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ai-test]').for
   });
   get('execution-run').addEventListener('click',async()=>{
     if(busy||remoteRunning||!execution||!get('execution-consent').checked)return;
-    const token=execution.token;execution=null;busy=true;controls();executionDialog.close();get('rows').replaceChildren();message(t('aitest.executing','조회 중…'));
+    const token=execution.token;execution=null;resultReview.clear();busy=true;controls();executionDialog.close();get('rows').replaceChildren();message(t('aitest.executing','조회 중…'));
     try{renderRows(await post('execute',{token,consent:true}));message('');}
     catch(ex){message(`${ex.message} ${t('aitest.uncertain','결과가 불확실합니다. 새로고침으로 상태를 확인하세요. 자동 재시도하지 않았습니다.')}`,true);remoteRunning=true;}
     finally{busy=false;controls();}

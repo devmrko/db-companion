@@ -45,7 +45,8 @@ public final class SelectAiTest {
     }
     public record Options(String owner,AiAssistant.Selection selected,List<AiAssistant.Choice> profiles,
             boolean running,Outcome latest,ExecutionResult execution,Outcome prompt,SelectAiReview.Result review,
-            List<String> schemas,String evidenceSchema,SelectAiEvidence.Snapshot evidence,SelectAiInspection.Snapshot inspection) {}
+            List<String> schemas,String evidenceSchema,SelectAiEvidence.Snapshot evidence,SelectAiInspection.Snapshot inspection,
+            SelectAiResultReview.Result resultReview) {}
     public record ExecutionPreview(String token,String resultId,String sql,String hash,List<String> tables,Instant expires) {
         public ExecutionPreview { tables=List.copyOf(tables); }
     }
@@ -112,12 +113,14 @@ public final class SelectAiTest {
             idle();if(inspection==null||!inspection.id().equals(id)||!Objects.equals(selected(),inspection.profile().selection()))throw SelectAiInspection.stale();return inspection;
         }
         private final SelectAiReview.State review=new SelectAiReview.State();
+        private final SelectAiResultReview.State resultReview=new SelectAiResultReview.State();
+        public SelectAiResultReview.State resultReview(){return resultReview;}
         private final SelectAiEvidence.State evidence=new SelectAiEvidence.State();
         public SelectAiEvidence.State evidence(){return evidence;}
         public synchronized Outcome prompt(){return prompt;}
         public SelectAiReview.State review(){return review;}
         public synchronized AiAssistant.Selection selected(){return guard.selected();}
-        public synchronized void select(AiAssistant.Selection value){idle();guard.select(value);prepared=null;execution=null;review.cancelPrepared();evidence.invalidate();inspection=null;}
+        public synchronized void select(AiAssistant.Selection value){idle();guard.select(value);prepared=null;execution=null;review.cancelPrepared();resultReview.cancelPrepared();evidence.invalidate();inspection=null;}
         public synchronized List<AiAssistant.Choice> profiles(boolean refresh,Supplier<List<AiAssistant.Choice>> loader){
             if(refresh){idle();invalidateRequests();evidence.clear();detail=null;detailName=null;inspection=null;}
             return guard.profiles(refresh,loader);
@@ -129,7 +132,7 @@ public final class SelectAiTest {
         public synchronized Prepared prepare(String owner,AiAssistant.Profile profile,Action action,String question,String language,Instant now){
             return prepare(owner,profile,action,question,language,now,null);
         }
-        public synchronized void invalidateRequests(){idle();cancelPrepared();execution=null;review.cancelPrepared();}
+        public synchronized void invalidateRequests(){idle();cancelPrepared();execution=null;review.cancelPrepared();resultReview.cancelPrepared();}
         public synchronized Prepared prepare(String owner,AiAssistant.Profile profile,Action action,String question,String language,Instant now,SelectAiEvidence.Snapshot context){
             return prepare(owner,profile,action,question,language,now,context,null);
         }
@@ -138,7 +141,7 @@ public final class SelectAiTest {
         }
         public synchronized Prepared prepare(String owner,AiAssistant.Profile profile,Action action,String question,String language,Instant now,SelectAiEvidence.Snapshot context,ConditionConfirmation confirmation,BusinessGlossary.Snapshot glossary){
             if(glossary!=null&&(!glossary.owner().equals(owner)||!glossary.profile().equals(profile.selection().name())||!glossary.question().equals(question)))throw BusinessGlossary.stale();
-            idle();execution=null;review.cancelPrepared();if(confirmation!=null&&!question.equals(confirmation.originalQuestion()))throw AiAssistant.stale();String prompt=BusinessGlossary.append(SelectAiTest.prompt(action,question,language,context,confirmation),glossary);if(prompt.length()>AiAssistant.MAX_SOURCE)throw new AiAssistant.Failure(413,"aitest.conditionsTooLong","질문·근거·확정 조건이 64,000자를 초과합니다. 내용을 줄여 주세요.");
+            idle();execution=null;review.cancelPrepared();resultReview.cancelPrepared();if(confirmation!=null&&!question.equals(confirmation.originalQuestion()))throw AiAssistant.stale();String prompt=BusinessGlossary.append(SelectAiTest.prompt(action,question,language,context,confirmation),glossary);if(prompt.length()>AiAssistant.MAX_SOURCE)throw new AiAssistant.Failure(413,"aitest.conditionsTooLong","질문·근거·확정 조건이 64,000자를 초과합니다. 내용을 줄여 주세요.");
             var preview=guard.prepare(owner,profile,action.name(),prompt,false,language,now,"select-ai-test");
             prepared=new Prepared(preview,action,question,context,confirmation,glossary);return prepared;
         }
@@ -146,11 +149,11 @@ public final class SelectAiTest {
             idle();guard.consume(token,consent,owner,now,"select-ai-test");
             var value=prepared;prepared=null;running=true;return Objects.requireNonNull(value);
         }
-        public synchronized void cancel(String token){guard.discard(token);review.cancel(token);if(prepared!=null&&Objects.equals(token,prepared.preview().token()))prepared=null;if(execution!=null&&Objects.equals(token,execution.preview().token()))execution=null;}
+        public synchronized void cancel(String token){guard.discard(token);review.cancel(token);resultReview.cancel(token);if(prepared!=null&&Objects.equals(token,prepared.preview().token()))prepared=null;if(execution!=null&&Objects.equals(token,execution.preview().token()))execution=null;}
         private void cancelPrepared(){if(prepared!=null)cancel(prepared.preview().token());}
         public synchronized boolean running(){return running;}
         public synchronized Outcome latest(){return latest;}
-        public synchronized void finish(Outcome result){if(result!=null&&result.action()==Action.PROMPT){prompt=result;}else{latest=result;executionResult=null;}review.clear();execution=null;running=false;guard.finish();}
+        public synchronized void finish(Outcome result){if(result!=null&&result.action()==Action.PROMPT){prompt=result;}else{latest=result;executionResult=null;resultReview.clear();}review.clear();execution=null;running=false;guard.finish();}
         public synchronized ProblemSave prepareProblemSave(String resultId,Instant now){idle();if(latest==null||!Objects.equals(latest.id(),resultId))throw AiAssistant.stale();var old=problemSaves.get(resultId);if(old!=null){if(old.unconfirmed())throw new AiAssistant.Failure(409,"problemQuestion.saveUnconfirmed","저장 결과를 확인할 때까지 새 저장 미리보기를 만들 수 없습니다.");if(old.savedId()!=null||old.saving()||now.isBefore(old.selection().expires()))return old.selection();problemSaves.remove(resultId);}if(problemSaves.size()>=MAX_PROBLEM_SAVE_LEDGER)throw new AiAssistant.Failure(409,"problemQuestion.saveLedgerFull","저장 확인 기록 한도에 도달했습니다. 현재 세션을 새로고침한 뒤 다시 시도해 주세요.");var preview=new ProblemSave(UUID.randomUUID().toString(),resultId,latest,prompt,inspection,now.plusSeconds(300));problemSaves.put(resultId,new ProblemSlot(preview,null,null,false,false));return preview;}
         public synchronized ProblemSaveBegin beginProblemSave(String resultId,String token,String purpose,Instant now){idle();var slot=problemSaves.get(resultId);if(slot==null||!Objects.equals(slot.selection().token(),token)||!now.isBefore(slot.selection().expires())||latest==null||!Objects.equals(latest.id(),resultId)||slot.unconfirmed())throw AiAssistant.stale();if(slot.purpose()!=null&&!slot.purpose().equals(purpose))throw AiAssistant.stale();if(slot.savedId()!=null)return new ProblemSaveBegin(slot.selection(),slot.savedId());if(slot.saving())throw AiAssistant.stale();problemSaves.put(resultId,new ProblemSlot(slot.selection(),purpose,null,true,false));return new ProblemSaveBegin(slot.selection(),null);}
         private ProblemSlot tokenProblemSave(String token){return problemSaves.values().stream().filter(s->Objects.equals(s.selection().token(),token)).findFirst().orElseThrow(AiAssistant::stale);}
@@ -161,7 +164,7 @@ public final class SelectAiTest {
         public synchronized Outcome reviewable(String id){
             idle();if(prompt==null||prompt.error()!=null||!Objects.equals(prompt.id(),id)||!Objects.equals(selected(),prompt.profile().selection()))throw AiAssistant.stale();return prompt;
         }
-        public synchronized void prepareReview(){idle();cancelPrepared();execution=null;}
+        public synchronized void prepareReview(){idle();cancelPrepared();execution=null;resultReview.cancelPrepared();}
         public synchronized void beginReview(){idle();running=true;}
         public synchronized void finishReview(){running=false;}
         public synchronized Outcome executable(String id){
@@ -169,7 +172,7 @@ public final class SelectAiTest {
                     ||!Objects.equals(selected(),latest.profile().selection()))throw staleExecution();return latest;
         }
         public synchronized ExecutionPreview prepareExecution(String id,com.dbcompanion.service.SelectAiReadSql.Checked checked,Instant now){
-            var result=executable(id);cancelPrepared();review.cancelPrepared();
+            var result=executable(id);cancelPrepared();review.cancelPrepared();resultReview.cancelPrepared();
             // Reuse display-only references; execution never depends on parser support.
             List<String> tables=result.sqlReferences()==null?List.of():result.sqlReferences().tables().stream()
                     .map(com.dbcompanion.service.SelectAiSqlReferences.Table::sqlName).toList();
@@ -180,10 +183,10 @@ public final class SelectAiTest {
             idle();if(!confirmed)throw new AiAssistant.Failure(400,"aitest.executeConsent","SQL 검토·조회 실행 확인이 필요합니다.");
             if(execution==null||!Objects.equals(execution.preview().token(),token))throw staleExecution();
             var value=execution;execution=null;executable(value.preview().resultId());
-            if(!now.isBefore(value.preview().expires()))throw staleExecution();running=true;return value;
+            if(!now.isBefore(value.preview().expires()))throw staleExecution();resultReview.clear();running=true;return value;
         }
         public synchronized ExecutionResult executionResult(){return executionResult;}
-        public synchronized void finishExecution(ExecutionResult result){executionResult=result;running=false;}
+        public synchronized void finishExecution(ExecutionResult result){executionResult=result;resultReview.clear();running=false;}
         private AiAssistant.Failure staleExecution(){return new AiAssistant.Failure(409,"aitest.executeStale","실행 요청이 만료되거나 변경됐습니다. SQL 실행 확인창을 다시 열어 주세요.");}
         public synchronized void idle(){if(running)throw new AiAssistant.Failure(409,"aitest.busy","요청 처리 중입니다. 완료 후 다시 시도해 주세요.");}
     }
