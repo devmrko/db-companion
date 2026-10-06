@@ -92,7 +92,7 @@
     <p role="status" data-test-execute-message></p>
     <div data-test-rows></div>
     <section class="app-inspection" data-result-review-panel hidden>
-      <h3 th:text="#{aitest.resultReview.title}">결과 설명·AI 검토</h3>
+      <div class="app-card-heading"><h3 th:text="#{aitest.resultReview.title}">결과 설명·AI 검토</h3><button th:replace="~{fragments/common :: sqlHelp('ai-test', 'result-review')}"></button></div>
       <p class="app-filter-message" th:text="#{aitest.resultReview.help}"></p>
       <details><summary th:text="#{aitest.resultReview.baseline}">비교할 대시보드 기준 (선택)</summary>
         <label class="d-block"><span th:text="#{aitest.resultReview.baselineHelp}"></span><textarea class="form-control" rows="4" maxlength="16000" data-result-review-baseline></textarea></label>
@@ -142,4 +142,4 @@
       <div class="app-editor-actions"><button type="button" class="btn app-btn app-btn-primary" data-test-execution-run disabled th:text="#{aitest.execute}">SQL 실행</button></div>
     </div>
   </dialog>
-</main></div><script type="module" th:src="@{/js/select-ai-test.mjs}"></script></body></html>
+</main></div><script th:src="@{/webjars/cytoscape/3.34.1/dist/cytoscape.min.js}"></script><script type="module" th:src="@{/js/select-ai-test.mjs}"></script></body></html>

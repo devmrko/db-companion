@@ -53,6 +53,12 @@ public class AiSqlHistoryService {
             return selected == null ? null : query(session, () -> repository.detail(selected));
         }
     }
+    public Candidates candidates(PoolSession session, String id) {
+        synchronized (session) {
+            var selected = session.metadata().sqlHistory().selection(id);
+            return selected == null ? null : query(session, () -> repository.candidates(selected));
+        }
+    }
     private <T> T query(PoolSession session, Supplier<T> work) {
         source.bind(session.pool(), session.metadata().info().username());
         try { return read.execute(status -> work.get()); }

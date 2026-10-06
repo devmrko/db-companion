@@ -61,6 +61,15 @@ vendor support commitment. Product names identify the systems with which it work
 
 No database credentials, Wallet, customer dataset, or private documentation are included.
 
+First-use guide: [English](docs/GETTING-STARTED.md) · [한국어](docs/GETTING-STARTED.ko.md) · [简体中文](docs/GETTING-STARTED.zh-CN.md) · [日本語](docs/GETTING-STARTED.ja.md).
+
+The [unreleased changes](CHANGELOG.md#unreleased) add shared RDF question grounding,
+question-evidence graphs, glossary JSON transfer, column statistics and SQL-history
+candidate inspection. The optional [semantic-query Agent example](demos/semantic-query-agent/README.md)
+provides APEX result-recovery components; it requires explicit installation and app
+integration. [Reporting and threshold alerts](docs/explanation/reporting-and-alerts.md)
+describes a deployment-neutral integration pattern, not an installed scheduler job.
+
 ## Build and run
 
 ```sh

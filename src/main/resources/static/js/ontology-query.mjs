@@ -5,6 +5,9 @@ import {attachArchive} from './ontology-archive.mjs';
 import {renderTokenAnalysis} from './business-glossary.mjs';
 import {mountQuestionAnalysis,analysisEndpoint} from './question-analysis.mjs';
 import {routeCoverage,coverageLabel,unmatchedLabel} from './ontology-route-coverage.mjs';
+import {renderDictionaryChoices,renderGroundedResult,automaticTermIds} from './ontology-grounding.mjs';
+import {renderPlan,blockedSources} from './ontology-plan.mjs';
+import {renderRdfWorkflow} from './ontology-rdf-workflow.mjs';
 
 export const selectedRoute=(search,id)=>search?.routes?.find(r=>r.id===id)??null;
 export const groupedTables=(search,route)=>(route?.tables??[]).map(name=>search.tables.find(t=>t.name===name)).filter(Boolean);
@@ -22,12 +25,21 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
   let search=null,routeId='',draft=null,preview=null,result=null,busy=false,rp=1,optionsReady=false;
   let invalidation=Promise.resolve();
   let archiveUi=null;
+  let groundedResult=null,availableSources=[];
+  const grounding=node('section',null,'border rounded p-3 mt-3');grounding.hidden=true;get('form').after(grounding);
+  const planPanel=node('section',null,'border rounded p-3 mt-3');planPanel.hidden=true;grounding.after(planPanel);
+  const automatic=node('input');automatic.type='checkbox';automatic.checked=true;
+  const automaticLabel=node('label');automaticLabel.append(automatic,node('span',q('plan.auto')));get('form').append(automaticLabel);
+  const graphSelect=node('select',null,'form-select app-select'),graphLabel=node('label',q('grounding.graph'));
+  graphSelect.setAttribute('aria-label',q('grounding.graph'));graphLabel.append(graphSelect);get('form').append(graphLabel);graphSelect.addEventListener('change',()=>invalidate(true));
+  graphLabel.hidden=automatic.checked;automatic.addEventListener('change',()=>{graphLabel.hidden=automatic.checked;invalidate(true);});
   const analysis=mountQuestionAnalysis(root,{changed:()=>invalidate(true),isBusy:()=>busy});
   const message=(value,error=false,target='message')=>{get(target).textContent=value;get(target).className=error?'app-alert is-error':'app-filter-message';};
   function controls(){
     for(const el of root.querySelectorAll('button,input:not([type="hidden"]),select,textarea'))el.disabled=busy;
     get('find').disabled=busy||!optionsReady;
-    const route=selectedRoute(search,routeId);get('selected').textContent=route?q('paths.selected',route.tables.length,route.relations.length):q('paths.choose');
+    const route=selectedRoute(search,routeId);get('selected').textContent=route?route.id==='INDEPENDENT'?q('plan.INDEPENDENT'):q('paths.selected',route.tables.length,route.relations.length):search?.routes.length?q('paths.choose'):'';
+    get('route-guidance').hidden=!search?.routes.length||route?.id==='INDEPENDENT';
     get('answer').disabled=busy||!route;get('sql').disabled=busy||!route;
     get('generate').disabled=busy||!preview||!get('consent').checked;
     get('reviewed').disabled=busy||!draft?.executable;get('execute').disabled=busy||!draft?.executable||!get('reviewed').checked;
@@ -40,7 +52,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
   function clearOutput(){draft=null;result=null;preview=null;get('reviewed').checked=false;get('consent').checked=false;for(const name of ['answer-panel','sql-panel','result-panel'])get(name).hidden=true;}
   function invalidate(clearSearch=false){
     const needsServer=!!search||!!draft||!!preview;
-    clearOutput();if(clearSearch){search=null;routeId='';get('evidence').hidden=true;}
+    clearOutput();if(clearSearch){search=null;routeId='';groundedResult=null;planPanel.hidden=true;planPanel.replaceChildren();get('evidence').hidden=true;grounding.hidden=true;grounding.replaceChildren();}
     if(needsServer){invalidation=invalidation.catch(()=>{}).then(()=>post('invalidate'));invalidation.catch(ex=>message(ex.message,true));}controls();
   }
   async function work(fn,target='message'){
@@ -48,11 +60,14 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
     try{await invalidation;await fn();}catch(ex){message(ex.message,true,target);}finally{busy=false;controls();}
   }
   async function load(refresh=false){await work(async()=>{
-    optionsReady=false;clearOutput();search=null;routeId='';get('evidence').hidden=true;
+    optionsReady=false;clearOutput();search=null;routeId='';get('evidence').hidden=true;grounding.hidden=true;grounding.replaceChildren();
     const data=await assistantApi(root.dataset.base+'/options?'+new URLSearchParams({schema:root.dataset.schema,refresh}));
+    availableSources=data.tables;planPanel.hidden=true;groundedResult=null;
     get('anchor').replaceChildren();const empty=node('option',q('automatic'));empty.value='';get('anchor').append(empty);
     for(const item of data.tables){const o=node('option',item.concept&&item.concept!==item.name?`${item.name} · ${item.concept}`:item.name);o.value=item.name;get('anchor').append(o);}
     optionsReady=data.tables.length>0;get('checked').textContent=q('checked',timestamp(data.checkedAt));message(optionsReady?'':q('noTables'));await analysis.load();
+    graphSelect.replaceChildren(new Option(q('grounding.catalog'),''));
+    try{const graphs=await assistantApi(root.dataset.base+'/graphs?'+new URLSearchParams({schema:root.dataset.schema}));for(const graph of graphs)graphSelect.append(new Option(graph.name,graph.name));}catch(ex){message(ex.message,true);}
   });}
   function tableDetails(info){
     const section=node('details',null,'app-query-table-details');section.append(node('summary',`${info.name} · v${info.revision} · ${q('status.'+info.state)}`));
@@ -73,12 +88,12 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
     const card=node('article',null,'app-query-route');card.dataset.routeId=route.id;
     const label=node('label',null,'app-query-route-select'),radio=node('input');radio.type='radio';radio.name='ontology-route';radio.value=route.id;radio.checked=routeId===route.id;
     radio.addEventListener('change',()=>{routeId=route.id;invalidate();root.querySelectorAll('[data-route-id]').forEach(el=>el.classList.toggle('is-selected',el.dataset.routeId===routeId));});
-    label.append(radio,node('strong',q(route.relations.length?'paths.route':'paths.table',index+1)),node('span',q('paths.count',route.tables.length,route.relations.length),'app-filter-message'));card.append(label);
+    label.append(radio,node('strong',route.id==='INDEPENDENT'?q('plan.INDEPENDENT'):q(route.relations.length?'paths.route':'paths.table',index+1)),node('span',q('paths.count',route.tables.length,route.relations.length),'app-filter-message'));card.append(label);
     const coverage=routeCoverage(search,route);
     if(coverage.total)card.append(node('p',coverageLabel(coverage),'app-filter-message'));
     if(coverage.unmatched.length)card.append(node('p',unmatchedLabel(coverage),'app-filter-message'));
     const chain=node('div',null,'app-query-route-chain');groupedTables(search,route).forEach((item,i)=>{
-      if(i)chain.append(node('span',routeArrow(search,route,i-1),'app-query-arrow'));
+      if(i)chain.append(node('span',route.id==='INDEPENDENT'?'+':routeArrow(search,route,i-1),'app-query-arrow'));
       const box=node('div',null,'app-query-route-node');box.append(node('strong',item.name));if(item.concept&&item.concept!==item.name)box.append(node('span',item.concept));chain.append(box);
     });card.append(chain);
     const matches=search.concepts.flatMap(c=>c.targets.filter(t=>route.tables.includes(t.table)).map(t=>`${c.term} → ${t.table} (${q('paths.basis.'+t.basis)})`));card.append(node('p',matches.join(' · '),'app-filter-message'));
@@ -116,11 +131,46 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
     message(value.executable?q('sqlReady'):value.reason,!value.executable,'sql-status');get('sql-panel').hidden=false;
   }
   async function prepare(mode){await work(async()=>{
-    clearOutput();const data=await post('preview',{id:search.id,mode,route:routeId});preview=data;
-    const p=data.request.profile;get('profile').textContent=`${p.selection.owner}.${p.selection.name} · ${p.provider} / ${p.model||t('assistant.defaultModel','제공자 기본 모델')}`;
-    get('payload').textContent=JSON.stringify(JSON.parse(data.request.source),null,2);get('transmission').textContent=q(mode==='SQL'?'sqlTransmission':'answerTransmission');
-    get('consent').checked=false;message('',false,'preview-status');get('preview').showModal();message('');
+    clearOutput();const data=await post('preview',{id:search.id,mode,route:routeId});showPreview(data);
   });}
+  function showPreview(data){preview=data;const mode=data.mode;
+    const p=data.request.profile;get('profile').textContent=`${p.selection.owner}.${p.selection.name} · ${p.provider} / ${p.model||t('assistant.defaultModel','제공자 기본 모델')}`;
+    get('payload').textContent=JSON.stringify(JSON.parse(data.request.source),null,2);get('transmission').textContent=q(['INTERPRET','RECOMMEND','PLAN'].includes(mode)?'grounding.aiTransmission':mode==='SQL'?'sqlTransmission':'answerTransmission');
+    get('consent').checked=false;message('',false,'preview-status');get('preview').showModal();message('');
+  }
+  async function showAiOutcome(value){
+    if(value.mode==='PLAN'){
+      routeId='';
+      renderRoutes();
+      renderPlan(planPanel,value.plan,search,groundedResult?.proposals??[],availableSources,selection=>work(async()=>{
+        clearOutput();search=await post('plan-selection',{id:search.id,...selection});routeId=selection.mode==='INDEPENDENT'?'INDEPENDENT':selection.route;
+        renderRoutes();message(q('plan.applied'));
+      }),()=>{routeId='';invalidate();});
+      // Render the recommendation first, including blocked sources. Never discard it on selection failure.
+      if(value.plan.mode!=='REVIEW'&&!value.plan.questions.length&&!blockedSources(value.plan,availableSources).length){
+        search=await post('plan-selection',{id:search.id,mode:value.plan.mode,route:value.plan.routeId,tables:value.plan.tables,candidates:value.plan.candidates.filter(c=>c.selected).map(c=>c.id)});
+        routeId=value.plan.mode==='INDEPENDENT'?'INDEPENDENT':value.plan.routeId;renderRoutes();
+      }return;
+    }
+    if(value.mode==='RECOMMEND'){
+      const r=value.recommendation;grounding.append(node('h3',q('grounding.recommendation'),'h5'),node('p',`${r.routeId} · ${r.reason}`),node('p',r.evidence.join(', ')));
+      r.questions.forEach(v=>grounding.append(node('p',v)));return;
+    }
+    if(value.result){groundedResult=value.result;search=value.result.search;routeId='';renderGroundedResult(grounding,value.result);get('evidence').hidden=!!value.result.rdf;if(!value.result.rdf)renderRoutes();}
+    else {grounding.replaceChildren();grounding.hidden=false;}
+    if(value.result?.summary){const interpreted=node('details');interpreted.append(node('summary',q('grounding.aiInterpretation')),node('p',value.interpretation.summary));grounding.append(interpreted);}
+    else grounding.prepend(node('h3',q('grounding.aiInterpretation'),'h5'),node('p',value.interpretation.summary));
+    if(value.result?.summary){
+      const raw=Array.from(grounding.children);grounding.replaceChildren();const summary=node('section');grounding.append(summary);
+      const evidence=renderRdfWorkflow(summary,value.result.summary,selection=>work(async()=>{
+        clearOutput();search=await post('rdf-selection',{id:search.id,...selection});routeId=selection.mode==='JOIN'?'RDF_JOIN':'INDEPENDENT';
+        showPreview(await post('preview',{id:search.id,mode:'SQL',route:routeId}));
+      }),()=>{routeId='';invalidate();});
+      evidence.append(...raw);
+    }
+    value.interpretation.questions.forEach(v=>grounding.append(node('p',v)));
+    if(value.interpretation.questions.length)grounding.append(node('p',q('grounding.clarify')));
+  }
   async function closePreview(){if(busy)return;await work(async()=>{if(preview)await post('cancel',{token:preview.request.token});preview=null;get('preview').close();message('');},'preview-status');}
   function renderRows(){
     const page=resultPage(result.rows,rp);rp=page.page;const table=node('table',null,'table app-table'),head=node('thead'),header=node('tr');for(const title of result.columns)header.append(node('th',title));head.append(header);table.append(head);const body=node('tbody');
@@ -128,15 +178,30 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
     get('result-count').textContent=t('ui.f32c9f13d498','{0}–{1} / {2}개',page.from,page.to,page.total);get('result-page').textContent=`${page.pages?page.page:0} / ${page.pages}`;controls();
   }
   get('form').addEventListener('submit',event=>{event.preventDefault();work(async()=>{
-    clearOutput();search=null;routeId='';get('evidence').hidden=true;
-    search=await post(analysisEndpoint('search',analysis.language()),{schema:root.dataset.schema,question:get('question').value,anchor:get('anchor').value});
-    get('evidence').hidden=false;renderRoutes();message(search.concepts.length||get('anchor').value||analysisMissing(search)?'':q('noMatch'));
+    clearOutput();search=null;routeId='';planPanel.hidden=true;planPanel.replaceChildren();groundedResult=null;get('evidence').hidden=true;
+    const question=get('question').value,anchor=get('anchor').value;
+    const dictionary=await post('interpret',{schema:root.dataset.schema,question,anchor});
+    const findRelations=async termIds=>{
+      const request={schema:root.dataset.schema,question,anchor,dictionaryId:dictionary.id,termIds,graph:graphSelect.value};
+      if(automatic.checked){showPreview(await post(analysisEndpoint('ai-interpret-preview',analysis.language()),request));return;}
+      const value=await post(analysisEndpoint('grounded-search',analysis.language()),request);
+      groundedResult=value;search=value.search;routeId='';renderGroundedResult(grounding,value);get('evidence').hidden=false;renderRoutes();
+      grounding.append(button(q('grounding.continue'),()=>work(async()=>{
+        clearOutput();showPreview(await post(analysisEndpoint('ai-interpret-preview',analysis.language()),request));
+      })));
+      message('');
+    };
+    const ids=automaticTermIds(dictionary);
+    if(ids!==null)await findRelations(ids);
+    else renderDictionaryChoices(grounding,dictionary,termIds=>work(()=>findRelations(termIds)));
+    message('');
   });});
   get('question').addEventListener('input',()=>invalidate(true));get('anchor').addEventListener('change',()=>invalidate(true));
   get('refresh').addEventListener('click',()=>load(true));
   get('answer').addEventListener('click',()=>prepare('ANSWER'));get('sql').addEventListener('click',()=>prepare('SQL'));get('consent').addEventListener('change',controls);get('reviewed').addEventListener('change',controls);
   get('close-preview').addEventListener('click',closePreview);get('preview').addEventListener('cancel',event=>{event.preventDefault();closePreview();});get('close-detail').addEventListener('click',()=>get('detail').close());
   get('generate').addEventListener('click',()=>work(async()=>{
+    if(['INTERPRET','RECOMMEND','PLAN'].includes(preview?.mode)){const token=preview.request.token;preview=null;const value=await post('assistant-generate',{token,consent:get('consent').checked});get('preview').close();await showAiOutcome(value);message('');return;}
     const token=preview.request.token;preview=null;const value=await post('generate',{token,consent:get('consent').checked});get('preview').close();value.mode==='SQL'?renderSql(value.sql):renderAnswer(value.answer);message('');
   },'preview-status'));
   get('execute').addEventListener('click',()=>work(async()=>{

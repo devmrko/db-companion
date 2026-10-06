@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {detailFields, mappedSqlFields, detailRequest} from '../../main/resources/static/js/execution-history.mjs';
+import {detailFields, mappedSqlFields, detailRequest, sourceFields, mappingStatus} from '../../main/resources/static/js/execution-history.mjs';
 
 test('detail metadata keeps unmodified text, zero and absent values', () => {
   const fields = detailFields({profile: '<script>x</script>', action: 'runsql', sid: 0, serial: null});
@@ -38,4 +38,21 @@ test('both full SQL texts are displayed without executing or truncating them', (
   assert.ok(source.includes("response.textContent = data.mappedSql ?? '—'"));
   assert.ok(source.includes('aria-expanded'));
   assert.ok(!source.includes('eval('));
+});
+test('cursor metrics distinguish parsing user and cumulative times, keeping missing averages missing', () => {
+  const fields=sourceFields({fields:[{name:'SQL_ID',value:'id'},{name:'PARSING_USER_NAME',value:'<app>'},{name:'EXECUTIONS',value:0},{name:'ELAPSED_SECONDS_TOTAL',value:'0'},{name:'ELAPSED_SECONDS_PER_EXECUTION',value:null},{name:'CPU_SECONDS_TOTAL',value:'1.25'}]});
+  assert.deepEqual(fields[0],['최초 파싱 사용자','<app>']);
+  assert.deepEqual(fields[1],['커서 누적 실행 횟수','0']);
+  assert.ok(fields.some(([label,value])=>label.includes('÷')&&value==='—'));
+  assert.ok(!fields.some(([label])=>label==='실행 사용자'||label.includes('마지막 실행 시간')));
+});
+test('mapping absence, inaccessible mapping and partial lookup failure are distinct', () => {
+  assert.match(mappingStatus({status:'NOT_FOUND'}),/변환 SQL이 없습니다/);
+  assert.match(mappingStatus({status:'UNAVAILABLE'}),/없다는 뜻은 아닙니다/);
+  assert.match(mappingStatus({status:'UNCONFIRMED'}),/확인하지 못했습니다/);
+  assert.match(mappingStatus({status:'FOUND'}),/개별 실행별 생성 결과 목록은 아닙니다/);
+  const source=readFileSync(new URL('../../main/resources/static/js/execution-history.mjs',import.meta.url),'utf8');
+  assert.ok(source.includes("data.source==='cache'"));
+  assert.ok(source.includes('sql.textContent=item.sql'));
+  assert.ok(source.includes('mappingItems?.replaceChildren()'));
 });

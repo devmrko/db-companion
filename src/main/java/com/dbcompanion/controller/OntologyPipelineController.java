@@ -18,7 +18,7 @@ public class OntologyPipelineController {
     public record Scope(String schema,List<String> tables){} public record Step(String token,int index,boolean consent,Boolean all){public Step(String token,int index,boolean consent){this(token,index,consent,false);}} public record Stop(String token){}
     public record Saved(String schema,String before){} public record Restore(String schema,String token){} public record Call(String schema,String token,int index,boolean confirmed){}
     public record Payload(String token,int index){}
-    public record Graph(String schema,String name){} public record Create(String token,boolean confirmed){}
+    public record Graph(String schema,String name,List<String> relations){} public record Create(String token,boolean confirmed){}
     public record Status(com.dbcompanion.service.OntologyDiscovery.Preview plan){}
     @PostMapping("/preview") public ResponseEntity<?> preview(@RequestBody Scope v,HttpServletRequest r){return run(r,false,()->service.preview(session(r),v.schema(),v.tables()));}
     @PostMapping("/status") public ResponseEntity<?> status(@RequestBody Scope v,HttpServletRequest r){return run(r,false,()->new Status(service.status(session(r),v.schema())));}
@@ -31,7 +31,7 @@ public class OntologyPipelineController {
     @PostMapping("/recover") public ResponseEntity<?> recover(@RequestBody Call v,HttpServletRequest r){return run(r,false,()->service.recover(session(r),v.schema(),v.token(),v.index(),v.confirmed()));}
     @PostMapping("/generate") public ResponseEntity<?> generate(@RequestBody Step v,Locale locale,HttpServletRequest r){return run(r,false,()->service.generate(session(r),v.token(),v.index(),v.consent(),locale));}
     @PostMapping("/stop") public ResponseEntity<?> stop(@RequestBody Stop v,HttpServletRequest r){return run(r,false,()->{service.stop(session(r),v.token());return Map.of("stopped",true);});}
-    @PostMapping("/graph/preview") public ResponseEntity<?> graph(@RequestBody Graph v,HttpServletRequest r){return run(r,false,()->service.graphPreview(session(r),v.schema(),v.name()));}
+    @PostMapping("/graph/preview") public ResponseEntity<?> graph(@RequestBody Graph v,HttpServletRequest r){return run(r,false,()->service.graphPreview(session(r),v.schema(),v.name(),v.relations()));}
     @PostMapping("/graph/create") public ResponseEntity<?> create(@RequestBody Create v,HttpServletRequest r){return run(r,true,()->service.create(session(r),v.token(),v.confirmed()));}
     private PoolSession session(HttpServletRequest r){var s=r.getSession(false);return s==null?null:(PoolSession)s.getAttribute(PoolSession.ATTRIBUTE);}
     private ResponseEntity<?> run(HttpServletRequest r,boolean ddl,Supplier<?> action){

@@ -103,7 +103,7 @@ public class DatabaseService {
                 var profiles = repository.profiles(dashboard.selectedSchema(), own, name);
                 if (name != null && profiles.isEmpty()) throw new AppException(PROFILE_NOT_ACCESSIBLE);
                 var attributes = name == null ? List.<com.dbcompanion.model.AiProfileAttribute>of()
-                        : repository.profileAttributes(dashboard.selectedSchema(), own, name);
+                        : com.dbcompanion.model.AiProfileAttribute.withTokenLimit(repository.profileAttributes(dashboard.selectedSchema(), own, name));
                 return new ProfilePage(profiles, attributes);
             });
         }

@@ -29,7 +29,7 @@ public class OntologyPipelineService {
     }
     private String login(PoolSession s){return s.metadata().info().username();}
     private void scope(PoolSession s,String schema){Ontology.name(schema);if(!schema.equals(s.metadata().selectedSchema()))throw new Failure(409,"stale");}
-    private <T>T query(PoolSession s,TransactionTemplate tx,Supplier<T> action){source.bind(s.pool(),login(s));try{return tx.execute(status->action.get());}finally{source.clear();}}
+    private <T>T query(PoolSession s,TransactionTemplate tx,Supplier<T> action){source.bind(s.pool(),login(s),s.metadata().assistant());try{return tx.execute(status->action.get());}finally{source.clear();}}
     private List<Entry> entries(PoolSession s,String schema){return repository.relationshipEntries(schema,login(s));}
     private OntologyRelations.Analysis analysis(PoolSession s,String schema,List<Entry> entries){return OntologyRelations.analyze(s.metadata().info().database(),schema,entries,Instant.now().toString());}
     private List<Entry> selectedEntries(PoolSession s,String schema,List<String> tables){
@@ -131,8 +131,9 @@ public class OntologyPipelineService {
         return List.copyOf(byName.values());
     }
     public void stop(PoolSession s,String token){synchronized(s){s.metadata().ontology().pipeline().stop(token);}}
-    public PropertyGraph.Preview graphPreview(PoolSession s,String schema,String name){synchronized(s){scope(s,schema);return query(s,read,()->{
-        var entries=entries(s,schema);var definition=PropertyGraph.build(schema,name,entries,analysis(s,schema,entries));var access=graphs.access(schema,login(s),definition.name());
+    public PropertyGraph.Preview graphPreview(PoolSession s,String schema,String name){return graphPreview(s,schema,name,null);}
+    public PropertyGraph.Preview graphPreview(PoolSession s,String schema,String name,List<String> relations){synchronized(s){scope(s,schema);return query(s,read,()->{
+        var entries=entries(s,schema);var definition=PropertyGraph.build(schema,name,entries,analysis(s,schema,entries),relations);var access=graphs.access(schema,login(s),definition.name());
         // Preview does not execute DDL, call AI, sample rows or query external data.
         var draft=new PropertyGraph.Draft(UUID.randomUUID().toString(),schema,definition,entries,Instant.now().plusSeconds(600));s.metadata().ontology().pipeline().graph(draft);
         return new PropertyGraph.Preview(draft.token(),definition,access,draft.expires(),access.allowed()&&definition.vertices()>0);
@@ -142,7 +143,7 @@ public class OntologyPipelineService {
         return query(s,ddl,()->{
             if(!graphs.access(schema,login(s),draft.definition().name()).allowed())throw new Failure(409,"pg.unavailable");
             var now=entries(s,schema);if(!PropertyGraph.sameDefinitions(draft.entries(),now))throw new Failure(409,"stale");
-            var definition=PropertyGraph.build(schema,draft.definition().name(),now,analysis(s,schema,now));
+            var definition=PropertyGraph.build(schema,draft.definition().name(),now,analysis(s,schema,now),draft.definition().selected());
             if(definition.sql().isEmpty()||!definition.equals(draft.definition()))throw new Failure(409,"stale");
             graphs.verify(now,definition);return graphs.create(definition);
         });

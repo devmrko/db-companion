@@ -11,9 +11,11 @@ import java.util.stream.Collectors;
 /** Catalog metadata graph. Never treats source business rows as vertices. */
 public final class MetadataGraph {
     private MetadataGraph() { }
+    public record Choice(String id,String name,String status,int mappings,List<String> evidence,List<String> sourceColumns,List<String> targetColumns,String condition) { }
     public record Plan(String schema,String name,String nodeView,String edgeView,String nodesSql,String edgesSql,
-                       List<String> ddl,String query,int objects,int columns,int relations,int mappings,List<PropertyGraph.Item> excluded) {
-        public Plan {ddl=List.copyOf(ddl);excluded=List.copyOf(excluded);}
+                       List<String> ddl,String query,int objects,int columns,int relations,int mappings,List<PropertyGraph.Item> excluded,
+                       List<Choice> available,List<String> selected) {
+        public Plan {ddl=List.copyOf(ddl);excluded=List.copyOf(excluded);available=List.copyOf(available);selected=List.copyOf(selected);}
     }
     public record Access(boolean supported,boolean owner,boolean graphPrivilege,boolean viewPrivilege,List<String> collisions) {
         public Access {collisions=List.copyOf(collisions);}
@@ -46,33 +48,62 @@ public final class MetadataGraph {
             &&a.document().source().columns().stream().map(ColumnInfo::name).toList().containsAll(r.sourceColumns())
             &&b.document().source().columns().stream().map(ColumnInfo::name).toList().containsAll(r.targetColumns());
     }
-    public static Plan build(String schema,String requested,List<Entry> entries,Analysis analysis){
+    public static Plan build(String schema,String requested,List<Entry> entries,Analysis analysis){return build(schema,requested,entries,analysis,null);}
+    /** A null selection includes every eligible relationship; an empty selection keeps only containment. */
+    public static Plan build(String schema,String requested,List<Entry> entries,Analysis analysis,List<String> relationIds){
         Ontology.name(schema);String name=PropertyGraph.graphName(requested),nodeView=name+"_NODES",edgeView=name+"_EDGES";
         if(entries.isEmpty()||entries.size()>Ontology.GRAPH_TABLE_LIMIT)throw new Failure(400,"mg.empty");
         if(!analysis.schema().equals(schema))throw new Failure(409,"mismatch");
         var byName=new LinkedHashMap<String,Entry>();var seqs=new HashSet<String>();int columns=0;
         for(var e:entries){if(!schema.equals(e.document().source().schema())||byName.putIfAbsent(e.document().source().table(),e)!=null||!seqs.add(seq(e)))throw new Failure(409,"mismatch");columns+=e.document().source().columns().size();}
         if(columns>OntologyRelations.MAX_COLUMNS)throw new Failure(413,"limit");
-        var links=new ArrayList<String>();var fks=new ArrayList<String>();var excluded=new ArrayList<PropertyGraph.Item>();int relations=0,mappings=0;
+        if(relationIds!=null&&(relationIds.size()>Ontology.GRAPH_EDGE_LIMIT||new HashSet<>(relationIds).size()!=relationIds.size()))throw new Failure(400,"invalid");
+        var requestedIds=relationIds==null?null:new HashSet<>(relationIds);
+        var links=new ArrayList<String>();var fks=new ArrayList<String>();var candidates=new ArrayList<String>();var excluded=new ArrayList<PropertyGraph.Item>();var available=new ArrayList<Choice>();var selectedRelations=new ArrayList<String>();int relations=0,mappings=0;
         for(var r:analysis.relations()){
             var a=byName.get(r.source());var b=byName.get(r.target());String reason="";
-            if(!Set.of("APPROVED","FK").contains(r.status()))reason="UNCONFIRMED";
+            boolean staleCandidate="STALE".equals(r.status())&&r.review()!=null&&"CANDIDATE".equals(r.review().status());
+            if(!Set.of("APPROVED","FK","CANDIDATE").contains(r.status())&&!staleCandidate)reason="UNCONFIRMED";
             else if(!schema.equals(r.targetSchema())||!mapping(r,a,b))reason="MAPPING";
             else if("FK".equals(r.status())&&(r.key()==null||!"ENABLED".equals(r.key().status())||!"VALIDATED".equals(r.key().validated())))reason="UNCONFIRMED";
             else if("APPROVED".equals(r.status())&&(r.review()==null||!a.document().links().contains(r.review())))reason="UNCONFIRMED";
             if(!reason.isEmpty()){excluded.add(new PropertyGraph.Item("RELATION",r.source()+" → "+r.target()+" · "+r.label(),"","EXCLUDED",reason));continue;}
-            if("FK".equals(r.status()))fks.add("(c.SEQ="+seq(a)+" AND k.name="+literal(r.key().name())+")");
+            available.add(new Choice(r.id(),r.source()+" → "+r.target()+(r.label().isBlank()?"":" · "+r.label()),r.status(),r.sourceColumns().size(),r.evidence(),r.sourceColumns(),r.targetColumns(),r.condition()));
+            if(requestedIds!=null&&!requestedIds.contains(r.id()))continue;
+            selectedRelations.add(r.id());
+            if("CANDIDATE".equals(r.status())||staleCandidate)candidates.addAll(candidateEdges(r,a,b));
+            else if("FK".equals(r.status()))fks.add("(c.SEQ="+seq(a)+" AND k.name="+literal(r.key().name())+")");
             else links.add("(c.SEQ="+seq(a)+" AND l.id="+literal(r.id())+")");
             relations++;mappings+=r.sourceColumns().size();
         }
+        if(requestedIds!=null&&!new HashSet<>(available.stream().map(Choice::id).toList()).containsAll(requestedIds))throw new Failure(409,"stale");
         String selected=entries.stream().map(MetadataGraph::seq).collect(Collectors.joining(","));
         String nodes=resource("nodes").replace("@@CATALOG@@",object(schema,"DBC_ONTOLOGY_CATALOG")).replace("@@OWNER@@",literal(schema)).replace("@@SEQS@@",selected);
         String edges=resource("edges").replace("@@CATALOG@@",object(schema,"DBC_ONTOLOGY_CATALOG")).replace("@@OWNER@@",literal(schema)).replace("@@SEQS@@",selected)
             .replace("@@LINK_FILTER@@",links.isEmpty()?"1=0":String.join(" OR ",links)).replace("@@FK_FILTER@@",fks.isEmpty()?"1=0":String.join(" OR ",fks));
         String graph="CREATE PROPERTY GRAPH "+object(schema,name)+"\nVERTEX TABLES ("+object(schema,nodeView)+" AS META_NODE KEY (NODE_ID)\n LABEL METADATA_NODE PROPERTIES (NODE_KIND,OWNER_NAME,OBJECT_NAME,COLUMN_NAME,DATA_TYPE,REVISION))\nEDGE TABLES ("+object(schema,edgeView)+" AS META_EDGE KEY (EDGE_ID)\n SOURCE KEY (SOURCE_ID) REFERENCES META_NODE (NODE_ID)\n DESTINATION KEY (TARGET_ID) REFERENCES META_NODE (NODE_ID)\n LABEL METADATA_LINK PROPERTIES (EDGE_KIND,RELATION_ID,RELATION_LABEL,CONDITION_TEXT,ORIGIN,RELATION_STATE,MAPPING_POSITION,MAPPING_COUNT))\nOPTIONS (TRUSTED MODE)";
+        if(!candidates.isEmpty())edges+="\nUNION ALL\n"+String.join("\nUNION ALL\n",candidates);
         var ddl=List.of("CREATE VIEW "+object(schema,nodeView)+" AS\n"+nodes,"CREATE VIEW "+object(schema,edgeView)+" AS\n"+edges,graph);
         if(ddl.stream().mapToInt(String::length).sum()>500_000)throw new Failure(413,"limit");
-        String query="SELECT * FROM GRAPH_TABLE ("+object(schema,name)+"\n MATCH (a IS METADATA_NODE)-[e IS METADATA_LINK]->(b IS METADATA_NODE)\n COLUMNS (a.OBJECT_NAME AS SOURCE_OBJECT, a.COLUMN_NAME AS SOURCE_COLUMN,\n e.EDGE_KIND AS EDGE_KIND,e.RELATION_ID AS RELATION_ID,e.RELATION_LABEL AS RELATION_LABEL,\n e.MAPPING_POSITION AS MAPPING_POSITION,e.MAPPING_COUNT AS MAPPING_COUNT,e.CONDITION_TEXT AS CONDITION_TEXT,\n b.OBJECT_NAME AS TARGET_OBJECT,b.COLUMN_NAME AS TARGET_COLUMN))\nFETCH FIRST 100 ROWS ONLY";
-        return new Plan(schema,name,nodeView,edgeView,nodes,edges,ddl,query,entries.size(),columns,relations,mappings,excluded);
+        String query=readQuery(schema,name);
+        return new Plan(schema,name,nodeView,edgeView,nodes,edges,ddl,query,entries.size(),columns,relations,mappings,excluded,available,selectedRelations);
+    }
+    public static String readQuery(String schema,String requested){
+        String name=PropertyGraph.graphName(requested);Ontology.name(schema);
+        return "SELECT * FROM GRAPH_TABLE ("+object(schema,name)+"\n MATCH (a IS METADATA_NODE)-[e IS METADATA_LINK]->(b IS METADATA_NODE)\n COLUMNS (a.OBJECT_NAME AS SOURCE_OBJECT, a.COLUMN_NAME AS SOURCE_COLUMN,\n e.EDGE_KIND AS EDGE_KIND,e.RELATION_ID AS RELATION_ID,e.RELATION_LABEL AS RELATION_LABEL, e.ORIGIN AS ORIGIN,e.RELATION_STATE AS RELATION_STATE,\n e.MAPPING_POSITION AS MAPPING_POSITION,e.MAPPING_COUNT AS MAPPING_COUNT,e.CONDITION_TEXT AS CONDITION_TEXT,\n b.OBJECT_NAME AS TARGET_OBJECT,b.COLUMN_NAME AS TARGET_COLUMN))\nFETCH FIRST 100 ROWS ONLY";
+    }
+    /** Snapshot candidates for exploration only. Never changes catalog review state. */
+    private static List<String> candidateEdges(Relation r,Entry a,Entry b){
+        var rows=new ArrayList<String>();String id=seq(a)+":"+r.id();
+        for(int i=0;i<=r.sourceColumns().size();i++){
+            boolean relation=i==0;String from="O:"+seq(a),to="O:"+seq(b);
+            if(!relation){
+                int source=a.document().source().columns().stream().map(ColumnInfo::name).toList().indexOf(r.sourceColumns().get(i-1))+1;
+                int target=b.document().source().columns().stream().map(ColumnInfo::name).toList().indexOf(r.targetColumns().get(i-1))+1;
+                from="C:"+seq(a)+":"+source;to="C:"+seq(b)+":"+target;
+            }
+            rows.add("SELECT "+literal((relation?"R:":"M:")+id+(relation?"":":"+i))+","+literal(from)+","+literal(to)+","+literal(relation?"RELATES_TO":"MAPS_TO")+","+literal(id)+","+literal(r.label())+","+literal(r.condition())+","+literal(r.origin())+","+literal(r.status())+","+i+","+r.sourceColumns().size()+" FROM DUAL");
+        }
+        return rows;
     }
 }

@@ -13,7 +13,7 @@ export async function runDiscovery(plan,{call,stop,progress}){
     const result=await call(index);completed++;progress(result);if(result.paused||result.done||result.resultLimit)break;
   }return completed;
 }
-export function ontologyPipeline(dialog,{schema,post,profiles,updated,canOpen}){
+export function ontologyPipeline(dialog,{schema,post,profiles,updated,canOpen,graphCreated=()=>{}}){
   const get=k=>dialog.querySelector(`[data-pipeline-${k}]`);let busy=false,stopping=false,plan=null,changed=false;
   const status=(text,error=false)=>{get('status').textContent=text;get('status').className=error?'app-alert is-error':'app-filter-message';};
   function diagnostic(error=null){const d=discoveryDiagnostic(error);get('diagnostic').hidden=!d;get('diagnostic').open=false;get('diagnostic-path').textContent=d?`${d.code} · ${d.path}`:'';get('raw').textContent=d?.rawResponse??'';}
@@ -103,27 +103,37 @@ export function ontologyPipeline(dialog,{schema,post,profiles,updated,canOpen}){
     if(!open(label('pg.title')))return;const host=get('body'),mode=el('select',undefined,'form-select'),field=el('label',undefined,'app-ontology-field'),panel=el('div');
     field.append(el('span',label('mg.mode')),mode);mode.setAttribute('aria-label',label('mg.mode'));
     for(const value of ['metadata','business']){const option=el('option',label('mg.'+value));option.value=value;mode.append(option);}
-    const render=()=>{panel.replaceChildren();status('');if(mode.value==='metadata')metadataGraphPanel(panel,{schema,post,lock,status,isBusy:()=>busy});else businessGraph(panel);};
+    const render=()=>{panel.replaceChildren();status('');if(mode.value==='metadata')metadataGraphPanel(panel,{schema,post,lock,status,isBusy:()=>busy,created:graphCreated});else businessGraph(panel);};
     mode.addEventListener('change',render);host.append(field,panel);render();
   }
   function businessGraph(host){
     host.append(el('p',label('mg.businessHelp'),'app-filter-message'));
     const name=el('input',undefined,'form-control');name.value='DBC_RELATION_GRAPH';name.maxLength=60;name.setAttribute('aria-label',label('pg.name'));
-    const row=el('label',undefined,'app-ontology-field');row.append(el('span',label('pg.name')),name);const result=el('div');let preview=null;
+    const row=el('label',undefined,'app-ontology-field');row.append(el('span',label('pg.name')),name);const result=el('div');let preview=null,selected=null;
     name.addEventListener('input',()=>{preview=null;result.replaceChildren();});
     const prepare=button(label('pg.preview'),async()=>{
       if(busy)return;lock(true);result.replaceChildren();status(label('discovery.preparing'));
       try{
-        preview=await post('/pipeline/graph/preview',{schema,name:name.value});const d=preview.definition,a=preview.access,counts=pipelineSummary(d);
+        preview=await post('/pipeline/graph/preview',{schema,name:name.value,relations:selected});const d=preview.definition,a=preview.access,counts=pipelineSummary(d);
         result.append(el('p',label('pg.summary',d.vertices,d.edges,counts.excluded)),el('p',label('pg.help'),'app-filter-message'));
         const states=[['supported',a.supported],['owner',a.owner],['privilege',a.privilege],['nameFree',!a.exists]];
         result.append(el('p',states.map(([key,ok])=>label('pg.'+key)+': '+label(ok?'pg.yes':'pg.no')).join(' · ')));
-        if(a.exists)result.append(el('p',a.existingStatus,'app-alert'));
+        if(a.exists)result.append(el('p',label('mg.nameCollision')+' '+a.existingStatus,'app-alert is-error'));
+        if(d.available.length){
+          const choices=el('fieldset'),mode=el('select',undefined,'form-select'),list=el('div',undefined,'app-pipeline-items'),boxes=[];
+          choices.append(el('legend',label('mg.relationScope')));mode.setAttribute('aria-label',label('mg.relationScope'));
+          for(const [value,title] of [['all',label('mg.allRelations')],['selected',label('mg.selectedRelations')]]){const option=el('option',title);option.value=value;mode.append(option);}mode.value=selected===null?'all':'selected';choices.append(mode);
+          for(const choice of d.available){const row=el('label',undefined,'app-pipeline-consent'),box=el('input');box.type='checkbox';box.value=choice.id;box.checked=selected===null||selected.includes(choice.id);box.disabled=selected===null;box.dataset.boundDisabled=String(box.disabled);boxes.push(box);row.append(box,el('span',choice.name));list.append(row);}
+          const invalidate=()=>{preview=null;status(label('mg.selectionChanged'));result.querySelectorAll('button').forEach(b=>{b.disabled=true;b.dataset.boundDisabled='true';});};
+          mode.addEventListener('change',()=>{selected=mode.value==='all'?null:boxes.filter(b=>b.checked).map(b=>b.value);boxes.forEach(b=>{b.disabled=selected===null;b.dataset.boundDisabled=String(b.disabled);});invalidate();});
+          boxes.forEach(b=>b.addEventListener('change',()=>{selected=boxes.filter(v=>v.checked).map(v=>v.value);invalidate();}));
+          choices.append(list,el('p',label('mg.selectionHelp'),'app-filter-message'));result.append(choices);
+        }
         const table=el('table',undefined,'table app-table'),head=el('thead'),hr=el('tr');['pg.target','pg.alias','pg.state'].forEach(k=>hr.append(el('th',label(k))));head.append(hr);table.append(head);const body=el('tbody');
         d.items.forEach(item=>{const r=el('tr');r.append(el('td',item.name),el('td',item.alias||'—'),el('td',item.status==='INCLUDED'?label('pg.included'):label('pg.reason.'+item.reason)));body.append(r);});table.append(body);const scroll=el('div',undefined,'app-pipeline-items');scroll.append(table);result.append(scroll,el('pre',d.sql||label('pg.noVertices'),'app-pipeline-code'));
         const consent=check(label('pg.consent')),create=button(label('pg.create'),async()=>{
           if(busy||!preview?.canCreate||!consent.input.checked)return;lock(true);status(label('pg.creating'));const token=preview.token;preview=null;
-          try{const created=await post('/pipeline/graph/create',{token,confirmed:true});status(label('pg.created',created.schema+'.'+created.name,created.status));result.append(el('pre',created.query,'app-pipeline-code'));}
+          try{const created=await post('/pipeline/graph/create',{token,confirmed:true});status(label('pg.created',created.schema+'.'+created.name,created.status));result.append(el('pre',created.query,'app-pipeline-code'));graphCreated(created);}
           catch(ex){status(ex.message+' · '+label('pg.noRetry'),true);}finally{create.dataset.boundDisabled='true';consent.input.dataset.boundDisabled='true';lock(false);}
         });
         create.dataset.boundDisabled='true';consent.input.disabled=!preview.canCreate;consent.input.dataset.boundDisabled=String(!preview.canCreate);

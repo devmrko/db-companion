@@ -80,6 +80,35 @@ class BusinessGlossaryServiceTest {
         assertThatThrownBy(()->service.verify(s,snapshot)).isInstanceOf(AiAssistant.Failure.class);
         assertThatThrownBy(()->service.resolve(s,"사업 AU","P",selection)).isInstanceOf(AiAssistant.Failure.class);
     }}
+    @Test void rdfDictionarySearchDoesNotInvalidateSelectAiDictionaryOrSqlPreparation(){try(var s=session()){
+        String question="사업 AU";text="READY";
+        var original=service.search(s,question,"P",true);
+        var rdf=service.search(s,question,"",false);
+        assertThat(service.interpret(s,rdf.id(),question,List.of(id)).terms()).containsExactly(term);
+        var snapshot=service.resolve(s,question,"P",new Selection(true,original.id(),List.of(id)));
+        var profile=new AiAssistant.Profile(new AiAssistant.Selection("APP","P"),"provider","model","v1");
+        var test=s.metadata().aiTest();test.select(profile.selection());
+        var prepared=test.prepare("APP",profile,SelectAiTest.Action.SQL,question,"ko",java.time.Instant.now(),null,null,snapshot);
+        assertThat(prepared.glossary()).isEqualTo(snapshot);
+        assertThat(prepared.preview().source()).contains(term.criteria());
+        assertThat(installs+saves).isZero();
+    }}
+    @Test void selectAiDictionaryRefreshDoesNotInvalidatePendingRdfInterpretation(){try(var s=session()){
+        var rdf=service.search(s,"사업 AU","",false);
+        var original=service.search(s,"사업 AU","P",false);
+        assertThat(service.interpret(s,rdf.id(),"사업 AU",List.of(id)).terms()).containsExactly(term);
+        assertThat(service.resolve(s,"사업 AU","P",new Selection(true,original.id(),List.of(id))).selected()).hasSize(1);
+    }}
+    @Test void coexistingSearchesStillRejectChangedDefinitionsAndClearTogether(){try(var s=session()){
+        var original=service.search(s,"사업 AU","P",false);
+        var rdf=service.search(s,"사업 AU","",false);
+        term=new Term(id,2,term.term(),term.aliases(),"changed",term.criteria(),true,"v2");
+        assertThatThrownBy(()->service.resolve(s,"사업 AU","P",new Selection(true,original.id(),List.of(id)))).isInstanceOf(AiAssistant.Failure.class);
+        assertThatThrownBy(()->service.interpret(s,rdf.id(),"사업 AU",List.of(id))).isInstanceOf(AiAssistant.Failure.class);
+        service.save(s,id,2,term.draft(),true);
+        assertThatThrownBy(()->s.metadata().businessGlossary().resolve(original.id(),"APP","P","사업 AU",java.time.Instant.now())).isInstanceOf(AiAssistant.Failure.class);
+        assertThatThrownBy(()->s.metadata().businessGlossary().resolve(rdf.id(),"APP","","사업 AU",java.time.Instant.now())).isInstanceOf(AiAssistant.Failure.class);
+    }}
     @Test void completeSearchResultsUpToThirtyResolveWithoutDroppingDefinitions(){
         for(int count:new int[]{11,30,31}){
             var terms=java.util.stream.IntStream.range(0,count).mapToObj(i->new Term(

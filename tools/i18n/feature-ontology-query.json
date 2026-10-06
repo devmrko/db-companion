@@ -1,4 +1,11 @@
 {
+  "ontology.query.grounding.rdfTitle": ["RDF 온톨로지 검색 결과","RDF ontology search results","RDF 本体搜索结果","RDF オントロジー検索結果"],
+  "ontology.query.grounding.rdfSource": ["현재 저장된 정의를 RDF 트리플로 조회했습니다. 업무 데이터나 실행용 조인 승인 결과가 아닙니다.","Searched RDF triples of current saved definitions, not business rows or approved executable joins.","查询当前保存定义的 RDF 三元组，而非业务数据或已批准的执行连接。","現在の保存定義の RDF トリプルを検索しました。業務データや実行用結合の承認結果ではありません。"],
+  "ontology.query.grounding.rdfEmpty": ["일치하는 RDF 근거가 없습니다. 검색 질문과 용어 정의를 확인하세요.","No matching RDF evidence. Review the search question and term definitions.","无匹配的 RDF 依据。请检查搜索问题和术语定义。","一致する RDF 根拠がありません。検索質問と用語定義を確認してください。"],
+  "ontology.query.grounding.rdfTriples": ["RDF 근거 · 주어 / 술어 / 목적어","RDF evidence · subject / predicate / object","RDF 依据 · 主语 / 谓语 / 宾语","RDF 根拠・主語 / 述語 / 目的語"],
+  "ontology.query.grounding.rdfLimited": ["표시 한도에 따라 일부 RDF 근거를 제외했습니다. 전체 결과가 아닙니다.","Some RDF evidence was omitted due to display limits. This is not the complete result.","部分 RDF 依据因显示限制被省略，非完整结果。","表示上限により一部の RDF 根拠を省略しました。全結果ではありません。"],
+  "ontology.query.aiReplyInvalid": ["AI 추천 응답을 처리하지 못했습니다. 질문 오류가 아닙니다. 응답 검증 항목:", "Could not process the AI recommendation. This is not a question error. Response validation:", "无法处理 AI 推荐。这不是问题输入错误。响应验证项：", "AI 推薦応答を処理できません。質問の入力エラーではありません。応答検証項目："],
+  "ontology.query.plan.blocked": ["추천은 표시했습니다. 다음 원천 정의가 미승인 상태여서 SQL 생성에 적용하지 않았습니다:", "Recommendation displayed. These source definitions are not approved, so the plan was not applied for SQL generation:", "已显示推荐。以下源定义未获批准，因此未应用于 SQL 生成：", "推薦を表示しました。次のソース定義は未承認のため SQL 生成には適用していません："],
   "ontology.query.title": [
     "온톨로지 질의",
     "Ontology query",
@@ -294,10 +301,10 @@
     "選択したテーブルが AI プロファイルの object_list に含まれていません。対象を含むプロファイルを選択してください。"
   ],
   "ontology.query.localTables": [
-    "첫 버전에서는 로컬 일반 테이블만 조회할 수 있습니다. 뷰·외부 테이블·가상 컬럼이 있는 테이블은 제외됩니다.",
-    "This version queries local physical tables only. Views, external tables and tables with virtual columns are excluded.",
-    "此版本仅查询本地实体表，不支持视图、外部表或包含虚拟列的表。",
-    "初版ではローカルの通常テーブルのみ照会できます。ビュー・外部テーブル・仮想列のあるテーブルは対象外です。"
+    "검증 가능한 로컬 테이블과 단순 컬럼 투영 뷰만 실행할 수 있습니다. DB 링크·외부 테이블·가상 컬럼·함수·복잡한 뷰 또는 확인할 수 없는 의존 객체는 차단합니다.",
+    "Only verified local tables and projection-only views can execute. DB links, external tables, virtual columns, functions, complex views and unverifiable dependencies are blocked.",
+    "仅允许已验证本地表和简单列投影视图。阻止数据库链接、外部表、虚拟列、函数、复杂视图及无法验证的依赖。",
+    "検証可能なローカルテーブルと単純な列投影ビューのみ実行できます。DB リンク・外部テーブル・仮想列・関数・複雑なビュー・未確認の依存先は拒否します。"
   ],
   "ontology.query.resultLimit": [
     "결과가 화면 반환 한도를 넘었습니다. 조회 범위를 줄여 주세요.",
@@ -413,8 +420,18 @@
     "已审查映射",
     "確認済み対応"
   ],
-  "ontology.query.basis.RULE_CANDIDATE": ["메타데이터 비교 후보", "Metadata matching candidate", "元数据匹配候选", "メタデータ照合候補"],
-  "ontology.query.basis.AI_CANDIDATE": ["AI 추천 후보", "AI-suggested candidate", "AI 推荐候选", "AI 推薦候補"],
+  "ontology.query.basis.RULE_CANDIDATE": [
+    "메타데이터 비교 후보",
+    "Metadata matching candidate",
+    "元数据匹配候选",
+    "メタデータ照合候補"
+  ],
+  "ontology.query.basis.AI_CANDIDATE": [
+    "AI 추천 후보",
+    "AI-suggested candidate",
+    "AI 推荐候选",
+    "AI 推薦候補"
+  ],
   "ontology.query.basis.CONDITIONAL": [
     "추가 조건 있음",
     "Additional condition",
@@ -444,5 +461,130 @@
     "Not validated",
     "未验证",
     "未検証"
-  ]
+  ],
+  "ontology.query.grounding.graph": [
+    "조회할 메타데이터 그래프",
+    "Metadata graph",
+    "元数据图",
+    "メタデータグラフ"
+  ],
+  "ontology.query.grounding.catalog": [
+    "저장된 온톨로지만 탐색",
+    "Saved ontology only",
+    "仅已保存本体",
+    "保存済みオントロジーのみ"
+  ],
+  "ontology.query.grounding.title": [
+    "1. 용어 정의 확인",
+    "1. Review dictionary definitions",
+    "1. 确认术语定义",
+    "1. 用語定義の確認"
+  ],
+  "ontology.query.grounding.choose": [
+    "의미를 선택하세요",
+    "Choose a meaning",
+    "选择含义",
+    "意味を選択"
+  ],
+  "ontology.query.grounding.ambiguous": [
+    "같은 표현에 여러 정의가 있습니다. 직접 선택하세요.",
+    "Multiple definitions match. Choose one.",
+    "匹配多个定义，请选择一个。",
+    "複数の定義から選択してください。"
+  ],
+  "ontology.query.grounding.none": [
+    "일치하는 활성 용어가 없습니다. 원문으로 탐색합니다.",
+    "No active term matched. Continue with the original question.",
+    "没有匹配的有效术语，使用原始问题。",
+    "一致する用語がありません。元の質問で探索します。"
+  ],
+  "ontology.query.grounding.limit": [
+    "용어 검색 한도를 넘었습니다. 질문 범위를 줄여 주세요.",
+    "Too many terms. Narrow the question.",
+    "术语过多，请缩小问题范围。",
+    "用語が多すぎます。質問を絞ってください。"
+  ],
+  "ontology.query.grounding.continue": [
+    "AI 질문 해석 미리보기",
+    "Preview AI question interpretation",
+    "预览 AI 问题解释",
+    "AI質問解釈をプレビュー"
+  ],
+  "ontology.query.grounding.interpreted": [
+    "해석된 질문",
+    "Interpreted question",
+    "解释后的问题",
+    "解釈した質問"
+  ],
+  "ontology.query.grounding.policy": [
+    "원문에 사전 정의를 덧붙였습니다. 제안 관계는 실행용 조인으로 자동 채택하지 않습니다.",
+    "Dictionary definitions supplement the original question. Proposed links do not authorize executable joins.",
+    "词典定义补充原始问题。建议关系不会自动授权执行连接。",
+    "元の質問に用語定義を補足します。提案関係は実行用結合を許可しません。"
+  ],
+  "ontology.query.grounding.proposals": [
+    "관련 제안 관계 (최대 100개)",
+    "Related proposals (up to 100)",
+    "相关建议（最多100个）",
+    "関連する提案（最大100件）"
+  ],
+  "ontology.query.grounding.graphNote": [
+    "관련 테이블의 관계를 최대 100행 조회했습니다. 그래프는 생성 시점의 스냅샷이며 조인 승인으로 사용하지 않습니다.",
+    "Up to 100 related graph rows. The graph is a creation-time snapshot, not join authorization.",
+    "最多100行相关图关系。图为创建时快照，不授权连接。",
+    "関連グラフを最大100行表示します。作成時点のスナップショットであり、結合の承認ではありません。"
+  ],
+  "ontology.query.grounding.graphEmpty": [
+    "선택 그래프에 일치하는 관계가 없습니다.",
+    "No matching relationships in this graph.",
+    "图中没有匹配关系。",
+    "グラフに一致する関係がありません。"
+  ],
+  "ontology.query.grounding.aiTransmission": [
+    "선택한 AI Assistant로 표시된 질문·사전 정의 또는 조회 경로·근거를 전송합니다. 호출 비용이 발생할 수 있습니다.",
+    "Send the displayed question, dictionary or retrieved routes/evidence to the selected AI Assistant. Usage charges may apply.",
+    "将显示的问题、词典或检索路径及依据发送给所选 AI Assistant，可能产生费用。",
+    "表示した質問・用語定義または取得した経路・根拠を選択中の AI Assistant に送信します。利用料金が発生する場合があります。"
+  ],
+  "ontology.query.grounding.aiInterpretation": [
+    "AI가 생성한 온톨로지 검색 질문",
+    "AI-generated ontology search question",
+    "AI 生成的本体搜索问题",
+    "AI が生成したオントロジー検索質問"
+  ],
+  "ontology.query.grounding.clarify": [
+    "위 확인 사항을 질문에 보완한 뒤 다시 검색하세요. 아직 관계 탐색을 실행하지 않았습니다.",
+    "Clarify the question and search again. Relationship search has not run.",
+    "请补充问题后重新搜索，尚未执行关系探索。",
+    "確認事項を質問に補足して再検索してください。関係探索は未実行です。"
+  ],
+  "ontology.query.grounding.recommend": [
+    "AI 경로 추천",
+    "Ask AI to recommend a route",
+    "AI 推荐路径",
+    "AIに経路推薦を依頼"
+  ],
+  "ontology.query.grounding.recommendation": [
+    "AI 경로 추천 결과",
+    "AI route recommendation",
+    "AI 路径推荐结果",
+    "AIの経路推薦結果"
+  ],
+  "ontology.query.grounding.search": ["정의 적용 · 관계 탐색","Apply definitions · Find relationships","应用定义 · 查找关系","定義を適用・関係を検索"],
+  "ontology.query.plan.title": ["추천 선택","Recommended selection","推荐选择","推奨選択"],
+  "ontology.query.plan.note": ["선택은 이번 질의의 참고 범위입니다. 후보의 승인 상태를 변경하거나 조인을 허용하지 않습니다. 수정 후 선택 적용을 누르세요.","Selection is context for this query, not approval or join authorization. Apply after editing.","选择仅用于本次查询参考，不代表批准或允许连接。修改后请应用。","選択は今回の参照範囲です。承認や結合の許可ではありません。変更後に適用してください。"],
+  "ontology.query.plan.mode": ["조회 방식","Query approach","查询方式","照会方式"],
+  "ontology.query.plan.auto": ["AI 검색 질문 생성 후 RDF 검색 · 전송 동의 필요","Generate search question with AI, then search RDF · consent required","AI 生成搜索问题后查询 RDF · 需同意发送","AI 検索質問生成後に RDF 検索・送信への同意が必要"],
+  "ontology.query.plan.PATH": ["확정 경로 사용","Use confirmed path","使用已确认路径","確定経路を使用"],
+  "ontology.query.plan.INDEPENDENT": ["관계 사용 없음 · 독립 집계","No relationships · Independent aggregates","不使用关系 · 独立聚合","関係を使用しない・独立集計"],
+  "ontology.query.plan.REVIEW": ["근거 부족 · 검토 필요","Insufficient evidence · Review required","依据不足 · 需要审查","根拠不足・要確認"],
+  "ontology.query.plan.choose": ["경로 선택","Choose a path","选择路径","経路を選択"],
+  "ontology.query.plan.sources": ["독립 집계 원천 (승인된 정의)","Independent sources (approved definitions)","独立数据源（已批准定义）","独立集計元（承認済み定義）"],
+  "ontology.query.plan.candidates": ["검토에 포함할 관계 후보","Candidate relationships for review","待审查关系候选","検討する関係候補"],
+  "ontology.query.plan.REFERENCE": ["참고에 포함","Include as reference","作为参考","参考に含める"],
+  "ontology.query.plan.EXCLUDE": ["불필요 · 제외 추천","Unneeded · Exclude","不需要 · 建议排除","不要・除外推奨"],
+  "ontology.query.plan.UNRESOLVED": ["근거 부족","Insufficient evidence","依据不足","根拠不足"],
+  "ontology.query.plan.notRecommended": ["자동 추천에 포함되지 않음","Not automatically recommended","未自动推荐","自動推奨の対象外"],
+  "ontology.query.plan.apply": ["선택 적용","Apply selection","应用选择","選択を適用"],
+  "ontology.query.plan.applied": ["선택을 적용했습니다. SQL 생성은 별도 전송 동의 후 실행합니다.","Selection applied. SQL generation requires separate consent.","已应用选择，SQL 生成需要单独确认。","選択を適用しました。SQL 生成は別途同意が必要です。"]
 }

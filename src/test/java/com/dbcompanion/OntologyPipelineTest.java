@@ -63,6 +63,15 @@ class OntologyPipelineTest {
         assertThat(d.vertices()).isEqualTo(2);assertThat(d.edges()).isEqualTo(1);
         assertThat(d.sql()).contains("CREATE PROPERTY GRAPH \"APP\".\"BUSINESS_GRAPH\"","\"ORDERS\" AS \"E1\" KEY (\"ORDER_ID\")","SOURCE KEY (\"ORDER_ID\") REFERENCES \"V1\"","DESTINATION KEY (\"BUYER_NO\") REFERENCES \"V2\" (\"CUSTOMER_ID\")","NO PROPERTIES","TRUSTED MODE").doesNotContain("OR REPLACE","ALL COLUMNS","GRANT","DROP");
     }
+    @Test void businessGraphSelectionKeepsOnlyExplicitlyChosenConfirmedRelations(){
+        var entries=List.of(orders(),customer());var baseline=data(entries);
+        var relation=new Relation("choice","ORDERS","APP","CUSTOMER",List.of("BUYER_NO"),List.of("CUSTOMER_ID"),"APPROVED","USER","buyer","",List.of(),null,null);
+        var analysis=new Analysis("APP",baseline.tables(),List.of(relation),"now");
+        var all=PropertyGraph.build("APP","GRAPH",entries,analysis);
+        assertThat(all.available()).hasSize(1);assertThat(all.edges()).isEqualTo(1);
+        assertThat(PropertyGraph.build("APP","GRAPH",entries,analysis,List.of()).edges()).isZero();
+        assertThatThrownBy(()->PropertyGraph.build("APP","GRAPH",entries,analysis,List.of("candidate"))).isInstanceOf(Failure.class);
+    }
     @Test void graphExcludesUnconfirmedConditionalKeylessAndNonuniqueMappings(){
         var r=new Relation("x","ORDERS","APP","CUSTOMER",List.of("BUYER_NO"),List.of("CUSTOMER_ID"),"CANDIDATE","AI","r","",List.of(),null,null);
         var valid=List.of(orders(),customer());assertThat(PropertyGraph.build("APP","G",valid,new Analysis("APP",data(valid).tables(),List.of(r),"now")).edges()).isZero();

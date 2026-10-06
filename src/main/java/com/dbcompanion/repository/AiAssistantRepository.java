@@ -14,6 +14,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class AiAssistantRepository {
     private final JdbcTemplate jdbc;
+    public String maxTokens(String profile){
+        var values=jdbc.query("SELECT ATTRIBUTE_VALUE FROM USER_CLOUD_AI_PROFILE_ATTRIBUTES WHERE PROFILE_NAME=? AND ATTRIBUTE_NAME='max_tokens'",(r,n)->r.getString(1),profile);
+        return values.isEmpty()?null:values.getFirst();
+    }
+    public void saveMaxTokens(String owner,String profile,int value){
+        AiAssistant.validateTokens(value);
+        jdbc.update("BEGIN "+ProfileHistorySql.object(owner,"DBMS_CLOUD_AI")+".SET_ATTRIBUTE(profile_name => ?, attribute_name => 'max_tokens', attribute_value => ?); END;",profile,Integer.toString(value));
+    }
     public AiAssistantRepository(JdbcTemplate jdbc){this.jdbc=new JdbcTemplate(Objects.requireNonNull(jdbc.getDataSource()));this.jdbc.setQueryTimeout(10);}
     public List<Choice> profiles(){
         return jdbc.query("""
@@ -49,10 +57,13 @@ public class AiAssistantRepository {
         return generateSql(owner,com.dbcompanion.model.SelectAiTest.Action.CHAT);
     }
     public static String generateSql(String owner,com.dbcompanion.model.SelectAiTest.Action action){
+        return generateSql(owner,action,false);
+    }
+    public static String generateSql(String owner,com.dbcompanion.model.SelectAiTest.Action action,boolean override){
         String verb=switch(Objects.requireNonNull(action)){case SQL->"showsql";case CHAT->"chat";case PROMPT->"showprompt";};
         String api=ProfileHistorySql.object(owner,"DBMS_CLOUD_AI");
         return "BEGIN IF "+api+".GET_CONVERSATION_ID IS NOT NULL THEN RAISE_APPLICATION_ERROR(-20051, 'Active conversation is not allowed'); END IF; "
-                +"? := "+api+".GENERATE(prompt => ?, profile_name => ?, action => '"+verb+"', attributes => '{\"conversation\":false}'); END;";
+                +"? := "+api+".GENERATE(prompt => ?, profile_name => ?, action => '"+verb+"', attributes => "+(override?"?":"'{\"conversation\":false}'")+"); END;";
     }
     public String explain(String owner,String profile,String prompt){
         return generate(owner,profile,prompt,com.dbcompanion.model.SelectAiTest.Action.CHAT);
@@ -65,10 +76,13 @@ public class AiAssistantRepository {
     }
     public String generate(String owner,String profile,String prompt,com.dbcompanion.model.SelectAiTest.Action action,int timeoutSeconds){
         com.dbcompanion.common.config.SelectAiExecutionSettings.validate(timeoutSeconds);
+        Integer tokens=jdbc.getDataSource() instanceof com.dbcompanion.common.db.SessionDataSource session?session.assistantMaxTokens(profile):null;
         return jdbc.execute((ConnectionCallback<String>) connection->{
-            try(var call=connection.prepareCall(generateSql(owner,action));var reader=new StringReader(prompt)){
+            try(var call=connection.prepareCall(generateSql(owner,action,tokens!=null));var reader=new StringReader(prompt)){
                 call.setQueryTimeout(timeoutSeconds);call.registerOutParameter(1,java.sql.Types.CLOB);
-                call.setCharacterStream(2,reader,prompt.length());call.setString(3,profile);call.execute();
+                call.setCharacterStream(2,reader,prompt.length());call.setString(3,profile);
+                if(tokens!=null)call.setString(4,"{\"conversation\":false,\"max_tokens\":"+tokens+"}");
+                call.execute();
                 var result=call.getClob(1);
                 if(result==null)throw new Failure(502,"assistant.emptyResult","설명 응답이 비어 있습니다. 자동 재시도하지 않았습니다.");
                 try{

@@ -1,0 +1,21 @@
+[
+ {"name":"double","sql":"SELECT 1.25d AS AMOUNT FROM DUAL","rows":[["1.25"]]},
+ {"name":"float","sql":"SELECT -2.5f AS AMOUNT FROM DUAL","rows":[["-2.5"]]},
+ {"name":"binary_nulls","sql":"SELECT CAST(NULL AS BINARY_DOUBLE) AS D, CAST(NULL AS BINARY_FLOAT) AS F FROM DUAL","rows":[[null,null]]},
+ {"name":"zero","sql":"SELECT 0d AS D, 0f AS F FROM DUAL","rows":[["0","0"]]},
+ {"name":"double_aggregate","sql":"SELECT SUM(AMOUNT) AS TOTAL FROM (SELECT 1.25d AMOUNT FROM DUAL UNION ALL SELECT 2.5d FROM DUAL)","rows":[["3.75"]]},
+ {"name":"float_aggregate","sql":"SELECT SUM(AMOUNT) AS TOTAL FROM (SELECT 1.25f AMOUNT FROM DUAL UNION ALL SELECT 2.5f FROM DUAL)","rows":[["3.75"]]},
+ {"name":"wide_range","sql":"SELECT 1e300d AS LARGE_D, 1e-300d AS SMALL_D, 1e30f AS LARGE_F, 1e-30f AS SMALL_F FROM DUAL","numbers":[1e300,1e-300,1e30,1e-30]},
+ {"name":"double_precision","sql":"SELECT 1.2345678901234567d AS D FROM DUAL","numbers":[1.2345678901234567]},
+ {"name":"mixed_legacy","sql":"SELECT 123456789012345678901234567890 AS N, CAST(NULL AS NUMBER) AS N_NULL, 'text' AS T, DATE '2020-01-02' AS DT, TIMESTAMP '2020-01-02 03:04:05.123456' AS TS, 1.25d AS D FROM DUAL","rows":[["123456789012345678901234567890",null,"text","2020-01-02T00:00:00","2020-01-02T03:04:05.123456000","1.25"]]},
+ {"name":"limit_more","sql":"SELECT CAST(LEVEL AS BINARY_DOUBLE) AS N FROM DUAL CONNECT BY LEVEL<=3","limit":2,"rows":[["1"],["2"]],"more":true},
+ {"name":"limit_exact","sql":"SELECT CAST(LEVEL AS BINARY_FLOAT) AS N FROM DUAL CONNECT BY LEVEL<=2","limit":2,"rows":[["1"],["2"]]},
+ {"name":"empty","sql":"SELECT 1d AS N FROM DUAL WHERE 1=0","rows":[]},
+ {"name":"double_nan","sql":"SELECT BINARY_DOUBLE_NAN AS BAD_D FROM DUAL","error":"Non-finite BINARY_DOUBLE result at column 1 (BAD_D)"},
+ {"name":"double_inf","sql":"SELECT BINARY_DOUBLE_INFINITY AS BAD_D FROM DUAL","error":"Non-finite BINARY_DOUBLE result at column 1 (BAD_D)"},
+ {"name":"double_negative_inf","sql":"SELECT -BINARY_DOUBLE_INFINITY AS BAD_D FROM DUAL","error":"Non-finite BINARY_DOUBLE result at column 1 (BAD_D)"},
+ {"name":"float_nan","sql":"SELECT BINARY_FLOAT_NAN AS BAD_F FROM DUAL","error":"Non-finite BINARY_FLOAT result at column 1 (BAD_F)"},
+ {"name":"float_inf","sql":"SELECT BINARY_FLOAT_INFINITY AS BAD_F FROM DUAL","error":"Non-finite BINARY_FLOAT result at column 1 (BAD_F)"},
+ {"name":"float_negative_inf","sql":"SELECT -BINARY_FLOAT_INFINITY AS BAD_F FROM DUAL","error":"Non-finite BINARY_FLOAT result at column 1 (BAD_F)"},
+ {"name":"unsupported_clob","sql":"SELECT TO_CLOB('not supported') AS C FROM DUAL","error":"Unsupported result type: 112"}
+]

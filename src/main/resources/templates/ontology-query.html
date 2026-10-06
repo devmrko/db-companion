@@ -20,7 +20,7 @@
       <div data-oq-tokens aria-live="polite"></div>
       <p class="app-filter-message" data-oq-path-note></p><div data-oq-routes></div>
       <details class="app-query-alternatives" data-oq-alternatives hidden><summary th:text="#{ontology.query.paths.alternatives}"></summary><div data-oq-other-routes></div></details>
-      <p class="app-filter-message" th:text="#{ontology.query.paths.confirmMeaning}"></p>
+      <p class="app-filter-message" data-oq-route-guidance th:text="#{ontology.query.paths.confirmMeaning}"></p>
       <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-secondary" data-oq-answer disabled th:text="#{ontology.query.explain}"></button><button type="button" class="btn app-btn app-btn-primary" data-oq-sql disabled th:text="#{ontology.query.makeSql}"></button><button type="button" class="btn app-btn app-btn-quiet" data-oa-preview disabled th:text="#{ontology.archive.preview}"></button></div>
     </section>
     <section class="app-card" data-oq-answer-panel hidden><h2 th:text="#{ontology.query.explanation}"></h2><div data-oq-answer-body></div><p class="app-filter-message" data-oq-answer-meta></p></section>
@@ -51,4 +51,4 @@
       </section>
     </dialog>
   </section>
-</main></div><script type="module" th:src="@{/js/ontology-query.mjs}"></script></body></html>
+</main></div><script th:src="@{/webjars/cytoscape/3.34.1/dist/cytoscape.min.js}"></script><script type="module" th:src="@{/js/ontology-query.mjs}"></script></body></html>

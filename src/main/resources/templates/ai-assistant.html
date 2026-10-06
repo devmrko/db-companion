@@ -14,6 +14,19 @@
       <div class="app-assistant-actions"><button type="submit" class="btn app-btn app-btn-primary" data-as-save disabled th:text="#{assistant.apply}">선택 적용</button><button type="button" class="btn app-btn app-btn-quiet" data-as-clear th:text="#{assistant.clear}">선택 해제</button></div>
     </form>
     <p class="app-filter-message" data-as-current></p>
+    <fieldset data-as-tokens-panel hidden class="app-card">
+      <legend th:text="#{assistant.tokens.title}">최대 응답 토큰</legend>
+      <p data-as-tokens-current class="app-filter-message"></p>
+      <label for="assistant-max-tokens" th:text="#{assistant.tokens.input}">max_tokens</label>
+      <input id="assistant-max-tokens" data-as-tokens type="number" min="1" max="2147483647" step="1" class="form-control" inputmode="numeric">
+      <p class="app-filter-message" th:text="#{assistant.tokens.help}"></p>
+      <div class="app-assistant-actions">
+        <button type="button" data-as-tokens-session class="btn app-btn app-btn-primary" th:text="#{assistant.tokens.session}">세션에 적용</button>
+        <button type="button" data-as-tokens-reset class="btn app-btn app-btn-quiet" th:text="#{assistant.tokens.reset}">프로필 값 사용</button>
+      </div>
+      <label><input type="checkbox" data-as-tokens-consent> <span th:text="#{assistant.tokens.consent}"></span></label>
+      <button type="button" data-as-tokens-persist class="btn app-btn app-btn-quiet" th:text="#{assistant.tokens.persist}">DB 프로필에 저장</button>
+    </fieldset>
     <p role="status" data-as-message></p>
     <details class="app-assistant-help"><summary th:text="#{assistant.helpTitle}">AI 도우미 ?</summary><p th:text="#{assistant.help}"></p></details>
   </section>

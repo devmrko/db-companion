@@ -13,7 +13,7 @@ class AiAssistantHttpTest {
     @LocalServerPort int port;
     @Test void realHttpRequiresLoginAndCsrfForEveryAssistantAction() throws Exception {
         var client=HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();
-        for(String path:List.of("/ai-assistant","/ai-assistant/options","/ai-assistant/selection","/db/functions/explain/preview","/db/functions/explain",
+        for(String path:List.of("/ai-assistant","/ai-assistant/options","/ai-assistant/selection","/ai-assistant/tokens","/db/functions/explain/preview","/db/functions/explain",
                 "/ai-test","/ai-test/options","/ai-test/profile","/ai-test/selection","/ai-test/preview","/ai-test/generate","/ai-test/cancel","/ai-test/execute/preview","/ai-test/execute","/ai-test/review/preview","/ai-test/review",
                 "/ai-test/evidence/options","/ai-test/evidence/search","/ai-test/evidence/choose")){
             var uri=URI.create("http://127.0.0.1:"+port+path);

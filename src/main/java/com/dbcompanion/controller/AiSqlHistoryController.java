@@ -25,7 +25,7 @@ public class AiSqlHistoryController {
                        @RequestParam(defaultValue="all") String match,
                        @RequestParam(defaultValue="") String from, @RequestParam(defaultValue="") String to,
                        @RequestParam(defaultValue="") String sqlId, @RequestParam(defaultValue="") String text,
-                       @RequestParam(defaultValue="") String actor, @RequestParam(defaultValue="1") String page,
+                       @RequestParam(required=false) String actor, @RequestParam(defaultValue="1") String page,
                        @RequestParam(defaultValue="false") boolean load, @RequestParam(defaultValue="false") boolean refresh,
                        @RequestParam(defaultValue="false") boolean awrAllowed, @RequestParam(defaultValue="false") boolean policies,
                        HttpServletRequest request, HttpServletResponse response, Model model) {
@@ -37,7 +37,9 @@ public class AiSqlHistoryController {
             model.addAttribute("q", Query.parse("cache", "", "", "", "", "", "1", today));
             model.addAttribute("awrAllowed", awrAllowed); model.addAttribute("load", load);
             try {
-                var query = Query.parse(source, from, to, sqlId, text, actor, page, match, today); model.addAttribute("q", query);
+                // Missing on first visit differs from explicitly clearing the visible scope filter.
+                String scope = actor == null && "cache".equals(source) ? session.metadata().info().username() : actor;
+                var query = Query.parse(source, from, to, sqlId, text, scope, page, match, today); model.addAttribute("q", query);
                 if (refresh) {
                     session.metadata().sqlHistory().refresh(query.source());
                     // Remove the refresh flag: a subsequent browser reload must reuse the session result.
@@ -47,11 +49,13 @@ public class AiSqlHistoryController {
                             .queryParam("load", load).queryParam("awrAllowed", awrAllowed).queryParam("policies", policies)
                             .build().encode().toUriString();
                 }
-                if (load) {
+                boolean available = AiSqlHistoryAccessAdvice.selected(model, query.source().name()).available();
+                model.addAttribute("sqlSourceBlocked", !available);
+                if (load && available) {
                     var result = service.page(session, query, awrAllowed); model.addAttribute("result", result);
                     if (result.failure() != null) response.setStatus(503);
                 }
-                if (query.source() == Source.audit && policies) model.addAttribute("policies", service.policies(session));
+                if (query.source() == Source.audit && policies && AiSqlHistoryAccessAdvice.selected(model, "policies").available()) model.addAttribute("policies", service.policies(session));
             } catch (IllegalArgumentException | java.time.DateTimeException ex) {
                 response.setStatus(400); model.addAttribute("inputError", UiMessages.text("sqlh.invalid", "조회 조건을 확인해 주세요. 기간은 최대 31일이며 AWR은 사용 확인이 필요합니다."));
             }
@@ -68,6 +72,17 @@ public class AiSqlHistoryController {
         } catch (IllegalArgumentException ex) { return error(400, UiMessages.text("sqlh.invalid", "조회 조건을 확인해 주세요.")); }
         catch (AmbiguousRecord ex) { return error(409, UiMessages.text("sqlh.ambiguous", "기록을 하나로 식별할 수 없습니다. 목록을 새로고침해 주세요.")); }
         catch (RuntimeException ex) { return error(503, AiSqlHistoryService.failure(ex, "detail").details()); }
+    }
+    @GetMapping("/ai-executions/sql/sources/candidates") @ResponseBody
+    public ResponseEntity<?> candidates(@RequestParam String id, HttpServletRequest request) {
+        var session=session(request); if(session==null) return error(401,UiMessages.text("ui.9f0bb0f1f663","다시 로그인해 주세요."));
+        try {
+            var result=service.candidates(session,id);
+            return result==null?error(404,UiMessages.text("sqlh.candidates.stale","기준 커서가 변경되었거나 만료됐습니다. 목록을 새로고침해 주세요."))
+                    :ResponseEntity.ok().header("Cache-Control","no-store").body(result);
+        } catch(IllegalArgumentException ex) { return error(400,UiMessages.text("sqlh.invalid","조회 조건을 확인해 주세요.")); }
+        catch(AmbiguousRecord ex) { return error(409,UiMessages.text("sqlh.ambiguous","기록을 하나로 식별할 수 없습니다. 목록을 새로고침해 주세요.")); }
+        catch(RuntimeException ex) { return error(503,UiMessages.text("sqlh.candidates.failed","후보 조회를 완료하지 못했습니다. 기존 상세 정보는 그대로 확인할 수 있습니다.")); }
     }
     private ResponseEntity<?> error(int status, String text) { return ResponseEntity.status(status).header("Cache-Control", "no-store").body(Map.of("error", text)); }
     private PoolSession session(HttpServletRequest request) {
