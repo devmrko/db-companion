@@ -1,9 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.1.0-alpha.4
 
-Integrated on 2026-10-06. These changes do not create a new release tag or install
-database objects automatically.
+Prepared on 2026-10-06. Fourth public alpha; not a stable or production-certified
+release. Database objects are not installed automatically.
 
 ### Added
 

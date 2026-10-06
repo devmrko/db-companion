@@ -1,28 +1,29 @@
 # Release validation
 
-## Unreleased integration validation
+## 0.1.0-alpha.4
 
-Checked on 2026-10-06 in an isolated publication worktree based on alpha.3. No new
-release tag or deployment is implied; the artifact version remains alpha.3.
+Candidate: **0.1.0-alpha.4** / tag **v0.1.0-alpha.4**. Checked on 2026-10-06
+in an isolated publication worktree based on alpha.3. Publishing source and a
+version tag does not deploy the application or install database objects.
 
 | Check | Result |
 | --- | --- |
-| `mvn -o -Pquality verify` | Passed; executable JAR built |
+| `mvn -o -Pquality clean verify` | Passed; executable alpha.4 JAR built |
 | Java unit, integration and embedded HTTP tests | 1,327 passed, 0 failures/errors/skips |
 | PMD | 0 violations |
 | Complete JS suite including the optional Agent example and real-app runtime test | 651 passed, 0 failures/skips |
-| Publication guard | 931 files, 0 findings before this validation-record update |
+| Publication guard | 931 files, 0 findings |
 | `git diff --check` | Passed |
 
-Environment: macOS, JDK 21.0.12.1, Maven 3.9.16 and Node 26.0.0. Two lifecycle
+Environment: macOS, JDK 21.0.12.1, Maven 3.9.16 and Node 26.0.0. Three lifecycle
 checks initially failed because sandboxed process inspection was unavailable; the
 unchanged full JS suite then passed with process access and the built JAR.
 Runtime checks used temporary directories and ports, not the existing application.
 
 ```sh
-mvn -Pquality verify
+mvn -Pquality clean verify
 # Set JAVA_HOME to the intended test JDK before running the next command.
-RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.3.jar node --test src/test/js/*.test.mjs demos/semantic-query-agent/*.test.mjs
+RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.4.jar node --test src/test/js/*.test.mjs demos/semantic-query-agent/*.test.mjs
 node scripts/publication-check.cjs --working-tree
 git diff --check
 ```
