@@ -23,7 +23,7 @@ class OntologyQueryUiTest {
         for(String path:List.of("/ontology-query","/ontology-query/options?schema=APP","/ontology-query/archive/status?schema=APP","/ontology-query/archive/list?schema=APP","/ontology-query/archive/graph?schema=APP&id=x")){
             var res=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+path)).GET().build(),HttpResponse.BodyHandlers.ofString());assertThat(res.statusCode()).isEqualTo(302);assertThat(res.headers().firstValue("location").orElse("")).endsWith("/login");
         }
-        for(String path:List.of("search","preview","generate","execute","cancel","invalidate","archive/install","archive/setup","archive/preview","archive/save")){
+        for(String path:List.of("search","interpret","grounded-search","ai-interpret-preview","ai-recommend-preview","assistant-generate","plan-selection","preview","generate","execute","cancel","invalidate","archive/install","archive/setup","archive/preview","archive/save")){
             var res=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/ontology-query/"+path)).header("Content-Type","application/json").POST(HttpRequest.BodyPublishers.ofString("{}")).build(),HttpResponse.BodyHandlers.ofString());assertThat(res.statusCode()).as(path).isEqualTo(403);
         }
         var script=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/js/ontology-query.mjs")).GET().build(),HttpResponse.BodyHandlers.ofString());assertThat(script.statusCode()).isEqualTo(200);assertThat(script.body()).contains("selectedRoute");

@@ -1,4 +1,5 @@
 import {t} from './i18n.mjs';
+import {statisticsEditor} from './ontology-statistics.mjs';
 const label=key=>t('ontology.values.'+key,key);
 export const valueType=type=>/^(CHAR|NCHAR|VARCHAR2|NVARCHAR2)(\(|$)/i.test(type)?'TEXT':/^(NUMBER|FLOAT)(\(|$)/i.test(type)?'NUMBER':'';
 export const aliases=value=>value.split('\n').map(v=>v.trim()).filter(Boolean);
@@ -11,9 +12,10 @@ export function addMapping(meaning,column,type,value='',name=''){
   const binding={id:globalThis.crypto.randomUUID(),column,type,value,label:name,aliases:[],description:''};rows.push(binding);return binding;
 }
 const el=(tag,text,cls)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(cls)node.className=cls;return node;};
-export function valuesEditor(host,{entry,meaning,editable,lookup,run,changed}){
+export function valuesEditor(host,{entry,meaning,editable,lookup,statistics,run,changed}){
   const columns=eligibleColumns(entry.document.source.columns,meaning);
   const rows=meaning.valueMappings??=[];
+  if(editable&&statistics)statisticsEditor(host,{entry,meaning,statistics,run});
   const help=el('details',undefined,'app-dds-help'),summary=el('summary','?'),helpBody=el('div');summary.setAttribute('aria-label',label('title'));helpBody.append(el('p',label('optionalHelp')),el('p',label('help')));help.append(summary,helpBody);host.append(help);
   function button(text,action){const b=el('button',text,'btn app-btn app-btn-quiet');b.type='button';b.disabled=!editable;b.dataset.boundDisabled=String(!editable);b.addEventListener('click',action);return b;}
   function field(text,input,parent){const f=el('label',undefined,'app-ontology-field');f.append(el('span',text),input);parent.append(f);return input;}

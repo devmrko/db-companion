@@ -1,7 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {profileLabel,assistantPost} from '../../main/resources/static/js/ai-assistant.mjs';
+import {profileLabel,assistantPost,tokenValue} from '../../main/resources/static/js/ai-assistant.mjs';
+test('token entry distinguishes inheritance from positive integer output limits',()=>{
+  assert.equal(tokenValue(''),null);assert.equal(tokenValue(' 4096 '),4096);
+  for(const value of ['0','-1','1.5','1e4','NaN','2147483648','3;DROP'])assert.throws(()=>tokenValue(value));
+});
+test('profile persistence requires separate explicit consent and does not run AI',()=>{
+  const code=fs.readFileSync('src/main/resources/static/js/ai-assistant.mjs','utf8');
+  assert.match(code,/persistent&&\(maxTokens===null\|\|!consent\)/);
+  assert.match(code,/version:tokens.version/);assert.match(code,/tokens-reset/);
+  assert.doesNotMatch(code,/innerHTML|localStorage|sessionStorage|\/generate/);
+});
 import {explanationRequest} from '../../main/resources/static/js/function-explain.mjs';
 test('explanation sends only explicit consent and a one-use token, not editable source or action',()=>{
   assert.deepEqual(explanationRequest({token:'one-use',source:'private',profile:'OTHER',action:'runsql'},true),{token:'one-use',consent:true});

@@ -54,6 +54,7 @@ function mount(dialog) {
       if(type==='integer')control.inputMode='numeric';if(type==='number')control.inputMode='decimal';
       for(const key of ['min','max','step'])if(spec[key])control.setAttribute(key,spec[key]);
       control.value=data.value??'';
+      if(attr==='max_tokens'&&data.value==null)control.placeholder=t('assistant.tokens.default','기본값 (미설정)');
       if(control.value!==(data.value??'')){control.type='text';control.value=data.value??'';}
       host.append(control);control.addEventListener('input',count);
       if(type==='suggest'){

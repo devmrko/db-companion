@@ -1,6 +1,6 @@
 # DB Companion
 
-**Version: 0.1.0-alpha.3** · Java 21+ · Spring Boot · MIT
+**Version: 0.1.0-alpha.4** · Java 21+ · Spring Boot · MIT
 
 A self-hosted workbench for inspecting Oracle database metadata, Select AI configuration,
 feedback, execution information, and governed business definitions.
@@ -97,6 +97,15 @@ check. No SQL embedded in a document or glossary criterion is executed.
 
 No database credentials, Wallet, customer dataset, or private documentation are included.
 
+First-use guide: [English](docs/GETTING-STARTED.md) · [한국어](docs/GETTING-STARTED.ko.md) · [简体中文](docs/GETTING-STARTED.zh-CN.md) · [日本語](docs/GETTING-STARTED.ja.md).
+
+The [unreleased changes](CHANGELOG.md#unreleased) add shared RDF question grounding,
+question-evidence graphs, glossary JSON transfer, column statistics and SQL-history
+candidate inspection. The optional [semantic-query Agent example](demos/semantic-query-agent/README.md)
+provides APEX result-recovery components; it requires explicit installation and app
+integration. [Reporting and threshold alerts](docs/explanation/reporting-and-alerts.md)
+describes a deployment-neutral integration pattern, not an installed scheduler job.
+
 ## Build and run
 
 ```sh
@@ -176,7 +185,7 @@ An optional runtime integration suite starts and stops isolated app instances on
 ports (never your already running app):
 
 ```sh
-RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.3.jar node --test src/test/js/app-runtime.test.mjs
+RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.4.jar node --test src/test/js/app-runtime.test.mjs
 ```
 
 Translation sources are public development assets under `tools/i18n`, not private

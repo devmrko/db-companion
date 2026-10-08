@@ -13,6 +13,7 @@
   </div></div>
   <nav th:replace="~{fragments/execution-tabs :: tabs('sql')}"></nav>
   <nav th:replace="~{fragments/sql-history-sources :: sources('archive')}"></nav>
+  <section th:replace="~{fragments/sql-history-sources :: access}"></section>
   <p role="status" aria-live="polite" data-ar-message></p>
   <section th:if="${archiveAdmin}" class="app-card archive-card" data-ar-access>
     <h2 th:text="#{archive.access.title}"></h2>

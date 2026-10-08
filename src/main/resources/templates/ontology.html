@@ -10,7 +10,7 @@
       <p class="app-filter-message" role="status" data-on-message></p>
       <p class="app-filter-message" th:text="#{ontology.cacheHint}"></p>
       <div class="app-ontology-viewbar" data-on-views hidden>
-        <div class="app-dds-tabs"><button type="button" data-on-view="list" aria-pressed="true" th:text="#{ontology.erd.list}"></button><button type="button" data-on-view="erd" aria-pressed="false">ERD</button><button type="button" data-on-view="relationships" aria-pressed="false" th:text="#{ontology.relationships.title}"></button></div>
+        <div class="app-dds-tabs"><button type="button" data-on-view="list" aria-pressed="true" th:text="#{ontology.erd.list}"></button><button type="button" data-on-view="erd" aria-pressed="false">ERD</button><button type="button" data-on-view="relationships" aria-pressed="false" th:text="#{ontology.relationships.title}"></button><button type="button" data-on-view="property-graphs" aria-pressed="false" th:text="#{ontology.mg.tab}">Property Graph</button></div>
         <button type="button" class="btn app-btn app-btn-primary" data-on-analyze aria-controls="ontology-relationships" th:text="#{ontology.relationships.analyze}"></button>
         <button type="button" class="btn app-btn app-btn-secondary" data-on-native th:text="#{ontology.native.title}"></button>
       </div>
@@ -40,6 +40,7 @@
     </dialog>
     <section th:replace="~{fragments/ontology-erd :: erd}"></section>
     <section th:replace="~{fragments/ontology-relationships :: relationships}"></section>
+    <section class="app-card" data-on-property-graphs hidden th:aria-label="#{ontology.mg.tab}"></section>
     <dialog class="app-preview-dialog app-ontology-dialog" data-on-pipeline-dialog aria-labelledby="ontology-pipeline-title">
       <div class="app-preview-header"><h2 id="ontology-pipeline-title" data-pipeline-title></h2><button type="button" class="btn app-btn app-btn-quiet" data-pipeline-close th:text="#{ontology.close}"></button></div>
       <p role="status" aria-live="polite" data-pipeline-status></p>

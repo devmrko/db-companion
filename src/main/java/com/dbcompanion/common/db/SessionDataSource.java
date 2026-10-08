@@ -8,12 +8,25 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SessionDataSource extends AbstractDataSource {
-    private record Binding(DataSource source, String schema) {}
+    private record Binding(DataSource source, String schema,String aiProfile,Integer maxTokens) {}
     private final ThreadLocal<Binding> current = new ThreadLocal<>();
 
     public void bind(DataSource source, String schema) {
         if (current.get() != null) throw new IllegalStateException("Nested pool binding");
-        current.set(new Binding(source, schema));
+        current.set(new Binding(source, schema,null,null));
+    }
+
+    /** Snapshot the login's override; it applies only to the selected assistant profile. */
+    public void bind(DataSource source,String schema,com.dbcompanion.model.AiAssistant.State assistant){
+        bind(source,schema);
+        synchronized(assistant){
+            var selected=assistant.selected();
+            current.set(new Binding(source,schema,selected==null?null:selected.name(),assistant.maxTokens()));
+        }
+    }
+    public Integer assistantMaxTokens(String profile){
+        var binding=current.get();
+        return binding!=null&&java.util.Objects.equals(binding.aiProfile(),profile)?binding.maxTokens():null;
     }
 
     public void clear() { current.remove(); }

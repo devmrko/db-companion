@@ -49,6 +49,7 @@ class AiSqlGenerateHistoryTest {
             if(source!=Source.awr && match==Match.all)expected.add(AiSqlHistoryRepository.GENERATE_PATTERN);
             expected.add("2026-09-15");expected.add("2026-09-22");
             if(source==Source.awr && match==Match.all)expected.add(AiSqlHistoryRepository.GENERATE_PATTERN);
+            if(source==Source.cache && match!=Match.select_ai)expected.add("DBMS_CLOUD_AI");
             if(match!=Match.select_ai)expected.add(AiSqlHistoryRepository.GENERATE_PATTERN);
             expected.add(10);
             assertThat(stmt.args()).containsExactlyElementsOf(expected);

@@ -1,5 +1,45 @@
 # Changelog
 
+## 0.1.0-alpha.4
+
+Prepared on 2026-10-06. Fourth public alpha; not a stable or production-certified
+release. Database objects are not installed automatically.
+
+### Added
+
+- A shared glossary-to-RDF question workflow for Ontology query and Select AI test,
+  scoped source/rule selection, SQL generation, separate review and execution.
+- An interactive question-evidence graph using locally bundled Cytoscape. Dictionary
+  source references, selected joins, reference candidates and independent aggregates
+  have distinct meanings; inspecting a graph never approves or executes a relation.
+- Business glossary JSON export/import with validation and explicit application.
+- Bounded column statistics and inspected local-view support in ontology workflows.
+- Permission-aware AI SQL history and up to three possible generated-SQL matches.
+  Candidate matches are evidence for investigation, not proven call/result mappings.
+- An optional account-neutral semantic-query Agent example with bounded model output,
+  saved SQL/results and authenticated APEX recovery integration components.
+- First-use guides in four languages, a screen guide and expanded SQL help references.
+
+### Improved
+
+- Property graph listing/querying and JDBC JSON normalization, while preserving
+  candidate/approved/stale relationship distinctions.
+- AI Assistant and Select AI profile output-token editing and inherited defaults.
+- RDF search context size, question/selection invalidation, evidence summaries and
+  source-specific SQL-history help and layout.
+- Callable query numeric handling for Oracle NUMBER, BINARY_FLOAT and BINARY_DOUBLE.
+  Decimal strings preserve numeric precision; non-finite values are rejected.
+- Long glossary criteria, value sampling and result/error diagnostics.
+
+### Publication scope
+
+- Schema, profile and credentials remain deployment inputs. Customer records,
+  recording artifacts, operational jobs, recipients and webhook secrets are excluded.
+- Reporting and threshold-alert guidance describes an integration pattern, not a
+  preinstalled reporting service. Document chunking/embedding and Graph Server
+  embedding are not included in this change.
+- Successful execution and AI explanation do not certify business correctness.
+
 ## 0.1.0-alpha.3
 
 Prepared on 2026-10-01. Third public alpha; not a stable or production-certified release.

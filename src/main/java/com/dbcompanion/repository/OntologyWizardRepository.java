@@ -13,13 +13,7 @@ public class OntologyWizardRepository {
     public OntologyWizardRepository(JdbcTemplate jdbc){this.jdbc=new JdbcTemplate(Objects.requireNonNull(jdbc.getDataSource()));this.jdbc.setQueryTimeout(10);}
     public void verify(Snapshot snapshot,List<ColumnInfo> selected){
         String schema=snapshot.schema(),table=snapshot.table();
-        Long normal=jdbc.queryForObject("""
-            SELECT COUNT(*) FROM SYS.ALL_TABLES t WHERE t.OWNER=? AND t.TABLE_NAME=?
-              AND t.TEMPORARY='N' AND t.NESTED='NO' AND t.SECONDARY='N'
-              AND NOT EXISTS (SELECT 1 FROM SYS.ALL_EXTERNAL_TABLES e WHERE e.OWNER=t.OWNER AND e.TABLE_NAME=t.TABLE_NAME)
-              AND NOT EXISTS (SELECT 1 FROM SYS.ALL_MVIEWS m WHERE m.OWNER=t.OWNER AND m.MVIEW_NAME=t.TABLE_NAME)
-            """,Long.class,schema,table);
-        if(normal==null||normal!=1)throw new Failure(422,"wizard.localOnly");
+        try{OntologyQueryRepository.verifySampleSource(jdbc,schema,table);}catch(Failure ex){throw new Failure(422,"wizard.localOnly");}
         var live=jdbc.query("SELECT COLUMN_NAME,DATA_TYPE FROM SYS.ALL_TAB_COLS WHERE OWNER=? AND TABLE_NAME=? AND VIRTUAL_COLUMN='NO' AND HIDDEN_COLUMN='NO'",(r,n)->Map.entry(r.getString(1),r.getString(2)),schema,table);
         for(var c:selected){
             String type=live.stream().filter(v->v.getKey().equals(c.name())).map(Map.Entry::getValue).findFirst().orElse("");
@@ -46,6 +40,12 @@ public class OntologyWizardRepository {
     public List<List<String>> sample(Snapshot snapshot,List<ColumnInfo> columns,int count){
         if(count!=10&&count!=20)throw new Failure(400,"invalid");verify(snapshot,columns);
         return jdbc.query(sampleSql(snapshot.schema(),snapshot.table(),columns),s->{s.setInt(1,count);s.setMaxRows(count);s.setFetchSize(count);},(r,n)->{
+            var values=new ArrayList<String>();for(int i=1;i<=columns.size();i++)values.add(r.getString(i));return values;
+        });
+    }
+    public List<List<String>> profileRows(Snapshot snapshot,List<ColumnInfo> columns){
+        verify(snapshot,columns);
+        return jdbc.query(sampleSql(snapshot.schema(),snapshot.table(),columns),s->{s.setInt(1,OntologyStatistics.LIMIT);s.setMaxRows(OntologyStatistics.LIMIT);s.setFetchSize(100);},(r,n)->{
             var values=new ArrayList<String>();for(int i=1;i<=columns.size();i++)values.add(r.getString(i));return values;
         });
     }

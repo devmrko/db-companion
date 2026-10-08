@@ -199,6 +199,7 @@ CREATE PACKAGE BODY {{PACKAGE}} AS
   FUNCTION query_rows(p_sql CLOB,p_limit NUMBER) RETURN JSON_OBJECT_T IS
     rc SYS_REFCURSOR; cursor_no INTEGER; count_columns INTEGER; description DBMS_SQL.DESC_TAB2;
     value_text VARCHAR2(32767); value_number NUMBER; value_date DATE; value_time TIMESTAMP;
+    value_float BINARY_FLOAT; value_double BINARY_DOUBLE;
     rows_json JSON_ARRAY_T:=JSON_ARRAY_T(); columns_json JSON_ARRAY_T:=JSON_ARRAY_T(); row_json JSON_ARRAY_T;
     result JSON_OBJECT_T:=JSON_OBJECT_T(); more BOOLEAN:=FALSE;
   BEGIN
@@ -211,6 +212,8 @@ CREATE PACKAGE BODY {{PACKAGE}} AS
       columns_json.append(description(i).col_name);
       CASE description(i).col_type
         WHEN 2 THEN DBMS_SQL.DEFINE_COLUMN(cursor_no,i,value_number);
+        WHEN 100 THEN DBMS_SQL.DEFINE_COLUMN(cursor_no,i,value_float);
+        WHEN 101 THEN DBMS_SQL.DEFINE_COLUMN(cursor_no,i,value_double);
         WHEN 12 THEN DBMS_SQL.DEFINE_COLUMN(cursor_no,i,value_date);
         WHEN 180 THEN DBMS_SQL.DEFINE_COLUMN(cursor_no,i,value_time);
         ELSE
@@ -224,6 +227,20 @@ CREATE PACKAGE BODY {{PACKAGE}} AS
       FOR i IN 1..count_columns LOOP
         CASE description(i).col_type
           WHEN 2 THEN DBMS_SQL.COLUMN_VALUE(cursor_no,i,value_number);IF value_number IS NULL THEN row_json.append_null; ELSE row_json.append(TO_CHAR(value_number,'TM9','NLS_NUMERIC_CHARACTERS=''.,''')); END IF;
+          -- Preserve native binary types: NUMBER conversion can overflow or lose small values.
+          -- Keep decimal-string cells; non-finite values fail explicitly, never become zero/NULL.
+          WHEN 100 THEN
+            DBMS_SQL.COLUMN_VALUE(cursor_no,i,value_float);
+            IF value_float IS NULL THEN row_json.append_null;
+            ELSIF value_float IS NAN OR value_float IN (BINARY_FLOAT_INFINITY,-BINARY_FLOAT_INFINITY) THEN
+              RAISE_APPLICATION_ERROR(-20067,'Non-finite BINARY_FLOAT result at column '||i||' ('||description(i).col_name||'); cannot return a finite numeric result');
+            ELSE row_json.append(TO_CHAR(value_float,'TM9','NLS_NUMERIC_CHARACTERS=''.,''')); END IF;
+          WHEN 101 THEN
+            DBMS_SQL.COLUMN_VALUE(cursor_no,i,value_double);
+            IF value_double IS NULL THEN row_json.append_null;
+            ELSIF value_double IS NAN OR value_double IN (BINARY_DOUBLE_INFINITY,-BINARY_DOUBLE_INFINITY) THEN
+              RAISE_APPLICATION_ERROR(-20067,'Non-finite BINARY_DOUBLE result at column '||i||' ('||description(i).col_name||'); cannot return a finite numeric result');
+            ELSE row_json.append(TO_CHAR(value_double,'TM9','NLS_NUMERIC_CHARACTERS=''.,''')); END IF;
           WHEN 12 THEN DBMS_SQL.COLUMN_VALUE(cursor_no,i,value_date);IF value_date IS NULL THEN row_json.append_null; ELSE row_json.append(TO_CHAR(value_date,'YYYY-MM-DD"T"HH24:MI:SS')); END IF;
           WHEN 180 THEN DBMS_SQL.COLUMN_VALUE(cursor_no,i,value_time);IF value_time IS NULL THEN row_json.append_null; ELSE row_json.append(TO_CHAR(value_time,'YYYY-MM-DD"T"HH24:MI:SS.FF9')); END IF;
           ELSE DBMS_SQL.COLUMN_VALUE(cursor_no,i,value_text);IF value_text IS NULL THEN row_json.append_null; ELSE row_json.append(value_text); END IF;

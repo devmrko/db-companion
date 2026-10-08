@@ -159,5 +159,10 @@ export function ontologyRelationships(root,{schema,base,post,run,saved,openDefin
       }});
     }catch(ex){get('result').hidden=true;throw ex;}
   }
-  return {show,invalidate,dirty:()=>dirty,all};
+  async function reviewGraphRow(row){
+    await show();const id=String(row.RELATION_ID??'').replace(/^\d+:/,'');
+    const relation=data?.relations.find(r=>r.id===id&&r.source===row.SOURCE_OBJECT&&r.target===row.TARGET_OBJECT);
+    if(relation)inspect(relation);else status(label('refreshRequired'),true);
+  }
+  return {show,invalidate,dirty:()=>dirty,all,reviewGraphRow};
 }

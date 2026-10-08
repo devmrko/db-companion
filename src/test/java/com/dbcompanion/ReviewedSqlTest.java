@@ -7,6 +7,14 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
 
 class ReviewedSqlTest {
+    @Test void independentUnionBranchesCannotBorrowAliasesOrAuthorizeJoins(){
+        var isolated=new ReviewedSql.Scope("APP",scope().tables(),List.of());
+        String left="SELECT 'standard' AS metric, COUNT(DISTINCT o.ID) AS amount FROM APP.ORDERS o WHERE TRIM(o.BUYER_NO) = '1'";
+        String right="SELECT 'business' AS metric, COUNT(DISTINCT c.CUSTOMER_ID) AS amount FROM APP.CUSTOMER c";
+        assertThat(ReviewedSql.check(left+" UNION ALL "+right,isolated).tables()).containsExactly("ORDERS","CUSTOMER");
+        for(String sql:List.of(left+" UNION "+right,left+" UNION ALL DELETE FROM ORDERS",left+" UNION ALL SELECT o.ID FROM CUSTOMER c",left+" UNION ALL SELECT c.CUSTOMER_ID FROM CUSTOMER c JOIN ORDERS o ON o.ID=c.CUSTOMER_ID",left+" UNION ALL",left+" UNION ALL SELECT x.ID FROM OTHER.ORDERS x"))
+            assertThatThrownBy(()->ReviewedSql.check(sql,isolated)).isInstanceOf(Failure.class);
+    }
     OntologyInquiry.Evidence relation(List<String> from,List<String> to){return new OntologyInquiry.Evidence("R1","RELATION","ORDERS","CUSTOMER",from,to,"buyer","","FK",true,List.of(),List.of(),"now");}
     ReviewedSql.Scope scope(List<String> from,List<String> to){return new ReviewedSql.Scope("APP",Map.of(
         "ORDERS",new ReviewedSql.Table("ORDERS",Set.of("ID","BUYER_NO","TENANT_ID","AMOUNT","CREATED_AT")),

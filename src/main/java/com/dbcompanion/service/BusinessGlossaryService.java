@@ -97,4 +97,13 @@ public class BusinessGlossaryService {
             var current=repository.find(owner(s),hit.term().id());if(!current.enabled()||!current.equals(hit.term()))throw BusinessGlossary.stale();
         }return null;});
     }
+    public OntologyQuestionGrounding.Result interpret(PoolSession s,String searchId,String question,List<String> ids){
+        var found=s.metadata().businessGlossary().resolve(searchId,owner(s),"",question,Instant.now());
+        var result=OntologyQuestionGrounding.resolve(found,ids);verifyTerms(s,result.terms());return result;
+    }
+    public void verifyTerms(PoolSession s,List<Term> terms){
+        query(s,false,()->{verifyTermsInTransaction(s,terms);return null;});
+    }
+    /** Caller already holds the authenticated login's read transaction. */
+    public void verifyTermsInTransaction(PoolSession s,List<Term> terms){repository.requireTable(owner(s));for(var term:terms)if(!term.equals(repository.find(owner(s),term.id())))throw BusinessGlossary.stale();}
 }

@@ -9,6 +9,17 @@ import tools.jackson.databind.json.JsonMapper;
 import static org.assertj.core.api.Assertions.*;
 
 class ProfileEditPolicyTest {
+    @Test void absentTokenLimitCanBeAddedWithoutWeakeningVersionOrReadbackChecks(){
+        var token=new Target("APP","P","max_tokens");
+        var before=Map.<String,Object>of("exists",true,"profile",Map.of("PROFILE_ID","1"),"attributes",Map.of("model","MODEL"));
+        assertThat(ProfileEditPolicy.value(before,token)).isNull();
+        var after=Map.<String,Object>of("exists",true,"profile",Map.of("PROFILE_ID","1"),"attributes",Map.of("model","MODEL","max_tokens","4096"));
+        assertThat(ProfileEditPolicy.readbackMatches(token,before,after,"4096",json)).isTrue();
+        assertThat(ProfileEditPolicy.readbackMatches(token,before,before,"4096",json)).isFalse();
+        assertThatThrownBy(()->ProfileEditPolicy.verifyVersion(token,after,ProfileEditPolicy.version(token,before,json),json)).isInstanceOf(MetadataEditException.class);
+        assertThatThrownBy(()->ProfileEditPolicy.value(Map.of("exists",false),token)).isInstanceOf(MetadataEditException.class);
+        assertThatThrownBy(()->ProfileEditPolicy.value(Map.of("exists",true),token)).isInstanceOf(MetadataEditException.class);
+    }
     final JsonMapper json=JsonMapper.builder().build();
     final Target target=new Target("APP","P","additional_instructions");
     Map<String,Object> data(String id,String instruction) {

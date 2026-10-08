@@ -63,7 +63,7 @@ public class SelectAiTestService {
     }
     public int executionTimeoutSeconds(){return executionSettings.sqlTimeoutSeconds();}
     private <T>T query(PoolSession session,boolean generating,Supplier<T> work){
-        source.bind(session.pool(),session.metadata().info().username());
+        source.bind(session.pool(),session.metadata().info().username(),session.metadata().assistant());
         try{return (generating?generate:read).execute(status->generating
                 ?JdbcNetworkTimeout.execute(source,executionSettings.generateNetworkTimeoutMillis(),work):work.get());}finally{source.clear();}
     }
@@ -129,6 +129,7 @@ public class SelectAiTestService {
     }
     private void verifyEvidence(PoolSession session,SelectAiEvidence.Snapshot evidence){
         if(evidence==null)return;SelectAiEvidence.scope(evidence.schema(),session.metadata().schemas());
+        if(!evidence.terms().isEmpty())Objects.requireNonNull(glossary).verifyTermsInTransaction(session,evidence.terms());
         ontology.require(evidence.schema(),session.metadata().info().username());
         var current=evidence.entries().stream().map(e->ontology.entry(evidence.schema(),e.document().source().table(),0)).toList();
         if(current.stream().anyMatch(Objects::isNull))throw SelectAiEvidence.stale();SelectAiEvidence.verify(evidence,current);
@@ -288,7 +289,7 @@ public class SelectAiTestService {
         var trace=state.progress().begin(operationId,"EXECUTE");trace.step(Stage.CONNECTION);
         long nanos=System.nanoTime();ExecutionResult result=null;
         try{
-            source.bind(session.pool(),session.metadata().info().username());
+            source.bind(session.pool(),session.metadata().info().username(),session.metadata().assistant());
             var data=execute.execute(status->JdbcNetworkTimeout.execute(source,executionSettings.networkTimeoutMillis(),()->{
                 trace.step(Stage.PROFILE);
                 verifyEvidence(session,value.evidence());

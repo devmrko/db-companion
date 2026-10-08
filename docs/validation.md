@@ -1,5 +1,40 @@
 # Release validation
 
+## 0.1.0-alpha.4
+
+Candidate: **0.1.0-alpha.4** / tag **v0.1.0-alpha.4**. Checked on 2026-10-06
+in an isolated publication worktree based on alpha.3. Publishing source and a
+version tag does not deploy the application or install database objects.
+
+| Check | Result |
+| --- | --- |
+| `mvn -o -Pquality clean verify` | Passed; executable alpha.4 JAR built |
+| Java unit, integration and embedded HTTP tests | 1,327 passed, 0 failures/errors/skips |
+| PMD | 0 violations |
+| Complete JS suite including the optional Agent example and real-app runtime test | 651 passed, 0 failures/skips |
+| Publication guard | 931 files, 0 findings |
+| `git diff --check` | Passed |
+
+Environment: macOS, JDK 21.0.12.1, Maven 3.9.16 and Node 26.0.0. Three lifecycle
+checks initially failed because sandboxed process inspection was unavailable; the
+unchanged full JS suite then passed with process access and the built JAR.
+Runtime checks used temporary directories and ports, not the existing application.
+
+```sh
+mvn -Pquality clean verify
+# Set JAVA_HOME to the intended test JDK before running the next command.
+RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.4.jar node --test src/test/js/*.test.mjs demos/semantic-query-agent/*.test.mjs
+node scripts/publication-check.cjs --working-tree
+git diff --check
+```
+
+These integration checks did not call a paid AI provider, log into a live database,
+install the optional APEX/PLSQL example, send reports or change operational jobs.
+The Agent example has contract and mocked-client tests, not a portable live-install
+certification. Business totals, DB privileges and app-specific APEX wiring need
+separate validation. Publication scanning is heuristic; account-specific configuration,
+customer data and private recording artifacts are deliberately excluded.
+
 ## 0.1.0-alpha.3
 
 Candidate: **0.1.0-alpha.3** / tag **v0.1.0-alpha.3**. Checked on 2026-10-01

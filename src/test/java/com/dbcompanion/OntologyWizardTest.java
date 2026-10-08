@@ -127,7 +127,9 @@ class OntologyWizardTest {
     }
     @Test void repositoryHasNoWritesAndBoundChecksPrecedeSampling() throws Exception {
         String repo=Files.readString(Path.of("src/main/java/com/dbcompanion/repository/OntologyWizardRepository.java"));
-        assertThat(repo).contains("verify(snapshot,columns)","setMaxRows(count)","setQueryTimeout(10)","SYS.ALL_EXTERNAL_TABLES","SYS.ALL_MVIEWS").doesNotContain("INSERT ","UPDATE ","DELETE ","jdbc.execute(","DBMS_RANDOM");
+        assertThat(repo).contains("verify(snapshot,columns)","setMaxRows(count)","setQueryTimeout(10)","OntologyQueryRepository.verifySampleSource").doesNotContain("INSERT ","UPDATE ","DELETE ","jdbc.execute(","DBMS_RANDOM");
+        String guard=Files.readString(Path.of("src/main/java/com/dbcompanion/repository/OntologyQueryRepository.java"));
+        assertThat(guard).contains("SYS.ALL_EXTERNAL_TABLES","SYS.ALL_MVIEWS","LocalViewSql.base","SYS.ALL_DEPENDENCIES");
         String service=Files.readString(Path.of("src/main/java/com/dbcompanion/service/OntologyWizardService.java"));
         assertThat(service).contains("\"DRAFT\",new Document", "finally{assistant.finish();}","profile.equals(ai.profile", "samples.verify", "OntologyWizard.merge");
     }

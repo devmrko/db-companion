@@ -47,6 +47,34 @@ class AiSqlHistoryTest {
                 "sn.DBID=st.DBID", "sn.INSTANCE_NUMBER=st.INSTANCE_NUMBER", "sn.SNAP_ID=st.SNAP_ID", "h.DBID=t.DBID", "h.SQL_ID=t.SQL_ID", "NVL(h.CON_DBID,-1)=NVL(t.CON_DBID,-1)", "NVL(h.CON_ID,-1)=NVL(t.CON_ID,-1)")
                 .doesNotContain("EXECUTION_TIME", "PARSING_SCHEMA_NAME ACTOR");
     }
+    @Test void cacheSkipsGenerateRegexForUnrelatedSqlWithoutTruncatingLongCalls() {
+        for (var match : Match.values()) {
+            var q = new Query(Source.cache,TODAY.minusDays(6),TODAY,"","","",1,match);
+            var statement = AiSqlHistoryRepository.listStatement(q, "");
+            assertThat(statement.sql().chars().filter(c -> c == '?').count()).isEqualTo(statement.args().size());
+            String predicate = statement.sql().substring(statement.sql().indexOf("FROM SYS.V_$SQL"));
+            assertThat(predicate).doesNotContain("SUBSTR", "s.SQL_TEXT", "FETCH FIRST", "DBMS_CLOUD_AI");
+            if (match == Match.select_ai) {
+                assertThat(predicate).doesNotContain("INSTR");
+            } else {
+                assertThat(predicate).contains("WHEN INSTR(UPPER(s.SQL_FULLTEXT), ?) = 0 THEN 0 WHEN REGEXP_LIKE(s.SQL_FULLTEXT, ?, 'i') THEN 1 ELSE 0 END = 1");
+                assertThat(statement.args()).containsSubsequence("DBMS_CLOUD_AI", AiSqlHistoryRepository.GENERATE_PATTERN);
+            }
+        }
+    }
+    @Test void cancellationIsNotCachedAndRetriesOnlyWhenPageIsRequestedAgain() {
+        var state = new State(); var calls = new AtomicInteger();
+        var q = query(Source.cache,"","","",1);
+        var first = state.page(q, () -> {
+            calls.incrementAndGet(); return new Page(List.of(),1,false,Instant.now(),new Failure(1013,"cancelled"));
+        });
+        assertThat(first.failure().cancelled()).isTrue();
+        assertThat(calls.get()).isEqualTo(1);
+        var next = state.page(q, () -> { calls.incrementAndGet(); return Page.of(List.of(),1); });
+        assertThat(next.failure()).isNull();
+        assertThat(calls.get()).isEqualTo(2);
+        assertThat(state.page(q, () -> { throw new AssertionError("Successful page should be cached"); })).isSameAs(next);
+    }
     @Test void auditDoesNotInventSqlIdOrCollectBindsAndRejectsShadowView() {
         var q = query(Source.audit,"","","APP",1);
         var sql = AiSqlHistoryRepository.listStatement(q,"AUDSYS.UNIFIED_AUDIT_TRAIL").sql();
@@ -84,6 +112,20 @@ class AiSqlHistoryTest {
         assertThatThrownBy(() -> state.selection("fake")).isInstanceOf(IllegalArgumentException.class);
         assertThat(state.selection(UUID.randomUUID().toString())).isNull();
     }
+    @Test void cursorDetailExposesCumulativeMetricsAndParsingIdentityNotInventedExecutionEvents() {
+        var selected = new Selection(query(Source.cache,"","","",1), item(List.of("123456789abcd","0","75","address","loaded")));
+        var sql = AiSqlHistoryRepository.detailStatement(selected, "").sql();
+        assertThat(sql).contains("s.PARSING_USER_ID", "SYS.ALL_USERS", "PARSING_USER_NAME", "s.MODULE", "s.ACTION",
+                "ROUND(s.ELAPSED_TIME/1000000,6) ELAPSED_SECONDS_TOTAL",
+                "s.ELAPSED_TIME/NULLIF(s.EXECUTIONS,0)/1000000", "CPU_SECONDS_TOTAL", "PLSQL_SECONDS_TOTAL")
+                .doesNotContain("LAST_EXECUTION_SECONDS", "EXECUTING_USER", "CREATED -", "LAST_ACTIVE_TIME -");
+        var mapping = AiSqlHistoryRepository.mappingStatement(selected);
+        assertThat(mapping.sql()).contains("FROM SYS.V_$MAPPED_SQL", "m.SQL_ID=? AND m.CON_ID=TO_NUMBER(?)", "MAPPED_SQL_FULLTEXT", "FETCH FIRST 11 ROWS ONLY")
+                .doesNotContain("LAST_ACTIVE_TIME", "LIKE", "SUBSTR", "USER_CLOUD_AI", "SQL_BIND_CAPTURE");
+        assertThat(mapping.args()).containsExactly("123456789abcd", "75");
+        assertThatThrownBy(() -> AiSqlHistoryRepository.mappingStatement(new Selection(query(Source.audit,"","","",1),item(List.of()))))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
     @Test void cachedFailuresAndPolicyStateOnlyReloadOnExplicitRefreshAndPagesAreBounded() {
         var state = new State(); var error = new Failure(942,"ORA-00942");
         var q = query(Source.cache,"","","",1);
@@ -104,7 +146,7 @@ class AiSqlHistoryTest {
         String controller = Files.readString(Path.of("src/main/java/com/dbcompanion/controller/AiSqlHistoryController.java"));
         assertThat(repo).doesNotContain("jdbc.execute", "jdbc.update", "SQL_BINDS", "prepareCall", "registerOutParameter", "CREATE AUDIT", "GRANT ");
         assertThat(service).contains("read.setReadOnly(true)", "read.setTimeout(10)", "source.bind(session.pool()", "source.clear()", "&& !awrAllowed");
-        assertThat(controller).contains("if (load)", "boolean refresh", "return \"redirect:\"").doesNotContain("PostMapping");
+        assertThat(controller).contains("if (load && available)", "boolean refresh", "return \"redirect:\"").doesNotContain("PostMapping");
         assertThat(AiSqlHistoryRepository.POLICY_SQL).contains("LEFT JOIN", "e.ENABLED_OPTION", "e.SUCCESS, e.FAILURE", "p.AUDIT_CONDITION", "p.AUDIT_ONLY_TOPLEVEL", "FETCH FIRST 201 ROWS ONLY");
     }
 }

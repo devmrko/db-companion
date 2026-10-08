@@ -18,22 +18,72 @@ public class AiAssistantService {
     private final AiAssistantRepository repository;
     private final ProfileHistoryRepository profiles;
     private final FunctionCatalogService functions;
-    private final TransactionTemplate read,generate;
+    private final TransactionTemplate read,generate,write;
     public AiAssistantService(SessionDataSource source,AiAssistantRepository repository,ProfileHistoryRepository profiles,FunctionCatalogService functions){
         this.source=source;this.repository=repository;this.profiles=profiles;this.functions=functions;
         var manager=new DataSourceTransactionManager(source);
         read=new TransactionTemplate(manager);read.setReadOnly(true);read.setTimeout(10);
         generate=new TransactionTemplate(manager);generate.setReadOnly(true);generate.setTimeout(90);
+        write=new TransactionTemplate(manager);write.setTimeout(10);
     }
     private <T>T query(PoolSession session,boolean generating,Supplier<T> work){
-        source.bind(session.pool(),session.metadata().info().username());
+        source.bind(session.pool(),session.metadata().info().username(),session.metadata().assistant());
         try{return (generating?generate:read).execute(status->work.get());}finally{source.clear();}
     }
     public Options options(PoolSession session,boolean refresh){
         synchronized(session){var metadata=session.metadata();var state=metadata.assistant();
-            return new Options(metadata.info().username(),state.selected(),state.profiles(refresh,()->query(session,false,repository::profiles)));
+            var choices=state.profiles(refresh,()->query(session,false,repository::profiles));
+            var selected=state.selected();
+            TokenSettings tokens=selected==null?null:query(session,false,()->new TokenSettings(selected.name(),repository.profile(selected).version(),repository.maxTokens(selected.name()),state.maxTokens()));
+            return new Options(metadata.info().username(),selected,choices,tokens);
         }
     }
+    public synchronized void tokens(PoolSession session,String name,String version,Integer value,boolean persistent,boolean consent){
+        AiAssistant.validateTokens(value);
+        if(persistent&&(value==null||!consent))throw new IllegalArgumentException("Explicit profile write confirmation required");
+        synchronized(session){
+            var state=session.metadata().assistant();var selected=state.selected();
+            if(selected==null||!selected.name().equals(name))throw AiAssistant.stale();
+            state.select(selected); // Busy guard and invalidate outstanding assistant consent.
+            source.bind(session.pool(),session.metadata().info().username());
+            try{
+                read.execute(status->{
+                    if(!repository.profile(selected).version().equals(version))throw AiAssistant.stale();
+                    return null;
+                });
+                if(persistent)persistTokens(selected,version,value);
+                state.maxTokens(persistent?null:value);
+            }finally{source.clear();}
+        }
+    }
+    private record TokenBefore(String owner,String requestId,java.util.Map<String,Object> snapshot) {}
+    private void persistTokens(Selection selected,String version,int value){
+        // Preserve the existing profile editor's before/after archive requirement.
+        var before=write.execute(status->{
+            profiles.requireArchive(selected.owner());
+            if(!repository.profile(selected).version().equals(version))throw AiAssistant.stale();
+            var snapshot=profiles.currentSnapshot(selected.owner(),selected.name(),true);
+            String id=String.valueOf(((java.util.Map<?,?>)snapshot.get("profile")).get("PROFILE_ID"));
+            String request=profiles.beforeEdit(selected.owner(),selected.name(),id,"max_tokens",selected.owner(),snapshot);
+            return new TokenBefore(profiles.packageOwner(selected.owner()),request,snapshot);
+        }); // Commit the recovery snapshot before invoking a potentially committing DB API.
+        RuntimeException failure=null;
+        try{
+            write.executeWithoutResult(status->{
+                if(!repository.profile(selected).version().equals(version))throw AiAssistant.stale();
+                repository.saveMaxTokens(before.owner(),selected.name(),value);
+            });
+        }catch(RuntimeException ex){failure=ex;}
+        try{
+            var after=read.execute(status->profiles.currentSnapshot(selected.owner(),selected.name(),true));
+            var target=new com.dbcompanion.model.ProfileEdit.Target(selected.owner(),selected.name(),"max_tokens");
+            boolean matches=ProfileEditPolicy.readbackMatches(target,before.snapshot(),after,Integer.toString(value),new tools.jackson.databind.json.JsonMapper());
+            String outcome=matches&&failure==null?"VERIFIED":"UNCERTAIN";
+            write.executeWithoutResult(status->profiles.afterEdit(selected.owner(),selected.name(),before.requestId(),outcome,after));
+            if(!matches||failure!=null)throw tokenSaveFailure();
+        }catch(RuntimeException ex){throw tokenSaveFailure();}
+    }
+    private Failure tokenSaveFailure(){return new Failure(503,"assistant.tokens.verifyFailed","저장 결과를 확인하지 못했습니다. 새로고침 후 DB 값과 변경 이력을 확인하세요. 자동 재시도하지 않았습니다.");}
     public Selection select(PoolSession session,String name){
         synchronized(session){
             var metadata=session.metadata();var state=metadata.assistant();

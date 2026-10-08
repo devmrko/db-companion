@@ -20,13 +20,15 @@ test('old SQL or prompt cannot be used across evidence variants',()=>{
   assert.equal(evidenceMatches(null,false,a,'q'),true);
   assert.equal(evidenceMatches(a,true,a,'changed'),false);
 });
-test('only explicit choice is posted, raw evidence uses safe text and no provider calls',()=>{
+test('shared RDF search requires consent and explicit evidence selection',()=>{
   const source=fs.readFileSync('src/main/resources/static/js/select-ai-evidence.mjs','utf8');
-  assert.ok(source.includes("post(analysisEndpoint('evidence/search',analysis.language())"));assert.match(source,/post\('evidence\/choose',\{searchId:search.id,route:get\('routes'\).value\}\)/);
+  const flow=fs.readFileSync('src/main/resources/static/js/select-ai-rdf-evidence.mjs','utf8');
+  assert.match(flow,/ai-interpret-preview/);assert.match(flow,/post\('test-evidence',\{id:searchId,...selection\}\)/);
+  assert.match(flow,/if\(!preview\|\|!consent.checked\)return/);assert.match(flow,/renderRdfWorkflow/);
   assert.match(source,/pre.textContent=value.source/);assert.match(source,/cell.textContent=text/);
   assert.doesNotMatch(source,/innerHTML|localStorage|sessionStorage|setInterval|setTimeout|post\('generate'|routes\[0\]/);
-  assert.match(source,/useOntology:enabled\(\),evidenceHash:/);
-  assert.match(source,/if\(!refresh&&loadedSchema===schema\)return/);
+  assert.match(flow,/useOntology:enabled\(\),evidenceHash:/);
+  assert.match(flow,/!refresh&&loadedSchema===schema/);
 });
 test('main workflow uses one context and blocks stale review and execution',()=>{
   const source=fs.readFileSync('src/main/resources/static/js/select-ai-test.mjs','utf8');

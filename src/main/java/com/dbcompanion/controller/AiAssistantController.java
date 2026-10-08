@@ -26,6 +26,14 @@ public class AiAssistantController {
     @GetMapping("/ai-assistant/options") @ResponseBody
     public ResponseEntity<?> options(@RequestParam(defaultValue="false") boolean refresh,HttpServletRequest request){return run(request,false,()->service.options(session(request),refresh));}
     public record Choose(String name) {}
+    public record Tokens(String name,String version,java.math.BigDecimal maxTokens,boolean persistent,boolean consent) {}
+    @PostMapping("/ai-assistant/tokens") @ResponseBody
+    public ResponseEntity<?> tokens(@RequestBody Tokens value,HttpServletRequest request){return run(request,false,()->{
+        final Integer limit;
+        try{limit=value.maxTokens()==null?null:value.maxTokens().intValueExact();}
+        catch(ArithmeticException ex){throw new IllegalArgumentException("max_tokens must be an integer in range");}
+        service.tokens(session(request),value.name(),value.version(),limit,value.persistent(),value.consent());return Map.of("saved",true);
+    });}
     @PostMapping("/ai-assistant/selection") @ResponseBody
     public ResponseEntity<?> select(@RequestBody Choose choice,HttpServletRequest request){return run(request,false,()->{service.select(session(request),choice.name());return Map.of("saved",true);});}
     public record Prepare(String schema,String reference) {}
@@ -38,6 +46,7 @@ public class AiAssistantController {
         if(session(request)==null)return error(401,UiMessages.text("ui.b9c067f345b1","로그인 세션이 만료되었습니다. 다시 로그인해 주세요."));
         try{return ResponseEntity.ok().header("Cache-Control","no-store").body(work.get());}
         catch(Failure ex){return error(ex.status(),ex.getMessage());}
+        catch(com.dbcompanion.common.exception.MetadataEditException ex){return error(ex.status(),ex.userMessage());}
         catch(com.dbcompanion.model.FunctionCatalog.Failure ex){return error(ex.status(),ex.getMessage());}
         catch(IllegalArgumentException ex){return error(400,UiMessages.text("assistant.invalid","요청 정보를 확인해 주세요."));}
         catch(RuntimeException ex){

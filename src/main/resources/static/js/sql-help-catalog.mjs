@@ -1,13 +1,14 @@
 // Copy-only, source-backed recipes. Values are placeholders, never session/customer data.
 import {nativeRdfHelp} from './sql-help-native-rdf.mjs';
 import {metadataGraphHelp} from './sql-help-metadata-graph.mjs';
+import {taskDefinition,delegatedHistory,resultReview,discoveryHistory,ordsChanges} from './sql-help-workflows.mjs';
+import {referenceFor} from './sql-help-references.mjs';
 // Each recipe is a DB operation, not a claim that SQL reproduces Java validation or UI state.
 const aiDoc='https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/dbms-cloud-ai-package.html';
-const dbDoc='https://docs.oracle.com/en/database/oracle/oracle-database/26/refrn/';
 const pair=(ko,en)=>({ko,en});
 const source=name=>`src/main/java/com/dbcompanion/${name}.java`;
 function recipe(id,ko,en,sql,origin,options={}) {
-  return {id,title:pair(ko,en),purpose:pair(ko,en),sql,source:source(origin),risk:'read',doc:dbDoc,
+  return {id,title:pair(ko,en),purpose:pair(ko,en),sql,source:source(origin),risk:'read',
     note:pair('앱의 바인드 변수를 예시 값으로 바꾼 구문입니다. 앱의 권한·동시 변경 검사와 이력 저장은 별도입니다.','Source SQL adapted with placeholders. Application permission checks, concurrency checks and history capture are separate.'),...options};
 }
 const attributes=`SELECT ATTRIBUTE_NAME, ATTRIBUTE_VALUE
@@ -258,11 +259,13 @@ ${comments}`,'repository/DatabaseRepository'),
   ANNOTATIONS (REPLACE "<ANNOTATION_NAME>" '<ANNOTATION_VALUE>');`,'common/db/MetadataSql',{risk:'ddl',verify:annotations}),
     recipe('column-annotation-add','컬럼 Annotation 추가','Add column Annotation',`ALTER TABLE "<SCHEMA>"."<TABLE_NAME>" MODIFY "<COLUMN_NAME>"
   ANNOTATIONS (ADD "<ANNOTATION_NAME>" '<ANNOTATION_VALUE>');`,'common/db/MetadataSql',{risk:'ddl',verify:annotations}),
-    recipe('history','코멘트·Annotation 변경 이력 조회','Read comment/Annotation history',`SELECT SEQ, CHANGED_AT, CHANGED_BY, COLUMN_NAME, CHANGE_KIND,
+    recipe('history','저장소 직접 조회: 코멘트·Annotation 이력','Direct store: comment/Annotation history',`SELECT SEQ, CHANGED_AT, CHANGED_BY, COLUMN_NAME, CHANGE_KIND,
        ANNOTATION_NAME, BEFORE_JSON, AFTER_JSON
 FROM "<SCHEMA>"."DBC_METADATA_HISTORY"
 WHERE SCHEMA_NAME = '<SCHEMA>' AND TABLE_NAME = '<TABLE_NAME>'
-ORDER BY SEQ DESC FETCH FIRST 20 ROWS ONLY;`,'repository/MetadataHistoryRepository')
+ORDER BY SEQ DESC FETCH FIRST 20 ROWS ONLY;`,'repository/MetadataHistoryRepository',{
+      note:pair('대상 스키마의 DBC_METADATA_HISTORY를 직접 읽을 권한이 있을 때의 예입니다. 앱에서 위임 이력 권한을 받은 경우에는 작업 선택의 위임받은 메타데이터 이력 조회를 사용하세요. 두 경로는 같은 권한이 아닙니다.','Use only with direct read access to the target schema history table. Delegated users should choose Read delegated metadata history; direct and delegated access are not interchangeable.')}),
+    delegatedHistory
   ],
   credentials:[
     recipe('list','Credential 목록 조회','Read credential metadata',`SELECT CREDENTIAL_NAME, ENABLED
@@ -289,7 +292,7 @@ SELECT OWNER, CREDENTIAL_NAME FROM DBA_CREDENTIALS
 WHERE OWNER = '<DB_USER>' AND CREDENTIAL_NAME = 'OCI$RESOURCE_PRINCIPAL';`,'repository/CredentialCatalogRepository',{risk:'write',source:'src/main/resources/templates/fragments/select-ai-setup.html',doc:'https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/resource-principal.html',
       note:pair('DB 설정 외에 OCI Dynamic Group 및 IAM 정책이 필요합니다. 이 화면의 수동 시작 안내이며 앱이 자동 활성화하지 않습니다.','Also requires OCI dynamic group and IAM policy. Manual setup guide only; the app does not enable it automatically.')})
   ],
-  'ai-test':[generate('showsql','SQL 만들기','Generate SQL','showsql'),generate('showprompt','전체 프롬프트 보기','View reconstructed prompt','showprompt'),generate('chat','AI 검토·설명','AI review or explanation','chat')],
+  'ai-test':[generate('showsql','SQL 만들기','Generate SQL','showsql'),generate('showprompt','전체 프롬프트 보기','View reconstructed prompt','showprompt'),generate('chat','AI 검토·설명','AI review or explanation','chat'),resultReview],
   feedback:[
     recipe('list','Feedback 원문·응답 SQL 조회','Read Feedback and response SQL',feedbackList,'repository/AiFeedbackRepository',{
       note:pair('<FEEDBACK_TABLE>은 실제 존재·권한을 확인한 프로필의 Feedback 테이블명입니다. 후보명만으로 존재를 단정하지 않습니다. 저장된 행이 현재 프롬프트에 사용되었다는 증거는 아닙니다.','Use the verified Feedback table, not an assumed candidate name. A stored row does not prove inclusion in the current prompt.')}),
@@ -666,3 +669,10 @@ WHERE RECORD_ID = '<RECORD_UUID>' AND STATE = 'REQUESTED';`,'repository/AppRecor
     generate('review','선택한 두 결과를 AI로 비교','Ask AI to compare two selected results','chat')
   ]
 };
+sqlHelpCatalog.ords.push(...ordsChanges);
+sqlHelpCatalog.agents.push(taskDefinition);
+sqlHelpCatalog.ontology.push(discoveryHistory);
+for(const [feature,operations] of Object.entries(sqlHelpCatalog))for(const operation of operations){
+  if(!operation.doc)Object.assign(operation,referenceFor(feature,operation.id));
+  else operation.docKind??='oracle';
+}

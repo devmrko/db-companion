@@ -18,6 +18,7 @@ public class AiSqlHistoryRepository {
         this.jdbc.setQueryTimeout(10);
     }
     public record Statement(String sql, List<Object> args) {}
+    public Candidates candidates(Selection selected) { return new AiSqlCandidates(jdbc).find(selected); }
     private static final String AI = "'^[[:space:]]*select[[:space:]]+ai([[:space:]]|$)'";
     private static String ai(String column) { return "REGEXP_LIKE(" + column + ", " + AI + ", 'i')"; }
     // Bound instead of embedded: the history query must not find its own search expression.
@@ -41,6 +42,14 @@ public class AiSqlHistoryRepository {
             case all -> "CASE WHEN " + ai(column) + " THEN 'SELECT AI' WHEN " + generate(column, args)
                     + " THEN 'DBMS_CLOUD_AI.GENERATE' ELSE 'DBMS_CLOUD_AI' END";
         };
+    }
+    /** CASE short-circuits the costly regex for unrelated cached SQL, without truncating CLOBs. */
+    private static String cacheMatch(Query q, List<Object> args) {
+        if (q.match() == Match.select_ai) return ai("s.SQL_FULLTEXT");
+        args.add("DBMS_CLOUD_AI");
+        String call = generate("s.SQL_FULLTEXT", args);
+        return "CASE " + (q.match() == Match.all ? "WHEN " + ai("s.SQL_FULLTEXT") + " THEN 1 " : "")
+                + "WHEN INSTR(UPPER(s.SQL_FULLTEXT), ?) = 0 THEN 0 WHEN " + call + " THEN 1 ELSE 0 END = 1";
     }
     private static String date(String column) { return "TO_CHAR(" + column + ", 'YYYY-MM-DD HH24:MI:SS')"; }
     private static String interval(String column) { return column + " >= TO_TIMESTAMP(?, 'YYYY-MM-DD') AND " + column + " < TO_TIMESTAMP(?, 'YYYY-MM-DD')"; }
@@ -68,7 +77,7 @@ public class AiSqlHistoryRepository {
             String kind = kind(q, "s.SQL_FULLTEXT", args); args.addAll(dates(q));
             sql = "SELECT s.SQL_ID K1, TO_CHAR(s.CHILD_NUMBER) K2, TO_CHAR(s.CON_ID) K3, RAWTOHEX(s.CHILD_ADDRESS) K4, s.FIRST_LOAD_TIME K5, "
                     + date("s.LAST_ACTIVE_TIME") + " OBSERVED, s.SQL_ID SQL_IDENT, s.PARSING_SCHEMA_NAME ACTOR, " + kind + " KIND, TO_CHAR(s.EXECUTIONS) TOTAL, SUBSTR(s.SQL_TEXT,1,500) PREVIEW "
-                    + "FROM SYS.V_$SQL s WHERE " + interval("s.LAST_ACTIVE_TIME") + " AND " + match(q, "s.SQL_FULLTEXT", args)
+                    + "FROM SYS.V_$SQL s WHERE " + interval("s.LAST_ACTIVE_TIME") + " AND " + cacheMatch(q, args)
                     + filters(q, "s.SQL_ID", "s.SQL_FULLTEXT", "s.PARSING_SCHEMA_NAME", args)
                     + " ORDER BY s.LAST_ACTIVE_TIME DESC, s.SQL_ID, s.CON_ID, s.CHILD_NUMBER, s.CHILD_ADDRESS";
         } else if (q.source() == Source.awr) {
@@ -107,7 +116,13 @@ public class AiSqlHistoryRepository {
     public static Statement detailStatement(Selection selected, String auditView) {
         var key = selected.item().keys(); var args = new ArrayList<Object>(key); String sql;
         switch (selected.query().source()) {
-            case cache -> sql = "SELECT s.SQL_ID, s.CHILD_NUMBER, s.CON_ID, s.PARSING_SCHEMA_NAME, s.FIRST_LOAD_TIME, " + date("s.LAST_ACTIVE_TIME") + " LAST_ACTIVE_TIME, s.EXECUTIONS, s.SQL_FULLTEXT FULL_SQL "
+            case cache -> sql = "SELECT s.SQL_ID, s.CHILD_NUMBER, s.CON_ID, s.PARSING_SCHEMA_NAME, s.PARSING_USER_ID, "
+                    + "(SELECT u.USERNAME FROM SYS.ALL_USERS u WHERE u.USER_ID=s.PARSING_USER_ID) PARSING_USER_NAME, s.FIRST_LOAD_TIME, "
+                    + date("s.LAST_ACTIVE_TIME") + " LAST_ACTIVE_TIME, s.EXECUTIONS, "
+                    + "ROUND(s.ELAPSED_TIME/1000000,6) ELAPSED_SECONDS_TOTAL, "
+                    + "ROUND(s.ELAPSED_TIME/NULLIF(s.EXECUTIONS,0)/1000000,6) ELAPSED_SECONDS_PER_EXECUTION, "
+                    + "ROUND(s.CPU_TIME/1000000,6) CPU_SECONDS_TOTAL, ROUND(s.PLSQL_EXEC_TIME/1000000,6) PLSQL_SECONDS_TOTAL, "
+                    + "s.ROWS_PROCESSED, s.MODULE, s.ACTION, s.SQL_FULLTEXT FULL_SQL "
                     + "FROM SYS.V_$SQL s WHERE s.SQL_ID=? AND s.CHILD_NUMBER=TO_NUMBER(?) AND s.CON_ID=TO_NUMBER(?) AND RAWTOHEX(s.CHILD_ADDRESS)=? AND s.FIRST_LOAD_TIME=? AND " + match(selected.query(), "s.SQL_FULLTEXT", args);
             case awr -> sql = "SELECT t.DBID, t.SQL_ID, t.CON_DBID, t.CON_ID, t.SQL_TEXT FULL_SQL FROM SYS.DBA_HIST_SQLTEXT t "
                     + "WHERE t.DBID=TO_NUMBER(?) AND t.SQL_ID=? AND NVL(TO_CHAR(t.CON_DBID),'-')=? AND NVL(TO_CHAR(t.CON_ID),'-')=? AND " + match(selected.query(), "t.SQL_TEXT", args);
@@ -125,11 +140,34 @@ public class AiSqlHistoryRepository {
         if (rows.size() > 1) throw new AmbiguousRecord();
         if (rows.isEmpty()) return null;
         var detail = rows.getFirst();
-        if (selected.query().source() != Source.awr) return detail;
+        if (selected.query().source() == Source.cache)
+            return new Detail(detail.fields(), detail.sql(), "cache", mapping(selected));
+        if (selected.query().source() != Source.awr) return new Detail(detail.fields(), detail.sql(), "audit", null);
         var fields = new ArrayList<>(detail.fields());
         fields.add(new Field("SNAPSHOT_INTERVAL_DB", selected.item().time()));
         fields.add(new Field("EXECUTIONS_DELTA_SUM", selected.item().count()));
-        return new Detail(List.copyOf(fields), detail.sql());
+        return new Detail(List.copyOf(fields), detail.sql(), "awr", null);
+    }
+    /** Exact original SQL ID/container only. Never correlate a GENERATE return by time or schema. */
+    public static Statement mappingStatement(Selection selected) {
+        if (selected.query().source() != Source.cache) throw new IllegalArgumentException("Cache record required");
+        return new Statement("SELECT m.MAPPED_SQL_ID, " + date("m.TRANSLATION_TIMESTAMP") + " TRANSLATED, m.TRANSLATION_METHOD, m.MAPPED_SQL_FULLTEXT "
+                + "FROM SYS.V_$MAPPED_SQL m WHERE m.SQL_ID=? AND m.CON_ID=TO_NUMBER(?) "
+                + "ORDER BY m.TRANSLATION_TIMESTAMP DESC NULLS LAST, m.MAPPED_SQL_ID, m.SQL_TRANSLATION_PROFILE_ID FETCH FIRST 11 ROWS ONLY",
+                List.of(selected.item().keys().get(0), selected.item().keys().get(2)));
+    }
+    private Mapping mapping(Selection selected) {
+        try {
+            var statement = mappingStatement(selected);
+            var rows = jdbc.query(statement.sql(), (r, n) -> new Translation(r.getString(1), r.getString(2), r.getString(3), r.getString(4)), statement.args().toArray());
+            return new Mapping(rows.isEmpty() ? "NOT_FOUND" : "FOUND", rows.subList(0, Math.min(10, rows.size())), rows.size() > 10);
+        } catch (RuntimeException ex) {
+            // Optional metadata must not turn a readable cursor into a failed detail request.
+            Throwable cause = ex;
+            while (!(cause instanceof SQLException) && cause.getCause() != null) cause = cause.getCause();
+            int code = cause instanceof SQLException sql ? sql.getErrorCode() : 0;
+            return new Mapping(code == 942 || code == 1031 ? "UNAVAILABLE" : "UNCONFIRMED", List.of(), false);
+        }
     }
     public static final String POLICY_SQL = """
             SELECT p.POLICY_NAME, p.OBJECT_SCHEMA, p.OBJECT_NAME, p.AUDIT_OPTION, p.AUDIT_CONDITION,
