@@ -25,6 +25,7 @@ export function mountGlossaryTransfer(root,{csrf,busy,setBusy,canRead,canWrite,r
   const message=(text,error=false)=>{get('message').textContent=text;get('message').className=error?'app-alert is-error':'app-filter-message';};
   const rows=()=>[...get('preview').querySelectorAll('input[data-import-row]:checked')].map(e=>Number(e.dataset.importRow));
   function controls(){
+    const footer=get('footer');if(footer)footer.hidden=!preview;
     get('export').disabled=busy()||!canRead();get('file').disabled=busy()||!canRead();
     get('consent').disabled=busy()||!canWrite()||uncertain;
     get('apply').disabled=busy()||!canWrite()||uncertain||!get('consent').checked||!selectedImportRows(preview,rows());

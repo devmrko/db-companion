@@ -1,5 +1,38 @@
 # Release validation
 
+## 0.1.0-alpha.6
+
+Candidate: **0.1.0-alpha.6** / tag **v0.1.0-alpha.6**. Checked on 2026-10-08.
+
+| Check | Result |
+| --- | --- |
+| `mvn -Pquality clean verify` | Passed; executable alpha.6 JAR built |
+| Java unit, integration and embedded HTTP tests | 1,338 passed, 0 failures/errors/skips |
+| PMD | 0 violations |
+| Complete JS suite including Agent example and real-app runtime test | 658 passed, 0 failures/skips |
+| Publication guard | 944 files, 0 findings |
+| `git diff --check` | Passed |
+
+Environment: macOS, JDK 25.0.2 compiling for Java 21, Maven 3.9.16, Node 26.
+Runtime tests used temporary ports/directories with process-inspection access,
+not the user's running application.
+
+```sh
+mvn -Pquality clean verify
+RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.6.jar node --test src/test/js/*.test.mjs demos/semantic-query-agent/*.test.mjs
+node scripts/publication-check.cjs --working-tree
+git diff --check
+```
+
+Synthetic workflow tests cover explicit upload, AI consent, proposal selection,
+comparison, return navigation, save completion, AI failure without automatic retry,
+and accessible tab navigation. Browser checks verified the initial document and
+JSON tabs and responsive layout at desktop and 390px widths. Browser file upload
+was blocked by extension permissions; it is not claimed as a new end-to-end live
+verification. No paid AI requests or live database writes were made for this
+release. No customer source documents, account configuration or screenshots are
+included. Publishing the source/tag does not redeploy or restart the application.
+
 ## 0.1.0-alpha.5
 
 Candidate: **0.1.0-alpha.5** / tag **v0.1.0-alpha.5**. Checked on 2026-10-08

@@ -1,6 +1,6 @@
 # DB Companion
 
-**Version: 0.1.0-alpha.5** · Java 21+ · Spring Boot · MIT
+**Version: 0.1.0-alpha.6** · Java 21+ · Spring Boot · MIT
 
 A self-hosted workbench for inspecting Oracle database metadata, Select AI configuration,
 feedback, execution information, and governed business definitions.
@@ -62,6 +62,12 @@ for writes. The destination is always the login owner's glossary.
 text and text PDFs (4 MB, 40,000 extracted characters, at most 80 PDF pages).
 Scans/OCR, encrypted PDFs, legacy Office files and spreadsheets are not supported.
 Review extracted text: images, layout and DOCX headers/footnotes are not extracted.
+
+Document enrichment and JSON transfer have separate tabs. Document work shows one
+step at a time: upload, review AI input, review candidates, and compare/save. Source
+chunks, search and embedding are optional advanced settings; an unavailable local
+embedding model does not prevent the default AI extraction workflow. AI consent
+appears only after payload preparation, and save consent only after comparison.
 
 1. Upload a document. The app keeps source chunks, locations and a text hash in the
    login session and builds a keyword index. No AI call or database write occurs.
@@ -185,7 +191,7 @@ An optional runtime integration suite starts and stops isolated app instances on
 ports (never your already running app):
 
 ```sh
-RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.5.jar node --test src/test/js/app-runtime.test.mjs
+RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.6.jar node --test src/test/js/app-runtime.test.mjs
 ```
 
 Translation sources are public development assets under `tools/i18n`, not private

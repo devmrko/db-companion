@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.0-alpha.6
+
+Prepared on 2026-10-08. Sixth public alpha; not a production-certified release.
+
+### Improved
+
+- Four-step document enrichment: upload, review AI input, review term candidates,
+  then compare and save. Only the current step's controls are visible.
+- Separate keyboard-accessible tabs for document enrichment and JSON transfer.
+- Optional source-chunk selection, search and embedding moved into advanced
+  settings. Missing local-model notices stay inside embedding settings.
+- AI consent appears after payload preparation; save consent appears only after
+  comparison. Changing selections invalidates pending review, and completed saves
+  show a confirmation instead of another save action.
+- Responsive step indicators and translated guidance in all four UI languages.
+
+### Validation and scope
+
+- Added synthetic workflow and keyboard-navigation regression tests, including
+  consent gates, failed AI responses and prevention of automatic retries.
+- No database schema, account, profile or paid-provider changes. Publication does
+  not restart the running application; live business correctness remains unverified.
+
 ## 0.1.0-alpha.5
 
 Prepared on 2026-10-08. Fifth public alpha; not a production-certified release.

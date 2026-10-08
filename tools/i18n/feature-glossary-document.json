@@ -1,4 +1,17 @@
 {
+  "glossaryDocument.tools": ["용어 사전 보강 방법", "Glossary enrichment tools", "术语表补充工具", "用語集の補強方法"],
+  "glossaryDocument.stepUpload": ["문서 올리기", "Upload document", "上传文档", "文書をアップロード"],
+  "glossaryDocument.stepAnalyze": ["AI 분석 확인", "Review AI request", "确认AI分析", "AI分析を確認"],
+  "glossaryDocument.stepCandidates": ["용어 후보 검토", "Review candidates", "审核术语候选", "用語候補を確認"],
+  "glossaryDocument.stepSave": ["사전에 반영", "Update glossary", "更新术语表", "用語集に反映"],
+  "glossaryDocument.start": ["문서 분석 준비", "Prepare document", "准备文档分析", "文書分析を準備"],
+  "glossaryDocument.advanced": ["고급 설정 · 원문 조각·검색·임베딩", "Advanced · chunks, search and embedding", "高级设置 · 分块、搜索及嵌入", "詳細設定・原文チャンク・検索・埋め込み"],
+  "glossaryDocument.uploadNotes": ["보관·추출 안내", "Retention and extraction details", "保留及提取说明", "保管・抽出について"],
+  "glossaryDocument.uploadHint": ["민감정보를 제거한 문서를 선택하세요. 이 단계에서는 AI에 전송하거나 사전에 저장하지 않습니다.", "Remove sensitive data before choosing a document. This step does not send it to AI or save glossary entries.", "请选择已去除敏感信息的文档。此步骤不会发送给AI或保存术语。", "機密情報を除いた文書を選択してください。この段階ではAI送信・用語集保存は行いません。"],
+  "glossaryDocument.analysisHint": ["원문을 확인한 뒤 AI 전송 내용을 확인하세요. 기본으로 전체 원문을 사용하며, 필요한 부분만 고급 설정에서 선택할 수 있습니다.", "Review the extracted source, then preview the AI request. All chunks are selected by default; narrow them in Advanced settings.", "检查提取的原文后确认AI发送内容。默认选择所有分块，可在高级设置中缩小范围。", "抽出した原文を確認してからAI送信内容を確認してください。既定では全文を使用し、詳細設定で対象を絞れます。"],
+  "glossaryDocument.candidateHint": ["사전에 추가할 용어를 선택하세요. 정의·업무 규칙과 원문 근거를 확인한 뒤 다음 단계에서 기존 내용과 비교합니다.", "Select terms to add. Review definitions, business rules and source evidence, then compare with existing entries in the next step.", "选择要添加的术语。检查定义、业务规则及原文依据后，在下一步与现有内容比较。", "追加する用語を選択してください。定義・業務ルール・原文の根拠を確認し、次の段階で既存内容と比較します。"],
+  "glossaryDocument.backAnalysis": ["분석 설정 다시 보기", "Return to analysis settings", "返回分析设置", "分析設定に戻る"],
+  "glossaryDocument.backCandidates": ["후보 선택으로 돌아가기", "Back to candidate selection", "返回候选选择", "候補選択に戻る"],
   "glossaryDocument.title": [
     "문서로 용어 사전 보강",
     "Enrich glossary from a document",

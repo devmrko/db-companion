@@ -4,6 +4,7 @@ import {renderHistory,historyStoragePresentation} from './business-glossary-hist
 import {renderTextSetup} from './business-glossary-setup.mjs';
 import {mountGlossaryTransfer} from './glossary-transfer.mjs';
 import {mountGlossaryDocument} from './glossary-document.mjs';
+import {mountGlossaryTools} from './glossary-tools.mjs';
 
 const label=(key,fallback,...args)=>t('businessGlossary.'+key,fallback,...args);
 const el=(tag,text,css)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(css)node.className=css;return node;};
@@ -85,6 +86,7 @@ export function mountBusinessGlossary(root,{csrf,question,profile,busy,setBusy,c
 }
 
 if(typeof document!=='undefined')document.querySelectorAll('[data-glossary-manager]').forEach(root=>{
+  mountGlossaryTools(root);
   const get=name=>root.querySelector(`[data-glossary-${name}]`),csrf=get('csrf'),post=(path,data)=>assistantApi('/business-glossary/'+path,assistantPost(csrf,data));
   let transfer=null,documentImport=null;
   let status=null,offset=0,more=false,editing=null,setup=null,busy=false,unknownWrite=false,historyState=null,historyTerm=null,historyNext='';
