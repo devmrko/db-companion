@@ -49,6 +49,42 @@ vendor support commitment. Product names identify the systems with which it work
   storage is reused. Earlier changes and direct SQL edits are not retroactively
   captured, and version numbers alone do not imply historical snapshots exist.
 
+## Glossary transfer and document enrichment
+
+In **Business glossary**, JSON export/import moves terms, aliases, definitions,
+criteria and enabled state, not database-specific row IDs or revisions. Imports
+show new, changed, unchanged and conflicting entries before saving selected rows.
+Limits are 4 MB / 500 terms; export refuses an oversized dictionary rather than
+silently exporting only part of it. Existing glossary and history storage is required
+for writes. The destination is always the login owner's glossary.
+
+**Enrich glossary from a document** supports UTF-8 TXT/Markdown, DOCX body/table
+text and text PDFs (4 MB, 40,000 extracted characters, at most 80 PDF pages).
+Scans/OCR, encrypted PDFs, legacy Office files and spreadsheets are not supported.
+Review extracted text: images, layout and DOCX headers/footnotes are not extracted.
+
+1. Upload a document. The app keeps source chunks, locations and a text hash in the
+   login session and builds a keyword index. No AI call or database write occurs.
+2. Optionally select an accessible DB-local ONNX embedding model and consent to
+   DB resource use. Vectors remain in session memory; no DB vector table/index is
+   created. Semantic search uses cosine similarity; keyword search remains available
+   without an embedding model. No models are installed and no external embedding
+   provider is called by this feature.
+3. Select source chunks and review the AI payload. The current **AI Assistant**
+   profile receives those chunks only after consent. One `chat` generation produces
+   a summary and up to 30 business-concept / detailed-rule proposals. There is no
+   automatic retry or summary-only substitution for the underlying source.
+4. Inspect definitions, rules and source quotes; select candidates and compare them
+   with existing glossary entries. New candidates are inactive by default. Select
+   the final rows and consent to save; source quotes are retained in the criteria
+   and changes are recorded atomically with the existing glossary history.
+
+Document work expires after 30 minutes or session termination. Clear the document
+to remove pending source/index/candidates; previously saved terms are not deleted.
+AI profile changes invalidate a prepared request, and unknown or fabricated source
+citations are rejected. An exact quotation match is **not** a business-correctness
+check. No SQL embedded in a document or glossary criterion is executed.
+
 ## Requirements
 
 - JDK 21 or later and Maven 3.9+.

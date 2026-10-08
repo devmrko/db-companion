@@ -1,0 +1,104 @@
+{
+  "glossaryTransfer.title": [
+    "내보내기 · 가져오기",
+    "Export / Import",
+    "导出 / 导入",
+    "エクスポート / インポート"
+  ],
+  "glossaryTransfer.note": [
+    "JSON으로 용어·별칭·정의·SQL 기준·활성 상태를 이동합니다. 대상 ID는 유지하고 변경 시 버전을 올립니다. 선택한 변경만 이력과 함께 저장하며 SQL 기준은 실행하지 않습니다.",
+    "Transfer terms, aliases, definitions, SQL criteria and enabled status as JSON. Existing destination IDs are retained and revisions advance on updates. Only selected changes are saved with history. SQL criteria are never executed.",
+    "以JSON迁移术语、别名、定义、SQL规则及启用状态。保留目标ID并在更新时递增版本。仅保存所选变更及历史，不执行SQL规则。",
+    "用語・別名・定義・SQL基準・有効状態をJSONで移行します。既存IDを保持し、更新時に版を進めます。選択した変更のみ履歴と共に保存し、SQL基準は実行しません。"
+  ],
+  "glossaryTransfer.export": [
+    "JSON 내보내기",
+    "Export JSON",
+    "导出JSON",
+    "JSONをエクスポート"
+  ],
+  "glossaryTransfer.import": [
+    "JSON 가져오기",
+    "Import JSON",
+    "导入JSON",
+    "JSONをインポート"
+  ],
+  "glossaryTransfer.limit": [
+    "JSON 파일 한도는 4 MB, 용어는 500개입니다.",
+    "JSON limit: 4 MB and 500 terms.",
+    "JSON限制为4 MB、500个术语。",
+    "JSONの上限は4 MB、500用語です。"
+  ],
+  "glossaryTransfer.consent": [
+    "선택한 항목의 등록·변경 및 활성 상태를 확인했습니다.",
+    "I reviewed the selected additions, changes and enabled status.",
+    "我已确认所选新增、变更及启用状态。",
+    "選択した追加・変更・有効状態を確認しました。"
+  ],
+  "glossaryTransfer.apply": [
+    "선택 항목 저장",
+    "Save selected entries",
+    "保存所选项",
+    "選択項目を保存"
+  ],
+  "glossaryTransfer.new": [
+    "새 용어",
+    "New term",
+    "新术语",
+    "新しい用語"
+  ],
+  "glossaryTransfer.update": [
+    "기존 용어 변경",
+    "Update existing term",
+    "更新已有术语",
+    "既存用語を更新"
+  ],
+  "glossaryTransfer.unchanged": [
+    "동일 · 건너뜀",
+    "Identical · skip",
+    "相同 · 跳过",
+    "同一 · スキップ"
+  ],
+  "glossaryTransfer.conflict": [
+    "기존 중복 · 선택 불가",
+    "Duplicate destination · blocked",
+    "目标重复 · 不可选",
+    "既存重複 · 選択不可"
+  ],
+  "glossaryTransfer.content": [
+    "내용 비교",
+    "Compare content",
+    "对比内容",
+    "内容を比較"
+  ],
+  "glossaryTransfer.before": [
+    "현재 내용",
+    "Current content",
+    "当前内容",
+    "現在の内容"
+  ],
+  "glossaryTransfer.after": [
+    "가져올 내용",
+    "Incoming content",
+    "导入内容",
+    "取り込む内容"
+  ],
+  "glossaryTransfer.exported": [
+    "JSON 파일을 내보냈습니다. 파일에 업무 정의가 포함됩니다.",
+    "JSON exported. The file contains business definitions.",
+    "已导出JSON，文件包含业务定义。",
+    "JSONを出力しました。業務定義が含まれています。"
+  ],
+  "glossaryTransfer.review": [
+    "가져올 항목을 선택하고 변경 내용을 확인하세요. 아직 저장하지 않았습니다.",
+    "Select entries and review changes. Nothing has been saved yet.",
+    "请选择条目并检查变更。尚未保存。",
+    "項目を選び変更内容を確認してください。まだ保存されていません。"
+  ],
+  "glossaryTransfer.saved": [
+    "{0}개 항목을 저장했습니다.",
+    "Saved {0} entries.",
+    "已保存{0}个条目。",
+    "{0}件を保存しました。"
+  ]
+}

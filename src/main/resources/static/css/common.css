@@ -1039,6 +1039,9 @@ dialog.app-profile-editor-compact { width: min(640px, calc(100vw - 32px)); }
 .app-glossary-hit { padding: 16px; border: 1px solid var(--app-border, #d5d3cf); border-radius: 6px; margin-block: 12px; background: var(--app-surface, #fff); }
 .app-glossary-definition { white-space: pre-wrap; overflow-wrap: anywhere; }
 .app-glossary-form { display: grid; gap: 16px; }
+[data-glossary-document] .app-btn { justify-self: start; max-width: 100%; white-space: normal; }
+[data-glossary-document] > h2 { margin-bottom: 0; }
+[data-glossary-document] pre { overflow-wrap: anywhere; white-space: pre-wrap; }
 .app-glossary-form > label:not(.app-glossary-pick) { display: grid; gap: 6px; min-width: 0; }
 .app-glossary-form textarea, .app-glossary-card textarea { width: 100%; resize: vertical; min-height: 90px; }
 .app-glossary-snapshot { margin-block: 12px; }

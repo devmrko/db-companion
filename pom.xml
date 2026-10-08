@@ -8,6 +8,7 @@
   <licenses><license><name>MIT License</name><url>https://opensource.org/license/mit</url><distribution>repo</distribution></license></licenses>
   <properties><java.version>21</java.version><oracle.version>23.26.3.0.0</oracle.version></properties>
   <dependencies>
+    <dependency><groupId>org.apache.pdfbox</groupId><artifactId>pdfbox</artifactId><version>3.0.8</version></dependency>
     <dependency><groupId>com.github.jsqlparser</groupId><artifactId>jsqlparser</artifactId><version>5.3</version></dependency>
     <dependency><groupId>org.eclipse.rdf4j</groupId><artifactId>rdf4j-rio-turtle</artifactId><version>5.3.2</version></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-webmvc</artifactId></dependency>

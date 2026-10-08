@@ -1,0 +1,248 @@
+{
+  "glossaryDocument.title": [
+    "문서로 용어 사전 보강",
+    "Enrich glossary from a document",
+    "从文档补充术语表",
+    "文書から用語集を補強"
+  ],
+  "glossaryDocument.flow": [
+    "원문 확인 → AI 요약·용어 후보 → 기존 사전 비교 → 선택 저장",
+    "Review source → AI summary and candidates → compare glossary → save selected",
+    "检查原文 → AI摘要及候选 → 对比术语表 → 选择保存",
+    "原文確認 → AI要約・候補 → 用語集と比較 → 選択保存"
+  ],
+  "glossaryDocument.limits": [
+    "TXT·MD·DOCX·텍스트 PDF, 최대 4 MB·추출 40,000자·PDF 80쪽. 스캔/OCR은 지원하지 않습니다.",
+    "TXT, MD, DOCX or text PDF. Max 4 MB, 40,000 extracted characters, 80 PDF pages. No scans/OCR.",
+    "TXT、MD、DOCX、文本PDF；最大4 MB、40,000字符、80页PDF。不支持扫描/OCR。",
+    "TXT・MD・DOCX・テキストPDF。最大4 MB・抽出40,000文字・PDF 80ページ。スキャン/OCR非対応。"
+  ],
+  "glossaryDocument.retention": [
+    "문서·검색 색인은 로그인 세션에서 최대 30분 동안만 사용합니다. 선택 저장한 용어와 출처 인용은 사전에 남습니다. 민감정보를 제거한 문서만 올리세요. DOCX는 본문·표의 텍스트만 추출하므로 원문을 확인하세요.",
+    "Document and indexes last up to 30 minutes in this login session. Saved terms and quotations remain in the glossary. Remove sensitive data before upload. DOCX extraction covers body/table text only; verify the extracted source.",
+    "文档与索引仅在登录会话中保留最多30分钟。已保存的术语及引用保留在术语表中。上传前删除敏感数据。DOCX仅提取正文及表格文字，请检查原文。",
+    "文書・索引はログインセッション内で最大30分有効です。保存した用語・引用は用語集に残ります。機密情報を除いてください。DOCXは本文・表の文字のみ抽出するため原文を確認してください。"
+  ],
+  "glossaryDocument.upload": [
+    "문서 선택",
+    "Choose document",
+    "选择文档",
+    "文書を選択"
+  ],
+  "glossaryDocument.clear": [
+    "문서 지우기",
+    "Clear document",
+    "清除文档",
+    "文書を消去"
+  ],
+  "glossaryDocument.cleared": [
+    "세션의 문서·색인·후보를 지웠습니다. 저장한 용어는 삭제하지 않습니다.",
+    "Session document, indexes and candidates cleared. Saved terms were not deleted.",
+    "已清除会话文档、索引和候选，未删除已保存术语。",
+    "セッションの文書・索引・候補を消去しました。保存済み用語は削除しません。"
+  ],
+  "glossaryDocument.source": [
+    "{0} · 원문 조각 {1}개 · 보관 만료 {2}",
+    "{0} · {1} chunks · expires {2}",
+    "{0} · {1}个分块 · 到期 {2}",
+    "{0} · {1}チャンク · 有効期限 {2}"
+  ],
+  "glossaryDocument.original": [
+    "원문 보기",
+    "View source",
+    "查看原文",
+    "原文表示"
+  ],
+  "glossaryDocument.uploaded": [
+    "원문을 나누고 키워드 색인을 만들었습니다. 아직 AI에 전송하거나 사전에 저장하지 않았습니다.",
+    "Source chunked and keyword index created. Nothing sent to AI or saved in the glossary.",
+    "已分块并创建关键词索引，尚未发送给AI或保存到术语表。",
+    "原文を分割しキーワード索引を作成しました。AI送信・用語集保存は未実行です。"
+  ],
+  "glossaryDocument.models": [
+    "로컬 임베딩 모델 조회",
+    "Load local embedding models",
+    "查询本地嵌入模型",
+    "ローカル埋め込みモデル一覧"
+  ],
+  "glossaryDocument.chooseModel": [
+    "모델 선택 (선택 사항)",
+    "Choose model (optional)",
+    "选择模型（可选）",
+    "モデルを選択（任意）"
+  ],
+  "glossaryDocument.modelNote": [
+    "등록된 로컬 ONNX 모델만 사용합니다. 모델 설치나 외부 임베딩 호출은 하지 않습니다.",
+    "Uses registered local ONNX models only. No installation or external embedding calls.",
+    "仅使用已注册的本地ONNX模型，不安装模型或调用外部嵌入。",
+    "登録済みローカルONNXモデルのみ使用。モデルの導入・外部埋め込み呼び出しは行いません。"
+  ],
+  "glossaryDocument.noModel": [
+    "사용 가능한 로컬 모델이 없습니다. 키워드 검색과 AI 용어 추출은 사용할 수 있습니다.",
+    "No accessible local model. Keyword search and AI extraction remain available.",
+    "没有可用的本地模型，仍可使用关键词搜索和AI提取。",
+    "利用可能なローカルモデルがありません。キーワード検索・AI抽出は利用可能です。"
+  ],
+  "glossaryDocument.embed": [
+    "로컬 임베딩 색인 만들기",
+    "Build local embedding index",
+    "创建本地嵌入索引",
+    "ローカル埋め込み索引を作成"
+  ],
+  "glossaryDocument.indexed": [
+    "{0}개 조각을 임베딩했습니다. 벡터는 세션에만 보관합니다.",
+    "Embedded {0} chunks. Vectors are session-only.",
+    "已嵌入{0}个分块，向量仅保留在会话中。",
+    "{0}チャンクを埋め込みました。ベクトルはセッション内のみ保持します。"
+  ],
+  "glossaryDocument.find": [
+    "문서 근거 검색",
+    "Search document evidence",
+    "搜索文档依据",
+    "文書の根拠を検索"
+  ],
+  "glossaryDocument.found": [
+    "검색 결과 {0}개 · 점수는 업무 정확도가 아닙니다. AI 전송 대상은 아래 원문 조각에서 선택합니다.",
+    "{0} matches. Scores do not measure business correctness. Select chunks below for AI transmission.",
+    "{0}条结果；分数不代表业务准确性。请在下方选择发送给AI的原文分块。",
+    "{0}件。スコアは業務の正確性ではありません。AI送信対象は下の原文で選択してください。"
+  ],
+  "glossaryDocument.preview": [
+    "AI 전송 미리보기",
+    "Preview AI transmission",
+    "预览AI发送内容",
+    "AI送信プレビュー"
+  ],
+  "glossaryDocument.previewNote": [
+    "선택한 원문으로 요약·용어 후보를 생성합니다. 한 번의 유료 AI 호출이며 자동 재시도하지 않습니다.",
+    "Generates summary and candidates from selected chunks. One paid AI call, no automatic retry.",
+    "基于所选原文生成摘要及候选。一次付费AI调用，不自动重试。",
+    "選択した原文から要約・候補を生成します。有料AI呼び出し1回、自動再試行なし。"
+  ],
+  "glossaryDocument.generate": [
+    "요약·용어 후보 생성 (AI 1회)",
+    "Generate summary and terms (1 AI call)",
+    "生成摘要及术语（1次AI调用）",
+    "要約・用語候補を生成（AI 1回）"
+  ],
+  "glossaryDocument.running": [
+    "AI가 선택한 원문을 분석 중입니다. 다시 누르지 마세요.",
+    "AI is analyzing selected source. Do not resubmit.",
+    "AI正在分析所选原文，请勿重复提交。",
+    "AIが選択した原文を分析中です。再送信しないでください。"
+  ],
+  "glossaryDocument.summary": [
+    "선택한 원문 요약",
+    "Summary of selected source",
+    "所选原文摘要",
+    "選択した原文の要約"
+  ],
+  "glossaryDocument.domain": [
+    "업무 개념",
+    "Business concept",
+    "业务概念",
+    "業務概念"
+  ],
+  "glossaryDocument.detail": [
+    "지표·상세 규칙",
+    "Metric / detailed rule",
+    "指标／详细规则",
+    "指標・詳細ルール"
+  ],
+  "glossaryDocument.drafts": [
+    "후보 {0}개. 인용 일치는 확인했지만 업무 정확성은 검토가 필요합니다. 아직 저장하지 않았습니다.",
+    "{0} candidates. Quotes match the source, but business correctness needs review. Not saved yet.",
+    "{0}个候选。引用与原文一致，业务准确性仍需审核。尚未保存。",
+    "{0}候補。引用の一致は確認済みですが業務の正確性は要確認です。未保存。"
+  ],
+  "glossaryDocument.compare": [
+    "선택 후보 · 기존 사전과 비교",
+    "Compare selected candidates with glossary",
+    "将所选候选与术语表比较",
+    "選択候補を既存用語集と比較"
+  ],
+  "glossaryDocument.reviewNote": [
+    "새 용어·변경 내용을 확인하고 저장할 항목을 다시 선택하세요. 기존 항목은 자동 덮어쓰지 않습니다.",
+    "Review new terms and changes, then select rows to save. No automatic overwrite.",
+    "检查新术语及更改，再选择保存项。不会自动覆盖。",
+    "新規用語・変更内容を確認し、保存する項目を選択してください。自動上書きはしません。"
+  ],
+  "glossaryDocument.save": [
+    "검토한 항목 저장",
+    "Save reviewed entries",
+    "保存已审核项",
+    "確認した項目を保存"
+  ],
+  "glossaryDocument.saved": [
+    "{0}개 항목을 출처·변경 이력과 함께 저장했습니다.",
+    "Saved {0} entries with source references and change history.",
+    "已保存{0}项，包括出处及更改历史。",
+    "{0}項目を出典・変更履歴とともに保存しました。"
+  ],
+  "glossaryDocument.assistant": [
+    "AI 도우미 설정",
+    "AI Assistant settings",
+    "AI助手设置",
+    "AIアシスタント設定"
+  ],
+  "glossaryDocument.model": [
+    "임베딩 모델",
+    "Embedding model",
+    "嵌入模型",
+    "埋め込みモデル"
+  ],
+  "glossaryDocument.indexConsent": [
+    "문서 조각을 DB 로컬 모델로 처리하는 데 동의합니다. DB 자원을 사용합니다.",
+    "I consent to processing chunks with the DB-local model, using DB resources.",
+    "同意使用数据库本地模型处理分块，将使用数据库资源。",
+    "DBローカルモデルによる処理に同意します。DBリソースを使用します。"
+  ],
+  "glossaryDocument.chunks": [
+    "AI 전송 대상 · 원문 조각 선택",
+    "AI input · select source chunks",
+    "AI输入 · 选择原文分块",
+    "AI送信対象・原文チャンクを選択"
+  ],
+  "glossaryDocument.index": [
+    "임베딩 설정 (선택 사항)",
+    "Embedding settings (optional)",
+    "嵌入设置（可选）",
+    "埋め込み設定（任意）"
+  ],
+  "glossaryDocument.search": [
+    "문서 검색어",
+    "Document search",
+    "文档搜索词",
+    "文書検索語"
+  ],
+  "glossaryDocument.semantic": [
+    "임베딩 검색 사용",
+    "Use embedding search",
+    "使用嵌入搜索",
+    "埋め込み検索を使用"
+  ],
+  "glossaryDocument.payload": [
+    "실제 AI 전송 내용",
+    "Actual AI payload",
+    "实际发送给AI的内容",
+    "実際のAI送信内容"
+  ],
+  "glossaryDocument.consent": [
+    "선택한 원문의 외부 전송과 AI 사용량 발생을 확인했습니다.",
+    "I acknowledge external transmission of selected source and AI usage costs.",
+    "已确认所选原文的外部传输及AI使用费用。",
+    "選択した原文の外部送信・AI利用料金を確認しました。"
+  ],
+  "glossaryDocument.enabled": [
+    "저장 후 검색에 사용 (기본은 비활성 초안)",
+    "Enable for search after saving (inactive draft by default)",
+    "保存后启用搜索（默认为未启用草稿）",
+    "保存後に検索で使用（既定は無効の下書き）"
+  ],
+  "glossaryDocument.saveConsent": [
+    "선택 항목의 내용·활성 상태와 기존 사전 변경을 확인했습니다.",
+    "I reviewed selected content, enabled state and changes to existing entries.",
+    "已确认所选内容、启用状态及现有术语更改。",
+    "選択内容・有効状態・既存用語への変更を確認しました。"
+  ]
+}

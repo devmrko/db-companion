@@ -12,6 +12,7 @@ Direct dependency declarations and their Maven POM license metadata were reviewe
 | Eclipse RDF4J | 5.3.2 | Eclipse Distribution License 1.0, as declared by the parent POM |
 | Bootstrap | 5.3.8 | [Bootstrap MIT license](https://getbootstrap.com/docs/5.3/about/license/); the WebJar packaging POM separately declares Apache License 2.0 |
 | Cytoscape.js | 3.34.1 | MIT, as declared by the WebJar POM |
+| Apache PDFBox | 3.0.8 | Apache License 2.0; retain upstream LICENSE and NOTICE. Used only for text extraction, not OCR. |
 
 Other libraries are resolved transitively by Maven. Use `mvn dependency:tree` to inspect the resolved dependency graph. PMD is a build-time tool, not part of the application runtime.
 

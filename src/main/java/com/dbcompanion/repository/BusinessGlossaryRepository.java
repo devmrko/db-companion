@@ -74,6 +74,15 @@ public class BusinessGlossaryRepository {
         var rows=jdbc.query("SELECT * FROM "+table(owner)+" WHERE UPPER(TERM_TEXT) LIKE ? ESCAPE '!' ORDER BY TERM_TEXT,TERM_ID OFFSET ? ROWS FETCH NEXT 21 ROWS ONLY",(r,n)->term(r),pattern,offset);
         return new Page(rows.stream().limit(20).toList(),rows.size()>20,offset);
     }
+    public List<Term> transferTerms(String owner) {
+        var rows=jdbc.query("SELECT * FROM "+table(owner)+" ORDER BY TERM_TEXT,TERM_ID FETCH FIRST 2001 ROWS ONLY",(r,n)->term(r));
+        if(rows.size()>BusinessGlossary.MAX_TERMS)throw BusinessGlossary.failure(413,"사전 내보내기·가져오기 검토 한도는 2,000개입니다. 일부만 처리하지 않습니다.");
+        return rows;
+    }
+    /** Serialize import name checks against concurrent INSERT/UPDATE transactions; no DDL/commit. */
+    public void lockTransfer(String owner) {
+        jdbc.execute("LOCK TABLE "+table(owner)+" IN SHARE ROW EXCLUSIVE MODE WAIT 5");
+    }
     public Term find(String owner,String id){var rows=jdbc.query("SELECT * FROM "+table(owner)+" WHERE TERM_ID=?",(r,n)->term(r),BusinessGlossary.id(id));if(rows.size()!=1)throw BusinessGlossary.stale();return rows.getFirst();}
     public Term save(String owner,String id,long revision,Draft d){
         String aliases=json.writeValueAsString(d.aliases()),search=d.term()+"\n"+String.join("\n",d.aliases())+"\n"+d.definition();

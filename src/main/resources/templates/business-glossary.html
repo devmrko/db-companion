@@ -66,6 +66,19 @@ END;
     <div class="app-glossary-toolbar"><label><span th:text="#{businessGlossary.mode}">검색 방식</span><select class="form-select" data-glossary-mode><option value="EXACT" th:text="#{businessGlossary.exact}">정확·등록 별칭</option><option value="TEXT" th:text="#{businessGlossary.combined}">정확·별칭 + Oracle 형태소 검색</option></select></label><button type="button" class="btn app-btn app-btn-primary" data-glossary-search th:text="#{businessGlossary.find}">검색</button></div>
     <div data-glossary-search-result></div>
   </section>
+  <section class="app-card app-glossary-card">
+    <div data-glossary-document></div>
+    <h2 th:text="#{glossaryTransfer.title}">내보내기 · 가져오기</h2>
+    <p th:text="#{glossaryTransfer.note}">JSON으로 용어·별칭·정의·SQL 기준·활성 상태를 이동합니다. 대상 사전의 ID와 버전은 유지하며, 선택한 변경만 이력과 함께 저장합니다. SQL 기준은 실행하지 않습니다.</p>
+    <div class="app-glossary-actions">
+      <button type="button" class="btn app-btn app-btn-secondary" data-transfer-export disabled th:text="#{glossaryTransfer.export}">JSON 내보내기</button>
+      <label><span th:text="#{glossaryTransfer.import}">JSON 가져오기</span><input type="file" accept=".json,application/json" data-transfer-file disabled></label>
+    </div>
+    <p th:text="#{glossaryTransfer.limit}">JSON 파일 한도는 4 MB, 용어는 500개입니다.</p>
+    <p role="status" data-transfer-message></p><div data-transfer-preview></div>
+    <label><input type="checkbox" data-transfer-consent disabled><span th:text="#{glossaryTransfer.consent}">선택한 항목의 등록·변경 및 활성 상태를 확인했습니다.</span></label>
+    <button type="button" class="btn app-btn app-btn-primary" data-transfer-apply disabled th:text="#{glossaryTransfer.apply}">선택 항목 저장</button>
+  </section>
   <dialog class="app-preview-dialog" data-glossary-editor aria-labelledby="glossary-edit-title"><div class="app-preview-header"><h2 id="glossary-edit-title" data-glossary-edit-title></h2><button type="button" class="btn app-btn app-btn-quiet" data-glossary-edit-close th:text="#{businessGlossary.close}">닫기</button></div><div class="app-preview-body app-glossary-form">
     <label><span th:text="#{businessGlossary.term}">대표 용어</span><input class="form-control" data-glossary-term maxlength="256" required></label>
     <label><span th:text="#{businessGlossary.aliasLines}">별칭·다른 표현 (한 줄에 하나, 최대 20개)</span><textarea class="form-control" rows="3" data-glossary-aliases maxlength="5200"></textarea></label>
