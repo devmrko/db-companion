@@ -15,7 +15,7 @@ export function mountGlossaryDocument(root,{csrf,busy,setBusy,canWrite,reload}){
   const field=(title,input)=>{const el=node('label');if(input.type==='checkbox'){el.className='app-glossary-pick';el.append(input,node('span',title));}else el.append(node('span',title),input);return el;};
   const checkbox=()=>{const el=node('input');el.type='checkbox';return el;};
   const info=node('p');info.role='status';info.setAttribute('aria-live','polite');
-  const upload=node('input');upload.type='file';upload.accept='.txt,.md,.docx,.pdf';
+  const upload=node('input');upload.type='file';upload.accept='.txt,.md,.docx,.pdf';upload.className='form-control app-glossary-file';
   const meta=node('p'),chunks=node('div'),hits=node('div'),candidates=node('div'),summary=node('div'),diff=node('div');
   const query=node('input');query.className='form-control';query.maxLength=500;
   const model=node('select');model.className='form-select';

@@ -1054,6 +1054,15 @@ dialog.app-profile-editor-compact { width: min(640px, calc(100vw - 32px)); }
 .app-glossary-hit { padding: 16px; border: 1px solid var(--app-border, #d5d3cf); border-radius: 6px; margin-block: 12px; background: var(--app-surface, #fff); }
 .app-glossary-definition { white-space: pre-wrap; overflow-wrap: anywhere; }
 .app-glossary-form { display: grid; gap: 16px; }
+.app-glossary-file { display: block; width: 100%; max-width: 560px; min-width: 0; padding: 0; font: inherit; color: var(--app-text); background: var(--app-surface, #fff); border: 1px solid var(--app-border); border-radius: 4px; overflow: hidden; }
+.app-glossary-file::file-selector-button { margin-inline-end: 12px; padding: 10px 14px; font: inherit; color: inherit; background: var(--app-sidebar-bg); border: 0; border-inline-end: 1px solid var(--app-border); cursor: pointer; }
+.app-glossary-file:focus-visible { outline: 3px solid var(--app-focus); outline-offset: 2px; }
+.app-glossary-file:disabled { opacity: .6; }
+.app-glossary-transfer-toolbar { gap: 20px; }
+.app-glossary-transfer-footer { display: grid; justify-items: start; gap: 16px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--app-border); }
+[data-transfer-message]:empty { display: none; }
+[data-glossary-transfer] pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+[data-glossary-document] > *, [data-glossary-transfer] > * { min-width: 0; }
 [data-glossary-document] .app-btn { justify-self: start; max-width: 100%; white-space: normal; }
 [data-glossary-document] > h2 { margin-bottom: 0; }
 [data-glossary-document] pre { overflow-wrap: anywhere; white-space: pre-wrap; }

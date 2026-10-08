@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.1.0-alpha.5
+
+Prepared on 2026-10-08. Fifth public alpha; not a production-certified release.
+
+### Added
+
+- Document-assisted glossary enrichment from bounded TXT, Markdown, DOCX and text
+  PDF uploads, source chunks and a session-local keyword index.
+- Optional DB-local ONNX embedding and semantic search, with explicit consent.
+- AI Assistant summary and business-concept / detailed-rule proposals with checked
+  source quotations, payload consent and one-use requests without automatic retries.
+- Candidate review, existing-term comparison and selected saves through the glossary
+  history transaction. New candidates are inactive by default.
+
+### Improved
+
+- Separate document and JSON-transfer cards, consistent file-input styling,
+  spaced consent/save controls and readable import-comparison cards.
+
+### Scope
+
+- No account-specific configuration, source documents, credentials or customer data.
+- No automatic model installation, persistent vector index, OCR or database setup.
+- Source citation matching and successful SQL execution do not certify business
+  correctness. Live Oracle/paid AI and deployment require separate verification.
+
 ## 0.1.0-alpha.4
 
 Prepared on 2026-10-06. Fourth public alpha; not a stable or production-certified

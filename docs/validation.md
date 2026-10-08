@@ -1,5 +1,40 @@
 # Release validation
 
+## 0.1.0-alpha.5
+
+Candidate: **0.1.0-alpha.5** / tag **v0.1.0-alpha.5**. Checked on 2026-10-08
+in the glossary feature worktree after integrating the published alpha.4 source.
+Publishing source and a version tag does not deploy the application.
+
+| Check | Result |
+| --- | --- |
+| `mvn -Pquality verify` | Passed; executable alpha.5 JAR built |
+| Java unit, integration and embedded HTTP tests | 1,338 passed, 0 failures/errors/skips |
+| PMD | 0 violations |
+| Complete JS suite including Agent example and real-app runtime test | 655 passed, 0 failures/skips |
+| Publication guard | 942 files, 0 findings |
+| `git diff --check` | Passed |
+
+Environment: macOS, JDK 25.0.2 compiling for Java 21, Maven 3.9.16, Node 26.
+The initial merged build detected duplicate glossary translation keys; duplicates
+were removed and all Java checks rerun. Sandboxed process inspection blocked the
+first JS lifecycle run; the unchanged full suite passed with process access and
+the built alpha.5 JAR. Runtime tests used temporary ports and directories.
+
+```sh
+mvn -Pquality verify
+RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.5.jar node --test src/test/js/*.test.mjs demos/semantic-query-agent/*.test.mjs
+node scripts/publication-check.cjs --working-tree
+git diff --check
+```
+
+Browser checks used isolated synthetic responses, not customer records: upload,
+keyword search, consent, AI proposal rendering, source quotes, review and save UI.
+The shared stylesheet/template and import controls were visually checked at normal
+desktop width and 390px. These checks do not establish live Oracle embedding,
+paid AI response quality or real glossary-write correctness. No live DB objects,
+profiles, credentials or the existing application process were changed.
+
 ## 0.1.0-alpha.4
 
 Candidate: **0.1.0-alpha.4** / tag **v0.1.0-alpha.4**. Checked on 2026-10-06

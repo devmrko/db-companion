@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-parent</artifactId><version>4.1.1</version><relativePath/></parent>
-  <groupId>com.dbcompanion</groupId><artifactId>db-manage-companion</artifactId><version>0.1.0-alpha.4</version>
+  <groupId>com.dbcompanion</groupId><artifactId>db-manage-companion</artifactId><version>0.1.0-alpha.5</version>
   <name>DB Manage Companion</name>
   <description>Independent database and Select AI administration workbench.</description>
   <licenses><license><name>MIT License</name><url>https://opensource.org/license/mit</url><distribution>repo</distribution></license></licenses>

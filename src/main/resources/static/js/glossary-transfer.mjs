@@ -10,11 +10,12 @@ export function renderImportPreview(host,preview,onChange){
   host.replaceChildren();
   for(const entry of preview.entries){
     const card=node('section'),pick=node('label'),check=node('input');check.type='checkbox';check.dataset.importRow=String(entry.row);
+    card.className='app-glossary-hit';pick.className='app-glossary-pick';
     check.disabled=!['NEW','UPDATE'].includes(entry.status);check.checked=false;
     check.addEventListener('change',onChange);
     const status={NEW:label('new','새 용어'),UPDATE:label('update','기존 용어 변경'),UNCHANGED:label('unchanged','동일 · 건너뜀'),CONFLICT:label('conflict','기존 중복 · 선택 불가')}[entry.status]||entry.status;
     pick.append(check,node('strong',`${entry.value.term} · ${status}`));card.append(pick);
-    const details=node('details');details.append(node('summary',label('content','내용 비교')));
+    const details=node('details');details.className='app-disclosure';details.append(node('summary',label('content','내용 비교')));
     if(entry.previous)details.append(node('h4',label('before','현재 내용')),node('pre',JSON.stringify(entry.previous,null,2)));
     details.append(node('h4',label('after','가져올 내용')),node('pre',JSON.stringify(entry.value,null,2)));card.append(details);host.append(card);
   }
