@@ -49,6 +49,16 @@ public class BusinessGlossaryRepository {
         return "READY";
     }
     public void requireTable(String owner){if(!tableStatus(owner).equals("READY"))throw BusinessGlossary.failure(409,"업무 용어 사전이 없거나 구조가 다릅니다. 관리 화면에서 상태를 확인해 주세요.");}
+    /** Read-only preflight; never attempts a grant or creates a partial Text configuration. */
+    public void requireTextSetupPrivilege(){
+        int allowed=jdbc.queryForObject("""
+            SELECT COUNT(*) FROM ALL_TAB_PRIVS
+            WHERE TABLE_SCHEMA='CTXSYS' AND TABLE_NAME='CTX_DDL' AND PRIVILEGE='EXECUTE'
+              AND (GRANTEE IN (USER,'PUBLIC') OR GRANTEE IN (SELECT ROLE FROM SESSION_ROLES))
+            """,Integer.class);
+        if(allowed==0)throw BusinessGlossary.failure(403,
+                "Oracle Text 설정 권한이 없습니다. DB 관리자에게 CTXSYS.CTX_DDL 실행 권한을 요청해 주세요. 설정 SQL은 실행하지 않았습니다.");
+    }
     public String textStatus(String owner){
         var lexer=jdbc.queryForList("SELECT PRE_OBJECT FROM CTXSYS.CTX_USER_PREFERENCES WHERE PRE_NAME=? AND PRE_CLASS='LEXER'",String.class,LEXER);
         var policy=jdbc.queryForList("SELECT IDX_NAME FROM CTXSYS.CTX_USER_INDEXES WHERE IDX_NAME=?",String.class,POLICY);
@@ -69,6 +79,7 @@ public class BusinessGlossaryRepository {
             if(!tableStatus(owner).equals("MISSING"))throw BusinessGlossary.stale();jdbc.execute(create(owner));requireTable(owner);
         }else if(operation.equals("TEXT")){
             requireTable(owner);if(!textStatus(owner).equals("MISSING"))throw BusinessGlossary.stale();
+            requireTextSetupPrivilege();
             for(String sql:textSetup(owner))jdbc.execute(sql);
             if(!textStatus(owner).equals("READY"))throw BusinessGlossary.failure(409,"Oracle Text 설정 확인이 필요합니다. 자동 재설치하거나 기존 객체를 삭제하지 않습니다.");
         }else throw BusinessGlossary.invalid();

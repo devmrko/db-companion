@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.0-alpha.10
+
+Prepared on 2026-10-13. Tenth public alpha; not a production-certified release.
+
+- Check effective Oracle Text setup privileges before issuing a preview and
+  again before executing setup DDL. Accounts without `CTX_DDL` execution access
+  receive an actionable permission message before any Text object is created.
+- Document fresh-account Oracle Text prerequisites without automatically granting
+  privileges or depending on a particular database account.
+
+Validation: Java 1,354 tests passed; JavaScript 654 passed with one optional
+runtime integration test skipped in the standard suite. PMD and publication
+checks passed. A separately provisioned Autonomous 26ai database confirmed
+fresh-account installation, phrase/alias search, input rejection, account
+isolation, and desktop/mobile UI operation. Synthetic quoted and HTML-like
+definitions retained their text through save, JSON export and import preview.
+Live permission checks covered both permitted and restricted accounts, with no
+AI calls. Private connection details and test artifacts are not published.
+
 ## 0.1.0-alpha.9
 
 Prepared on 2026-10-13. Ninth public alpha; not a production-certified release.

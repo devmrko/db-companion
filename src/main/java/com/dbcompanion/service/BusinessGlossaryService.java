@@ -60,7 +60,7 @@ public class BusinessGlossaryService {
     public Setup setupPreview(PoolSession s,String operation){
         Status status=status(s);var statements=switch(operation){
             case "TABLE"->{if(!status.table().equals("MISSING"))throw BusinessGlossary.stale();yield List.of(BusinessGlossarySql.create(owner(s)));}
-            case "TEXT"->{if(!status.table().equals("READY")||!status.text().equals("MISSING"))throw BusinessGlossary.stale();yield BusinessGlossarySql.textSetup(owner(s));}
+            case "TEXT"->{if(!status.table().equals("READY")||!status.text().equals("MISSING"))throw BusinessGlossary.stale();query(s,false,()->{repository.requireTextSetupPrivilege();return null;});yield BusinessGlossarySql.textSetup(owner(s));}
             case "HISTORY"->{if(!historyStatus(s).equals("MISSING"))throw BusinessGlossary.stale();yield List.of(AppRecordSql.create(owner(s)));}
             default->throw BusinessGlossary.invalid();};
         return s.metadata().businessGlossary().setup(new Setup(UUID.randomUUID().toString(),owner(s),operation,statements,Instant.now().plusSeconds(300)));

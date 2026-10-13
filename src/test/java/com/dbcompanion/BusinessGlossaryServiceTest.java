@@ -23,12 +23,13 @@ class BusinessGlossaryServiceTest {
     final JsonMapper json=new JsonMapper();
     final String id="11111111-1111-1111-1111-111111111111";
     Term term=new Term(id,1,"사업 AU",List.of("사업 활성 사용자"),"사업 기준 활성 사용자","BIZ_AU_FLAG = '1'",true,"v1");
-    String table="READY",text="MISSING";int tokenCalls,installs,saves,phraseCalls,keyCalls;
+    String table="READY",text="MISSING";int tokenCalls,installs,saves,phraseCalls,keyCalls;boolean textSetupAllowed=true;
     List<Target> nativeTargets=List.of(new Target("사업 AU","TERM",List.of(id)));
     final BusinessGlossaryRepository repository=new BusinessGlossaryRepository(new JdbcTemplate(source),json){
         @Override public String tableStatus(String owner){return table;}
         @Override public void requireTable(String owner){if(!table.equals("READY"))throw BusinessGlossary.stale();}
         @Override public String textStatus(String owner){return text;}
+        @Override public void requireTextSetupPrivilege(){if(!textSetupAllowed)throw BusinessGlossary.failure(403,"Oracle Text 설정 권한이 없습니다.");}
         @Override public List<Key> keys(String owner){keyCalls++;return List.of(new Key(id,term.revision(),term.term(),term.aliases()));}
         @Override public Term find(String owner,String key){assertThat(owner).isEqualTo("APP");assertThat(key).isEqualTo(id);return term;}
         @Override public List<Token> tokens(String question){tokenCalls++;return List.of(new Token("사업",1,6),new Token("AU",4,2));}
@@ -41,6 +42,11 @@ class BusinessGlossaryServiceTest {
         @Override public void append(String owner,Term before,Term after){}
     });
     private PoolSession session(){var s=new PoolSession(new HikariDataSource(),"LOW",()->{});s.initialize(new DatabaseSession(new DatabaseInfo("APP","APP","LOW","DB"),List.of("APP","OTHER")));return s;}
+    @Test void missingTextPrivilegeRejectsPreviewWithoutIssuingInstallation(){try(var s=session()){
+        textSetupAllowed=false;
+        assertThatThrownBy(()->service.setupPreview(s,"TEXT")).isInstanceOf(AiAssistant.Failure.class).hasMessageContaining("권한");
+        assertThat(installs).isZero();
+    }}
     @Test void exactSearchNeedsNeitherTextNorAProfileAndNeverInstalls(){try(var s=session()){
         var result=service.search(s,"2026-08-03 사업 AU를 알려줘","",false);
         assertThat(result.hits()).hasSize(1);assertThat(result.tokens()).isEmpty();assertThat(result.question()).startsWith("2026-08-03");assertThat(tokenCalls+installs+saves).isZero();

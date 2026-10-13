@@ -63,6 +63,15 @@ The response is a JSON CLOB. Query output is an ordered column list plus arrays 
 
 ## Evidence and dependencies
 
+A fresh account needs Oracle Text setup privileges before creating its lexer,
+policy and index. The glossary setup preview and execution check effective
+`EXECUTE` access to `CTXSYS.CTX_DDL` (direct, PUBLIC, or an enabled role); they
+do not grant it. An administrator can grant `CTXAPP` and the required direct
+package privileges (`CTXSYS.CTX_DDL`, `CTXSYS.CTX_DOC`) to the intended local
+account after reviewing scope. Direct execution grants are required where
+stored PL/SQL cannot rely on role privileges. No `ANY` or PUBLIC grant is needed.
+See [Oracle Text user setup](https://docs.oracle.com/en/database/oracle/oracle-database/26/ccapp/creating-oracle-text-user.html).
+
 Glossary mode requires the existing owner-local `DBC_BUSINESS_TERM`, `DBC_BT_CTX` and `DBC_BT_KO_POLICY`. The package generator embeds the very same `db/glossary/phrase-search.sql` used by the app. Full phrase matches and longest overlapping spans are retained; generic token OR results are not directly attached as definitions. At most 30 definitions and 64 unique tokens are permitted. Korean lexer configuration is reused, not auto-installed or silently replaced by the UI language.
 
 Ontology mode reads `DBC_ONTOLOGY_CATALOG`, the source of saved ontology/RDF definitions. It does **not** run SPARQL or reproduce the ontology inquiry screen's automatic three-hop path finder. Select the tables explicitly. Each table must be inside the caller's profile object list. The latest revision must be APPROVED; an older approved revision is not substituted for a newer draft. Definitions are projected without author/profile/sampling diagnostics. Sensitive/private-named columns and associated mappings/relationships are excluded.
