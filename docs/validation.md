@@ -7,7 +7,8 @@ Candidate: **0.1.0-alpha.7** / tag **v0.1.0-alpha.7**. Checked on 2026-10-13.
 - Java unit, integration and embedded HTTP checks: 1,345 passed.
 - PMD: no violations. Publication guard and whitespace checks passed.
 - JavaScript application tests: 650 passed, including the real-JAR lifecycle
-  test on isolated ports. Optional Agent example checks are run separately.
+  test on isolated ports. The complete run including the optional Agent example
+  passed 661 tests, with no failures or skipped tests.
 - Synthetic multipart HTTP coverage includes TXT, DOCX, text PDF, invalid formats
   and over-limit uploads. No external AI call or database write is performed by
   these tests. RDF output is parsed by an independent Turtle parser.
