@@ -26,6 +26,7 @@ public class LanguageController {
     /** Only known read-only page routes; never redirect to a write endpoint or external site. */
     public static String safeReturn(String target) {
         if("/db/audit".equals(target))return target;
+        if("/db/functions/glossary-search".equals(target))return target;
         if("/db/functions/ai-query".equals(target)||"/db/vpd".equals(target)||"/business-glossary".equals(target)||"/ontology".equals(target)||"/ontology-query".equals(target)||"/ai-test".equals(target)||"/ai-test/problems".equals(target))return target;
         if(target==null || target.contains("\\") || target.contains("\r") || target.contains("\n") || target.contains("#"))return "/login";
         String route=target.split("\\?",2)[0];

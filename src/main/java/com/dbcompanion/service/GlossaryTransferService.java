@@ -48,6 +48,7 @@ public class GlossaryTransferService {
         if(document==null)throw BusinessGlossary.invalid();
         return query(session,false,()->{
             String owner=session.metadata().info().username();repository.requireTable(owner);
+            for(var term:document.terms())repository.validateRdf(owner,term.rdf());
             return GlossaryTransfer.preview(owner,document,repository.transferTerms(owner));
         });
     }

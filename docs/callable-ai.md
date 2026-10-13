@@ -4,6 +4,35 @@
 
 The generated PL/SQL is standalone: Oracle Text matching, definition retrieval, prompt composition, `DBMS_CLOUD_AI.GENERATE(action=>'showsql')`, and optional query execution happen inside Oracle. It does not call DB Companion or an application endpoint. Business rules stay in the dictionary, ontology, comments and profile Feedback, not in Java or the package source.
 
+## Search-only module
+
+**Functions → Create glossary search function** previews and creates one
+`DBC_GLOSSARY_SEARCH(p_question CLOB) RETURN CLOB AUTHID CURRENT_USER` function.
+It returns `formatVersion`, `question`, `schema`, `glossary` (tokens, matching
+targets, definitions and SQL criteria), and `aiCalled:false`. No profile is
+required; it does not generate or execute business SQL.
+
+```sql
+SELECT DBC_GLOSSARY_SEARCH(:question) AS EVIDENCE_JSON FROM DUAL;
+```
+
+The function and existing AI package share the same generated search helpers
+and phrase-search asset. Extracting those helpers does not upgrade or modify an
+installed AI package. This first module separates deterministic retrieval from
+paid AI generation; prompt/SQL/execution remain in the existing pipeline.
+
+The wizard checks the owner-local dictionary, Oracle Text setup, session
+`CREATE PROCEDURE` privilege, object-name availability and stored source.
+Creation requires a five-minute, single-use preview and explicit DDL consent.
+It never replaces an existing object, grants privileges or retries a failed
+creation. Compilation errors remain visible; an unconfirmed failure requires
+a fresh status check. Search tests execute only a valid, source-matching module.
+The limits and Oracle invocation-chain rules below still apply.
+
+SQL/PLSQL blocks use the common read-only source UI: line numbers, syntax
+highlighting, source search, optional wrapping and copying the original code.
+These display controls never execute code or modify its text.
+
 ## Options and modes
 
 | Argument | Meaning |

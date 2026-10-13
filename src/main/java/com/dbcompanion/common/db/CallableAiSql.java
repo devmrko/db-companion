@@ -16,13 +16,16 @@ public final class CallableAiSql {
         }catch(IOException ex){throw new IllegalStateException(ex);}
     }
     public static List<String> statements(String owner){
+        return List.of(resource("spec.sql").replace("{{PACKAGE}}",ProfileHistorySql.object(owner,NAME)),
+            resource("body.sql").replace("{{GLOSSARY_FUNCTIONS}}",resource("glossary-functions.sql").stripTrailing())
+                .replace("{{PACKAGE}}",ProfileHistorySql.object(owner,NAME)).replace("{{PHRASE_BLOCK}}",phraseBlock()));
+    }
+    public static String phraseBlock(){
         String phrase=BusinessGlossarySql.phraseSearch("DBC_CALLER_SCHEMA")
             .replace("\"DBC_CALLER_SCHEMA\".\"DBC_BUSINESS_TERM\"","{{GLOSSARY_TABLE}}")
             .replaceFirst("\\?",":question_bind").replaceFirst("\\?",":query_bind").replaceFirst("\\?",":result_bind");
         // Bind placeholders are positional inside the dynamic anonymous block.
-        String escaped=phrase.replace("'","''");
-        return List.of(resource("spec.sql").replace("{{PACKAGE}}",ProfileHistorySql.object(owner,NAME)),
-            resource("body.sql").replace("{{PACKAGE}}",ProfileHistorySql.object(owner,NAME)).replace("{{PHRASE_BLOCK}}",escaped));
+        return phrase.replace("'","''");
     }
     public static String script(String owner){return String.join("\n/\n\n",statements(owner))+"\n/\n";}
 }

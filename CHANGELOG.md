@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.1.0-alpha.8
+
+Prepared on 2026-10-13. Eighth public alpha; not a production-certified release.
+
+### Added
+
+- Owner-local glossary search function wizard: prerequisite checks, generated
+  code, expiring single-use creation consent and question-to-JSON search tests.
+  No profile or AI call is required. Existing objects are never replaced.
+- Common SQL/PLSQL code display with syntax highlighting, line numbers,
+  source search, wrapping and original-source copying.
+
+### Improved
+
+- Shared generated glossary helpers preserve the existing callable AI package
+  while exposing a separate search-only module.
+- Responsive RDF editing, busy-control guards, stale analysis-response rejection
+  and stable export filenames. Import previews validate RDF source mappings
+  before selected saves.
+
+### Validation and scope
+
+- Java 1,352 and JavaScript 664 tests passed; PMD and publication checks passed.
+- Synthetic UI checks cover creation consent, four languages and mobile layout.
+  Authorized Oracle validation separately confirmed compilation, search-only
+  JSON results, SQL invocation and input rejection without paid AI calls.
+- No account-specific credentials, source records or configuration are published.
+  No automatic installation, privilege grants or existing package replacement.
+
 ## 0.1.0-alpha.7
 
 Prepared on 2026-10-13. Seventh public alpha; not a production-certified release.

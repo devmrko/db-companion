@@ -1,0 +1,224 @@
+{
+  "glossaryFunction.title": [
+    "용어사전 검색 함수 만들기",
+    "Create glossary search function",
+    "创建术语搜索函数",
+    "用語検索関数を作成"
+  ],
+  "glossaryFunction.back": [
+    "← 함수 목록",
+    "← Functions",
+    "← 函数列表",
+    "← 関数一覧"
+  ],
+  "glossaryFunction.description": [
+    "자연어 질문 → 용어·별칭 검색 → 업무 정의·SQL 기준 JSON. AI 호출이나 SQL 실행은 하지 않습니다.",
+    "Question → term/alias search → definition and SQL criteria JSON. No AI or business SQL execution.",
+    "问题 → 术语/别名搜索 → 定义和 SQL 标准 JSON。不调用 AI 或执行业务 SQL。",
+    "質問 → 用語・別名検索 → 定義・SQL 基準の JSON。AI 呼出や業務 SQL 実行は行いません。"
+  ],
+  "glossaryFunction.preflight": [
+    "1. 생성 조건 확인",
+    "1. Check prerequisites",
+    "1. 检查创建条件",
+    "1. 作成条件を確認"
+  ],
+  "glossaryFunction.refresh": [
+    "다시 확인",
+    "Check again",
+    "重新检查",
+    "再確認"
+  ],
+  "glossaryFunction.scope": [
+    "로그인 소유 스키마에만 생성합니다. 기존 객체를 교체하거나 권한을 부여하지 않습니다.",
+    "Creates only in the login owner's schema. No replacement or privilege grants.",
+    "仅在登录用户的模式中创建。不替换对象或授予权限。",
+    "ログイン所有スキーマにのみ作成。既存オブジェクトの置換・権限付与は行いません。"
+  ],
+  "glossaryFunction.code": [
+    "2. 함수 코드 확인",
+    "2. Review function code",
+    "2. 检查函数代码",
+    "2. 関数コードを確認"
+  ],
+  "glossaryFunction.contract": [
+    "입력: 질문 CLOB(최대 8,000자). 출력: 질문·토큰·일치 용어·정의·SQL 기준을 담은 JSON CLOB. 활성 용어만 검색하며 30개 초과·근거 크기 초과는 오류로 알립니다.",
+    "Input: question CLOB (8,000 characters). Output: JSON CLOB with question, tokens, matches, definitions and SQL criteria. Searches enabled terms only; exceeding 30 matches or evidence limits raises an error.",
+    "输入：问题 CLOB（最多 8,000 字符）。输出：包含问题、词元、匹配、定义和 SQL 标准的 JSON CLOB。仅搜索启用术语；超过 30 个匹配或证据限制时报错。",
+    "入力：質問 CLOB（最大8,000文字）。出力：質問・トークン・一致用語・定義・SQL基準のJSON CLOB。有効用語のみ検索。30件超過・根拠サイズ超過はエラー。"
+  ],
+  "glossaryFunction.source": [
+    "생성할 코드",
+    "Generated code",
+    "生成代码",
+    "生成コード"
+  ],
+  "glossaryFunction.ddl": [
+    "생성은 DDL이며 암시적 COMMIT이 발생합니다. 실패해도 객체가 남을 수 있습니다. 자동 삭제·교체·재시도하지 않습니다.",
+    "Creation is DDL with implicit COMMIT. An object may remain after failure. No automatic deletion, replacement or retry.",
+    "创建是 DDL，会隐式提交。失败后对象可能保留。不自动删除、替换或重试。",
+    "作成はDDLで暗黙COMMITが発生。失敗後もオブジェクトが残る場合があります。自動削除・置換・再試行は行いません。"
+  ],
+  "glossaryFunction.preview": [
+    "생성 전 최종 확인",
+    "Final creation preview",
+    "创建前最终确认",
+    "作成前の最終確認"
+  ],
+  "glossaryFunction.consent": [
+    "표시된 코드·소유자·DDL 영향을 확인했고 함수 1개 생성에 동의합니다.",
+    "I reviewed the code, owner and DDL effects and consent to creating one function.",
+    "我已检查代码、所有者和 DDL 影响，同意创建一个函数。",
+    "コード・所有者・DDLの影響を確認し、関数1個の作成に同意します。"
+  ],
+  "glossaryFunction.create": [
+    "함수 생성",
+    "Create function",
+    "创建函数",
+    "関数作成"
+  ],
+  "glossaryFunction.test": [
+    "3. 질문으로 검색 테스트",
+    "3. Test a question",
+    "3. 用问题测试搜索",
+    "3. 質問で検索テスト"
+  ],
+  "glossaryFunction.testNote": [
+    "설치된 코드가 이 버전과 일치할 때만 실행합니다. 사전 읽기만 수행하며 AI 비용은 발생하지 않습니다.",
+    "Runs only if installed code matches this version. Reads the dictionary; no AI cost.",
+    "仅在安装代码与当前版本一致时运行。只读词典，无 AI 费用。",
+    "インストール済みコードがこの版と一致する場合のみ実行。辞書の読取りのみでAI費用なし。"
+  ],
+  "glossaryFunction.question": [
+    "질문",
+    "Question",
+    "问题",
+    "質問"
+  ],
+  "glossaryFunction.search": [
+    "사전 검색",
+    "Search dictionary",
+    "搜索词典",
+    "辞書検索"
+  ],
+  "glossaryFunction.result": [
+    "전달용 JSON · 실행된 SQL이 아님",
+    "Evidence JSON · not executed SQL",
+    "证据 JSON · 不是执行的 SQL",
+    "引渡し用 JSON · 実行済み SQL ではありません"
+  ],
+  "glossaryFunction.owner": [
+    "소유 스키마",
+    "Owner schema",
+    "所有者模式",
+    "所有スキーマ"
+  ],
+  "glossaryFunction.dictionary": [
+    "용어사전",
+    "Dictionary",
+    "词典",
+    "用語辞書"
+  ],
+  "glossaryFunction.text": [
+    "Oracle Text 설정",
+    "Oracle Text setup",
+    "Oracle Text 设置",
+    "Oracle Text 設定"
+  ],
+  "glossaryFunction.function": [
+    "함수 상태",
+    "Function state",
+    "函数状态",
+    "関数状態"
+  ],
+  "glossaryFunction.privilege": [
+    "CREATE PROCEDURE 권한",
+    "CREATE PROCEDURE privilege",
+    "CREATE PROCEDURE 权限",
+    "CREATE PROCEDURE 権限"
+  ],
+  "glossaryFunction.expires": [
+    "확인 유효 기한: {0}",
+    "Preview expires: {0}",
+    "确认有效期：{0}",
+    "確認期限：{0}"
+  ],
+  "glossaryFunction.expired": [
+    "확인이 만료되었습니다. 다시 확인해 주세요.",
+    "Preview expired; check again.",
+    "确认已过期，请重新检查。",
+    "確認が期限切れです。再確認してください。"
+  ],
+  "glossaryFunction.created": [
+    "함수가 생성되었습니다. 질문으로 검색을 확인하세요.",
+    "Function created. Test a question.",
+    "函数已创建，请用问题测试。",
+    "関数を作成しました。質問で検索を確認してください。"
+  ],
+  "glossaryFunction.inspect": [
+    "생성 결과를 확인해 주세요. 자동 재생성하지 않습니다.",
+    "Inspect the creation result. No automatic recreation.",
+    "请检查创建结果，不自动重新创建。",
+    "作成結果を確認してください。自動再作成しません。"
+  ],
+  "glossaryFunction.uncertain": [
+    "생성 결과를 확인하지 못했습니다. 객체가 남았을 수 있습니다. 다시 확인한 뒤 판단하세요.",
+    "Creation result unconfirmed. An object may remain; check status before continuing.",
+    "创建结果未确认，对象可能已保留。请先重新检查状态。",
+    "作成結果が不明です。オブジェクトが残る場合があります。状態を再確認してください。"
+  ],
+  "glossaryFunction.searched": [
+    "사전 검색 완료 · AI 호출 없음",
+    "Dictionary search complete · no AI call",
+    "词典搜索完成 · 无 AI 调用",
+    "辞書検索完了 · AI呼出なし"
+  ],
+  "glossaryFunction.state.READY": [
+    "준비됨",
+    "Ready",
+    "就绪",
+    "準備完了"
+  ],
+  "glossaryFunction.state.MISSING": [
+    "없음",
+    "Missing",
+    "缺失",
+    "なし"
+  ],
+  "glossaryFunction.state.CONFLICT": [
+    "기존 객체와 충돌 · 교체 안 함",
+    "Existing object conflict · not replaced",
+    "已有对象冲突 · 不替换",
+    "既存オブジェクトと競合・置換なし"
+  ],
+  "glossaryFunction.state.INVALID": [
+    "컴파일 오류 · 확인 필요",
+    "Compilation failed · review required",
+    "编译错误 · 需检查",
+    "コンパイルエラー・要確認"
+  ],
+  "glossaryFunction.state.CHECK_REQUIRED": [
+    "설정 확인 필요",
+    "Setup review required",
+    "需检查设置",
+    "設定の確認が必要"
+  ],
+  "glossaryFunction.state.MISMATCH": [
+    "구조 불일치",
+    "Structure mismatch",
+    "结构不匹配",
+    "構造不一致"
+  ],
+  "glossaryFunction.state.YES": [
+    "있음",
+    "Available",
+    "有",
+    "あり"
+  ],
+  "glossaryFunction.state.NO": [
+    "없음",
+    "Unavailable",
+    "无",
+    "なし"
+  ]
+}

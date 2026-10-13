@@ -34,6 +34,8 @@ class GlossaryTransferServiceTest {
     }};
     private final Repo repo=new Repo();
     private boolean failHistory;
+    private boolean rejectRdf;
+    private int rdfChecks;
     private final BusinessGlossaryHistoryRepository history=new BusinessGlossaryHistoryRepository(new JdbcTemplate(source),null,json){
         @Override public void require(String owner){}
         @Override public void append(String owner,BusinessGlossary.Term before,BusinessGlossary.Term after){
@@ -46,6 +48,9 @@ class GlossaryTransferServiceTest {
         List<BusinessGlossary.Term> terms=List.of();
         Repo(){super(new JdbcTemplate(source),json);}
         @Override public void requireTable(String owner){assertThat(owner).isEqualTo("APP");}
+        @Override public void validateRdf(String owner,com.dbcompanion.model.GlossaryRdf.Definition rdf){
+            if(rdf!=null){rdfChecks++;if(rejectRdf)throw new IllegalArgumentException("Foreign or missing source");}
+        }
         @Override public List<BusinessGlossary.Term> transferTerms(String owner){return terms;}
         @Override public void lockTransfer(String owner){events.add("lock");}
         @Override public BusinessGlossary.Term save(String owner,String id,long revision,BusinessGlossary.Draft value){
@@ -83,6 +88,18 @@ class GlossaryTransferServiceTest {
             assertThat(service.export(s).terms()).containsExactly(draft("definition"));
             for(String value:List.of("null","[]","{}","x".repeat(GlossaryTransfer.MAX_BYTES+1)))
                 assertThatThrownBy(()->service.preview(s,value)).isInstanceOf(RuntimeException.class);
+            assertThat(events).doesNotContain("lock","save","history");
+        }
+    }
+    @Test void invalidRdfIsRejectedDuringReadOnlyImportPreviewBeforeWrites(){
+        var rdf=new com.dbcompanion.model.GlossaryRdf.Definition("","","","",List.of(),List.of(),
+            List.of(new com.dbcompanion.model.GlossaryRdf.Mapping("OTHER","T","C","VALUE","SUM")));
+        var value=new BusinessGlossary.Draft("Revenue",List.of(),"definition","",false,rdf);
+        String document=json.writeValueAsString(new GlossaryTransfer.Document(GlossaryTransfer.FORMAT,2,List.of(value)));
+        try(var s=session()){
+            rejectRdf=true;assertThatThrownBy(()->service.preview(s,document)).isInstanceOf(IllegalArgumentException.class);
+            assertThat(rdfChecks).isEqualTo(1);assertThat(events).doesNotContain("lock","save","history","commit");
+            rejectRdf=false;assertThat(service.preview(s,document).entries()).hasSize(1);
             assertThat(events).doesNotContain("lock","save","history");
         }
     }

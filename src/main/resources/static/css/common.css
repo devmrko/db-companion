@@ -1288,3 +1288,34 @@ dialog.app-profile-editor-compact { width: min(640px, calc(100vw - 32px)); }
   .app-ords-inputs { grid-template-columns: minmax(0, 1fr); }
   .app-ords-handler { padding: 12px; }
 }
+.app-glossary-rdf-body, .app-glossary-rdf-analysis { display: grid; gap: 16px; min-width: 0; }
+.app-glossary-rdf-body p { margin: 0; overflow-wrap: anywhere; }
+.app-glossary-rdf-fields { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+.app-glossary-rdf-fields label { display: grid; gap: 6px; min-width: 0; }
+.app-glossary-rdf-wide { grid-column: 1 / -1; }
+.app-glossary-rdf-fields textarea[rows="2"] { min-height: 72px; }
+.app-glossary-rdf-body > button, .app-glossary-rdf-analysis > button { justify-self: start; }
+.app-glossary-rdf-output { display: grid; gap: 12px; min-width: 0; }
+.app-glossary-rdf-output > p { white-space: pre-wrap; }
+.app-glossary-rdf-output pre { max-height: 360px; overflow: auto; }
+.app-ontology-consent input[type="checkbox"] { width: 16px; height: 16px; flex: 0 0 auto; margin-top: 3px; }
+[data-oq-sql-panel], [data-oq-result-panel] { padding: 24px; min-width: 0; }
+.app-code-view { min-width: 0; margin-block: 12px; }
+.app-code-view .app-source-toolbar select { display: none; }
+.app-code-view .app-source-toolbar { flex-wrap: wrap; }
+.app-code-view .app-source-viewport { max-height: 480px; }
+.app-code-view .app-source-toolbar input { flex: 1 1 160px; min-width: 0; }
+@media (max-width: 600px) {
+  .app-glossary-rdf-fields { grid-template-columns: minmax(0,1fr); }
+  [data-oq-sql-panel], [data-oq-result-panel] { padding: 16px; }
+}
+.app-code-source { display: none; }
+.app-module-card { padding: 24px; margin-block: 20px; min-width: 0; }
+.app-module-card h2 { font-size: 1.15rem; }
+.app-module-card > button { margin-block: 12px; }
+.app-module-status { display: grid; grid-template-columns: minmax(120px,1fr) minmax(0,2fr); gap: 8px 16px; }
+.app-module-status dd { margin: 0; overflow-wrap: anywhere; }
+.app-module-question { display: grid; gap: 8px; margin-block: 16px; }
+[data-gf-confirm] { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--app-border,#ddd); }
+[data-gf-json] { max-height: 480px; overflow: auto; }
+@media (max-width: 600px) { .app-module-card { padding: 16px; } }
