@@ -6,10 +6,10 @@
     "エクスポート / インポート"
   ],
   "glossaryTransfer.note": [
-    "JSON으로 용어·별칭·정의·SQL 기준·활성 상태를 이동합니다. 대상 ID는 유지하고 변경 시 버전을 올립니다. 선택한 변경만 이력과 함께 저장하며 SQL 기준은 실행하지 않습니다.",
-    "Transfer terms, aliases, definitions, SQL criteria and enabled status as JSON. Existing destination IDs are retained and revisions advance on updates. Only selected changes are saved with history. SQL criteria are never executed.",
-    "以JSON迁移术语、别名、定义、SQL规则及启用状态。保留目标ID并在更新时递增版本。仅保存所选变更及历史，不执行SQL规则。",
-    "用語・別名・定義・SQL基準・有効状態をJSONで移行します。既存IDを保持し、更新時に版を進めます。選択した変更のみ履歴と共に保存し、SQL基準は実行しません。"
+    "JSON으로 용어·별칭·정의·SQL 기준·활성 상태와 RDF를 이동합니다. 대표 용어로 대상과 비교하며, 파일 ID로 대상 행을 선택하지 않습니다. 기존 대상 ID는 유지하고 변경 시 버전을 올리며 신규 항목은 새 ID를 만듭니다. RDF 포함 파일은 버전 2, 기존 버전 1도 지원합니다. 선택한 변경만 이력과 함께 저장하며 SQL 기준은 실행하지 않습니다.",
+    "Transfer terms, aliases, definitions, SQL criteria, status and RDF as JSON. Match by term, never source ID. Retain destination IDs and advance revisions on updates; generate new IDs for new terms. RDF uses format v2; v1 remains supported. Save only selected changes with history; never execute SQL criteria.",
+    "以 JSON 迁移术语、别名、定义、SQL 规则、状态和 RDF。按术语匹配，不按来源 ID。更新保留目标 ID 并递增版本，新项生成新 ID。RDF 使用格式 v2，也支持 v1。仅保存所选变更与历史，不执行 SQL。",
+    "用語・別名・定義・SQL 基準・状態・RDF を JSON で移行します。出所 ID ではなく代表用語で比較します。既存 ID は保持し更新時に版を進め、新規用語には新 ID を作ります。RDF は形式 v2、v1 も対応。選択した変更のみ履歴と共に保存し SQL は実行しません。"
   ],
   "glossaryTransfer.export": [
     "JSON 내보내기",

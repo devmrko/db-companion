@@ -53,3 +53,10 @@ const helpFeature=()=>document.querySelector('[data-sql-help-feature]')?.dataset
   (document.body.querySelector('[data-ai-test]')?'ai-test':featureForPath(location.pathname));
 document.querySelectorAll('.app-topbar').forEach(root=>mountSqlHelp(root,helpFeature()));
 mountHelpPanels(document,window);
+// Hide only confirmed unavailable features; retain unknown/transient states.
+if(document.querySelector('.app-topbar'))fetch('/app/feature-access',{cache:'no-store',credentials:'same-origin',headers:{Accept:'application/json'}}).then(async response=>{
+  if(!response.ok||!response.headers.get('content-type')?.includes('application/json'))return;
+  const value=await response.json(),states=Object.values(value.dds||{});
+  if(states.length===4&&states.every(state=>state==='ACCESS_REQUIRED'))document.querySelectorAll('a[href="/db/security"]').forEach(link=>{link.hidden=true;});
+  if(['ACCESS_REQUIRED','UNAVAILABLE'].includes(value.auditOriginal)&&value.auditArchive==='MISSING')document.querySelectorAll('a[href="/db/audit"]').forEach(link=>{link.hidden=true;});
+}).catch(()=>{/* Capability lookup does not replace page errors. */});

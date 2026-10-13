@@ -15,6 +15,22 @@ import static com.dbcompanion.common.db.BusinessGlossarySql.*;
 public class BusinessGlossaryRepository {
     private final JdbcTemplate jdbc;
     private final JsonMapper json;
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    private BusinessGlossaryHistoryRepository history;
+    private Term enrich(String owner,Term term){return history==null?term:history.enrich(owner,term);}
+    private List<Term> enrich(String owner,List<Term> terms){return history==null?terms:history.enrich(owner,terms);}
+    public void validateRdf(String owner,com.dbcompanion.model.GlossaryRdf.Definition rdf){
+        if(rdf==null)return;
+        for(var mapping:rdf.mappings()){
+            if(!owner.equals(mapping.schema()))throw BusinessGlossary.failure(400,"RDF 매핑은 로그인 소유 스키마의 원천만 지정할 수 있습니다.");
+            var types=jdbc.queryForList("SELECT OBJECT_TYPE FROM SYS.ALL_OBJECTS WHERE OWNER=? AND OBJECT_NAME=? AND STATUS='VALID' AND SUBOBJECT_NAME IS NULL",String.class,owner,mapping.table());
+            if(types.size()!=1||!List.of("TABLE","VIEW").contains(types.getFirst())
+                    ||mapping.table().startsWith("DR$")||mapping.table().startsWith("VECTOR$")||mapping.table().contains("#RDF")||mapping.table().contains("#SEM")||mapping.table().contains("$VECTAB")
+                    ||jdbc.queryForObject("SELECT COUNT(*) FROM SYS.ALL_EXTERNAL_TABLES WHERE OWNER=? AND TABLE_NAME=?",Integer.class,owner,mapping.table())!=0
+                    ||jdbc.queryForObject("SELECT COUNT(*) FROM SYS.ALL_TAB_COLUMNS WHERE OWNER=? AND TABLE_NAME=? AND COLUMN_NAME=?",Integer.class,owner,mapping.table(),mapping.column())!=1)
+                throw BusinessGlossary.failure(400,"RDF 매핑의 원천·컬럼을 확인해 주세요. 로컬 테이블·뷰 메타데이터만 참조합니다.");
+        }
+    }
     public BusinessGlossaryRepository(JdbcTemplate jdbc,JsonMapper json){this.jdbc=new JdbcTemplate(Objects.requireNonNull(jdbc.getDataSource()));this.jdbc.setQueryTimeout(30);this.json=json;}
     public String tableStatus(String owner){
         var objects=jdbc.queryForList("SELECT OBJECT_TYPE FROM SYS.ALL_OBJECTS WHERE OWNER=? AND OBJECT_NAME=? AND SUBOBJECT_NAME IS NULL",String.class,owner,TABLE);
@@ -72,18 +88,18 @@ public class BusinessGlossaryRepository {
     public Page page(String owner,String filter,int offset){
         String pattern="%"+filter.toUpperCase(Locale.ROOT).replace("!","!!").replace("%","!%").replace("_","!_")+"%";
         var rows=jdbc.query("SELECT * FROM "+table(owner)+" WHERE UPPER(TERM_TEXT) LIKE ? ESCAPE '!' ORDER BY TERM_TEXT,TERM_ID OFFSET ? ROWS FETCH NEXT 21 ROWS ONLY",(r,n)->term(r),pattern,offset);
-        return new Page(rows.stream().limit(20).toList(),rows.size()>20,offset);
+        return new Page(enrich(owner,rows.stream().limit(20).toList()),rows.size()>20,offset);
     }
     public List<Term> transferTerms(String owner) {
         var rows=jdbc.query("SELECT * FROM "+table(owner)+" ORDER BY TERM_TEXT,TERM_ID FETCH FIRST 2001 ROWS ONLY",(r,n)->term(r));
         if(rows.size()>BusinessGlossary.MAX_TERMS)throw BusinessGlossary.failure(413,"사전 내보내기·가져오기 검토 한도는 2,000개입니다. 일부만 처리하지 않습니다.");
-        return rows;
+        return enrich(owner,rows);
     }
     /** Serialize import name checks against concurrent INSERT/UPDATE transactions; no DDL/commit. */
     public void lockTransfer(String owner) {
         jdbc.execute("LOCK TABLE "+table(owner)+" IN SHARE ROW EXCLUSIVE MODE WAIT 5");
     }
-    public Term find(String owner,String id){var rows=jdbc.query("SELECT * FROM "+table(owner)+" WHERE TERM_ID=?",(r,n)->term(r),BusinessGlossary.id(id));if(rows.size()!=1)throw BusinessGlossary.stale();return rows.getFirst();}
+    public Term find(String owner,String id){var rows=jdbc.query("SELECT * FROM "+table(owner)+" WHERE TERM_ID=?",(r,n)->term(r),BusinessGlossary.id(id));if(rows.size()!=1)throw BusinessGlossary.stale();return enrich(owner,rows.getFirst());}
     public Term save(String owner,String id,long revision,Draft d){
         String aliases=json.writeValueAsString(d.aliases()),search=d.term()+"\n"+String.join("\n",d.aliases())+"\n"+d.definition();
         boolean insert=id==null||id.isBlank();String termId=insert?UUID.randomUUID().toString():BusinessGlossary.id(id);

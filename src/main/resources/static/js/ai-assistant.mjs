@@ -1,6 +1,7 @@
 import {t} from './i18n.mjs';
 export function assistantError(data,status){
   const error=new Error(data.error||`HTTP ${status}`);
+  error.status=status;
   if(status===422&&data.diagnostic)error.diagnostic=data.diagnostic;
   return error;
 }

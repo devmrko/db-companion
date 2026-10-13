@@ -39,13 +39,16 @@ public class BusinessGlossaryService {
         return new Analysis("ORACLE_TEXT",tokens);
     }
     public Page page(PoolSession s,String filter,int offset){if(offset<0||offset>100000)throw BusinessGlossary.invalid();String value=BusinessGlossary.text(filter,256,false);return query(s,false,()->{repository.requireTable(owner(s));return repository.page(owner(s),value,offset);});}
+    public BusinessGlossaryRdf.View rdf(PoolSession s,String id){return query(s,false,()->{repository.requireTable(owner(s));return BusinessGlossaryRdf.export(repository.find(owner(s),id));});}
+    public GlossarySqlExplanation.Analysis explain(PoolSession s,String id,String sql){return query(s,false,()->{repository.requireTable(owner(s));return GlossarySqlExplanation.analyze(sql,repository.find(owner(s),id),owner(s));});}
     public Term save(PoolSession s,String id,long revision,Draft value,boolean consent){
         if(!consent||value==null)throw BusinessGlossary.failure(400,"사전에 저장할 내용을 확인해 주세요.");
         var result=query(s,true,()->{
             String owner=owner(s);repository.requireTable(owner);Objects.requireNonNull(history).require(owner);
             Term before=id==null||id.isBlank()?null:repository.find(owner,id);
             if(before!=null&&before.revision()!=revision)throw BusinessGlossary.stale();
-            var saved=repository.save(owner,id,revision,value);history.append(owner,before,saved);return saved;
+            var rdf=value.rdf()==null&&before!=null?before.rdf():value.rdf();repository.validateRdf(owner,rdf);
+            var saved=repository.save(owner,id,revision,value).withRdf(rdf);history.append(owner,before,saved);return saved;
         });
         s.metadata().businessGlossary().clear();return result;
     }

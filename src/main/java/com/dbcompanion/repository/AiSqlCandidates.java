@@ -72,7 +72,9 @@ public final class AiSqlCandidates {
         if (!analysis.status().equals("PARSED")) return List.of();
         return analysis.tables().stream().filter(t->{
             String owner=Objects.toString(t.owner(),"").toUpperCase(Locale.ROOT),name=t.name().toUpperCase(Locale.ROOT);
-            return !Set.of("SYS","SYSTEM","AUDSYS","C##CLOUD$SERVICE").contains(owner) && !owner.startsWith("APEX_")
+            return !Set.of("SYS","SYSTEM","AUDSYS","CTXSYS","MDSYS","XDB","ORDSYS","ORDS_METADATA","C##CLOUD$SERVICE").contains(owner) && !owner.startsWith("APEX_")
+                    && !name.startsWith("DR$") && !name.startsWith("VECTOR$") && !name.startsWith("SYS_IOT_")
+                    && !name.contains("#RDF") && !name.contains("#SEM") && !name.contains("$VECTAB")
                     && !name.equals("DUAL") && !name.startsWith("USER_") && !name.startsWith("ALL_") && !name.startsWith("DBA_")
                     && !name.startsWith("V$") && !name.startsWith("GV$") && !name.startsWith("V_$") && !name.startsWith("GV_$") && !name.startsWith("DBC_");
         }).map(SelectAiSqlReferences.Table::sqlName).toList();

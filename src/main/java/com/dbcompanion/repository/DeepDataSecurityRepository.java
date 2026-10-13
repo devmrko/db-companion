@@ -14,6 +14,16 @@ public class DeepDataSecurityRepository {
     public static final int ROW_LIMIT=5000;
     private final JdbcTemplate jdbc;
     public DeepDataSecurityRepository(JdbcTemplate jdbc){this.jdbc=jdbc;}
+    public Map<String,String> capabilities(){
+        var result=new LinkedHashMap<String,String>();
+        for(var kind:Kind.values()){
+            var view=switch(kind){case roles->View.ROLES;case assignments->View.ASSIGNMENTS;case applications->View.APPLICATIONS;case grants->View.GRANTS;};
+            var value=read(view,"*"," WHERE 1=0");
+            if(kind==Kind.grants&&value.status().equals("ACCESS_REQUIRED"))value=read(View.VISIBLE_GRANTS,"*"," WHERE 1=0");
+            result.put(kind.name(),value.status());
+        }
+        return Collections.unmodifiableMap(result);
+    }
     private enum View {
         ROLES("DBA_DATA_ROLES"), ASSIGNMENTS("DBA_DATA_ROLE_GRANTS"), APPLICATIONS("DBA_APPLICATION_IDENTITIES"),
         GRANTS("DBA_DATA_GRANTS"), VISIBLE_GRANTS("ALL_DATA_GRANTS"),

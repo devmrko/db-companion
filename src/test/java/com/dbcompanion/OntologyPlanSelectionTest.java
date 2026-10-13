@@ -19,8 +19,8 @@ class OntologyPlanSelectionTest {
         var ai=new AiAssistantRepository(new JdbcTemplate(source)){
             @Override public AiAssistant.Profile profile(AiAssistant.Selection selection){return profile;}
             @Override public String explain(String owner,String name,String prompt){
-                assertThat(prompt).contains("RDF ontology metadata","originalQuestion","dictionaryEvidence");
-                return "{\"summary\":\"Find the source properties for the unreviewed concept\",\"concepts\":[\"unreviewed\"],\"questions\":[]}";
+                assertThat(prompt).contains("searchQuestion","searchTerms","clarifications","originalQuestion","dictionaryEvidence");
+                return "{\"searchQuestion\":\"Find the source properties for the unreviewed concept\",\"searchTerms\":[\"unreviewed\"],\"clarifications\":[]}";
             }
         };
         var profiles=new ProfileHistoryRepository(new JdbcTemplate(source),json,null){@Override public String packageOwner(String owner){return "SYS";}};

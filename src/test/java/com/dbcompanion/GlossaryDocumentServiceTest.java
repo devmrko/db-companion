@@ -110,4 +110,27 @@ class GlossaryDocumentServiceTest {
             assertThat(calls).isZero();
         }
     }
+    @Test void multipartHttpAcceptsTextDocxAndPdfAndRejectsOversizedOrInvalidFiles() throws Exception {
+        var controller=new GlossaryDocumentController(new GlossaryDocumentReader(),service(),null,json);
+        var mvc=org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup(controller).build();
+        try(var one=session()){
+            var http=new MockHttpSession();http.setAttribute(PoolSession.ATTRIBUTE,one);
+            var docx=new java.io.ByteArrayOutputStream();
+            try(var zip=new java.util.zip.ZipOutputStream(docx)){zip.putNextEntry(new java.util.zip.ZipEntry("word/document.xml"));zip.write("<w:document xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><w:body><w:p><w:r><w:t>Revenue means transaction total.</w:t></w:r></w:p></w:body></w:document>".getBytes(StandardCharsets.UTF_8));zip.closeEntry();}
+            var pdf=new java.io.ByteArrayOutputStream();
+            try(var document=new org.apache.pdfbox.pdmodel.PDDocument()){
+                var page=new org.apache.pdfbox.pdmodel.PDPage();document.addPage(page);
+                try(var stream=new org.apache.pdfbox.pdmodel.PDPageContentStream(document,page)){stream.beginText();stream.setFont(new org.apache.pdfbox.pdmodel.font.PDType1Font(org.apache.pdfbox.pdmodel.font.Standard14Fonts.FontName.HELVETICA),12);stream.newLineAtOffset(50,700);stream.showText("Revenue means transaction total.");stream.endText();}document.save(pdf);
+            }
+            for(var file:List.of(new MockMultipartFile("file","guide.txt","text/plain","Revenue means transaction total.".getBytes(StandardCharsets.UTF_8)),new MockMultipartFile("file","guide.docx","application/octet-stream",docx.toByteArray()),new MockMultipartFile("file","guide.pdf","application/pdf",pdf.toByteArray()))){
+                var result=mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart("/business-glossary/document/upload").file(file).session(http)).andReturn();
+                assertThat(result.getResponse().getStatus()).isEqualTo(200);assertThat(result.getResponse().getContentAsString()).contains("Revenue means transaction total.");
+            }
+            for(var file:List.of(new MockMultipartFile("file","old.doc","application/octet-stream",new byte[]{1,2}),new MockMultipartFile("file","bad.txt","text/plain",new byte[]{(byte)0xff}))){
+                assertThat(mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart("/business-glossary/document/upload").file(file).session(http)).andReturn().getResponse().getStatus()).isEqualTo(422);
+            }
+            assertThat(mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart("/business-glossary/document/upload").file(new MockMultipartFile("file","large.txt","text/plain",new byte[4_000_001])).session(http)).andReturn().getResponse().getStatus()).isEqualTo(413);
+            assertThat(calls).isZero();
+        }
+    }
 }

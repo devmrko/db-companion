@@ -20,7 +20,7 @@ class GlossaryTransferTest {
     }
     @Test void versionLimitsRequiredFieldsAndDuplicateNamesFailClosed(){
         assertThatThrownBy(()->new GlossaryTransfer.Document("other",1,List.of())).isInstanceOf(RuntimeException.class);
-        assertThatThrownBy(()->new GlossaryTransfer.Document(GlossaryTransfer.FORMAT,2,List.of())).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(()->new GlossaryTransfer.Document(GlossaryTransfer.FORMAT,3,List.of())).isInstanceOf(RuntimeException.class);
         assertThatThrownBy(()->document(List.of(draft("Users","one"),draft("users","two")))).isInstanceOf(RuntimeException.class);
         assertThatThrownBy(()->document(java.util.Collections.nCopies(501,draft("Users","one")))).isInstanceOf(RuntimeException.class);
         assertThatThrownBy(()->draft("Users","")).isInstanceOf(RuntimeException.class);

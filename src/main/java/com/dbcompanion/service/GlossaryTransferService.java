@@ -35,7 +35,7 @@ public class GlossaryTransferService {
             String owner=session.metadata().info().username();repository.requireTable(owner);
             var terms=repository.transferTerms(owner);
             if(terms.size()>500)throw BusinessGlossary.failure(413,"내보내기 한도는 500개입니다. 일부만 내보내지 않습니다.");
-            var document=new GlossaryTransfer.Document(GlossaryTransfer.FORMAT,1,terms.stream().map(BusinessGlossary.Term::draft).toList());
+            var document=new GlossaryTransfer.Document(GlossaryTransfer.FORMAT,terms.stream().anyMatch(t->t.rdf()!=null)?2:1,terms.stream().map(BusinessGlossary.Term::draft).toList());
             if(json.writeValueAsBytes(document).length>GlossaryTransfer.MAX_BYTES)throw BusinessGlossary.failure(413,"내보낼 파일이 4 MB를 초과합니다. 일부만 내보내지 않습니다.");
             return document;
         });
@@ -64,7 +64,8 @@ public class GlossaryTransferService {
             }
             for(var entry:entries) {
                 var before=entry.previous();
-                var saved=repository.save(owner,before==null?null:before.id(),before==null?0:before.revision(),entry.value());
+                repository.validateRdf(owner,entry.value().rdf());
+                var saved=repository.save(owner,before==null?null:before.id(),before==null?0:before.revision(),entry.value()).withRdf(entry.value().rdf());
                 history.append(owner,before,saved);
             }
             return entries.size();

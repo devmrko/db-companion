@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.1.0-alpha.7
+
+Prepared on 2026-10-13. Seventh public alpha; not a production-certified release.
+
+### Added
+
+- Optional business-meaning RDF and fully qualified table/column mapping RDF in
+  glossary editing, revision history, Turtle export and portable JSON format v2.
+  Format v1 remains supported and does not silently erase existing RDF mappings.
+- Display-only SQL AST comparison with saved source/column mappings. This does
+  not certify aggregations, date ranges, filters, joins or business correctness.
+- Build version/time display and login-scoped feature-access observations.
+
+### Improved
+
+- Distinct RDF search intent and genuine missing-input clarification contracts.
+  AI-free dictionary searches use the RDF source-selection workflow as well.
+- Assistant readiness guidance, empty-list presentation, glossary character
+  budgets and rejection of over-limit paste without silent truncation.
+- Internal Text/RDF/vector object filtering and SQL-candidate exclusions.
+- Permission-aware DDS tabs and audit actions, folded diagnostics, two-week
+  audit defaults and separate read/install/status/pause SQL examples.
+- Configured SQL timeout guidance and preservation of reviewed translations.
+
+### Scope
+
+- No automatic database installation, permission grants, source-table changes,
+  profile changes or relationship approval. New RDF mappings are user declarations.
+- RDF extensions share the existing term/history transaction; history readiness
+  remains mandatory for saves. Non-local mappings are rejected before saving.
+- Synthetic file-upload, RDF/JSON, SQL-reference, HTTP and lifecycle tests are
+  separate from real-database and paid-AI verification.
+
 ## 0.1.0-alpha.6
 
 Prepared on 2026-10-08. Sixth public alpha; not a production-certified release.

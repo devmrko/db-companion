@@ -24,12 +24,13 @@ public class AuditHistoryController {
     @GetMapping public String page(HttpServletRequest r,HttpServletResponse response,Model m){
         var s=session(r);if(s==null)return "redirect:/login";response.setHeader("Cache-Control","no-store");
         m.addAttribute("info",s.metadata().info());m.addAttribute("activePage","audit");m.addAttribute("languageReturn","/db/audit");
-        m.addAttribute("today",LocalDate.now(ZoneOffset.UTC));m.addAttribute("from",LocalDate.now(ZoneOffset.UTC).minusDays(1));return "audit-history";
+        m.addAttribute("today",LocalDate.now(ZoneOffset.UTC));m.addAttribute("from",LocalDate.now(ZoneOffset.UTC).minusDays(13));return "audit-history";
     }
     @GetMapping("/status") @ResponseBody public ResponseEntity<?> status(HttpServletRequest r){return run(r,()->service.status(session(r)));}
-    @GetMapping("/help") @ResponseBody public ResponseEntity<?> help(HttpServletRequest r){return run(r,()->{
+    @GetMapping("/help") @ResponseBody public ResponseEntity<?> help(@RequestParam(defaultValue="original") String source,HttpServletRequest r){return run(r,()->{
+        if(!Set.of("original","archive").contains(source))throw new IllegalArgumentException("Invalid help source");
         var s=service.status(session(r));String view=s.source().isEmpty()?"AUDSYS.UNIFIED_AUDIT_TRAIL":s.source();
-        return Map.of("sql",AuditHistorySql.help(view),"source",view);
+        var sections=AuditHistorySql.helpSections(view,source.equals("archive"));return Map.of("sql",sections.get("READ"),"sections",sections,"source",source.equals("archive")?AuditHistorySql.TABLE:view);
     });}
     @GetMapping("/list") @ResponseBody public ResponseEntity<?> list(@RequestParam String from,@RequestParam String to,
         @RequestParam(defaultValue="original")String source,@RequestParam(defaultValue="dds")String scope,

@@ -24,6 +24,9 @@ public class BusinessGlossaryController {
     @GetMapping("/history/status") @ResponseBody public ResponseEntity<?> historyStatus(HttpServletRequest r){return respond(r,()->Map.of("storage",service.historyStatus(session(r))));}
     @GetMapping("/history") @ResponseBody public ResponseEntity<?> history(@RequestParam String id,@RequestParam(defaultValue="") String before,HttpServletRequest r){return respond(r,()->service.history(session(r),id,before));}
     @GetMapping("/list") @ResponseBody public ResponseEntity<?> list(@RequestParam(defaultValue="") String filter,@RequestParam(defaultValue="0") int offset,HttpServletRequest r){return respond(r,()->service.page(session(r),filter,offset));}
+    @GetMapping("/rdf") @ResponseBody public ResponseEntity<?> rdf(@RequestParam String id,HttpServletRequest r){return respond(r,()->service.rdf(session(r),id));}
+    public record Explain(String id,String sql) {}
+    @PostMapping("/rdf/explain") @ResponseBody public ResponseEntity<?> explain(@RequestBody Explain v,HttpServletRequest r){return respond(r,()->service.explain(session(r),v.id(),v.sql()));}
     public record Save(String id,long revision,BusinessGlossary.Draft value,boolean consent) {}
     @PostMapping("/save") @ResponseBody public ResponseEntity<?> save(@RequestBody Save v,HttpServletRequest r){return respond(r,()->service.save(session(r),v.id(),v.revision(),v.value(),v.consent()));}
     public record SetupRequest(String operation) {}

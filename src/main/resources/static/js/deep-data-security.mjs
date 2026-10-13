@@ -1,4 +1,5 @@
 import {t} from './i18n.mjs';
+import {observedTime} from './observed-time.mjs';
 
 const labels={
   DATA_ROLE:['dds.role','역할'],MAPPED_TO:['dds.mapping','외부 매핑'],ENABLED_BY_DEFAULT:['dds.default','기본 활성화'],
@@ -50,8 +51,9 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-dds]').forEach
   function status(host,value){
     const message=stateMessage(value);host.replaceChildren();
     host.append(node('span',value.source,'app-dds-source'));
+    if(value.observedAt)host.append(node('p',observedTime(value.observedAt),'app-filter-message'));
     if(message)host.append(node('p',message,'app-alert is-error'));
-    if(value.error)host.append(node('pre',value.error,'app-dds-error'));
+    if(value.error){const detail=node('details');detail.append(node('summary',t('auditFixes.errorDetail','오류 상세')),node('pre',value.error,'app-dds-error'));host.append(detail);}
     if(value.status==='ACCESS_REQUIRED'){
       const help=node('details',undefined,'app-dds-access');help.append(node('summary',t('dds.accessHelp','조회 권한 ?')),
         node('p',t('dds.accessText','DB 관리자에게 해당 SYS 뷰의 조회 가능 여부를 확인하세요. ORA-00942는 뷰 미지원과 권한 부족 모두에서 발생할 수 있습니다. 권한은 자동 부여하지 않습니다.')));host.append(help);
@@ -75,8 +77,8 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-dds]').forEach
       get('list').append(table(data.columns,result.rows,select));
       if(!result.total)get('list').append(node('p',t('dds.empty','조회된 항목이 없습니다.'),'app-empty'));
     }
-    get('count').textContent=t('ui.f32c9f13d498','{0}–{1} / {2}개',result.from,result.to,result.total);
-    get('page').textContent=`${result.total?page:0} / ${result.pages}`;
+    get('count').textContent=data?.status==='AVAILABLE'?t('ui.f32c9f13d498','{0}–{1} / {2}개',result.from,result.to,result.total):'';
+    get('page').textContent=result.total?`${page} / ${result.pages}`:'';
     get('prev').disabled=page<=1;get('next').disabled=page>=result.pages;
   }
   function details(sections,title){
@@ -122,5 +124,6 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-dds]').forEach
     tabs.forEach(tab=>tab.setAttribute('aria-pressed',String(tab===button)));list();
   }));
   get('filter').addEventListener('input',()=>{page=1;render();});get('prev').addEventListener('click',()=>{page--;render();});get('next').addEventListener('click',()=>{page++;render();});
-  get('refresh').addEventListener('click',()=>list(true));list();
+  async function initialize(){try{const response=await fetch('/app/feature-access',{cache:'no-store',headers:{Accept:'application/json'}});if(response.ok){const access=await response.json();tabs.forEach(tab=>{tab.hidden=access.dds?.[tab.dataset.ddsTab]==='ACCESS_REQUIRED';});const available=tabs.find(tab=>!tab.hidden);if(!available){get('status').replaceChildren(node('p',t('dds.access','조회 권한 또는 DB 지원 여부를 확인해 주세요.')));get('filter').disabled=true;get('refresh').disabled=true;render();return;}kind=available.dataset.ddsTab;tabs.forEach(tab=>tab.setAttribute('aria-pressed',String(tab===available)));}}catch(ex){/* Unknown capability: preserve normal error handling. */}await list();}
+  get('refresh').addEventListener('click',()=>list(true));initialize();
 });

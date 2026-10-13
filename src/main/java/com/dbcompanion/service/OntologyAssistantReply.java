@@ -18,10 +18,25 @@ public final class OntologyAssistantReply {
     public record Candidate(String id,String use,String reason,boolean selected){}
     public record Plan(String mode,String routeId,List<String> tables,List<Candidate> candidates,String reason,List<String> questions){}
     public static Interpretation ontologyQuestion(String output,JsonMapper json){
-        var n=object(output,json,Set.of("summary","concepts","questions"));
-        var summary=string(n,"summary",2000);var concepts=list(n,"concepts",12,80);var questions=list(n,"questions",5,500);
+        var n=object(output,json,Set.of("searchQuestion","searchTerms","clarifications","summary","concepts","questions"));
+        boolean modern=n.has("searchQuestion");
+        if(modern&&n.properties().stream().anyMatch(p->Set.of("summary","concepts","questions").contains(p.getKey())))throw invalid("response: mixed search contracts");
+        var summary=string(n,modern?"searchQuestion":"summary",2000);
+        var concepts=list(n,modern?"searchTerms":"concepts",12,80);
+        var questions=modern?clarifications(n):list(n,"questions",5,500);
         if(summary.isBlank()||questions.isEmpty()&&concepts.isEmpty())throw invalid("summary/concepts: ontology question and search terms required");
         return new Interpretation(summary,concepts,questions,List.of());
+    }
+    private static List<String> clarifications(JsonNode n){
+        var items=n.path("clarifications");if(!items.isArray()||items.size()>5)throw invalid("clarifications: array required, max 5");
+        var result=new ArrayList<String>();
+        for(var item:items){
+            if(!item.isObject()||item.properties().stream().anyMatch(p->!Set.of("missingField","question").contains(p.getKey())))throw invalid("clarifications: missingField and question required");
+            String field=string(item,"missingField",32),question=string(item,"question",500);
+            if(!Set.of("DOMAIN","DATE_RANGE","METRIC","POPULATION","UNIT").contains(field)||question.isBlank())throw invalid("clarifications: only missing user input can block retrieval");
+            result.add(question);
+        }
+        return List.copyOf(result);
     }
     public static Plan plan(String output,OntologyInquiry.Search search,Set<String> tables,Set<String> candidates,JsonMapper json){
         var n=object(output,json,Set.of("mode","routeId","tables","candidates","reason","questions"));

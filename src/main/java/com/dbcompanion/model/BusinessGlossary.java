@@ -10,7 +10,9 @@ import tools.jackson.databind.json.JsonMapper;
 public final class BusinessGlossary {
     private BusinessGlossary() {}
     public static final int MAX_TERMS=2000, MAX_HITS=30, MAX_SELECTED=MAX_HITS, MAX_TOKENS=64;
-    public record Draft(String term,List<String> aliases,String definition,String criteria,boolean enabled) {
+    public record Draft(String term,List<String> aliases,String definition,String criteria,boolean enabled,GlossaryRdf.Definition rdf) {
+        public Draft(String term,List<String> aliases,String definition,String criteria,boolean enabled){this(term,aliases,definition,criteria,enabled,null);}
+        public Draft withRdf(GlossaryRdf.Definition value){return new Draft(term,aliases,definition,criteria,enabled,value);}
         public Draft {
             term=text(term,256,true);definition=text(definition,4000,true);criteria=text(criteria,4000,false);
             if(aliases==null)aliases=List.of();
@@ -18,9 +20,11 @@ public final class BusinessGlossary {
             aliases=aliases.stream().map(a->text(a,256,true)).distinct().toList();
         }
     }
-    public record Term(String id,long revision,String term,List<String> aliases,String definition,String criteria,boolean enabled,String updatedAt) {
+    public record Term(String id,long revision,String term,List<String> aliases,String definition,String criteria,boolean enabled,String updatedAt,GlossaryRdf.Definition rdf) {
+        public Term(String id,long revision,String term,List<String> aliases,String definition,String criteria,boolean enabled,String updatedAt){this(id,revision,term,aliases,definition,criteria,enabled,updatedAt,null);}
         public Term { aliases=List.copyOf(aliases); }
-        public Draft draft(){return new Draft(term,aliases,definition,criteria,enabled);}
+        public Draft draft(){return new Draft(term,aliases,definition,criteria,enabled,rdf);}
+        public Term withRdf(GlossaryRdf.Definition value){return new Term(id,revision,term,aliases,definition,criteria,enabled,updatedAt,value);}
     }
     public record Key(String id,long revision,String term,List<String> aliases) { public Key { aliases=List.copyOf(aliases); } }
     public record Status(String owner,String table,String text,String message) {}

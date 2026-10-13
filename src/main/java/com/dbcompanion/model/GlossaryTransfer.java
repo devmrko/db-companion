@@ -15,7 +15,8 @@ public final class GlossaryTransfer {
     private GlossaryTransfer() {}
     public record Document(String format, int version, List<BusinessGlossary.Draft> terms) {
         public Document {
-            if (!FORMAT.equals(format) || version != 1 || terms == null || terms.size() > 500 || terms.stream().anyMatch(java.util.Objects::isNull)) throw BusinessGlossary.invalid();
+            if (!FORMAT.equals(format) || (version != 1&&version != 2) || terms == null || terms.size() > 500 || terms.stream().anyMatch(java.util.Objects::isNull)) throw BusinessGlossary.invalid();
+            if(version==1&&terms.stream().anyMatch(t->t.rdf()!=null))throw BusinessGlossary.invalid();
             terms = List.copyOf(terms);
             var names = new HashSet<String>();
             for (var term : terms) if (!names.add(BusinessGlossary.normalize(term.term()))) throw BusinessGlossary.failure(400, "파일에 중복 대표 용어가 있습니다.");
@@ -31,6 +32,7 @@ public final class GlossaryTransfer {
             var value = doc.terms().get(row);
             var matches = index.getOrDefault(BusinessGlossary.normalize(value.term()), List.of());
             var previous = matches.size() == 1 ? matches.getFirst() : null;
+            if(previous!=null&&value.rdf()==null)value=value.withRdf(previous.rdf());
             String status = matches.size() > 1 ? "CONFLICT" : previous == null ? "NEW" : previous.draft().equals(value) ? "UNCHANGED" : "UPDATE";
             entries.add(new Entry(row, value, status, previous));
         }

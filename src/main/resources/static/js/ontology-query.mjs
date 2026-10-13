@@ -28,8 +28,10 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
   let groundedResult=null,availableSources=[];
   const grounding=node('section',null,'border rounded p-3 mt-3');grounding.hidden=true;get('form').after(grounding);
   const planPanel=node('section',null,'border rounded p-3 mt-3');planPanel.hidden=true;grounding.after(planPanel);
-  const automatic=node('input');automatic.type='checkbox';automatic.checked=true;
+  let assistantSelection=null;
+  const automatic=node('input');automatic.type='checkbox';automatic.checked=false;
   const automaticLabel=node('label');automaticLabel.append(automatic,node('span',q('plan.auto')));get('form').append(automaticLabel);
+  const assistantHint=node('p',null,'app-filter-message');assistantHint.setAttribute('role','status');automaticLabel.after(assistantHint);
   const graphSelect=node('select',null,'form-select app-select'),graphLabel=node('label',q('grounding.graph'));
   graphSelect.setAttribute('aria-label',q('grounding.graph'));graphLabel.append(graphSelect);get('form').append(graphLabel);graphSelect.addEventListener('change',()=>invalidate(true));
   graphLabel.hidden=automatic.checked;automatic.addEventListener('change',()=>{graphLabel.hidden=automatic.checked;invalidate(true);});
@@ -38,6 +40,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
   function controls(){
     for(const el of root.querySelectorAll('button,input:not([type="hidden"]),select,textarea'))el.disabled=busy;
     get('find').disabled=busy||!optionsReady;
+    automatic.disabled=busy||!assistantSelection;
     const route=selectedRoute(search,routeId);get('selected').textContent=route?route.id==='INDEPENDENT'?q('plan.INDEPENDENT'):q('paths.selected',route.tables.length,route.relations.length):search?.routes.length?q('paths.choose'):'';
     get('route-guidance').hidden=!search?.routes.length||route?.id==='INDEPENDENT';
     get('answer').disabled=busy||!route;get('sql').disabled=busy||!route;
@@ -66,6 +69,9 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
     get('anchor').replaceChildren();const empty=node('option',q('automatic'));empty.value='';get('anchor').append(empty);
     for(const item of data.tables){const o=node('option',item.concept&&item.concept!==item.name?`${item.name} · ${item.concept}`:item.name);o.value=item.name;get('anchor').append(o);}
     optionsReady=data.tables.length>0;get('checked').textContent=q('checked',timestamp(data.checkedAt));message(optionsReady?'':q('noTables'));await analysis.load();
+    try{assistantSelection=(await assistantApi('/ai-assistant/options')).selected??null;}catch{assistantSelection=null;}
+    automatic.checked=!!assistantSelection;graphLabel.hidden=automatic.checked;
+    assistantHint.textContent=assistantSelection?t('auditFixes.query.profile','AI 도우미: {0}',`${assistantSelection.owner}.${assistantSelection.name}`):t('auditFixes.query.noProfile','AI 도우미가 선택되지 않아 AI 없이 RDF 근거를 검색합니다. AI를 사용하려면 위 설정에서 프로필을 선택하세요.');
     graphSelect.replaceChildren(new Option(q('grounding.catalog'),''));
     try{const graphs=await assistantApi(root.dataset.base+'/graphs?'+new URLSearchParams({schema:root.dataset.schema}));for(const graph of graphs)graphSelect.append(new Option(graph.name,graph.name));}catch(ex){message(ex.message,true);}
   });}
@@ -158,8 +164,10 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
     }
     if(value.result){groundedResult=value.result;search=value.result.search;routeId='';renderGroundedResult(grounding,value.result);get('evidence').hidden=!!value.result.rdf;if(!value.result.rdf)renderRoutes();}
     else {grounding.replaceChildren();grounding.hidden=false;}
-    if(value.result?.summary){const interpreted=node('details');interpreted.append(node('summary',q('grounding.aiInterpretation')),node('p',value.interpretation.summary));grounding.append(interpreted);}
-    else grounding.prepend(node('h3',q('grounding.aiInterpretation'),'h5'),node('p',value.interpretation.summary));
+    if(value.generatedByAi!==false){
+      if(value.result?.summary){const interpreted=node('details');interpreted.append(node('summary',q('grounding.aiInterpretation')),node('p',value.interpretation.summary));grounding.append(interpreted);}
+      else grounding.prepend(node('h3',q('grounding.aiInterpretation'),'h5'),node('p',value.interpretation.summary));
+    }
     if(value.result?.summary){
       const raw=Array.from(grounding.children);grounding.replaceChildren();const summary=node('section');grounding.append(summary);
       const evidence=renderRdfWorkflow(summary,value.result.summary,selection=>work(async()=>{
@@ -185,7 +193,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology-query
       const request={schema:root.dataset.schema,question,anchor,dictionaryId:dictionary.id,termIds,graph:graphSelect.value};
       if(automatic.checked){showPreview(await post(analysisEndpoint('ai-interpret-preview',analysis.language()),request));return;}
       const value=await post(analysisEndpoint('grounded-search',analysis.language()),request);
-      groundedResult=value;search=value.search;routeId='';renderGroundedResult(grounding,value);get('evidence').hidden=false;renderRoutes();
+      await showAiOutcome({result:value,interpretation:{summary:question,questions:[]},generatedByAi:false});
       grounding.append(button(q('grounding.continue'),()=>work(async()=>{
         clearOutput();showPreview(await post(analysisEndpoint('ai-interpret-preview',analysis.language()),request));
       })));

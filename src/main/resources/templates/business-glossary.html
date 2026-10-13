@@ -90,10 +90,11 @@ END;
     </div>
   </section>
   <dialog class="app-preview-dialog" data-glossary-editor aria-labelledby="glossary-edit-title"><div class="app-preview-header"><h2 id="glossary-edit-title" data-glossary-edit-title></h2><button type="button" class="btn app-btn app-btn-quiet" data-glossary-edit-close th:text="#{businessGlossary.close}">닫기</button></div><div class="app-preview-body app-glossary-form">
+    <p class="app-filter-message" th:text="#{auditFixes.text.scope}"></p>
     <label><span th:text="#{businessGlossary.term}">대표 용어</span><input class="form-control" data-glossary-term maxlength="256" required></label>
     <label><span th:text="#{businessGlossary.aliasLines}">별칭·다른 표현 (한 줄에 하나, 최대 20개)</span><textarea class="form-control" rows="3" data-glossary-aliases maxlength="5200"></textarea></label>
-    <label><span th:text="#{businessGlossary.definition}">업무 정의</span><textarea class="form-control" rows="4" data-glossary-definition maxlength="4000" required></textarea></label>
-    <label><span th:text="#{businessGlossary.criteria}">집계·필터·SQL 기준 (실행하지 않음)</span><textarea class="form-control" rows="4" data-glossary-criteria maxlength="4000"></textarea></label>
+    <label><span th:text="#{businessGlossary.definition}">업무 정의</span><textarea class="form-control" rows="4" data-glossary-definition maxlength="4000" required aria-describedby="definition-count"></textarea><small id="definition-count" data-glossary-definition-count></small></label>
+    <label><span th:text="#{businessGlossary.criteria}">집계·필터·SQL 기준 (실행하지 않음)</span><textarea class="form-control" rows="4" data-glossary-criteria maxlength="4000" aria-describedby="criteria-count"></textarea><small id="criteria-count" data-glossary-criteria-count></small></label>
     <label class="app-glossary-pick"><input type="checkbox" data-glossary-enabled checked><span th:text="#{businessGlossary.enabled}">검색에 사용 (해제하면 비활성화, 삭제하지 않음)</span></label>
     <label class="app-glossary-pick"><input type="checkbox" data-glossary-save-consent><span th:text="#{businessGlossary.saveConsent}">이 내용을 로그인 소유 스키마의 사전에 저장합니다.</span></label>
     <p data-glossary-edit-error role="alert" class="app-alert is-error"></p><button type="button" class="btn app-btn app-btn-primary" data-glossary-save disabled th:text="#{businessGlossary.save}">저장</button>

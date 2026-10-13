@@ -19,7 +19,9 @@ public final class OntologyRdfWorkflow {
         var sources=parsed.status().equals("PARSED")?parsed.tables().stream()
                 .filter(t->t.owner()==null||t.owner().equals(schema)).map(SelectAiSqlReferences.Table::name)
                 .filter(names::contains).distinct().toList():List.<String>of();
-        return new TermReference(term.id(),term.revision(),term.term(),sources);
+        var combined=new LinkedHashSet<>(sources);
+        if(term.rdf()!=null)term.rdf().mappings().stream().filter(m->schema.equals(m.schema())&&names.contains(m.table())).forEach(m->combined.add(m.table()));
+        return new TermReference(term.id(),term.revision(),term.term(),List.copyOf(combined));
     }
     private static String relationIri(OntologyRelations.Relation relation,Entry source){
         String version="urn:uuid:"+source.documentId()+"/revision/"+source.revision();
@@ -29,6 +31,8 @@ public final class OntologyRdfWorkflow {
     }
     public static Set<String> preferred(OntologyInquiry.Dataset data,OntologyQuestionGrounding.Result ground){
         if(ground==null)return Set.of();var names=new LinkedHashSet<String>();
+        var available=data.entries().stream().map(e->e.document().source().table()).collect(java.util.stream.Collectors.toSet());
+        ground.terms().stream().filter(t->t.rdf()!=null).flatMap(t->t.rdf().mappings().stream()).filter(m->data.schema().equals(m.schema())&&available.contains(m.table())).forEach(m->names.add(m.table()));
         for(var e:data.entries()){String name=e.document().source().table();
             if(java.util.regex.Pattern.compile("(?<![\\p{L}\\p{N}_$#])"+java.util.regex.Pattern.quote(name)+"(?![\\p{L}\\p{N}_$#])",java.util.regex.Pattern.CASE_INSENSITIVE).matcher(ground.interpreted()).find())names.add(name);}
         return Set.copyOf(names);

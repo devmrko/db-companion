@@ -1,5 +1,33 @@
 # Release validation
 
+## 0.1.0-alpha.7
+
+Candidate: **0.1.0-alpha.7** / tag **v0.1.0-alpha.7**. Checked on 2026-10-13.
+
+- Java unit, integration and embedded HTTP checks: 1,345 passed.
+- PMD: no violations. Publication guard and whitespace checks passed.
+- JavaScript application tests: 650 passed, including the real-JAR lifecycle
+  test on isolated ports. Optional Agent example checks are run separately.
+- Synthetic multipart HTTP coverage includes TXT, DOCX, text PDF, invalid formats
+  and over-limit uploads. No external AI call or database write is performed by
+  these tests. RDF output is parsed by an independent Turtle parser.
+- Browser checks used synthetic responses for glossary RDF editing/export;
+  this is not a claim of live Oracle glossary persistence or AI correctness.
+
+Run with JDK 21+ and Maven:
+
+```sh
+mvn -Pquality clean verify
+RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.7.jar node --test src/test/js/*.test.mjs demos/semantic-query-agent/*.test.mjs
+node scripts/publication-check.cjs --working-tree
+git diff --check
+```
+
+Real-account read/write and paid-provider checks require separately approved
+verification. Operational logs, deployment paths and customer evidence are not
+included in the public repository. SQL/RDF comparison is display-only and does
+not certify date filters, aggregation rules or join multiplicity.
+
 ## 0.1.0-alpha.6
 
 Candidate: **0.1.0-alpha.6** / tag **v0.1.0-alpha.6**. Checked on 2026-10-08.
