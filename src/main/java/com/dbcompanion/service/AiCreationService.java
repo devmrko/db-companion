@@ -102,5 +102,5 @@ public class AiCreationService {
     }
     private static String objectId(Map<String,Object> data,Kind kind){var fields=(Map<?,?>)data.get(kind==Kind.PROFILE?"profile":"object");return Objects.toString(fields.get(kind==Kind.PROFILE?"PROFILE_ID":"ID"),null);}
     private static Result result(Plan p,boolean verified,String stage,String detail){return new Result(verified,stage,detail,p.input.name(),p.copied,p.feedback.size(),verified&&p.created!=null&&p.copied==p.feedback.size());}
-    private static String detail(RuntimeException ex){return ex instanceof com.dbcompanion.common.exception.MetadataEditException e?e.userMessage():CredentialCatalogRepository.error(ex);}
+    private static String detail(RuntimeException ex){return ex instanceof com.dbcompanion.common.exception.MetadataEditException e?e.userMessage():com.dbcompanion.common.exception.ObjectCreationException.from(ex,"CREATE_OR_VERIFY",true).display();}
 }

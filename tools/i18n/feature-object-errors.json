@@ -1,0 +1,50 @@
+{
+  "objectError.INVALID_INPUT": [
+    "입력 형식·필수 항목을 확인하세요. 이름은 영문 대문자이며 함수 본문에 SQL 클라이언트의 / 구분자를 넣지 마세요.",
+    "Check required fields and input format. Use uppercase names and omit SQL client slash separators.",
+    "请检查必填项和格式。名称应为大写，函数正文不要包含 SQL 客户端的 / 分隔符。",
+    "必須項目と形式を確認してください。名前は英大文字、関数本体には / 区切りを含めないでください。"
+  ],
+  "objectError.DUPLICATE": [
+    "같은 이름의 객체가 있습니다. 다른 이름을 사용하세요. 기존 객체는 교체하지 않습니다.",
+    "An object with this name exists. Use a new name; existing objects are not replaced.",
+    "已存在同名对象。请使用新名称，不会替换现有对象。",
+    "同名のオブジェクトがあります。別の名前を使用してください。既存のものは置換しません。"
+  ],
+  "objectError.ACCESS_DENIED": [
+    "생성 권한이 부족합니다. Function은 CREATE PROCEDURE, Credential은 DBMS_CLOUD 실행 권한을 관리자에게 확인하세요.",
+    "Insufficient privileges. Ask an administrator to check CREATE PROCEDURE for functions and DBMS_CLOUD execution for credentials.",
+    "权限不足。请管理员检查函数的 CREATE PROCEDURE 权限和 Credential 的 DBMS_CLOUD 执行权限。",
+    "権限が不足しています。関数の CREATE PROCEDURE、Credential の DBMS_CLOUD 実行権限を管理者に確認してください。"
+  ],
+  "objectError.REFERENCE_INVALID": [
+    "DB가 속성 또는 참조 구성을 거부했습니다. 연결할 Profile·Agent·Task·Tool의 존재·활성 상태와 설정을 확인하세요.",
+    "The database rejected attributes or references. Check the existence, status and configuration of the referenced Profile, Agent, Task and Tool.",
+    "数据库拒绝属性或引用配置。请检查关联 Profile、Agent、Task、Tool 的存在、状态和配置。",
+    "DBが属性または参照構成を拒否しました。参照する Profile・Agent・Task・Tool の存在・状態・設定を確認してください。"
+  ],
+  "objectError.TIMEOUT": [
+    "요청 시간이 초과되거나 취소되었습니다. 완료 여부를 추측하여 다시 생성하지 마세요.",
+    "The request timed out or was canceled. Do not assume failure and repeat creation.",
+    "请求超时或已取消。请勿推测失败后重复创建。",
+    "要求がタイムアウトまたはキャンセルされました。失敗と判断して再作成しないでください。"
+  ],
+  "objectError.DATABASE_ERROR": [
+    "DB 처리 중 오류가 발생했습니다. 표시된 단계와 오류 코드를 확인하세요. 비밀값 보호를 위해 DB 오류 원문은 표시하지 않습니다.",
+    "Database operation failed. Check the stage and error code. Raw database messages are withheld to protect secrets.",
+    "数据库操作失败。请检查阶段和错误代码。为保护秘密值，不显示数据库原始错误信息。",
+    "DB処理に失敗しました。段階とエラーコードを確認してください。秘密値保護のためDBエラー原文は表示しません。"
+  ],
+  "objectError.inspect": [
+    "객체가 남았을 수 있습니다. 목록·상태 확인 후 새 미리보기로 진행하세요. 자동 재시도하지 않습니다.",
+    "An object may remain. Inspect its status before a new preview. No automatic retry.",
+    "对象可能已保留。请先检查状态，再重新预览。不会自动重试。",
+    "オブジェクトが残っている場合があります。状態確認後に再プレビューしてください。自動再試行しません。"
+  ],
+  "objectError.notSubmitted": [
+    "생성 요청 전 차단했습니다. 생성 SQL은 실행하지 않았습니다.",
+    "Blocked before creation; creation SQL was not executed.",
+    "在创建前已拦截，未执行创建 SQL。",
+    "作成前にブロックしました。作成SQLは実行していません。"
+  ]
+}

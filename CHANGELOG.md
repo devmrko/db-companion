@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.0-alpha.11
+
+Prepared on 2026-10-13. Eleventh public alpha; not a production-certified release.
+
+- Add owner-local Credential creation (username/password or API key) and Function
+  creation with reusable echo and installed-glossary templates. Functions accept
+  a CLOB and return a CLOB with invoker rights; creation does not execute them.
+- Preview code, require consent, consume short-lived session-bound plans once,
+  refuse replacement, and display database readback and compilation errors.
+  Credential secrets are excluded from previews, history and stored plans.
+- Classify creation failures with a sanitized Java runtime exception and common
+  HTTP handler: validation, duplicate, permissions, references, timeout and DB
+  failure. Distinguish preflight rejection from possibly-created objects and
+  never automatically retry an uncertain write.
+
+Validation: Java 1,363 tests passed; JavaScript 656 passed with one optional test
+skipped. PMD and publication checks passed. Browser-only creation on a separate
+test database covered Credential, both Function templates, Profile, Tool, Task,
+Agent and Team, plus duplicate rejection, visible INVALID compilation errors,
+permission denial before DDL, and desktop/mobile layouts. External credential
+authentication and paid AI execution were not tested. Test credentials and
+database-specific artifacts are excluded from publication.
+
 ## 0.1.0-alpha.10
 
 Prepared on 2026-10-13. Tenth public alpha; not a production-certified release.
