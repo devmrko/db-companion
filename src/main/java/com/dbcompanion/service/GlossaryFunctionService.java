@@ -26,13 +26,14 @@ public class GlossaryFunctionService {
         return bound(session,()->{
             var status=repository.status(owner(session));
             if(!status.installable())throw new IllegalArgumentException("Check dictionary, Oracle Text, CREATE PROCEDURE and object-name availability");
-            return new Preview(UUID.randomUUID().toString(),status.owner(),status.sql(),Instant.now().plusSeconds(300));
+            return new Preview(UUID.randomUUID().toString(),status.owner(),status.sql(),Instant.now().plusSeconds(300),status.fingerprint());
         });
     }
     public Status install(PoolSession session,Preview preview){
         return bound(session,()->{
+            var current=repository.status(owner(session));
             if(!preview.owner().equals(owner(session))||!Instant.now().isBefore(preview.expires())
-                    ||!preview.sql().equals(com.dbcompanion.common.db.GlossaryFunctionSql.create(owner(session))))
+                    ||!preview.sql().equals(current.sql())||!preview.fingerprint().equals(current.fingerprint()))
                 throw new IllegalArgumentException("The creation preview expired or changed; preview again");
             return repository.install(owner(session));
         });

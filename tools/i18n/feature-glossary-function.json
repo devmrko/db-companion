@@ -30,10 +30,10 @@
     "再確認"
   ],
   "glossaryFunction.scope": [
-    "로그인 소유 스키마에만 생성합니다. 기존 객체를 교체하거나 권한을 부여하지 않습니다.",
-    "Creates only in the login owner's schema. No replacement or privilege grants.",
-    "仅在登录用户的模式中创建。不替换对象或授予权限。",
-    "ログイン所有スキーマにのみ作成。既存オブジェクトの置換・権限付与は行いません。"
+    "로그인 소유 스키마에 설치합니다. 앱이 생성한 기존 v1 검색 함수만 확인 후 교체할 수 있습니다. 다른 객체나 권한은 변경하지 않습니다.",
+    "Installs in the login owner's schema. Only the app-generated v1 search function can be replaced after confirmation. No other objects or grants change.",
+    "安装于登录用户模式。确认后仅可替换本应用生成的 v1 搜索函数，不改变其他对象或权限。",
+    "ログイン所有スキーマにインストール。確認後にアプリ生成のv1検索関数のみ置換できます。他のオブジェクト・権限は変更しません。"
   ],
   "glossaryFunction.code": [
     "2. 함수 코드 확인",
@@ -66,16 +66,16 @@
     "作成前の最終確認"
   ],
   "glossaryFunction.consent": [
-    "표시된 코드·소유자·DDL 영향을 확인했고 함수 1개 생성에 동의합니다.",
-    "I reviewed the code, owner and DDL effects and consent to creating one function.",
-    "我已检查代码、所有者和 DDL 影响，同意创建一个函数。",
-    "コード・所有者・DDLの影響を確認し、関数1個の作成に同意します。"
+    "패키지 명세·본문과 호출 함수의 코드 및 DDL 영향을 확인했고 표시된 설치·v1 교체에 동의합니다.",
+    "I reviewed the package specification, body, wrapper and DDL effects and consent to the displayed installation/v1 replacement.",
+    "我已检查包规范、包体、调用函数和 DDL 影响，同意显示的安装/v1 替换。",
+    "パッケージ仕様・本体・呼出関数とDDLの影響を確認し、表示されたインストール・v1置換に同意します。"
   ],
   "glossaryFunction.create": [
-    "함수 생성",
-    "Create function",
-    "创建函数",
-    "関数作成"
+    "모듈 설치·v1 업데이트",
+    "Install module / update v1",
+    "安装模块 / 更新 v1",
+    "モジュール導入・v1更新"
   ],
   "glossaryFunction.test": [
     "3. 질문으로 검색 테스트",
@@ -220,5 +220,65 @@
     "Unavailable",
     "无",
     "なし"
+  ],
+  "glossaryFunction.plan": [
+    "실제로 실행할 DDL",
+    "DDL to execute",
+    "实际执行的 DDL",
+    "実行するDDL"
+  ],
+  "glossaryFunction.part.FUNCTION": [
+    "호출 함수",
+    "Entry function",
+    "调用函数",
+    "呼出関数"
+  ],
+  "glossaryFunction.part.PACKAGE": [
+    "패키지 명세 · 공개 인터페이스",
+    "Package specification · public interface",
+    "包规范 · 公共接口",
+    "パッケージ仕様・公開インターフェース"
+  ],
+  "glossaryFunction.action.CREATE": [
+    "새로 생성",
+    "Create new",
+    "新建",
+    "新規作成"
+  ],
+  "glossaryFunction.action.KEEP": [
+    "설치 코드 유지",
+    "Keep installed code",
+    "保留已安装代码",
+    "導入済みコードを維持"
+  ],
+  "glossaryFunction.action.REPLACE_V1": [
+    "확인된 v1 호출 함수 교체",
+    "Replace recognized v1 function",
+    "替换已确认的 v1 函数",
+    "確認済みv1関数を置換"
+  ],
+  "glossaryFunction.state.LEGACY": [
+    "기존 v1 · 업데이트 가능",
+    "Legacy v1 · update available",
+    "旧版 v1 · 可更新",
+    "既存v1・更新可能"
+  ],
+  "glossaryFunction.state.INCOMPLETE": [
+    "일부 설치됨 · 나머지 설치 가능",
+    "Partly installed · complete installation",
+    "部分已安装 · 可完成安装",
+    "一部導入済み・残りを導入可能"
+  ],
+  "glossaryFunction.flow": [
+    "처리 순서 · 패키지 SEARCH",
+    "Processing flow · package SEARCH",
+    "处理顺序 · 包 SEARCH",
+    "処理順序・パッケージ SEARCH"
+  ],
+  "glossaryFunction.part.PACKAGE_BODY": [
+    "패키지 본문 · 역할별 구현",
+    "Package body · role-based implementation",
+    "包体 · 按职责实现",
+    "パッケージ本体・役割別実装"
   ]
 }

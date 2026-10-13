@@ -3,8 +3,25 @@ package com.dbcompanion.common.db;
 /** A portable search-only module. No profile, AI request, business SQL or writes. */
 public final class GlossaryFunctionSql {
     public static final String NAME="DBC_GLOSSARY_SEARCH";
+    public static final String API="DBC_GLOSSARY_API";
     private GlossaryFunctionSql() {}
     public static String create(String owner){
+        return """
+            CREATE FUNCTION %s(p_question CLOB)
+              RETURN CLOB AUTHID CURRENT_USER AS
+              -- DB Companion glossary search v2: thin entry point
+            BEGIN
+              RETURN %s.SEARCH(p_question);
+            END DBC_GLOSSARY_SEARCH;
+            """.formatted(ProfileHistorySql.object(owner,NAME),ProfileHistorySql.object(owner,API));
+    }
+    public static java.util.List<String> statements(String owner){
+        return java.util.List.of(CallableAiSql.resource("glossary-api-spec.sql").replace("{{API}}",ProfileHistorySql.object(owner,API)),
+            CallableAiSql.resource("glossary-api-body.sql").replace("{{API}}",ProfileHistorySql.object(owner,API)),create(owner));
+    }
+    public static String script(String owner){return String.join("\n/\n\n",statements(owner))+"\n/\n";}
+    /** Exact v1 fingerprint recognition only; never displayed as the new source. */
+    public static String legacyCreate(String owner){
         return """
             CREATE FUNCTION %s(p_question CLOB)
               RETURN CLOB AUTHID CURRENT_USER AS

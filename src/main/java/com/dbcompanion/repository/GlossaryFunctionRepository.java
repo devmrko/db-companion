@@ -3,10 +3,12 @@ package com.dbcompanion.repository;
 import com.dbcompanion.common.db.GlossaryFunctionSql;
 import com.dbcompanion.common.db.ProfileHistorySql;
 import com.dbcompanion.model.GlossaryFunction.Status;
+import com.dbcompanion.model.GlossaryFunction.Code;
 import java.io.StringReader;
 import java.sql.Clob;
 import java.sql.Types;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Objects;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,29 +28,68 @@ public class GlossaryFunctionRepository {
         var dictionary=glossary.tableStatus(owner);
         var text=dictionary.equals("READY")?glossary.textStatus(owner):"MISSING";
         boolean canCreate=jdbc.queryForObject("SELECT COUNT(*) FROM SESSION_PRIVS WHERE PRIVILEGE='CREATE PROCEDURE'",Integer.class)>0;
-        var types=jdbc.queryForList("SELECT OBJECT_TYPE||':'||STATUS FROM USER_OBJECTS WHERE OBJECT_NAME=? AND SUBOBJECT_NAME IS NULL",String.class,GlossaryFunctionSql.NAME);
-        String state="MISSING";
-        List<String> errors=List.of();
-        if(!types.isEmpty()){
-            state="CONFLICT";
-            if(types.size()==1&&types.getFirst().startsWith("FUNCTION:")){
-                errors=jdbc.query("SELECT LINE,POSITION,TEXT FROM USER_ERRORS WHERE NAME=? AND TYPE='FUNCTION' ORDER BY SEQUENCE",
-                    (r,n)->r.getInt(1)+":"+r.getInt(2)+" "+r.getString(3),GlossaryFunctionSql.NAME);
-                String actual=String.join("",jdbc.queryForList("SELECT TEXT FROM USER_SOURCE WHERE NAME=? AND TYPE='FUNCTION' ORDER BY LINE",String.class,GlossaryFunctionSql.NAME));
-                String expected=GlossaryFunctionSql.create(owner).replaceFirst("^CREATE FUNCTION "+java.util.regex.Pattern.quote(ProfileHistorySql.object(owner,GlossaryFunctionSql.NAME)),"FUNCTION "+GlossaryFunctionSql.NAME);
-                if(normalize(actual).equals(normalize(expected)))state=types.getFirst().equals("FUNCTION:VALID")?"READY":"INVALID";
+        var scripts=GlossaryFunctionSql.statements(owner);
+        var codes=new ArrayList<Code>();
+        var states=new ArrayList<String>();
+        var errors=new ArrayList<String>();
+        var snapshots=new ArrayList<String>();
+        for(int i=0;i<scripts.size();i++){
+            String name=i<2?GlossaryFunctionSql.API:GlossaryFunctionSql.NAME;
+            String type=i==0?"PACKAGE":i==1?"PACKAGE BODY":"FUNCTION";
+            var objects=jdbc.queryForList("SELECT OBJECT_TYPE||':'||STATUS FROM USER_OBJECTS WHERE OBJECT_NAME=? AND SUBOBJECT_NAME IS NULL ORDER BY OBJECT_TYPE",String.class,name);
+            String actual=String.join("",jdbc.queryForList("SELECT TEXT FROM USER_SOURCE WHERE NAME=? AND TYPE=? ORDER BY LINE",String.class,name,type));
+            String expected=storedSource(owner,name,scripts.get(i));
+            String state="CONFLICT";
+            boolean wrongType=objects.stream().anyMatch(o->iTypeConflict(name,o));
+            if(!wrongType){
+                if(objects.stream().noneMatch(o->o.startsWith(type+":")))state="MISSING";
+                else if(normalize(actual).equals(normalize(expected)))state=objects.contains(type+":VALID")?"READY":"INVALID";
+                else if(i==2&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyCreate(owner)))))state="LEGACY";
             }
+            states.add(state);
+            snapshots.add(name+":"+type+":"+objects+":"+actual);
+            errors.addAll(jdbc.query("SELECT LINE,POSITION,TEXT FROM USER_ERRORS WHERE NAME=? AND TYPE=? ORDER BY SEQUENCE",
+                (r,n)->name+" "+type+" "+r.getInt(1)+":"+r.getInt(2)+" "+r.getString(3),name,type));
+            String action=state.equals("MISSING")?"CREATE":state.equals("LEGACY")?"REPLACE_V1":"KEEP";
+            String sql=action.equals("REPLACE_V1")?scripts.get(i).replaceFirst("CREATE FUNCTION","CREATE OR REPLACE FUNCTION"):scripts.get(i);
+            codes.add(new Code(name,type,action,sql));
         }
-        return new Status(owner,dictionary,text,state,canCreate,errors,GlossaryFunctionSql.create(owner),GlossaryFunctionSql.example(owner));
+        String state=moduleState(states);
+        String sql=String.join("\n/\n\n",codes.stream().filter(c->!c.action().equals("KEEP")).map(Code::sql).toList());
+        return new Status(owner,dictionary,text,state,canCreate,errors,sql,GlossaryFunctionSql.example(owner),List.copyOf(codes),
+            com.dbcompanion.service.OntologyQueryService.hash(String.join("\n",snapshots)));
+    }
+    private static boolean iTypeConflict(String name,String object){
+        return name.equals(GlossaryFunctionSql.NAME)?!object.startsWith("FUNCTION:"):
+            !object.startsWith("PACKAGE:")&&!object.startsWith("PACKAGE BODY:");
+    }
+    public static String moduleState(List<String> states){
+        if(states.contains("CONFLICT")||states.get(0).equals("MISSING")&&!states.get(1).equals("MISSING"))return "CONFLICT";
+        if(states.contains("INVALID"))return "INVALID";
+        if(states.stream().allMatch(s->s.equals("READY")))return "READY";
+        if(states.stream().allMatch(s->s.equals("MISSING")))return "MISSING";
+        return states.get(2).equals("LEGACY")?"LEGACY":"INCOMPLETE";
+    }
+    public static String storedSource(String owner,String name,String sql){
+        return sql.replaceFirst("^CREATE (?:OR REPLACE )?","")
+            .replaceFirst(java.util.regex.Pattern.quote(ProfileHistorySql.object(owner,name)),name);
     }
     public static String normalize(String source){
         return source.replace("\r\n","\n").strip()
-            .replaceFirst("(?i)^FUNCTION\\s+\"DBC_GLOSSARY_SEARCH\"","FUNCTION DBC_GLOSSARY_SEARCH");
+            .replaceFirst("(?i)^(FUNCTION|PACKAGE BODY|PACKAGE)\\s+\"(DBC_GLOSSARY_SEARCH|DBC_GLOSSARY_API)\"","$1 $2");
     }
     public Status install(String owner){
-        if(!status(owner).installable())throw new IllegalArgumentException("Creation conditions changed; inspect the status again");
-        // Never replace an existing object. A race is rejected by Oracle CREATE.
-        jdbc.execute(GlossaryFunctionSql.create(owner));
+        var plan=status(owner);
+        if(!plan.installable())throw new IllegalArgumentException("Creation conditions changed; inspect the status again");
+        for(var code:plan.codes()){
+            if(code.action().equals("KEEP"))continue;
+            var current=status(owner);
+            var next=current.codes().stream().filter(c->c.name().equals(code.name())&&c.type().equals(code.type())).findFirst().orElseThrow();
+            if(!current.installable()||!next.action().equals(code.action())||!next.sql().equals(code.sql()))
+                throw new IllegalArgumentException("Stored code changed; preview again");
+            // CREATE rejects races. Only our exact v1 wrapper may be replaced.
+            jdbc.execute(code.sql());
+        }
         return status(owner);
     }
     public Object search(String owner,String question){

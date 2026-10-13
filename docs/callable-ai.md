@@ -16,17 +16,29 @@ required; it does not generate or execute business SQL.
 SELECT DBC_GLOSSARY_SEARCH(:question) AS EVIDENCE_JSON FROM DUAL;
 ```
 
-The function and existing AI package share the same generated search helpers
-and phrase-search asset. Extracting those helpers does not upgrade or modify an
-installed AI package. This first module separates deterministic retrieval from
-paid AI generation; prompt/SQL/execution remain in the existing pipeline.
+The function is a short entry point calling `DBC_GLOSSARY_API.SEARCH`. The package
+body separates validation, tokenization, candidate retrieval, question matching,
+overlap removal, definition retrieval and response construction into named
+functions. SEARCH shows only their calling order. There is no generated anonymous
+PL/SQL block hidden inside a CLOB string. Only short owner-local SELECT statements
+are dynamic; values remain bound. The overlap query is ordinary static SQL.
+
+The response contract and phrase-matching behavior remain compatible with v1.
+The existing AI package retains its original implementation and is not implicitly
+upgraded to depend on this package. Prompt/SQL/execution remain in that pipeline.
 
 The wizard checks the owner-local dictionary, Oracle Text setup, session
 `CREATE PROCEDURE` privilege, object-name availability and stored source.
-Creation requires a five-minute, single-use preview and explicit DDL consent.
-It never replaces an existing object, grants privileges or retries a failed
-creation. Compilation errors remain visible; an unconfirmed failure requires
-a fresh status check. Search tests execute only a valid, source-matching module.
+Installation requires a five-minute, single-use preview and explicit DDL consent.
+The wizard separately shows the actual SEARCH flow, entry function, package
+specification, package body and planned DDL. Stored-source fingerprints invalidate
+changed previews. An exact, app-generated v1 function can be explicitly replaced
+with the v2 entry function; unrelated objects are blocked. Exact installed package
+parts are kept, and missing parts can be completed after fresh confirmation.
+DDL failure may leave partial objects; no automatic cleanup or retry occurs.
+Compilation errors remain visible. Search tests require all three valid,
+source-matching components. Back up source before a deliberate v1 migration;
+fingerprint checks are not a database-wide DDL lock.
 The limits and Oracle invocation-chain rules below still apply.
 
 SQL/PLSQL blocks use the common read-only source UI: line numbers, syntax

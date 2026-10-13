@@ -1,6 +1,6 @@
 # DB Companion
 
-**Version: 0.1.0-alpha.8** · Java 21+ · Spring Boot · MIT
+**Version: 0.1.0-alpha.9** · Java 21+ · Spring Boot · MIT
 
 A self-hosted workbench for inspecting Oracle database metadata, Select AI configuration,
 feedback, execution information, and governed business definitions.
@@ -191,7 +191,7 @@ An optional runtime integration suite starts and stops isolated app instances on
 ports (never your already running app):
 
 ```sh
-RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.8.jar node --test src/test/js/app-runtime.test.mjs
+RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.9.jar node --test src/test/js/app-runtime.test.mjs
 ```
 
 Translation sources are public development assets under `tools/i18n`, not private

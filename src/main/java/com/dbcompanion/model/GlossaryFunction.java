@@ -6,10 +6,16 @@ import java.util.List;
 public final class GlossaryFunction {
     private GlossaryFunction() {}
     public record Status(String owner,String dictionary,String text,String function,boolean canCreate,
-                         List<String> errors,String sql,String example) {
-        public boolean installable(){return canCreate&&dictionary.equals("READY")&&text.equals("READY")&&function.equals("MISSING");}
+                         List<String> errors,String sql,String example,List<Code> codes,String fingerprint) {
+        public Status(String owner,String dictionary,String text,String function,boolean canCreate,List<String> errors,String sql,String example){
+            this(owner,dictionary,text,function,canCreate,errors,sql,example,List.of(),function+":"+sql);
+        }
+        public boolean installable(){return canCreate&&dictionary.equals("READY")&&text.equals("READY")&&List.of("MISSING","LEGACY","INCOMPLETE").contains(function);}
     }
-    public record Preview(String token,String owner,String sql,Instant expires) {}
+    public record Code(String name,String type,String action,String sql) {}
+    public record Preview(String token,String owner,String sql,Instant expires,String fingerprint) {
+        public Preview(String token,String owner,String sql,Instant expires){this(token,owner,sql,expires,"");}
+    }
     public record Apply(String token,boolean consent) {}
     public record Question(String question) {
         public Question {

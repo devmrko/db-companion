@@ -19,11 +19,13 @@
   <section class="app-card app-module-card">
     <h2 th:text="#{glossaryFunction.code}">2. 함수 코드 확인</h2>
     <p th:text="#{glossaryFunction.contract}">입력: 질문 CLOB(최대 8,000자). 출력: 질문·토큰·일치 용어·정의·SQL 기준을 담은 JSON CLOB. 활성 용어만 검색하며 30개 초과·근거 크기 초과는 오류로 알립니다.</p>
-    <details class="app-disclosure"><summary th:text="#{glossaryFunction.source}">생성할 코드</summary><div class="app-disclosure-body"><pre class="app-preview-source" data-code-language="sql" data-gf-code></pre></div></details>
+    <details class="app-disclosure" open><summary th:text="#{glossaryFunction.flow}">처리 순서 · 패키지 SEARCH</summary><div class="app-disclosure-body"><pre class="app-preview-source" data-code-language="sql" data-gf-flow></pre></div></details>
+    <div class="app-module-code-parts" data-gf-code></div>
     <p th:text="#{glossaryFunction.ddl}">생성은 DDL이며 암시적 COMMIT이 발생합니다. 실패해도 객체가 남을 수 있습니다. 자동 삭제·교체·재시도하지 않습니다.</p>
     <button type="button" class="btn app-btn app-btn-secondary" data-gf-preview disabled th:text="#{glossaryFunction.preview}">생성 전 최종 확인</button>
     <div data-gf-confirm hidden>
       <p data-gf-expiry></p>
+      <details class="app-disclosure"><summary th:text="#{glossaryFunction.plan}">실제로 실행할 DDL</summary><div class="app-disclosure-body"><pre class="app-preview-source" data-code-language="sql" data-gf-plan></pre></div></details>
       <label class="app-glossary-pick"><input type="checkbox" data-gf-consent><span th:text="#{glossaryFunction.consent}">표시된 코드·소유자·DDL 영향을 확인했고 함수 1개 생성에 동의합니다.</span></label>
       <button type="button" class="btn app-btn app-btn-primary" data-gf-create disabled th:text="#{glossaryFunction.create}">함수 생성</button>
     </div>

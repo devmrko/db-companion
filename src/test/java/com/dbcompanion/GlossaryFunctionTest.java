@@ -46,16 +46,25 @@ class GlossaryFunctionTest {
     @Test void generatedModuleIsSearchOnlyBoundedInvokerRightsAndPortable(){
         var sql=GlossaryFunctionSql.create("APP");
         assertThat(sql).startsWith("CREATE FUNCTION \"APP\".\"DBC_GLOSSARY_SEARCH\"(p_question CLOB)")
-            .contains("AUTHID CURRENT_USER","CTX_DOC.POLICY_TOKENS","CTX_DOC.POLICY_HIGHLIGHT","CONTAINS(SEARCH_TEXT",
-                "ENABLED_YN=''Y''",">8000","ids.get_size>30","require_size(result.to_clob,40000)",
-                "result.put('aiCalled',FALSE)",":question_bind",":query_bind",":result_bind");
-        assertThat(sql).doesNotContain("CREATE OR REPLACE","DBMS_CLOUD_AI","GRANT ","COMMIT","AUTONOMOUS_TRANSACTION","{{PHRASE_BLOCK}}","{{PACKAGE}}","p_profile");
+            .contains("AUTHID CURRENT_USER","RETURN \"APP\".\"DBC_GLOSSARY_API\".SEARCH(p_question)");
+        assertThat(sql.lines().count()).isLessThan(10);
+        var scripts=GlossaryFunctionSql.statements("APP");
+        assertThat(scripts).hasSize(3);
+        assertThat(scripts.getFirst()).contains("AUTHID CURRENT_USER","FUNCTION SEARCH(p_question CLOB) RETURN CLOB");
+        var body=scripts.get(1);
+        assertThat(body).contains("CTX_DOC.POLICY_TOKENS","CTX_DOC.POLICY_HIGHLIGHT","CONTAINS(SEARCH_TEXT",
+            "JSON_TABLE(occurrences","p_question)>8000","ids.get_size>30",
+            "GETLENGTH(glossary.to_clob())>40000","response.put('aiCalled',FALSE)");
+        assertThat(body).doesNotContain("TO_CLOB(","EXECUTE IMMEDIATE block_text","{{","DBMS_CLOUD_AI","CREATE OR REPLACE","AUTONOMOUS_TRANSACTION");
+        int last=body.indexOf("FUNCTION SEARCH");
+        for(String call:List.of("validate_question(p_question)","require_dictionary;","tokenize_question(question_text)",
+            "build_text_query(tokens)","find_term_candidates(query_text)","match_question_terms(question_text,candidates)",
+            "remove_overlapping_matches(matches)","load_term_definitions(matches)","build_search_response(question_text")){
+            int next=body.indexOf(call,last+1);assertThat(next).isGreaterThan(last);last=next;
+        }
         assertThat(GlossaryFunctionSql.example("APP")).contains(":question").doesNotContain("showsql");
-        String shared=CallableAiSql.resource("glossary-functions.sql").stripTrailing().replace("{{PHRASE_BLOCK}}",CallableAiSql.phraseBlock());
-        assertThat(CallableAiSql.statements("APP").get(1)).contains(shared);
-        assertThat(sql).contains(shared);
-        assertThat(sql.indexOf("result JSON_OBJECT_T")).isLessThan(sql.indexOf("FUNCTION local_object"));
         assertThat(GlossaryFunctionRepository.normalize("FUNCTION \"DBC_GLOSSARY_SEARCH\"\r\n RETURN CLOB")).isEqualTo("FUNCTION DBC_GLOSSARY_SEARCH\n RETURN CLOB");
+        assertThat(GlossaryFunctionRepository.storedSource("APP",GlossaryFunctionSql.API,scripts.getFirst())).startsWith("PACKAGE DBC_GLOSSARY_API");
     }
     @Test void creationRequiresConsentUsesLoginOwnerAndConsumesPreviewOnce(){
         try(var s=session()){
@@ -90,6 +99,23 @@ class GlossaryFunctionTest {
         try(var s=session()){
             assertThatThrownBy(()->service.search(s,new Question("Revenue"))).isInstanceOf(IllegalArgumentException.class);
             current="READY";assertThat(service.search(s,new Question("Revenue")).toString()).contains("\"aiCalled\":false");assertThat(reads).isEqualTo(1);
+        }
+    }
+    @Test void exactLegacyAndPartialModulesHaveAnExplicitMigrationPathButConflictsDoNot(){
+        assertThat(GlossaryFunctionRepository.moduleState(List.of("MISSING","MISSING","MISSING"))).isEqualTo("MISSING");
+        assertThat(GlossaryFunctionRepository.moduleState(List.of("MISSING","MISSING","LEGACY"))).isEqualTo("LEGACY");
+        assertThat(GlossaryFunctionRepository.moduleState(List.of("READY","MISSING","MISSING"))).isEqualTo("INCOMPLETE");
+        assertThat(GlossaryFunctionRepository.moduleState(List.of("READY","READY","MISSING"))).isEqualTo("INCOMPLETE");
+        assertThat(GlossaryFunctionRepository.moduleState(List.of("READY","READY","READY"))).isEqualTo("READY");
+        for(var states:List.of(List.of("MISSING","READY","MISSING"),List.of("CONFLICT","READY","LEGACY"),List.of("READY","READY","CONFLICT")))
+            assertThat(GlossaryFunctionRepository.moduleState(states)).isEqualTo("CONFLICT");
+        assertThat(GlossaryFunctionRepository.moduleState(List.of("READY","INVALID","LEGACY"))).isEqualTo("INVALID");
+        try(var s=session()){
+            current="LEGACY";assertThat(service.preview(s).sql()).contains("DBC_GLOSSARY_API");
+            current="INCOMPLETE";assertThat(service.preview(s).owner()).isEqualTo("APP");
+            var p=service.preview(s);current="LEGACY";
+            assertThatThrownBy(()->service.install(s,p)).isInstanceOf(IllegalArgumentException.class);
+            assertThat(writes).isZero();
         }
     }
 }

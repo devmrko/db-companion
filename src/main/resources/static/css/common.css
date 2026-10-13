@@ -1319,3 +1319,4 @@ dialog.app-profile-editor-compact { width: min(640px, calc(100vw - 32px)); }
 [data-gf-confirm] { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--app-border,#ddd); }
 [data-gf-json] { max-height: 480px; overflow: auto; }
 @media (max-width: 600px) { .app-module-card { padding: 16px; } }
+.app-module-code-parts { display: grid; gap: 12px; }

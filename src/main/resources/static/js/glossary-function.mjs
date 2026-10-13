@@ -2,10 +2,15 @@ import {t} from './i18n.mjs';
 import {assistantApi,assistantPost} from './ai-assistant.mjs';
 
 export function canCreateFunction(status){
-  return status?.canCreate===true&&status.dictionary==='READY'&&status.text==='READY'&&status.function==='MISSING';
+  return status?.canCreate===true&&status.dictionary==='READY'&&status.text==='READY'&&['MISSING','LEGACY','INCOMPLETE'].includes(status.function);
 }
 export function canTestFunction(status){
   return status?.dictionary==='READY'&&status.text==='READY'&&status.function==='READY';
+}
+export function searchFlow(codes){
+  const body=codes?.find(code=>code.type==='PACKAGE BODY')?.sql||'';
+  const start=body.lastIndexOf('  FUNCTION SEARCH('),end=body.lastIndexOf('END DBC_GLOSSARY_API;');
+  return start<0||end<start?'':body.slice(start,end).trim();
 }
 export function mountGlossaryFunction(root){
   const get=key=>root.querySelector(`[data-gf-${key}]`),csrf=get('csrf');
@@ -31,7 +36,16 @@ export function mountGlossaryFunction(root){
       get('status').append(dt,dd);
     }
     for(const error of value.errors){const li=document.createElement('li');li.textContent=error;get('errors').append(li);}
-    get('code').textContent=value.sql;get('example').textContent=value.example;controls();
+    get('code').replaceChildren();
+    get('flow').textContent=searchFlow(value.codes);
+    for(const fragment of [...(value.codes||[])].sort((a,b)=>Number(b.type==='FUNCTION')-Number(a.type==='FUNCTION'))){
+      const details=document.createElement('details'),summary=document.createElement('summary'),body=document.createElement('div'),pre=document.createElement('pre');
+      details.className='app-disclosure';details.open=fragment.type==='FUNCTION';body.className='app-disclosure-body';
+      summary.textContent=`${t('glossaryFunction.part.'+fragment.type.replaceAll(' ','_'),fragment.type)} · ${fragment.name} · ${t('glossaryFunction.action.'+fragment.action,fragment.action)}`;
+      pre.className='app-preview-source';pre.dataset.codeLanguage='sql';pre.textContent=fragment.sql;
+      body.append(pre);details.append(summary,body);get('code').append(details);
+    }
+    get('example').textContent=value.example;controls();
   }
   async function refresh(){
     if(busy)return;invalidate();busy=true;controls();
@@ -45,7 +59,7 @@ export function mountGlossaryFunction(root){
   get('preview').addEventListener('click',async()=>{
     if(busy||!canCreateFunction(status)||uncertain)return;invalidate();busy=true;controls();
     try{
-      preview=await api('preview',{});get('code').textContent=preview.sql;get('code').closest('details').open=true;get('confirm').hidden=false;
+      preview=await api('preview',{});get('plan').textContent=preview.sql;get('confirm').hidden=false;
       get('expiry').textContent=t('glossaryFunction.expires','확인 유효 기한: {0}',new Date(preview.expires).toLocaleString());
       expiryTimer=setTimeout(()=>{invalidate();say(t('glossaryFunction.expired','확인이 만료되었습니다. 다시 확인해 주세요.'));},Math.max(0,Date.parse(preview.expires)-Date.now()));
     }catch(ex){invalidate();say(ex.message);}

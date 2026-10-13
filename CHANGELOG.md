@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.0-alpha.9
+
+Prepared on 2026-10-13. Ninth public alpha; not a production-certified release.
+
+- Replace the generated PL/SQL-in-CLOB search implementation with named package
+  functions and a short entry function. Only bounded owner-local SELECT text is
+  dynamic; search values remain bound.
+- Show the actual SEARCH calling order, package specification, package body and
+  entry function separately. Installation previews show only planned DDL.
+- Permit explicit migration of an exact app-generated v1 function; block foreign
+  sources and changed previews. Preserve recognized installed components and
+  expose compilation or partial-installation errors without automatic cleanup.
+- Preserve the response contract, overlap rules and search limits. Existing AI
+  packages are not silently migrated; no grants or dictionary changes occur.
+
+Validation: Java 1,353 and JavaScript 666 tests passed, with no PMD violations or
+publication findings. Authorized Oracle checks separately confirmed eight
+equivalent search responses before/after migration, compilation readiness and
+unchanged existing AI package source. Live UI checks confirmed separate code
+sections and dictionary search without AI calls.
+
 ## 0.1.0-alpha.8
 
 Prepared on 2026-10-13. Eighth public alpha; not a production-certified release.
