@@ -6,6 +6,7 @@
   <div class="app-page-heading"><h1 th:text="#{aitest.title}">Select AI 테스트</h1><button th:replace="~{fragments/common :: sqlHelp('ai-test', 'showsql')}"></button><a th:href="@{/ai-executions/sql}" th:text="#{aitest.history}">실행 이력</a></div>
   <p><a class="app-inline-link" th:href="@{/db/functions/ai-query}" th:text="#{callable.test}">DB 함수 호출 테스트</a></p>
   <th:block th:replace="~{fragments/select-ai-setup :: guide}"></th:block>
+  <section th:replace="~{fragments/semantic-release :: panel}"></section>
   <section class="app-card app-test-card app-test-progress" data-test-progress hidden>
     <h2 th:text="#{aitest.progress.title}">단계별 처리 시간</h2>
     <p class="app-filter-message" th:text="#{aitest.progress.help}">현재 로그인 세션의 최근 8회입니다. 서버에서 측정한 단계 시간이며 DB 실행계획의 세부 시간이 아닙니다. SQL 실행과 결과 읽기 모두 DB 작업·네트워크 대기를 포함할 수 있습니다.</p>

@@ -22,6 +22,8 @@ public final class DatabaseSession {
     public SelectAiTest.State aiTest() { return aiTest; }
     private final BusinessGlossary.State businessGlossary = new BusinessGlossary.State();
     public BusinessGlossary.State businessGlossary(){return businessGlossary;}
+    private final SemanticRelease.State semanticRelease=new SemanticRelease.State();
+    public SemanticRelease.State semanticRelease(){return semanticRelease;}
     private final SelectAiComparison.State aiComparison = new SelectAiComparison.State();
     public SelectAiComparison.State aiComparison(){return aiComparison;}
     private final SelectAiBatch.State aiBatch = new SelectAiBatch.State();

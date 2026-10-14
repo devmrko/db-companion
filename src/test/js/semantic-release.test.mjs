@@ -1,0 +1,25 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {selectionItems,editableMembers} from '../../main/resources/static/js/semantic-release.mjs';
+test('revision editor preserves parent membership and offers new current items unselected',()=>{
+  const rows=editableMembers({terms:[{id:'a',term:'old',revision:2}],entries:[{document:{source:{table:'T'}},revision:3}]},{terms:[{id:'a',term:'latest',revision:7},{id:'b',term:'new',revision:1}],sources:[{table:'T',revision:9},{table:'U',revision:1}]});
+  assert.equal(rows.find(r=>r.id==='a').revision,2);assert.equal(rows.find(r=>r.id==='T').revision,3);
+  assert.equal(rows.find(r=>r.id==='b').included,false);assert.equal(rows.find(r=>r.id==='U').included,false);
+});
+test('version selector has deployed default and explicit live development, never implicit HEAD',()=>{
+  assert.deepEqual(selectionItems([{id:'12345678-9',name:'v1'}]).map(x=>x[0]),['DEFAULT','LIVE','12345678-9']);
+});
+test('both query screens use the same version panel and mutations require explicit confirmation',()=>{
+  for(const file of ['ontology-query','ai-test'])assert.match(readFileSync(`src/main/resources/templates/${file}.html`,'utf8'),/fragments\/semantic-release :: panel/);
+  const js=readFileSync('src/main/resources/static/js/semantic-release.mjs','utf8');
+  assert.match(js,/expected:state.preference/);assert.match(js,/expected:state.head/);
+  assert.match(js,/assistantPost/);assert.doesNotMatch(js,/innerHTML|localStorage|sessionStorage/);
+  assert.match(js,/location.reload\(\)/);
+});
+test('semantic labels exist in all supported languages',()=>{
+  const keys=Object.keys(JSON.parse(readFileSync('tools/i18n/feature-semantic-release.json','utf8')));
+  for(const locale of ['','_ko','_en','_ja','_zh_CN']){
+    const bundle=readFileSync(`src/main/resources/i18n/messages${locale}.properties`,'utf8');for(const key of keys)assert.ok(bundle.includes(key+'='));
+  }
+});

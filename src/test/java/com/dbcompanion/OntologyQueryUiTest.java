@@ -20,11 +20,14 @@ class OntologyQueryUiTest {
     @LocalServerPort int port;@Autowired JsonMapper json;
     @Test void realHttpRequiresLoginAndCsrfBeforeGenerationOrExecution() throws Exception {
         var client=HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();
-        for(String path:List.of("/ontology-query","/ontology-query/options?schema=APP","/ontology-query/archive/status?schema=APP","/ontology-query/archive/list?schema=APP","/ontology-query/archive/graph?schema=APP&id=x")){
+        for(String path:List.of("/semantic-releases","/semantic-releases/example","/ontology-query","/ontology-query/options?schema=APP","/ontology-query/archive/status?schema=APP","/ontology-query/archive/list?schema=APP","/ontology-query/archive/graph?schema=APP&id=x")){
             var res=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+path)).GET().build(),HttpResponse.BodyHandlers.ofString());assertThat(res.statusCode()).isEqualTo(302);assertThat(res.headers().firstValue("location").orElse("")).endsWith("/login");
         }
         for(String path:List.of("search","interpret","grounded-search","ai-interpret-preview","ai-recommend-preview","assistant-generate","plan-selection","preview","generate","execute","cancel","invalidate","archive/install","archive/setup","archive/preview","archive/save")){
             var res=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/ontology-query/"+path)).header("Content-Type","application/json").POST(HttpRequest.BodyPublishers.ofString("{}")).build(),HttpResponse.BodyHandlers.ofString());assertThat(res.statusCode()).as(path).isEqualTo(403);
+        }
+        for(String action:List.of("create","select","deploy","initialize","revise")){
+            var res=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/semantic-releases/"+action)).header("Content-Type","application/json").POST(HttpRequest.BodyPublishers.ofString("{}")).build(),HttpResponse.BodyHandlers.ofString());assertThat(res.statusCode()).isEqualTo(403);
         }
         var script=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/js/ontology-query.mjs")).GET().build(),HttpResponse.BodyHandlers.ofString());assertThat(script.statusCode()).isEqualTo(200);assertThat(script.body()).contains("selectedRoute");
     }
@@ -47,6 +50,7 @@ class OntologyQueryUiTest {
             String html=engine.process("ontology-query",c);assertThat(html).contains("&lt;schema&gt;","data-oq-consent","data-oq-reviewed","data-oq-execute disabled","data-oq-evidence hidden","aria-labelledby=\"oq-preview-title\"","aria-live=\"polite\"").doesNotContain("??ontology.","th:","onclick=","onload=","data-schema=\"<schema>");
             assertThat(html.split("value=\"/ontology-query\"",-1)).hasSize(4);
             assertThat(html).contains("SKOS", "prefLabel", "altLabel");
+            assertThat(html).contains("data-semantic-release","data-sr-select disabled","data-sr-deploy disabled").doesNotContain("??semantic.");
             assertThat(html).contains("data-oa-preview disabled","data-oa-save disabled","data-oa-install hidden","data-oa-dialog","CONSTRUCT","DBC_RDF");
         }
         assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/ontology-query")).isEqualTo("/ontology-query");assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/ontology-query/execute")).isEqualTo("/login");

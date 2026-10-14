@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.1.0-alpha.14
+
+Prepared on 2026-10-14. Semantic deployment versioning alpha; not production-certified.
+
+- Save immutable owner-local deployment versions containing active glossary terms,
+  saved ontology and its embedded table/column metadata. Record item revisions,
+  snapshot hashes and parent deployment IDs; do not copy business data.
+- Initialize an operational version explicitly, create revised deployments from
+  existing item revisions, and separately promote or roll back the operational
+  pointer. Preserve original versions and record actor, time and switch reason.
+- Select deployment versions in Ontology Query and Select AI Test. Persist the
+  test selection per DB account, invalidate old evidence on switching, and reject
+  missing or stale version references instead of silently using current definitions.
+- Unify change-history presentation with changed by, changed at and change details.
+- Reuse shared UI layout and provide Korean, English, Japanese and Chinese labels.
+
+Validation: Java 1,385 tests passed; JavaScript 674 passed, one optional test skipped.
+Build, PMD and publication checks passed. Actual Oracle persistence, signed-in UI
+interaction and paid AI generation with deployment versions remain unverified.
+Profiles, Feedback, physical metadata and business data remain live. Frozen glossary
+search uses registered term/alias matching, not the live Oracle Text index. External
+APEX/Agent consumers and profile A/B comparison do not support deployment versions
+in this release. See [design and limits](docs/semantic-release-design.md).
+
 ## 0.1.0-alpha.13
 
 Prepared on 2026-10-14. Advisory evaluation update; not a production-certified release.

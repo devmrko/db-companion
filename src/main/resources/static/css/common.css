@@ -1359,6 +1359,8 @@ dialog.app-profile-editor-compact { width: min(640px, calc(100vw - 32px)); }
 .app-card-note { margin: 0; padding: 12px 24px; font-size: 13px; line-height: 1.6; color: var(--app-muted); }
 .app-empty { margin: 0; padding: 24px; text-align: center; color: var(--app-muted); font-size: 13px; }
 .app-field { display: grid; gap: 7px; min-width: 0; }
+.app-scroll-region { min-width: 0; max-height: 480px; overflow: auto; margin-block: 12px; }
+.app-scroll-region .app-table input[type="number"] { min-width: 100px; }
 .app-creation-grid > .app-field { display: grid; }
 .app-check-field { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-height: var(--app-control-height); }
 .app-check-field input { width: 18px; height: 18px; margin: 0; flex: 0 0 auto; accent-color: var(--app-accent); }
@@ -1374,4 +1376,12 @@ dialog.app-profile-editor-compact { width: min(640px, calc(100vw - 32px)); }
 .app-module-card > .app-card-heading { padding: 0 0 18px; margin-bottom: 16px; }
 @media (max-width: 600px) {
   .app-card-note { padding-inline: 16px; }
+}
+/* Shared provenance line for all change histories. Long identifiers wrap safely. */
+.app-change-history-summary {
+  overflow-wrap: anywhere;
+  white-space: normal;
+  line-height: 1.6;
+  font-weight: 400;
+  min-width: 0;
 }

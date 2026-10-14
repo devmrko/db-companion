@@ -75,13 +75,17 @@ public class AiAssistantRepository {
         return generate(owner,profile,prompt,action,90);
     }
     public String generate(String owner,String profile,String prompt,com.dbcompanion.model.SelectAiTest.Action action,int timeoutSeconds){
+        return generate(owner,profile,prompt,action,timeoutSeconds,null);
+    }
+    public String generate(String owner,String profile,String prompt,com.dbcompanion.model.SelectAiTest.Action action,int timeoutSeconds,String semanticAttributes){
         com.dbcompanion.common.config.SelectAiExecutionSettings.validate(timeoutSeconds);
         Integer tokens=jdbc.getDataSource() instanceof com.dbcompanion.common.db.SessionDataSource session?session.assistantMaxTokens(profile):null;
         return jdbc.execute((ConnectionCallback<String>) connection->{
-            try(var call=connection.prepareCall(generateSql(owner,action,tokens!=null));var reader=new StringReader(prompt)){
+            try(var call=connection.prepareCall(generateSql(owner,action,tokens!=null||semanticAttributes!=null));var reader=new StringReader(prompt)){
                 call.setQueryTimeout(timeoutSeconds);call.registerOutParameter(1,java.sql.Types.CLOB);
                 call.setCharacterStream(2,reader,prompt.length());call.setString(3,profile);
-                if(tokens!=null)call.setString(4,"{\"conversation\":false,\"max_tokens\":"+tokens+"}");
+                if(semanticAttributes!=null){var mapper=tools.jackson.databind.json.JsonMapper.builder().build();var attributes=(tools.jackson.databind.node.ObjectNode)mapper.readTree(semanticAttributes);if(tokens!=null)attributes.put("max_tokens",tokens);call.setString(4,mapper.writeValueAsString(attributes));}
+                else if(tokens!=null)call.setString(4,"{\"conversation\":false,\"max_tokens\":"+tokens+"}");
                 call.execute();
                 var result=call.getClob(1);
                 if(result==null)throw new Failure(502,"assistant.emptyResult","설명 응답이 비어 있습니다. 자동 재시도하지 않았습니다.");

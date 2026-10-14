@@ -1,4 +1,5 @@
 import {t} from './i18n.mjs';
+import {changeHistorySummary} from './change-history-summary.mjs';
 import {diffHistoryText} from './history-compare.mjs';
 import {snapshotChanges, valueChange, compactRows} from './profile-diff.mjs';
 
@@ -59,7 +60,10 @@ const node = (tag, text = '', className) => {
   const el = document.createElement(tag); el.textContent = text; if (className) el.className = className; return el;
 };
 const button = text => { const el = node('button', text, 'btn app-btn app-btn-quiet'); el.type = 'button'; return el; };
-const label = entry => `#${entry.seq} · ${entry.eventAt} · ${entry.profile ?? t('ui.6ef390cf7926', "미분류")} · ${entry.actor}`;
+const label = entry => `#${entry.seq} · ${entry.profile ?? t('ui.6ef390cf7926', "미분류")}`;
+const provenance = entry => changeHistorySummary({actor:entry.actor,at:entry.eventAt,
+  content:[label(entry),entry.editStage].filter(Boolean).join(' · '),
+  role:entry.kind==='REQUEST'?'request':entry.kind==='EDIT'||entry.editStage?'change':'record'});
 
 function mount(root) {
   const profile = root.dataset.profile;
@@ -121,12 +125,12 @@ function mount(root) {
     header.append(node('h3', t('ui.e884c7c67060', "버전 비교")), close); panel.append(header);
     panel.append(node('p', t('ui.3c4e70221ed0', "기준 #{0} → {1}", left.seq, right ? t('ui.1a87a79078a1', "비교 #{0}", right.seq) : t('ui.4c947acf46f6', "비교할 이력 선택")), 'app-profile-selection'));
     if (selectionError) { const error = node('p', selectionError, 'app-history-compare-error'); error.setAttribute('role', 'alert'); panel.append(error); }
-    panel.append(node('p', t('ui.6daf48631f89', "기준 {0}", label(left)), 'app-muted'));
+    panel.append(node('p', t('ui.6daf48631f89', "기준 {0}", provenance(left)), 'app-change-history-summary'));
     if (!right) panel.append(node('p', t('ui.311251130131', "비교할 기록의 ‘비교’ 버튼을 누르세요.")));
     else {
       try {
         const result = changedProfileFields(left, right);
-        panel.append(node('p', t('ui.83eccdbf261c', "비교 {0}", label(right)), 'app-muted'));
+        panel.append(node('p', t('ui.83eccdbf261c', "비교 {0}", provenance(right)), 'app-change-history-summary'));
         for (const notice of new Set([result.left.notice, result.right.notice])) panel.append(node('p', notice, 'app-muted'));
         panel.append(node('p', result.changes.length ? t('ui.c243e5cdb8d6', "변경 {0}개 항목 · − 삭제 / + 추가", result.changes.length)
           : t('ui.2b0c2a8c40e1', "#{0}와 #{1}의 보관된 {2}이 같습니다.", left.seq, right.seq, left.kind === 'SNAPSHOT' ? t('ui.6c91fa536dd6', "현재값") : t('ui.625fa62c2d6b', "요청값")), 'app-history-compare-result'));
@@ -180,7 +184,7 @@ function mount(root) {
       if(entry.kind==='EDIT') {
         try {
           const pair=editPair(entry),show=button(t('ui.d8291eb080d2', "변경 내용"));
-          card.append(node('p',t('ui.697d144c1d76', "{0} · {1} · 변경자 {2}", pair.attribute, pair.outcome==='VERIFIED'?t('ui.5d9c284e2909', "저장 확인"):t('ui.4a7770229e8f', "저장 결과 확인 필요"), entry.actor),'app-muted'));
+          card.append(node('p',changeHistorySummary({actor:entry.actor,at:entry.eventAt,content:`${pair.attribute} · ${pair.outcome==='VERIFIED'?t('ui.5d9c284e2909', "저장 확인"):t('ui.4a7770229e8f', "저장 결과 확인 필요")}`}), 'app-change-history-summary'));
           show.addEventListener('click',()=>{left=pair.left;right=pair.right;selectionError='';drawComparison();});heading.append(show);
           for(const part of [pair.left,pair.right].filter(Boolean)) {
             const actions=node('div','','app-history-toolbar'),baseline=button(t('ui.eaea55bff600', "기준")),candidate=button(t('ui.c0154c812ab6', "비교"));
@@ -193,7 +197,7 @@ function mount(root) {
         entries.append(card);continue;
       }
       const kind = entry.kind === 'SNAPSHOT' ? t('ui.52e3d517bcff', "현재값 스냅샷 · 작성자는 조회한 계정") : entry.kind === 'REQUEST' ? t('ui.f37982f20f02', "변경 요청 · {0} / {1}", data.request?.operation, data.request?.attribute) : t('ui.5c239b968c9d', "미분류 호출 · 원문 확인 필요");
-      card.append(node('p', kind, 'app-muted'));
+      card.append(node('p',changeHistorySummary({actor:entry.actor,at:entry.eventAt,content:kind,role:entry.kind==='REQUEST'?'request':'record'}),'app-change-history-summary'));
       if (version) {
         card.append(node('p', version.notice, 'app-muted'));
         const actions = node('div', '', 'app-history-toolbar'), baseline = button(t('ui.eaea55bff600', "기준")), candidate = button(t('ui.c0154c812ab6', "비교"));

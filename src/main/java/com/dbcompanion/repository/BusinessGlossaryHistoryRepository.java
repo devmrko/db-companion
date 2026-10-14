@@ -30,6 +30,22 @@ public class BusinessGlossaryHistoryRepository {
     public Term enrich(String owner,Term term){
         return enrich(owner,List.of(term)).getFirst();
     }
+    /** Read a recorded revision, including a pre-history snapshot recorded as before. */
+    public Term revision(String owner,String id,long revision){
+        BusinessGlossary.id(id);if(revision<1)throw BusinessGlossary.invalid();require(owner);
+        var rows=jdbc.query("SELECT PAYLOAD FROM "+AppRecordSql.table(owner)
+                +" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED' AND JSON_VALUE(PAYLOAD,'$.termId')=?"
+                +" AND (JSON_VALUE(PAYLOAD,'$.after.revision' RETURNING NUMBER)=? OR JSON_VALUE(PAYLOAD,'$.before.revision' RETURNING NUMBER)=?)"
+                +" ORDER BY SEQ DESC FETCH FIRST 1 ROW ONLY",(r,n)->{
+            var clob=r.getClob(1);try{
+                if(clob==null||clob.length()>200_000)throw BusinessGlossary.invalid();
+                var change=json.readValue(clob.getSubString(1,(int)clob.length()),Change.class);
+                var term=change.after().revision()==revision?change.after():change.before();
+                if(term==null||!id.equals(term.id())||term.revision()!=revision)throw BusinessGlossary.invalid();return term;
+            }finally{if(clob!=null)clob.free();}
+        },BusinessGlossaryHistory.TYPE,id,revision,revision);
+        if(rows.size()!=1)throw BusinessGlossary.stale();return rows.getFirst();
+    }
     public List<Term> enrich(String owner,List<Term> terms){
         if(terms.isEmpty()||!"READY".equals(status(owner)))return terms;
         var snapshots=new HashMap<String,Term>();

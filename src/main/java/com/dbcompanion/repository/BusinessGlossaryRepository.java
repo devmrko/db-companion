@@ -111,6 +111,10 @@ public class BusinessGlossaryRepository {
         jdbc.execute("LOCK TABLE "+table(owner)+" IN SHARE ROW EXCLUSIVE MODE WAIT 5");
     }
     public Term find(String owner,String id){var rows=jdbc.query("SELECT * FROM "+table(owner)+" WHERE TERM_ID=?",(r,n)->term(r),BusinessGlossary.id(id));if(rows.size()!=1)throw BusinessGlossary.stale();return enrich(owner,rows.getFirst());}
+    public Term revision(String owner,String id,long revision){
+        var current=find(owner,id);if(current.revision()==revision)return current;
+        if(history==null)throw BusinessGlossary.stale();return history.revision(owner,id,revision);
+    }
     public Term save(String owner,String id,long revision,Draft d){
         String aliases=json.writeValueAsString(d.aliases()),search=d.term()+"\n"+String.join("\n",d.aliases())+"\n"+d.definition();
         boolean insert=id==null||id.isBlank();String termId=insert?UUID.randomUUID().toString():BusinessGlossary.id(id);

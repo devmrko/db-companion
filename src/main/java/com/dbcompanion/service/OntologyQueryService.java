@@ -14,6 +14,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class OntologyQueryService {
+    @org.springframework.beans.factory.annotation.Autowired(required=false) private SemanticReleaseService releases;
     private final SessionDataSource source;private final OntologyRepository repository;private final AiAssistantRepository ai;private final ProfileHistoryRepository profiles;
     private final OntologyQueryRepository queries;private final PropertyGraphRepository graphs;private final JsonMapper json;private final TransactionTemplate read,generate,execute;
     private final QuestionAnalysisService analysis;
@@ -30,6 +31,7 @@ public class OntologyQueryService {
     public BusinessGlossary.Search interpret(PoolSession s,String schema,String question){synchronized(s){scope(s,schema);return glossary.search(s,question,"",false);}}
     public GroundedSearch groundedSearch(PoolSession s,String schema,String question,String anchor,QuestionLanguage language,String dictionaryId,List<String> termIds,String graphName){synchronized(s){
         scope(s,schema);var state=s.metadata().inquiry();state.invalidate();
+        if(releases!=null&&releases.active(s)!=null&&graphName!=null&&!graphName.isBlank())throw SemanticRelease.invalid();
         var grounding=glossary.interpret(s,dictionaryId,question,termIds);
         if(graphName!=null&&!graphName.isBlank())return searchGrounding(s,schema,anchor,language,graphName,grounding,List.of());
         var terms=grounding.terms().stream().map(BusinessGlossary.Term::term).limit(12).toList();
@@ -48,6 +50,7 @@ public class OntologyQueryService {
         state.remember(result);state.grounding(grounding);var value=new GroundedSearch(result,grounding,proposals,graph);state.grounded(value);return value;
     }
     public Preview interpretPreview(PoolSession s,String schema,String question,String anchor,QuestionLanguage language,String dictionaryId,List<String> ids,String graph){synchronized(s){
+        if(releases!=null&&releases.active(s)!=null&&graph!=null&&!graph.isBlank())throw SemanticRelease.invalid();
         scope(s,schema);var grounding=glossary.interpret(s,dictionaryId,question,ids);s.metadata().inquiry().invalidate();
         return assistantPreview(s,new AiStep("","INTERPRET",schema,anchor,language,graph,grounding,""),json.writeValueAsString(Map.of("originalQuestion",grounding.original(),"dictionaryEvidence",grounding.terms().stream().map(t->Map.of("id",t.id(),"term",t.term(),"definition",t.definition(),"criteria",t.criteria(),"rdf",t.rdf()==null?Map.of():t.rdf())).toList())));
     }}
@@ -60,8 +63,9 @@ public class OntologyQueryService {
         state.invalidate();return assistantPreview(s,new AiStep("","PLAN",schema,"",language,"",grounding,id),payload);
     }}
     private Preview assistantPreview(PoolSession s,AiStep step,String payload){
-        if(payload.length()>AiAssistant.MAX_SOURCE)throw new Failure(413,"query.narrow");var assistant=s.metadata().assistant();var selection=assistant.selected();if(selection==null)throw new Failure(409,"chooseProfile");
-        return query(s,login(s),read,()->{var request=assistant.prepare(step.schema(),ai.profile(selection),"ONTOLOGY_"+step.mode(),payload,false,step.language().code(),Instant.now(),"ontology-assistant");
+        final String evidence=releases==null?payload:releases.stamp(s,payload);
+        if(evidence.length()>AiAssistant.MAX_SOURCE)throw new Failure(413,"query.narrow");var assistant=s.metadata().assistant();var selection=assistant.selected();if(selection==null)throw new Failure(409,"chooseProfile");
+        return query(s,login(s),read,()->{var request=assistant.prepare(step.schema(),ai.profile(selection),"ONTOLOGY_"+step.mode(),evidence,false,step.language().code(),Instant.now(),"ontology-assistant");
             s.metadata().inquiry().aiStep(new AiStep(request.token(),step.mode(),step.schema(),step.anchor(),step.language(),step.graph(),step.grounding(),step.searchId()));return new Preview(step.mode(),request);});
     }
     public OntologyInquiry.Search applyPlan(PoolSession s,String id,String mode,String route,List<String> tables,List<String> candidateIds){synchronized(s){
@@ -134,7 +138,10 @@ public class OntologyQueryService {
     private void scope(PoolSession s,String schema){Ontology.name(schema);if(!schema.equals(s.metadata().selectedSchema()))throw new Failure(409,"query.stale");}
     private String login(PoolSession s){return s.metadata().info().username();}
     private <T>T query(PoolSession s,String schema,TransactionTemplate tx,Supplier<T> fn){source.bind(s.pool(),schema,s.metadata().assistant());try{return tx.execute(status->fn.get());}finally{source.clear();}}
-    private OntologyInquiry.Dataset dataset(PoolSession s,String schema,boolean refresh){return s.metadata().inquiry().dataset(schema,refresh,()->query(s,login(s),read,()->{
+    private OntologyInquiry.Dataset dataset(PoolSession s,String schema,boolean refresh){
+        var release=releases==null?null:releases.active(s);
+        if(release!=null)return s.metadata().inquiry().dataset(schema,refresh,()->{var entries=release.content().entries();var now=Instant.now().toString();return new OntologyInquiry.Dataset(schema,entries,OntologyRelations.analyze(s.metadata().info().database(),schema,entries,now),now);});
+        return s.metadata().inquiry().dataset(schema,refresh,()->query(s,login(s),read,()->{
         var entries=repository.relationshipEntries(schema,login(s));var now=Instant.now().toString();return new OntologyInquiry.Dataset(schema,entries,OntologyRelations.analyze(s.metadata().info().database(),schema,entries,now),now);
     }));}
     public OntologyInquiry.Options options(PoolSession s,String schema,boolean refresh){synchronized(s){scope(s,schema);var d=dataset(s,schema,refresh);return new OntologyInquiry.Options(schema,d.entries().stream().map(e->new OntologyInquiry.Choice(e.document().source().table(),e.document().meaning().concept(),e.state(),e.revision())).toList(),d.checkedAt());}}
@@ -143,6 +150,7 @@ public class OntologyQueryService {
         var data=dataset(s,schema,false);var tokens=Objects.requireNonNull(analysis).analyze(s,question,language);
         var result=OntologyInquiry.search(data,question,anchor,tokens);state.remember(result);return result;}}
     private void verify(PoolSession s,String schema,List<Entry> entries){
+        var release=s.metadata().semanticRelease().selected();if(release!=null){if(!schema.equals(release.content().owner()))throw SemanticRelease.invalid();SemanticReleaseService.verifyEntries(release,entries);return;}
         repository.require(schema,login(s));for(var e:entries){var current=repository.entry(schema,e.document().source().table(),0);if(current==null||!e.state().equals(current.state())||!PropertyGraph.sameDefinitions(List.of(e),List.of(current)))throw new Failure(409,"query.stale");}
     }
     public Preview preview(PoolSession s,String id,String mode,String route,Locale locale){synchronized(s){
@@ -159,6 +167,7 @@ public class OntologyQueryService {
                 var providerMetadata=entries.stream().map(e->Map.of("table",e.document().source().table(),"columns",e.document().source().columns().stream().map(c->Map.of("name",c.name(),"type",c.dataType())).toList())).toList();
                 payload=json.writeValueAsString(Map.of("context",json.readTree(payload),"allowedColumns",ReviewedSql.scope(selected,entries).tables(),"providerMetadata",providerMetadata,"attributes",attributes(schema,entries)));
             }
+            if(releases!=null)payload=releases.stamp(s,payload);
             if(payload.length()>AiAssistant.MAX_SOURCE)throw new Failure(413,"query.narrow");
             var request=assistant.prepare(schema,profile,"ONTOLOGY_QUERY",payload,false,locale.getLanguage(),Instant.now(),"inquiry");state.prepare(new OntologyInquiry.Prepared(request.token(),mode,selected,entries));return new Preview(mode,request);
         });
@@ -171,6 +180,8 @@ public class OntologyQueryService {
             String payload=json.writeValueAsString(Map.of("context",json.readTree(rdfSqlContext(selected,entries,grounding)),"queryMode",mode,
                 "evidence",selected.evidence(),"physicalMetadata",entries.stream().map(e->Map.of("table",e.document().source().table(),"columns",e.document().source().columns().stream().filter(c->OntologyContext.safe(c,e.document().meaning().columns().get(c.name()))&&ReviewedSql.scalar(c.dataType())).map(c->Map.of("name",c.name(),"type",c.dataType())).toList())).toList(),
                 "policy","INDEPENDENT means separate source queries or aggregates, combined by UNION ALL; never join detail populations. JOIN may use only supplied verified relations. Draft meanings are not approved rules."));
+            if(payload.length()>AiAssistant.MAX_SOURCE)throw new Failure(413,"query.narrow");
+            if(releases!=null)payload=releases.stamp(s,payload);
             if(payload.length()>AiAssistant.MAX_SOURCE)throw new Failure(413,"query.narrow");
             return test.evidence().attach(new SelectAiEvidence.Snapshot(selected.schema(),selected.question(),"RDF_"+mode,entries.stream().map(OntologyContext::reference).toList(),hash(payload),payload,entries,grounding.terms()));
         }

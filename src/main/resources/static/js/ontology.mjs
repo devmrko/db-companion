@@ -1,4 +1,5 @@
 import {t} from './i18n.mjs';
+import {changeHistoryFields} from './change-history-summary.mjs';
 import {editGuard} from './edit-guard.mjs';
 import {assistantApi,assistantPost} from './ai-assistant.mjs';
 import {pageOf} from './table-list.mjs';
@@ -81,7 +82,11 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology]').fo
     }else if(tab==='rdf'){
       rdfData??=await assistantApi(url('/rdf',{table:source.table,revision:entry.revision}));host.append(rdfViewer(rdfData,dirty));
     }else{
-      const data=await assistantApi(url('/history',{table:source.table,before:historyBefore}));host.append(grid(['version','state','actor','recordedAt'].map(label),data.items.map(v=>[button('v'+v.revision,()=>{if(leave())work(async()=>{tab='definition';await open(source.table,v.revision);});}),label(v.state),v.actor,v.recordedAt])));
+      const data=await assistantApi(url('/history',{table:source.table,before:historyBefore}));
+      host.append(grid(changeHistoryFields({}).map(field=>field.label),data.items.map(v=>{
+        const fields=changeHistoryFields({actor:v.actor,at:v.recordedAt});
+        return [fields[0].value,fields[1].value,button(`v${v.revision} · ${label(v.state)}`,()=>{if(leave())work(async()=>{tab='definition';await open(source.table,v.revision);});})];
+      })));
       const controls=el('div',undefined,'app-dds-pages'),prev=button(t('ui.da7e61c67cc5','이전'),()=>work(async()=>{historyBefore=historyStack.pop()??'';await render();}),'btn app-btn app-btn-quiet'),next=button(t('ui.aef613c6612d','다음'),()=>work(async()=>{historyStack.push(historyBefore);historyBefore=data.next;await render();}),'btn app-btn app-btn-quiet');prev.disabled=!historyStack.length;next.disabled=!data.next;prev.dataset.boundDisabled=String(prev.disabled);next.dataset.boundDisabled=String(next.disabled);controls.append(prev,next);host.append(controls);
     }
   }

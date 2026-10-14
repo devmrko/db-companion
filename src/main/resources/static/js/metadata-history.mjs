@@ -1,4 +1,5 @@
 import {t} from './i18n.mjs';
+import {changeHistorySummary} from './change-history-summary.mjs';
 import {mountHistoryComparison} from './history-compare.mjs';
 
 export function formatHistoryJson(value) {
@@ -227,8 +228,8 @@ if (typeof document !== 'undefined') {
         data.entries.forEach(row => {
           const rowContainer = element('div', '', 'app-history-row');
           const item = element('details', '', 'app-history-entry');
-          item.append(element('summary', `#${row.seq} · ${row.column || root.dataset.objectLabel || t('ui.3d721f9ac601', "테이블")} · ${row.kind}${row.annotationName ? ' / ' + row.annotationName : ''}`));
-          item.append(element('p', `${row.changedAt} · ${row.changedBy}`, 'app-muted'));
+          const content=`#${row.seq} · ${row.column || root.dataset.objectLabel || t('ui.3d721f9ac601', "테이블")} · ${row.kind}${row.annotationName ? ' / ' + row.annotationName : ''}`;
+          item.append(element('summary',changeHistorySummary({actor:row.changedBy,at:row.changedAt,content}), 'app-change-history-summary'));
           const comparison = element('div', '', 'app-history-comparison');
           for (const [title, json] of [[t('ui.0c263cac5947', "변경 전"), row.beforeJson], [t('ui.cc34819ae36e', "변경 후"), row.afterJson]]) {
             const block = element('div'); block.append(element('h3', title), element('pre', formatHistoryJson(json))); comparison.append(block);

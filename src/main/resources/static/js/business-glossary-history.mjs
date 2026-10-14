@@ -1,5 +1,5 @@
 import {t} from './i18n.mjs';
-import {observedTime} from './observed-time.mjs';
+import {changeHistorySummary} from './change-history-summary.mjs';
 const label=(key,fallback,...args)=>t('businessGlossary.history.'+key,fallback,...args);
 const el=(tag,text,css)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(css)node.className=css;return node;};
 export function historyStoragePresentation(storage,table){
@@ -33,7 +33,7 @@ export function renderHistory(host,entries){
     const c=entry.change,details=el('details',undefined,'app-disclosure');
     details.open=host.childElementCount===0;
     const action=c.operation==='CREATE'?label('created','등록'):label('updated','수정');
-    details.append(el('summary',`${action} · ${c.before?'v'+c.before.revision+' → ':''}v${c.after.revision} · ${observedTime(entry.recordedAt)} · ${entry.actor}`));
+    details.append(el('summary',changeHistorySummary({actor:entry.actor,at:entry.recordedAt,content:`${action} · ${c.before?'v'+c.before.revision+' → ':''}v${c.after.revision}`}), 'app-change-history-summary'));
     const grid=el('div',undefined,'app-glossary-history-grid');
     grid.append(snapshot(label('before','변경 전'),c.before),snapshot(label('after','변경 후'),c.after));
     details.append(grid);host.append(details);

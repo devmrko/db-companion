@@ -16,6 +16,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class BusinessGlossaryService {
+    @org.springframework.beans.factory.annotation.Autowired(required=false) private SemanticReleaseService releases;
     private final SessionDataSource source;private final BusinessGlossaryRepository repository;private final JsonMapper json;
     private final TransactionTemplate read,write;
     private final BusinessGlossaryHistoryRepository history;
@@ -71,6 +72,13 @@ public class BusinessGlossaryService {
     }
     public Search search(PoolSession s,String question,String profile,boolean useText){
         SelectAiTest.question(question);String requestedProfile=BusinessGlossary.text(profile,128,false);
+        var release=releases==null?null:releases.active(s);
+        if(release!=null){
+            var terms=release.content().terms();var targets=BusinessGlossary.exactTargets(question,terms.stream().map(t->new Key(t.id(),t.revision(),t.term(),t.aliases())).toList());
+            var ids=targets.stream().flatMap(t->t.termIds().stream()).distinct().toList();
+            var hits=terms.stream().filter(t->ids.contains(t.id())).limit(BusinessGlossary.MAX_HITS).map(term->{var found=targets.stream().filter(t->t.termIds().contains(term.id())).toList();return new Hit(term,found.stream().anyMatch(t->t.kind().equals("TERM"))?"TERM":"ALIAS",found.stream().map(Target::expression).toList());}).toList();
+            return s.metadata().businessGlossary().remember(new Search(UUID.randomUUID().toString(),owner(s),requestedProfile,question,"RELEASE_EXACT_ALIAS",targets,List.of(),"",hits,ids.size()>BusinessGlossary.MAX_HITS,Instant.now().plusSeconds(900)));
+        }
         // A standalone dictionary search needs no profile. Select AI selections are bound when a snapshot is requested.
         return query(s,false,()->{
             String owner=owner(s);repository.requireTable(owner);
@@ -92,10 +100,13 @@ public class BusinessGlossaryService {
         if(search.more())throw BusinessGlossary.failure(413,"검색 결과가 한도를 초과했습니다. 일부만 첨부하지 않습니다. 질문 범위를 좁혀 주세요.");
         if(selection.termIds().size()>BusinessGlossary.MAX_SELECTED||selection.termIds().size()!=search.hits().size()||new HashSet<>(selection.termIds()).size()!=selection.termIds().size())throw BusinessGlossary.invalid();
         var selected=new ArrayList<Hit>();for(String id:selection.termIds())selected.add(search.hits().stream().filter(h->h.term().id().equals(id)).findFirst().orElseThrow(BusinessGlossary::stale));
-        var result=BusinessGlossary.snapshot(search,selected,json,Instant.now());verify(s,result);return result;
+        var result=BusinessGlossary.snapshot(search,selected,json,Instant.now());verify(s,result);
+        if(releases!=null&&s.metadata().semanticRelease().selected()!=null){String payload=releases.stamp(s,result.source());result=new Snapshot(result.owner(),result.profile(),result.question(),result.mode(),result.targets(),result.tokens(),result.textQuery(),result.selected(),payload,OntologyQueryService.hash(payload),result.capturedAt());}
+        return result;
     }
     public void verify(PoolSession s,Snapshot snapshot){
         if(snapshot==null)return;if(!owner(s).equals(snapshot.owner()))throw BusinessGlossary.stale();
+        var release=s.metadata().semanticRelease().selected();if(release!=null){SemanticReleaseService.verifyTerms(release,snapshot.selected().stream().map(Hit::term).toList());return;}
         query(s,false,()->{repository.requireTable(owner(s));for(var hit:snapshot.selected()){
             var current=repository.find(owner(s),hit.term().id());if(!current.enabled()||!current.equals(hit.term()))throw BusinessGlossary.stale();
         }return null;});
@@ -105,8 +116,9 @@ public class BusinessGlossaryService {
         var result=OntologyQuestionGrounding.resolve(found,ids);verifyTerms(s,result.terms());return result;
     }
     public void verifyTerms(PoolSession s,List<Term> terms){
+        var release=s.metadata().semanticRelease().selected();if(release!=null){SemanticReleaseService.verifyTerms(release,terms);return;}
         query(s,false,()->{verifyTermsInTransaction(s,terms);return null;});
     }
     /** Caller already holds the authenticated login's read transaction. */
-    public void verifyTermsInTransaction(PoolSession s,List<Term> terms){repository.requireTable(owner(s));for(var term:terms)if(!term.equals(repository.find(owner(s),term.id())))throw BusinessGlossary.stale();}
+    public void verifyTermsInTransaction(PoolSession s,List<Term> terms){var release=s.metadata().semanticRelease().selected();if(release!=null){SemanticReleaseService.verifyTerms(release,terms);return;}repository.requireTable(owner(s));for(var term:terms)if(!term.equals(repository.find(owner(s),term.id())))throw BusinessGlossary.stale();}
 }
