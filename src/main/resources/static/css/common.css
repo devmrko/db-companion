@@ -1359,6 +1359,8 @@ dialog.app-profile-editor-compact { width: min(640px, calc(100vw - 32px)); }
 .app-card-note { margin: 0; padding: 12px 24px; font-size: 13px; line-height: 1.6; color: var(--app-muted); }
 .app-empty { margin: 0; padding: 24px; text-align: center; color: var(--app-muted); font-size: 13px; }
 .app-field { display: grid; gap: 7px; min-width: 0; }
+.app-selection-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.app-selection-toolbar > .app-field { flex: 1 1 260px; }
 .app-scroll-region { min-width: 0; max-height: 480px; overflow: auto; margin-block: 12px; }
 .app-scroll-region .app-table input[type="number"] { min-width: 100px; }
 .app-creation-grid > .app-field { display: grid; }

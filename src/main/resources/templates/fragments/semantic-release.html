@@ -1,13 +1,21 @@
 <!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
-<section th:fragment="panel" class="app-card app-module-card" data-semantic-release th:attr="data-base=@{/semantic-releases}">
+<section th:fragment="panel" class="app-card app-module-card" data-semantic-selector th:attr="data-base=@{/semantic-releases}">
+  <input type="hidden" data-sr-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+  <div class="app-card-heading"><h2 th:text="#{semantic.selection}"></h2><a th:href="@{/semantic-versions}" th:text="#{semantic.management}"></a></div>
+  <div class="app-selection-toolbar"><label class="app-field" for="semantic-selection"><span th:text="#{semantic.selection}"></span><select id="semantic-selection" class="form-select app-select" data-sr-selection disabled></select></label><button type="button" class="btn app-btn app-btn-secondary" data-sr-select disabled th:text="#{semantic.apply}"></button></div>
+  <p class="app-filter-message" th:text="#{semantic.testHelp}"></p>
+  <p class="app-filter-message" data-sr-current></p><p role="status" aria-live="polite" data-sr-message></p>
+  <script type="module" th:src="@{/js/semantic-selector.mjs}"></script>
+</section>
+<section th:fragment="manager" class="app-card app-module-card" data-semantic-release th:attr="data-base=@{/semantic-releases}">
   <input type="hidden" data-sr-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
   <h2 th:text="#{semantic.title}">시멘틱 배포 버전</h2>
   <p class="app-filter-message" th:text="#{semantic.help}"></p>
   <p role="status" data-sr-message></p>
   <button type="button" class="btn app-btn app-btn-primary" data-sr-initialize hidden th:text="#{semantic.initialize}"></button>
-  <label for="semantic-selection" th:text="#{semantic.selection}"></label>
-  <div class="app-editor-actions"><select id="semantic-selection" class="form-select app-select" data-sr-selection disabled></select><button type="button" class="btn app-btn app-btn-primary" data-sr-select disabled th:text="#{semantic.apply}"></button></div>
   <p class="app-filter-message" data-sr-current></p>
+  <h3 th:text="#{semantic.list}"></h3><div class="app-scroll-region" data-sr-contents></div>
+  <details class="app-disclosure" data-sr-detail hidden><summary th:text="#{semantic.view}"></summary><div class="app-scroll-region" data-sr-summary></div><details><summary>JSON</summary><pre class="app-preview-source" data-code-language="json" data-sr-json></pre></details></details>
   <details class="app-disclosure"><summary th:text="#{semantic.manage}"></summary>
     <p th:text="#{semantic.snapshotHelp}"></p>
     <div class="app-field app-section"><label for="semantic-name" th:text="#{semantic.name}"></label><input id="semantic-name" class="form-control" maxlength="120" data-sr-name></div>
@@ -25,8 +33,7 @@
       <div class="app-field"><label for="semantic-reason" th:text="#{semantic.reason}"></label><input id="semantic-reason" class="form-control" maxlength="500" data-sr-reason></div>
     </div>
     <button type="button" class="btn app-btn app-btn-secondary" data-sr-deploy disabled th:text="#{semantic.deploy}"></button>
-    <details><summary th:text="#{semantic.contents}"></summary><div data-sr-contents></div></details>
-    <h3 th:text="#{semantic.history}"></h3><div data-sr-history></div>
   </details>
+  <details class="app-disclosure"><summary th:text="#{semantic.history}"></summary><div data-sr-history></div></details>
   <script type="module" th:src="@{/js/semantic-release.mjs}"></script>
 </section></body></html>

@@ -10,12 +10,19 @@ test('revision editor preserves parent membership and offers new current items u
 test('version selector has deployed default and explicit live development, never implicit HEAD',()=>{
   assert.deepEqual(selectionItems([{id:'12345678-9',name:'v1'}]).map(x=>x[0]),['DEFAULT','LIVE','12345678-9']);
 });
-test('both query screens use the same version panel and mutations require explicit confirmation',()=>{
+test('query selector cannot initialize, create, revise or deploy versions',()=>{
   for(const file of ['ontology-query','ai-test'])assert.match(readFileSync(`src/main/resources/templates/${file}.html`,'utf8'),/fragments\/semantic-release :: panel/);
-  const js=readFileSync('src/main/resources/static/js/semantic-release.mjs','utf8');
-  assert.match(js,/expected:state.preference/);assert.match(js,/expected:state.head/);
+  const js=readFileSync('src/main/resources/static/js/semantic-selector.mjs','utf8');
+  assert.match(js,/expected:state.preference/);assert.doesNotMatch(js,/['"]\/(deploy|create|initialize|revise)['"]/);
   assert.match(js,/assistantPost/);assert.doesNotMatch(js,/innerHTML|localStorage|sessionStorage/);
   assert.match(js,/location.reload\(\)/);
+});
+test('manager has row actions and cannot change the test selection',()=>{
+  const js=readFileSync('src/main/resources/static/js/semantic-release.mjs','utf8');
+  assert.match(js,/expected:state.head/);assert.doesNotMatch(js,/post\('\/select'/);
+  for(const key of ['view','editCopy','promote'])assert.ok(js.includes(`action('${key}'`));
+  const html=readFileSync('src/main/resources/templates/semantic-versions.html','utf8');
+  assert.match(html,/semantic-release :: manager/);assert.doesNotMatch(html,/semantic-release :: panel/);
 });
 test('semantic labels exist in all supported languages',()=>{
   const keys=Object.keys(JSON.parse(readFileSync('tools/i18n/feature-semantic-release.json','utf8')));

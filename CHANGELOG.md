@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.0-alpha.15
+
+Prepared on 2026-10-14. Deployment-version UI separation; not production-certified.
+
+- Add a dedicated Deployment versions page and sidebar menu. Show version name,
+  operational status, creator and creation time, with view, revise and promote actions.
+- Keep only the version selector and management link on Ontology Query and Select
+  AI Test. Explicitly distinguish the retained test selection from operational
+  deployment and label live definitions as an unreleased working copy.
+- Show deployment members and item revisions before the expandable JSON details.
+  Clear stale editor state and reuse shared responsive layout classes.
+- Initial deployment setup no longer changes an existing test selection.
+
+Validation: Java 1,385 tests passed; JavaScript 675 passed, one optional test skipped.
+Build, PMD and publication checks passed. Tests cover authentication, CSRF, four-language
+template rendering and separation of query selectors from management actions.
+Signed-in browser layout and real Oracle persistence remain unverified; no DB objects,
+definitions, profiles or deployment records were changed during this UI update.
+
 ## 0.1.0-alpha.14
 
 Prepared on 2026-10-14. Semantic deployment versioning alpha; not production-certified.

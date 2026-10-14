@@ -74,11 +74,15 @@ Unsupported generation paths must reject a release instead of silently mixing ve
 
 ## UI
 
-Shared semantic-version panel in Select AI Test and Ontology Query: deployed default,
-explicit release, development/live selection; snapshot contents; create from current
-saved definitions; promote/rollback with expected pointer and explicit confirmation;
-deployment history using Changed by / Changed at / Change details. Creation, selection
-and deployment are separate actions. Switching production does not mutate live sources.
+Dedicated Deployment versions page (/semantic-versions), linked from the sidebar:
+version list, creator/time, operational badge, view contents, create revision and
+promote/rollback actions with expected pointer, reason and confirmation. Initialization
+does not change a previously selected test preference. Query/Test pages have only the
+test selector and a management link; they cannot create or promote from those panels.
+Label LIVE as unreleased working definitions, not a second operational environment.
+The retained DB-account test choice is explicitly distinguished from the operational
+pointer. Creation, selection and deployment are separate actions. Switching production
+does not mutate live sources.
 
 ## Verification
 
@@ -90,8 +94,8 @@ Actual DB writes and paid AI validation require separate user approval.
 
 ## Implementation limits and rollout
 
-- The management panel is shared by Ontology Query and Select AI Test. It is not a
-  separate branch manager. Revision numbers reference existing item histories.
+- The dedicated management page is not a branch manager. Revision numbers reference
+  existing item histories. Query and test pages share only the version selector.
 - A complete query-enabled snapshot is bounded at 2,000 active terms, 100 saved
   ontology sources and the existing archive JSON limit. Exceeding a limit fails the
   whole save, not a partial release. At least one saved ontology source is required.
