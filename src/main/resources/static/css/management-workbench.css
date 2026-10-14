@@ -13,8 +13,8 @@
 .app-management-workbench .workbench-wide { grid-column: 1 / -1; }
 .app-management-workbench label:not(:has(input[type=checkbox])) { display: block; min-width: 0; }
 .app-management-workbench label > span:first-child { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
-.app-management-workbench :is(.form-control, .form-select) { width: 100%; min-width: 0; max-width: 100%; background-color: var(--app-surface); font-size: 14px; padding: 10px 12px; line-height: 1.5; }
-.app-management-workbench .form-select { padding-right: 36px; min-height: 42px; }
+.app-management-workbench :is(.form-control, .form-select) { width: 100%; min-width: 0; max-width: 100%; background-color: var(--app-surface); font-size: 13px; padding: 8px 12px; line-height: 1.5; }
+.app-management-workbench .form-select { padding-right: 36px; min-height: var(--app-control-height); }
 .app-management-workbench textarea { min-height: 88px; resize: vertical; }
 .app-management-workbench .workbench-code { font: 13px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; }
 .app-management-workbench .workbench-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }

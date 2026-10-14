@@ -29,7 +29,7 @@ export function queryGraph(summary,selection,showReferences=false){
     // A multi-source dictionary rule must not be depicted as independent per-source aggregates.
     if(selection.mode==='INDEPENDENT'&&mapped.length===1){
       const ruleId='rule:'+i;
-      nodes.push({data:{id:ruleId,kind:'rule',label:graphLabel(rule.term,36)+'\n'+text('ruleBasis')+'\n'+graphLabel(rule.definition,110),record:rule,reference:ref},position:{x:690,y:110+i*210}});
+      nodes.push({data:{id:ruleId,kind:'rule',label:graphLabel(rule.term,36)+'\n'+text('ruleBasis')+'\n'+graphLabel(rule.definition,60),record:rule,reference:ref},position:{x:690,y:110+i*210}});
       outputs.get(mapped[0]).push(ruleId);
       edges.push({data:{id:'criteria:'+i,source:nodeId(mapped[0]),target:ruleId,kind:'criteria',label:text('ruleBasis'),record:rule,reference:ref}});
     }
@@ -67,7 +67,7 @@ export function graphPanel(host,summary){
   const header=element('div'),title=element('h4',text('title')),toolbar=element('div');header.className='app-query-graph-header';toolbar.className='app-query-graph-tools';header.append(title,toolbar);
   const hint=element('p',text('readingHint')),legend=element('p',text('legend'));hint.className=legend.className='app-query-graph-caption';
   const body=element('div'),canvas=element('div'),detail=element('aside');body.className='app-query-graph-body';canvas.className='app-query-graph-canvas';detail.className='app-query-graph-detail';
-  canvas.setAttribute('role','img');canvas.setAttribute('aria-label',text('title'));detail.setAttribute('aria-label',text('detail'));
+  canvas.className+=' app-graph-canvas';canvas.setAttribute('role','img');canvas.setAttribute('aria-label',text('title'));detail.setAttribute('aria-label',text('detail'));
   const picker=element('select'),pickerLabel=element('label',text('inspect'));picker.className='form-select';pickerLabel.append(picker);
   const counts=element('p'),warning=element('p');counts.className=warning.className='app-query-graph-caption';warning.setAttribute('role','status');
   function button(key,action){const b=element('button',text(key));b.type='button';b.className='btn app-btn app-btn-quiet';b.addEventListener('click',action);toolbar.append(b);return b;}

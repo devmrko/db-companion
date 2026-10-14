@@ -39,7 +39,7 @@
     </form>
     <p class="app-muted app-sql-scope" th:if="${kind == 'cache' && sqlSourceBlocked != true}" th:text="#{sqlh.cache.scope}"></p>
     <div class="app-alert is-error" role="alert" th:if="${inputError}" th:text="${inputError}"></div>
-    <p class="app-muted" th:if="${result == null && inputError == null && sqlSourceBlocked != true}" th:text="#{sqlh.start}"></p>
+    <p class="app-card-note" th:if="${result == null && inputError == null && sqlSourceBlocked != true}" th:text="#{sqlh.start}"></p>
     <th:block th:if="${result != null}">
       <div class="app-execution-access">
         <span th:if="${result.failure != null && result.failure.cancelled()}" class="app-badge app-access-status" role="status" data-access="cancelled" th:text="#{sqlh.cancelled}"></span>

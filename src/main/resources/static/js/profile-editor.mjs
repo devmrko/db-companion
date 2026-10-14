@@ -79,6 +79,7 @@ function mount(dialog) {
     pending?.abort(); pending=new AbortController(); const id=++generation;
     cleanup();cleanup=()=>{};find('raw').append(value);find('raw').querySelector('details')?.remove();find('control').replaceChildren();find('help').replaceChildren();
     control=value;state=null; locked=false; reload=false; fields.disabled=true; value.value=''; initial=''; count();
+    find('raw').hidden=true;find('counter').hidden=true;
     find('object').textContent=`${dialog.dataset.schema}.${dialog.dataset.profile}`;
     find('label').textContent=button.dataset.editProfileAttribute; find('hint').textContent='';
     show(t('ui.8bf609c884ca', "불러오는 중…")); dialog.showModal();

@@ -30,7 +30,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ai-creation]')
   const sync=()=>{get('attributes').value=JSON.stringify(config,null,2);invalidate();};
   function fields(){get('typed').replaceChildren();
     for(const [name,value]of Object.entries(config)){
-      const label=el('label'),title=el('span',name);label.append(title);const spec=profileField(name);let input;
+      const label=el('label'),title=el('span',name);label.className=typeof value==='boolean'?'app-check-field':'app-field';label.append(title);const spec=profileField(name);let input;
       const choices=name==='credential_name'?form.credentials:form.references[name];
       if(typeof value==='boolean'){input=el('input');input.type='checkbox';input.checked=value;input.setAttribute('role','switch');}
       else if(choices||name==='provider'||name==='tool_type'){

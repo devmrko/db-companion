@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.1.0-alpha.12
+
+Prepared on 2026-10-14. UI consistency update; not a production-certified release.
+
+- Reuse shared card headings, section spacing, field, checkbox, empty-state and
+  graph-container classes. Align single-line controls and buttons at 38px.
+- Fix creation-dialog headings, table action wrapping, dashboard build details,
+  history guidance spacing, workbench controls and profile-editor loading layout.
+- Show relationship labels on selection and fit the initial graph to its canvas;
+  retain the complete relationship list and evidence details.
+
+Validation: Java 1,363 tests passed; JavaScript 663 passed with one optional test
+skipped. Quality and publication checks passed. Desktop browser checks covered
+dashboard, profile creation layout, VPD controls, DDS empty state and relationship
+rendering. No database writes or paid AI calls were made. Mobile layouts and all
+permission-dependent paths were not revalidated in this update.
+
 ## 0.1.0-alpha.11
 
 Prepared on 2026-10-13. Eleventh public alpha; not a production-certified release.

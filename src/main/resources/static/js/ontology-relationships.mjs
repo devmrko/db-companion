@@ -1,6 +1,6 @@
 import {t} from './i18n.mjs';
 import {assistantApi} from './ai-assistant.mjs';
-import {tableId,readableZoom} from './ontology-erd.mjs';
+import {tableId} from './ontology-erd.mjs';
 const label=(key,...args)=>t('ontology.relationships.'+key,key,...args);
 const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text??'';if(cls)e.className=cls;return e;};
 const normalize=s=>String(s??'').normalize('NFC').toLocaleLowerCase();
@@ -47,14 +47,15 @@ export function ontologyRelationships(root,{schema,base,post,run,saved,openDefin
   function input(value,max,area=false){const e=el(area?'textarea':'input',undefined,'form-control');e.value=value??'';e.maxLength=max;if(area)e.rows=2;e.addEventListener('input',()=>dirty=true);return e;}
   function selector(host,title,items,value,change){const e=el('select',undefined,'form-select app-select');e.setAttribute('aria-label',title);e.append(...items.map(v=>new Option(v.label??v.name,v.name)));e.value=value;e.addEventListener('change',()=>{dirty=true;change(e.value);});field(host,title,e);return e;}
   function draw(){
-    cy?.destroy();cy=null;get('canvas').replaceChildren();if(!data.tables.length){status(label('empty'));return;}
+    cy?.destroy();cy=null;get('canvas').classList.add('app-graph-canvas');get('canvas').replaceChildren();if(!data.tables.length){status(label('empty'));return;}
     if(typeof globalThis.cytoscape!=='function')throw new Error(t('ontology.erd.libraryError','Diagram library unavailable'));
     const theme=getComputedStyle(root),color=(key,fallback)=>theme.getPropertyValue(key).trim()||fallback;
     cy=globalThis.cytoscape({container:get('canvas'),elements:relationElements(data),minZoom:.08,maxZoom:2.5,userZoomingEnabled:false,
       layout:{name:'grid'},style:[
         {selector:'node',style:{shape:'roundrectangle',width:250,height:90,label:'data(label)','text-wrap':'wrap','text-max-width':225,'font-size':13,'text-valign':'center',color:color('--app-text','#302c28'),'background-color':color('--app-surface','#fff'),'border-width':1.5,'border-color':color('--app-border','#bbb')}},
         {selector:'node.boundary',style:{'border-style':'dashed'}},
-        {selector:'edge',style:{width:1.5,'curve-style':'bezier','target-arrow-shape':'triangle',label:'data(label)','font-size':10,'text-background-opacity':.9,'text-background-color':color('--app-surface','#fff'),'text-wrap':'ellipsis','text-max-width':140,'line-color':color('--app-muted','#888'),'target-arrow-color':color('--app-muted','#888')}},
+        {selector:'edge',style:{width:1.5,'curve-style':'bezier','target-arrow-shape':'triangle',label:'','font-size':12,'text-background-opacity':.9,'text-background-color':color('--app-surface','#fff'),'text-wrap':'ellipsis','text-max-width':180,'line-color':color('--app-muted','#888'),'target-arrow-color':color('--app-muted','#888')}},
+        {selector:'edge:selected, edge:active',style:{label:'data(label)','z-index':10}},
         {selector:'edge.candidate, edge.stale, edge.unchecked',style:{'line-style':'dashed','line-color':'#af752f','target-arrow-color':'#af752f'}},
         {selector:'edge.approved',style:{width:2.5,'line-color':'#497867','target-arrow-color':'#497867'}},
         {selector:':selected',style:{'border-width':3,'border-color':color('--app-accent','#845e4d'),'overlay-opacity':.12}}
@@ -64,7 +65,7 @@ export function ontologyRelationships(root,{schema,base,post,run,saved,openDefin
     cy.on('zoom',()=>get('zoom').textContent=Math.round(cy.zoom()*100)+'%');layout();
   }
   function focus(){if(cy){cy.resize();cy.zoom(1);cy.center(cy.$(':selected').length?cy.$(':selected'):cy.nodes().sort((a,b)=>b.degree()-a.degree()).first());}}
-  function layout(){if(cy&&data){cy.resize();cy.layout({name:data.tables.length>120?'grid':'cose',animate:false,randomize:false,padding:30,nodeRepulsion:()=>14000,idealEdgeLength:()=>95,numIter:500}).run();const zoom=readableZoom(cy.zoom());focus();cy.zoom(zoom);get('zoom').textContent=Math.round(zoom*100)+'%';}}
+  function layout(){if(cy&&data){cy.resize();cy.layout({name:'grid',animate:false,padding:30,avoidOverlap:true,spacingFactor:1.4}).run();cy.fit(undefined,35);get('zoom').textContent=Math.round(cy.zoom()*100)+'%';}}
   function counts(){status(label('counts',data.tables.length,...['FK','CANDIDATE','APPROVED','REJECTED','STALE'].map(s=>data.relations.filter(r=>r.status===s).length)));
     const scope=coverage();get('coverage').textContent=t('ontology.discovery.coverage','Saved {0} / {1}',scope.saved,scope.total);
     const isolated=unconnectedTables(data,schema);

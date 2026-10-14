@@ -1,6 +1,6 @@
 <!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body><th:block th:fragment="editor(kind)">
 <section th:if="${info.username == selectedSchema}" class="app-card" data-local-create th:attr="data-kind=${kind},data-schema=${selectedSchema},data-base=@{/db/objects/create}">
-  <details data-lc-panel><summary th:text="${kind == 'CREDENTIAL'} ? #{localCreate.credential} : #{localCreate.function}">신규 생성</summary>
+  <details class="app-disclosure" data-lc-panel><summary th:text="${kind == 'CREDENTIAL'} ? #{localCreate.credential} : #{localCreate.function}">신규 생성</summary>
     <div class="app-disclosure-body">
       <p class="app-muted" th:text="#{localCreate.help}"></p>
       <input type="hidden" data-lc-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
