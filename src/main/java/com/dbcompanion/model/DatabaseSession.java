@@ -26,6 +26,8 @@ public final class DatabaseSession {
     public SelectAiComparison.State aiComparison(){return aiComparison;}
     private final SelectAiBatch.State aiBatch = new SelectAiBatch.State();
     public SelectAiBatch.State aiBatch(){return aiBatch;}
+    private final ProblemEvaluation.State problemEvaluation=new ProblemEvaluation.State();
+    public ProblemEvaluation.State problemEvaluation(){return problemEvaluation;}
     private final ExternalSources.State externalSources = new ExternalSources.State();
     public ExternalSources.State externalSources() { return externalSources; }
     private final Scheduler.State scheduler = new Scheduler.State();

@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.0-alpha.13
+
+Prepared on 2026-10-14. Advisory evaluation update; not a production-certified release.
+
+- Add advisory LLM review of saved problem-question attempts, followed by a
+  separate human verdict and required reason. Preview evidence and obtain
+  one-call transmission consent; do not execute SQL or change business rules.
+- Preserve criteria fingerprints, original evidence, reviewer profile/version,
+  timing and human decisions in owner-local evaluation history. Support retrying
+  a failed save without repeating the AI call and include evaluations in confirmed
+  question deletion. Batch evaluation and accuracy dashboards remain future work.
+- Design: [Question evaluation and human decisions](docs/problem-evaluation-design.md).
+
+Validation: Java 1,374 tests passed; JavaScript 665 passed with one optional test
+skipped. Quality, packaging and publication checks passed. New tests cover
+consent, stale evidence/profile settings, human verdict requirements, save retry,
+duplicate prevention, session ownership, CSRF and late UI responses. Actual
+Oracle evaluation persistence and paid AI review remain unverified.
+
 ## 0.1.0-alpha.12
 
 Prepared on 2026-10-14. UI consistency update; not a production-certified release.
