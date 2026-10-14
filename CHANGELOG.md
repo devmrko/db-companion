@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.0-alpha.16
+
+Prepared on 2026-10-14. Deployment numbering and setup feedback fixes; not production-certified.
+
+- Show automatically assigned numeric deployment versions (v1, v2, ...) separately
+  from descriptions. Preserve UUID references and snapshot hashes; operational
+  rollback leaves version numbers unchanged.
+- Add explicit missing-storage SQL preview and consented creation on Deployment
+  versions. Enforce owner scope, privilege checks, CSRF and expiring single-use
+  tickets. Never install on read or replace an existing table.
+- Show progress, errors and empty operational-history messages. Remove the
+  misleading fixed history count. Log safe error category/Oracle code for diagnosis.
+- Batch glossary revision enrichment during initial snapshot capture instead of
+  repeatedly checking the archive per term. Retain physical metadata validation.
+
+Validation: Java 1,388 tests passed; JavaScript 676 passed, one optional test skipped.
+Build, PMD and publication checks passed. Real Oracle DDL, number allocation/concurrency
+and signed-in browser behavior remain unverified (browser connector failed to load).
+No existing business definitions or profiles are changed by deployment. Initial
+creation performance is improved in code; the reported runtime failure was not reproduced.
+
 ## 0.1.0-alpha.15
 
 Prepared on 2026-10-14. Deployment-version UI separation; not production-certified.

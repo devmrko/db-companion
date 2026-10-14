@@ -15,6 +15,10 @@ transaction. GET, login and search never write. If an operational pointer alread
 exists, initialization returns that version without creating another. A concurrent
 initialization must roll back on pointer conflict, not leave a partial deployment.
 Missing storage or empty ontology requires setup; neither triggers automatic DDL.
+The management screen can explicitly preview and create missing DBC_APP_RECORD storage.
+Creation requires owner scope, CREATE TABLE privilege, a five-minute single-use server
+ticket, CSRF and user consent. DDL auto-commits; failures require checking actual storage
+state before retrying. Existing tables are never replaced, and GET never installs.
 
 Editing a deployment version starts from its immutable membership. The administrator
 can select a historical revision for each term or ontology source, add items, or
@@ -49,6 +53,16 @@ Use a fixed owner-local deployment pointer row, optimistic expected revision and
 transactional deployment event. A stale browser cannot overwrite a newer deployment.
 Rollback selects a previously saved release; it does not overwrite dictionary or DB
 comments. Actor and timestamps originate in the authenticated DB session.
+
+Display deployments as numeric versions (v1, v2, ...), separate from their editable
+description on creation. UUIDs remain internal references and existing snapshot hashes
+are unchanged. A typed SEMANTIC_NUMBERS row maps release IDs to stable positive numbers;
+allocation is locked and committed in the same transaction as the new release. Legacy
+releases are numbered by creation sequence; the first subsequent save persists that
+mapping. Concurrent first-allocation conflicts fail and roll back, never auto-retry.
+The number map is bounded at 10,000 releases. Rollback does not reuse or reset numbers.
+Snapshot capture enriches active glossary revisions in one batch rather than validating
+the archive independently for every term. Physical metadata checks remain mandatory.
 
 ## Query binding
 

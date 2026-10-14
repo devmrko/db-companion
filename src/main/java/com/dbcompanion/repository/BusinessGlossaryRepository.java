@@ -106,6 +106,11 @@ public class BusinessGlossaryRepository {
         if(rows.size()>BusinessGlossary.MAX_TERMS)throw BusinessGlossary.failure(413,"사전 내보내기·가져오기 검토 한도는 2,000개입니다. 일부만 처리하지 않습니다.");
         return enrich(owner,rows);
     }
+    /** Batch release capture avoids repeating history-store introspection per term. */
+    public List<Term> releaseTerms(String owner){
+        var rows=jdbc.query("SELECT * FROM "+table(owner)+" WHERE ENABLED_YN='Y' ORDER BY TERM_TEXT,TERM_ID FETCH FIRST 2001 ROWS ONLY",(r,n)->term(r));
+        if(rows.size()>BusinessGlossary.MAX_TERMS)throw BusinessGlossary.failure(413,"활성 용어가 배포 버전 한도 2,000개를 초과합니다.");return enrich(owner,rows);
+    }
     /** Serialize import name checks against concurrent INSERT/UPDATE transactions; no DDL/commit. */
     public void lockTransfer(String owner) {
         jdbc.execute("LOCK TABLE "+table(owner)+" IN SHARE ROW EXCLUSIVE MODE WAIT 5");

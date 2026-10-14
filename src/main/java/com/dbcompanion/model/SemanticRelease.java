@@ -10,6 +10,8 @@ public final class SemanticRelease {
     public static final String TYPE="SEMANTIC_RELEASE",DEPLOY="SEMANTIC_DEPLOY",POINTER="SEMANTIC_POINTER";
     public static final String POINTER_ID="1853af8e-a445-4d27-b590-03dffed30cb2";
     public static final String PREFERENCE="SEMANTIC_PREFERENCE",PREFERENCE_ID="aed9dc50-bedd-411e-973b-a5083bbbf3db";
+    public static final String NUMBERS="SEMANTIC_NUMBERS",NUMBERS_ID="bf19f014-699e-4e5c-9571-1e3226ce9837";
+    public record Numbering(Map<String,Long> values){public Numbering{values=Map.copyOf(values);values.keySet().forEach(QueryArchive::id);if(values.values().stream().anyMatch(n->n<1)||new HashSet<>(values.values()).size()!=values.size())throw invalid();}}
     public record Preference(long revision,String selection){public Preference{if(revision<0)throw invalid();if(!Set.of("LIVE","DEFAULT").contains(selection))QueryArchive.id(selection);}}
     public record Content(int format,String database,String owner,String name,List<BusinessGlossary.Term> terms,List<Ontology.Entry> entries,String parentId){
         public Content(int format,String database,String owner,String name,List<BusinessGlossary.Term> terms,List<Ontology.Entry> entries){this(format,database,owner,name,terms,entries,"");}
@@ -34,13 +36,20 @@ public final class SemanticRelease {
     public record Deployment(String previous,String target,long revision,String reason){}
     public record TermRef(String id,long revision){public TermRef{BusinessGlossary.id(id);if(revision<1)throw invalid();}}
     public record SourceRef(String table,int revision){public SourceRef{Ontology.name(table);if(revision<1)throw invalid();}}
+    public record StoragePlan(String token,String owner,String sql,java.time.Instant expiresAt){}
     public static AiAssistant.Failure invalid(){return BusinessGlossary.failure(409,"시멘틱 버전이 없거나 범위·무결성을 확인할 수 없습니다. 버전을 다시 선택해 주세요.");}
     public static final class State {
         private boolean resolved;
         private Version selected;
+        private StoragePlan storagePlan;
+        public synchronized StoragePlan storagePlan(StoragePlan value){storagePlan=value;return value;}
+        public synchronized StoragePlan consumeStorage(String token,String owner,boolean confirmed,java.time.Instant now){
+            var plan=storagePlan;storagePlan=null;
+            if(!confirmed||plan==null||!plan.token().equals(token)||!plan.owner().equals(owner)||!now.isBefore(plan.expiresAt()))throw invalid();return plan;
+        }
         public synchronized boolean resolved(){return resolved;}
         public synchronized Version selected(){return selected;}
         public synchronized void select(Version value){selected=value;resolved=true;}
-        public synchronized void clear(){selected=null;resolved=false;}
+        public synchronized void clear(){selected=null;resolved=false;storagePlan=null;}
     }
 }

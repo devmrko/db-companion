@@ -1,6 +1,6 @@
 import {t} from './i18n.mjs';
 import {assistantApi,assistantPost} from './ai-assistant.mjs';
-import {selectionItems} from './semantic-release.mjs';
+import {selectionItems,versionLabel} from './semantic-release.mjs';
 
 const label=(key,...args)=>t('semantic.'+key,key,...args);
 if(typeof document!=='undefined')document.querySelectorAll('[data-semantic-selector]').forEach(root=>{
@@ -22,7 +22,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-semantic-selec
       const option=document.createElement('option');option.value=value;option.textContent=text;return option;
     }));
     get('selection').value=state.preference.selection;
-    const name=id=>state.versions.find(v=>v.id===id)?.name||id;
+    const name=id=>{const version=state.versions.find(v=>v.id===id);return version?versionLabel(version):id;};
     get('current').textContent=label('current',name(state.head.releaseId)||'—',name(state.selected)||(state.preference.selection==='LIVE'?label('live'):label('pending')));
     get('message').textContent=state.storage!=='READY'?label('storage'):!state.head.releaseId?label('needsSetup'):'';
   });

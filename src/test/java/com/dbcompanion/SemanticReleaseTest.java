@@ -5,6 +5,7 @@ import com.dbcompanion.model.*;
 import com.dbcompanion.model.SemanticRelease.*;
 import com.dbcompanion.repository.*;
 import com.dbcompanion.service.*;
+import com.dbcompanion.service.SemanticReleaseService.Item;
 import java.sql.Connection;
 import java.util.*;
 import org.junit.jupiter.api.Test;
@@ -20,12 +21,17 @@ class SemanticReleaseTest {
         case "getAutoCommit"->true;case "getTransactionIsolation"->Connection.TRANSACTION_READ_COMMITTED;case "equals"->p==a[0];case "hashCode"->System.identityHashCode(p);default->empty(m.getReturnType());});}};
     final JdbcTemplate jdbc=new JdbcTemplate(source);String storage="READY";
     final Map<String,SemanticReleaseRepository.Row> saved=new LinkedHashMap<>();final Map<String,String> kinds=new HashMap<>();
-    Head head=new Head(0,"");Preference preference=new Preference(0,"DEFAULT");int physicalChecks;
+    Head head=new Head(0,"");Preference preference=new Preference(0,"DEFAULT");int physicalChecks,installCalls;boolean canInstall=true;
+    final Map<String,Long> numbers=new LinkedHashMap<>();
     final AppRecordRepository records=new AppRecordRepository(jdbc,json){
         @Override public String status(String a,String b){return storage;}
         @Override public void require(String a,String b){if(!storage.equals("READY"))throw SemanticRelease.invalid();}
+        @Override public void install(String a,String b){installCalls++;storage="READY";}
     };
     final SemanticReleaseRepository repo=new SemanticReleaseRepository(jdbc,json){
+        @Override public Map<String,Long> numbers(String owner){return Map.copyOf(numbers);}
+        @Override public void assignNumber(String owner,String id){numbers.putIfAbsent(id,(long)numbers.size()+1);}
+        @Override public void requireStoragePrivilege(){if(!canInstall)throw SemanticRelease.invalid();}
         @Override public Head head(String owner){assertThat(owner).isEqualTo("APP");return head;}
         @Override public Preference preference(String owner){return preference;}
         @Override public void preference(String owner,Preference expected,String selection){if(!expected.equals(preference))throw SemanticRelease.invalid();preference=new Preference(expected.revision()+1,selection);}
@@ -40,6 +46,7 @@ class SemanticReleaseTest {
         @Override public void lockTransfer(String owner){}
         @Override public List<BusinessGlossary.Key> keys(String owner){return List.of(new BusinessGlossary.Key(term.id(),1,term.term(),term.aliases()));}
         @Override public BusinessGlossary.Term find(String owner,String id){return term;}
+        @Override public List<BusinessGlossary.Term> releaseTerms(String owner){return List.of(term);}
     };
     final OntologyRepository ontology=new OntologyRepository(jdbc,json,new DatabaseRepository(jdbc),new TableStructureRepository(jdbc)){
         @Override public List<Ontology.Entry> relationshipEntries(String a,String b){return List.of(fixtures.customer());}
@@ -48,6 +55,31 @@ class SemanticReleaseTest {
     final PropertyGraphRepository physical=new PropertyGraphRepository(jdbc){@Override public void verifyMetadata(List<Ontology.Entry> entries){physicalChecks++;}};
     final SemanticReleaseService service=new SemanticReleaseService(source,records,repo,glossary,ontology,physical,json);
     PoolSession session(){return new OntologyReadCacheTest().session();}
+    @Test void numericVersionsAreIndependentOfNamesAndRemainStableOnRollback(){try(var s=session()){
+        var a=service.create(s,"same description",true);var b=service.create(s,"same description",true);
+        assertThat(service.status(s).versions()).extracting(Item::number).containsExactly(1L,2L);
+        service.deploy(s,b.id(),head,"upgrade",true);service.deploy(s,a.id(),head,"rollback",true);
+        assertThat(service.status(s).versions()).extracting(Item::number).containsExactly(1L,2L);
+        assertThat(service.detail(s,a.id()).content().name()).isEqualTo("same description");
+    }}
+    @Test void storageNeedsPreviewConsentPrivilegeAndSingleUseToken(){try(var s=session()){
+        storage="MISSING";assertThat(service.status(s).storage()).isEqualTo("MISSING");assertThat(installCalls).isZero();
+        canInstall=false;assertThatThrownBy(()->service.storagePreview(s)).isInstanceOf(AiAssistant.Failure.class);
+        canInstall=true;var denied=service.storagePreview(s);assertThat(installCalls).isZero();
+        assertThatThrownBy(()->service.storageInstall(s,denied.token(),false)).isInstanceOf(AiAssistant.Failure.class);
+        assertThatThrownBy(()->service.storageInstall(s,denied.token(),true)).isInstanceOf(AiAssistant.Failure.class);
+        var plan=service.storagePreview(s);assertThat(plan.sql()).contains("CREATE TABLE");
+        assertThat(service.storageInstall(s,plan.token(),true).storage()).isEqualTo("READY");assertThat(installCalls).isEqualTo(1);
+        assertThatThrownBy(()->service.storageInstall(s,plan.token(),true)).isInstanceOf(AiAssistant.Failure.class);
+        assertThat(saved).isEmpty();
+    }}
+    @Test void storageTicketRejectsExpiryAndDifferentOwner(){
+        var state=new State();var now=java.time.Instant.now();
+        state.storagePlan(new StoragePlan("token","APP","sql",now));
+        assertThatThrownBy(()->state.consumeStorage("token","APP",true,now)).isInstanceOf(AiAssistant.Failure.class);
+        state.storagePlan(new StoragePlan("token","APP","sql",now.plusSeconds(60)));
+        assertThatThrownBy(()->state.consumeStorage("token","OTHER",true,now)).isInstanceOf(AiAssistant.Failure.class);
+    }
     @Test void immutableSnapshotHasHashAndDoesNotDeploy(){try(var s=session()){
         var v=service.create(s,"candidate",true);assertThat(v.content().terms()).containsExactly(term);assertThat(v.hash()).hasSize(64);
         assertThat(service.status(s).head().revision()).isZero();assertThatThrownBy(()->service.active(s)).isInstanceOf(AiAssistant.Failure.class);assertThat(saved).hasSize(1);assertThat(physicalChecks).isEqualTo(1);

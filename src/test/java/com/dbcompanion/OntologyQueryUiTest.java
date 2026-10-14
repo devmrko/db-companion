@@ -26,7 +26,7 @@ class OntologyQueryUiTest {
         for(String path:List.of("search","interpret","grounded-search","ai-interpret-preview","ai-recommend-preview","assistant-generate","plan-selection","preview","generate","execute","cancel","invalidate","archive/install","archive/setup","archive/preview","archive/save")){
             var res=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/ontology-query/"+path)).header("Content-Type","application/json").POST(HttpRequest.BodyPublishers.ofString("{}")).build(),HttpResponse.BodyHandlers.ofString());assertThat(res.statusCode()).as(path).isEqualTo(403);
         }
-        for(String action:List.of("create","select","deploy","initialize","revise")){
+        for(String action:List.of("create","select","deploy","initialize","revise","storage-preview","storage-install")){
             var res=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/semantic-releases/"+action)).header("Content-Type","application/json").POST(HttpRequest.BodyPublishers.ofString("{}")).build(),HttpResponse.BodyHandlers.ofString());assertThat(res.statusCode()).isEqualTo(403);
         }
         var script=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/js/ontology-query.mjs")).GET().build(),HttpResponse.BodyHandlers.ofString());assertThat(script.statusCode()).isEqualTo(200);assertThat(script.body()).contains("selectedRoute");
@@ -54,7 +54,7 @@ class OntologyQueryUiTest {
             assertThat(html).contains("data-oa-preview disabled","data-oa-save disabled","data-oa-install hidden","data-oa-dialog","CONSTRUCT","DBC_RDF");
             c.setVariable("activePage","semantic-versions");c.setVariable("languageReturn","/semantic-versions");
             String management=engine.process("semantic-versions",c);
-            assertThat(management).contains("data-semantic-release","data-sr-contents","data-sr-deploy disabled","data-sr-revise disabled","data-sr-initialize").doesNotContain("data-semantic-selector","data-sr-selection","??semantic.","th:");
+            assertThat(management).contains("data-semantic-release","data-sr-contents","data-sr-deploy disabled","data-sr-revise disabled","data-sr-initialize","data-sr-storage-preview hidden","data-sr-storage-install disabled","data-sr-storage-consent").doesNotContain("data-semantic-selector","data-sr-selection","??semantic.","th:");
         }
         assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/semantic-versions")).isEqualTo("/semantic-versions");
         assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/ontology-query")).isEqualTo("/ontology-query");assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/ontology-query/execute")).isEqualTo("/login");

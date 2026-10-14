@@ -12,6 +12,13 @@
   <h2 th:text="#{semantic.title}">시멘틱 배포 버전</h2>
   <p class="app-filter-message" th:text="#{semantic.help}"></p>
   <p role="status" data-sr-message></p>
+  <button type="button" class="btn app-btn app-btn-secondary" data-sr-storage-preview hidden th:text="#{semantic.storagePreview}"></button>
+  <section class="app-section" data-sr-storage-panel hidden>
+    <p th:text="#{semantic.storageHelp}"></p>
+    <pre class="app-preview-source" data-code-language="sql" data-sr-storage-sql></pre>
+    <label class="app-check-field"><input type="checkbox" data-sr-storage-consent><span th:text="#{semantic.storageConsent}"></span></label>
+    <button type="button" class="btn app-btn app-btn-primary" data-sr-storage-install disabled th:text="#{semantic.storageInstall}"></button>
+  </section>
   <button type="button" class="btn app-btn app-btn-primary" data-sr-initialize hidden th:text="#{semantic.initialize}"></button>
   <p class="app-filter-message" data-sr-current></p>
   <h3 th:text="#{semantic.list}"></h3><div class="app-scroll-region" data-sr-contents></div>

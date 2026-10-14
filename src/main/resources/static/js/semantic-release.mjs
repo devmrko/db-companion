@@ -3,7 +3,8 @@ import {assistantApi,assistantPost} from './ai-assistant.mjs';
 import {changeHistorySummary} from './change-history-summary.mjs';
 const label=(key,...args)=>t('semantic.'+key,key,...args);
 const node=(tag,text)=>{const e=document.createElement(tag);e.textContent=text;return e;};
-export function selectionItems(versions){return [['DEFAULT',label('default')],['LIVE',label('live')],...versions.map(v=>[v.id,`${v.name} · ${v.id.slice(0,8)}`])];}
+export const versionLabel=v=>`v${v.number} · ${v.name}`;
+export function selectionItems(versions){return [['DEFAULT',label('default')],['LIVE',label('live')],...versions.map(v=>[v.id,versionLabel(v)])];}
 export function editableMembers(parent,catalog){
   const terms=new Map(catalog.terms.map(t=>[t.id,{kind:'term',id:t.id,label:t.term,revision:t.revision,included:false}]));
   for(const t of parent.terms)terms.set(t.id,{kind:'term',id:t.id,label:t.term,revision:t.revision,included:true});
@@ -12,8 +13,8 @@ export function editableMembers(parent,catalog){
   return [...terms.values(),...sources.values()];
 }
 if(typeof document!=='undefined')document.querySelectorAll('[data-semantic-release]').forEach(root=>{
-  const get=name=>root.querySelector(`[data-sr-${name}]`);let state,busy=false,editing='',members=[];
-  const controls=()=>{for(const key of ['create','deploy','target','initialize','parent','load','revise'])get(key).disabled=busy||state?.storage!=='READY';get('deploy').disabled||=!state?.versions.length;get('load').disabled||=!state?.versions.length;get('revise').disabled||=!editing;for(const button of get('contents').querySelectorAll('button'))button.disabled=busy;};
+  const get=name=>root.querySelector(`[data-sr-${name}]`);let state,busy=false,editing='',members=[],storagePlan=null;
+  const controls=()=>{for(const key of ['create','deploy','target','initialize','parent','load','revise'])get(key).disabled=busy||state?.storage!=='READY';get('deploy').disabled||=!state?.versions.length;get('load').disabled||=!state?.versions.length;get('revise').disabled||=!editing;for(const button of get('contents').querySelectorAll('button'))button.disabled=busy;get('storage-preview').disabled=busy||state?.storage!=='MISSING';get('storage-install').disabled=busy||!storagePlan||!get('storage-consent').checked;};
   const options=(host,items)=>host.replaceChildren(...items.map(([value,text])=>{const e=node('option',text);e.value=value;return e;}));
   const reveal=element=>{for(let ancestor=element.parentElement;ancestor&&ancestor!==root;ancestor=ancestor.parentElement)if(ancestor.tagName==='DETAILS')ancestor.open=true;element.scrollIntoView({block:'nearest'});element.focus();};
   function showContents(snapshot){
@@ -22,7 +23,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-semantic-relea
     const append=(name,revision)=>{const row=node('tr','');row.append(node('td',name),node('td',String(revision)));body.append(row);};
     for(const term of snapshot.content.terms)append(`${label('term')} · ${term.term}`,term.revision);
     for(const entry of snapshot.content.entries)append(`${label('source')} · ${entry.document.source.table}`,entry.revision);
-    table.append(body);get('summary').replaceChildren(node('h3',snapshot.content.name),table);
+    table.append(body);const item=state.versions.find(v=>v.id===snapshot.id);get('summary').replaceChildren(node('h3',item?versionLabel(item):snapshot.content.name),table);
     get('json').textContent=JSON.stringify(snapshot,null,2);get('detail').hidden=false;get('detail').open=true;get('detail').scrollIntoView({block:'nearest'});
   }
   function versionList(data){
@@ -35,23 +36,35 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-semantic-relea
       action('view',()=>run(async()=>showContents(await assistantApi(root.dataset.base+'/'+encodeURIComponent(version.id)))));
       action('editCopy',()=>{get('parent').value=version.id;reveal(get('load'));get('load').click();});
       if(version.id!==data.head.releaseId)action('promote',()=>{get('target').value=version.id;get('reason').value='';reveal(get('reason'));});
-      actions.append(toolbar);row.append(node('td',version.name),node('td',label(version.id===data.head.releaseId?'operational':'saved')),node('td',version.recordedAt),node('td',version.actor),actions);body.append(row);
+      actions.append(toolbar);row.append(node('td',versionLabel(version)),node('td',label(version.id===data.head.releaseId?'operational':'saved')),node('td',version.recordedAt),node('td',version.actor),actions);body.append(row);
     }
     table.append(body);get('contents').replaceChildren(data.versions.length?table:node('p',label('empty')));
   }
   function render(data){state=data;
     editing='';members=[];get('members').replaceChildren();
-    options(get('target'),data.versions.map(v=>[v.id,`${v.name} · ${v.id.slice(0,8)}`]));
-    options(get('parent'),data.versions.map(v=>[v.id,`${v.name} · ${v.recordedAt}`]));
+    options(get('target'),data.versions.map(v=>[v.id,versionLabel(v)]));
+    options(get('parent'),data.versions.map(v=>[v.id,`${versionLabel(v)} · ${v.recordedAt}`]));
     get('initialize').hidden=data.storage!=='READY'||!!data.head.releaseId;
-    get('current').textContent=label('operationalCurrent',data.versions.find(v=>v.id===data.head.releaseId)?.name||data.head.releaseId||'—');
+    get('storage-preview').hidden=data.storage!=='MISSING';
+    const display=id=>{const v=data.versions.find(v=>v.id===id);return v?versionLabel(v):id||'—';};
+    get('current').textContent=label('operationalCurrent',display(data.head.releaseId));
     versionList(data);
-    get('history').replaceChildren(...data.history.map(row=>{const event=JSON.parse(row.payload);const p=node('p',changeHistorySummary({actor:row.actor,at:row.recordedAt,content:`${event.previous||'—'} → ${event.target} · ${event.reason}`}));p.className='app-change-history-summary';return p;}));
+    get('history').replaceChildren(...(data.history.length?data.history.map(row=>{const event=JSON.parse(row.payload);const p=node('p',changeHistorySummary({actor:row.actor,at:row.recordedAt,content:`${display(event.previous)} → ${display(event.target)} · ${event.reason}`}));p.className='app-change-history-summary';return p;}):[node('p',label('historyEmpty'))]));
     get('message').textContent=data.storage==='READY'?'':label('storage');controls();
   }
-  async function run(work){if(busy)return;busy=true;controls();get('message').textContent='';try{await work();}catch(e){get('message').textContent=e.message;}finally{busy=false;controls();}}
+  async function run(work){if(busy)return;busy=true;controls();get('message').textContent=label('processing');try{await work();if(get('message').textContent===label('processing'))get('message').textContent='';}catch(e){get('message').textContent=e.message;get('message').scrollIntoView({block:'nearest'});}finally{busy=false;controls();}}
   const post=(path,data)=>assistantApi(root.dataset.base+path,assistantPost(get('csrf'),data));
-  get('initialize').addEventListener('click',()=>run(async()=>{if(!confirm(label('confirmInitialize')))return;await post('/initialize',{confirmed:true});render(await assistantApi(root.dataset.base));}));
+  get('storage-consent').addEventListener('change',controls);
+  get('storage-preview').addEventListener('click',()=>run(async()=>{
+    storagePlan=null;get('storage-consent').checked=false;get('storage-panel').hidden=true;
+    storagePlan=await post('/storage-preview',{});get('storage-sql').textContent=storagePlan.sql;get('storage-panel').hidden=false;
+  }));
+  get('storage-install').addEventListener('click',()=>run(async()=>{
+    if(!storagePlan||!get('storage-consent').checked)return;
+    const token=storagePlan.token;storagePlan=null;get('storage-consent').checked=false;
+    const updated=await post('/storage-install',{token,confirmed:true});get('storage-panel').hidden=true;render(updated);
+  }));
+  get('initialize').addEventListener('click',()=>run(async()=>{if(!confirm(label('confirmInitialize')))return;await post('/initialize',{confirmed:true});render(await assistantApi(root.dataset.base));get('message').textContent=label('initialized');}));
   get('load').addEventListener('click',()=>run(async()=>{
     editing='';members=[];get('members').replaceChildren();
     const parent=await assistantApi(root.dataset.base+'/'+encodeURIComponent(get('parent').value));

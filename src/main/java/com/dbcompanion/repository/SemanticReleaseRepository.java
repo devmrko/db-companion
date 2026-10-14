@@ -17,6 +17,10 @@ public class SemanticReleaseRepository {
         if(value==null)throw SemanticRelease.invalid();try{if(value.length()>QueryArchive.MAX_JSON)throw SemanticRelease.invalid();return value.getSubString(1,(int)value.length());}finally{value.free();}
     }
     public record Row(String id,String actor,String recordedAt,String payload){}
+    public void requireStoragePrivilege(){
+        if(jdbc.queryForObject("SELECT COUNT(*) FROM SESSION_PRIVS WHERE PRIVILEGE IN ('CREATE TABLE','CREATE ANY TABLE')",Integer.class)==0)
+            throw BusinessGlossary.failure(403,"저장소 생성에는 CREATE TABLE 권한과 기본 테이블스페이스 할당량이 필요합니다. 관리자에게 확인해 주세요.");
+    }
     public List<Row> list(String owner,String type){
         return jdbc.query("SELECT RECORD_ID,ACTOR,RECORDED_AT,PAYLOAD FROM "+AppRecordSql.table(owner)+" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED' ORDER BY SEQ DESC FETCH FIRST 101 ROWS ONLY",
             (r,n)->new Row(r.getString(1),r.getString(2),r.getString(3),payload(r.getClob(4))),type);
@@ -27,13 +31,37 @@ public class SemanticReleaseRepository {
         if(values.size()!=1)throw SemanticRelease.invalid();return values.getFirst();
     }
     public void insert(String owner,String id,String type,Object value){
-        if(!Set.of(SemanticRelease.TYPE,SemanticRelease.DEPLOY,SemanticRelease.POINTER,SemanticRelease.PREFERENCE).contains(type))throw SemanticRelease.invalid();
+        if(!Set.of(SemanticRelease.TYPE,SemanticRelease.DEPLOY,SemanticRelease.POINTER,SemanticRelease.PREFERENCE,SemanticRelease.NUMBERS).contains(type))throw SemanticRelease.invalid();
         String text=json.writeValueAsString(value);if(text.length()>QueryArchive.MAX_JSON)throw SemanticRelease.invalid();
         jdbc.update("INSERT INTO "+AppRecordSql.table(owner)+" (RECORD_ID,RECORD_TYPE,STATE,PAYLOAD) VALUES (?,?,'SUCCEEDED',?)",s->{s.setString(1,id);s.setString(2,type);s.setCharacterStream(3,new StringReader(text),text.length());});
     }
     public Head head(String owner){
         var values=jdbc.query("SELECT PAYLOAD FROM "+AppRecordSql.table(owner)+" WHERE RECORD_ID=? AND RECORD_TYPE=? AND STATE='SUCCEEDED'",(r,n)->json.readValue(payload(r.getClob(1)),Head.class),SemanticRelease.POINTER_ID,SemanticRelease.POINTER);
         return values.isEmpty()?new Head(0,""):values.getFirst();
+    }
+    private List<Numbering> numbering(String owner,boolean lock){
+        return jdbc.query("SELECT PAYLOAD FROM "+AppRecordSql.table(owner)+" WHERE RECORD_ID=? AND RECORD_TYPE=? AND STATE='SUCCEEDED'"+(lock?" FOR UPDATE WAIT 5":""),
+            (r,n)->json.readValue(payload(r.getClob(1)),Numbering.class),SemanticRelease.NUMBERS_ID,SemanticRelease.NUMBERS);
+    }
+    /** Legacy versions are ordered once; the first subsequent save persists these numbers. */
+    public Map<String,Long> numbers(String owner){
+        var stored=numbering(owner,false);if(!stored.isEmpty())return stored.getFirst().values();
+        var ids=jdbc.queryForList("SELECT RECORD_ID FROM "+AppRecordSql.table(owner)+" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED' ORDER BY SEQ FETCH FIRST 10001 ROWS ONLY",String.class,SemanticRelease.TYPE);
+        if(ids.size()>10000)throw BusinessGlossary.failure(413,"배포 버전 번호 관리 한도 10,000개를 초과했습니다.");
+        var result=new LinkedHashMap<String,Long>();for(var id:ids)result.put(id,(long)result.size()+1);return result;
+    }
+    /** Same transaction as snapshot insertion. Serializes number allocation across app sessions. */
+    public void assignNumber(String owner,String id){
+        if(numbering(owner,false).isEmpty()){
+            try{insert(owner,SemanticRelease.NUMBERS_ID,SemanticRelease.NUMBERS,new Numbering(numbers(owner)));}
+            catch(org.springframework.dao.DuplicateKeyException ex){throw SemanticRelease.invalid();}
+        }
+        var locked=numbering(owner,true);if(locked.size()!=1)throw SemanticRelease.invalid();
+        var values=new LinkedHashMap<>(locked.getFirst().values());if(values.containsKey(id))return;
+        if(values.size()>=10000)throw BusinessGlossary.failure(413,"배포 버전 번호 관리 한도 10,000개를 초과했습니다.");
+        values.put(QueryArchive.id(id),values.values().stream().mapToLong(Long::longValue).max().orElse(0)+1);
+        String value=json.writeValueAsString(new Numbering(values));
+        if(jdbc.update("UPDATE "+AppRecordSql.table(owner)+" SET PAYLOAD=?,UPDATED_AT=SYSTIMESTAMP WHERE RECORD_ID=? AND RECORD_TYPE=?",s->{s.setCharacterStream(1,new StringReader(value),value.length());s.setString(2,SemanticRelease.NUMBERS_ID);s.setString(3,SemanticRelease.NUMBERS);})!=1)throw SemanticRelease.invalid();
     }
     public Preference preference(String owner){
         var values=jdbc.query("SELECT PAYLOAD FROM "+AppRecordSql.table(owner)+" WHERE RECORD_ID=? AND RECORD_TYPE=? AND STATE='SUCCEEDED'",(r,n)->json.readValue(payload(r.getClob(1)),Preference.class),SemanticRelease.PREFERENCE_ID,SemanticRelease.PREFERENCE);
