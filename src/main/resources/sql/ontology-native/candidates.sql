@@ -12,15 +12,16 @@ BEGIN
 ), rdf_columns AS (
   SELECT r.* FROM TABLE(SEM_MATCH(
     'PREFIX m: <urn:dbc:meta:>
-     SELECT ?capture_graph ?object_name ?column_name_value ?datatype_value ?type_owner
+     SELECT ?capture_graph ?capture_node ?object_name ?column_name_value ?datatype_value ?type_owner
      WHERE { GRAPH ?capture_graph {
-       ?capture_graph m:object ?object_node .
+       ?capture_node m:object ?object_node .
        ?object_node m:name ?object_name ; m:hasColumn ?column_node .
        ?column_node m:name ?column_name_value ; m:dataType ?datatype_value .
        OPTIONAL { ?column_node m:dataTypeOwner ?type_owner }
      } }', SEM_MODELS('DBC_METADATA'), NULL, NULL, NULL, NULL,
      'DO_UNESCAPE=T', NULL, NULL, ~' || DBMS_ASSERT.ENQUOTE_LITERAL(USER) || q'~, 'DBC_META_RDF')) r
   JOIN selected_captures s ON s.snapshot_iri=r.capture_graph
+  WHERE r.capture_node=r.capture_graph
 )
 SELECT DISTINCT a.object_name AS source_table, b.object_name AS target_table,
        a.column_name_value AS source_column, b.column_name_value AS target_column,

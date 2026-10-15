@@ -93,7 +93,7 @@ class AiAssistantTest {
         assertThat(repository).contains("setCharacterStream(2","Types.CLOB","setQueryTimeout(timeoutSeconds)","action,90)","result.free()").doesNotContain("logger","getPassword","CREATE TABLE");
         assertThat(repository.substring(repository.indexOf("public String generate("))).doesNotContain("jdbc.update(","SET_ATTRIBUTE");
         String service=Files.readString(Path.of("src/main/java/com/dbcompanion/service/AiAssistantService.java"));
-        assertThat(service).contains("before.equals(now)","finally{state.finish();}","finally{source.clear();}","functions.detail(session,schema,reference)");
+        assertThat(service).contains("before.equals(now)","finally{state.finish();}","finally{source.clear();}","functions.freshDetail(session,schema,reference)");
         assertThat(service).contains("persistent&&(value==null||!consent)","profiles.requireArchive", "profiles.beforeEdit", "profiles.afterEdit");
         String controller=Files.readString(Path.of("src/main/java/com/dbcompanion/controller/AiAssistantController.java"));
         assertThat(controller).contains("no-store","record Generate(String token,boolean consent)","CredentialCatalogRepository.error(ex)").doesNotContain("getMessage(),ex","Logger");
@@ -108,7 +108,7 @@ class AiAssistantTest {
             String html=engine.process("ai-assistant",context);assertThat(html).contains("data-assistant-settings","&lt;script&gt;","value=\"/ai-assistant\"").doesNotContain("??assistant.","th:","> <script>");
             assertThat(html.split("value=\"/ai-assistant\"",-1)).hasSize(4);
             context.setVariable("activePage","functions");context.setVariable("routineName","\"APP\".\"F\"");
-            html=engine.process("functions",context);assertThat(html).contains("data-function-explain","data-ae-consent","data-ae-source-details").doesNotContain("??assistant.","th:");
+            html=engine.process("functions",context);assertThat(html).contains("data-function-explain","data-ae-consent","data-ae-source-details","data-ae-context","maxlength=\"4000\"","data-ae-refined-panel hidden","data-ae-refine disabled").doesNotContain("??assistant.","th:");
         }
         assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/ai-assistant")).isEqualTo("/ai-assistant");
     }

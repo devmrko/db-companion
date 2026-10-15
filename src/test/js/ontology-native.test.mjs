@@ -1,15 +1,30 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {nativeSelection,nativeCanPreview} from '../../main/resources/static/js/ontology-native.mjs';
+import {nativeSelection,nativeCanPreview,nativeRuntimeReady,nativeCapturesVerified} from '../../main/resources/static/js/ontology-native.mjs';
 import {nativeRdfSql} from '../../main/resources/static/js/sql-help-native-source.mjs';
 import {helpFor,operationsFor} from '../../main/resources/static/js/sql-help.mjs';
+test('RDF operations require confirmed runtime readiness, not just existing storage',()=>{
+  for(const state of ['MISSING','RESTART_REQUIRED','LOADING','UNAVAILABLE','UNKNOWN'])
+    assert.equal(nativeRuntimeReady({storage:'READY',runtime:{state}}),false);
+  assert.equal(nativeRuntimeReady(null),false);
+  assert.equal(nativeRuntimeReady({storage:'READY'}),false);
+  assert.equal(nativeRuntimeReady({storage:'MISSING',runtime:{state:'READY'}}),true);
+});
 test('native selection requires two captured objects and enforces limit',()=>{
   assert.deepEqual(nativeSelection(['B','A','A']),['A','B']);
   assert.equal(nativeCanPreview(['A'],[{table:'A'}]),false);
   assert.equal(nativeCanPreview(['A','B'],[{table:'A'}]),false);
   assert.equal(nativeCanPreview(['A','B'],[{table:'A'},{table:'B'}]),true);
   const names=Array.from({length:51},(_,i)=>String(i));assert.equal(nativeCanPreview(names,names.map(table=>({table}))),false);
+});
+test('capture success requires readback of every exact new snapshot, not a prior capture',()=>{
+  const captures=[{table:'A',iri:'new-a'},{table:'B',iri:'new-b'}];
+  assert.equal(nativeCapturesVerified(captures,[]),false);
+  assert.equal(nativeCapturesVerified(captures,[{table:'A',iri:'old-a'},captures[1]]),false);
+  assert.equal(nativeCapturesVerified(captures,[captures[0]]),false);
+  assert.equal(nativeCapturesVerified(captures,[captures[1],captures[0]]),true);
+  assert.equal(nativeCapturesVerified([],[]),false);
 });
 test('native SQL help uses exact executable app resources',()=>{
   for(const [name,sql] of Object.entries(nativeRdfSql)){

@@ -1,12 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {defaults,parseAttributes,fieldValue,canCreate,copySequence,resultUrl} from '../../main/resources/static/js/ai-creation.mjs';
+import {defaults,parseAttributes,creationAttributes,fieldValue,canCreate,copySequence,resultUrl} from '../../main/resources/static/js/ai-creation.mjs';
 import {teamChanges} from '../../main/resources/static/js/team-history.mjs';
 test('creation history is compatible with existing Team comparison',()=>{const changes=teamChanges({exists:false,request:{}},{exists:true,object:{NAME:'T',STATUS:'DISABLED'},attributes:{agents:'[{"name":"A","task":"T"}]'}});assert.ok(changes.some(c=>c.name==='agents'));assert.ok(changes.some(c=>c.after==='true'));});
 test('profile creation requires cost consent even with no feedback',()=>{assert.equal(canCreate({input:{kind:'PROFILE'},feedback:[]},true,false,false,false),false);assert.equal(canCreate({input:{kind:'PROFILE'},feedback:[]},true,true,false,false),true);});
 test('defaults are independent and never use deployment-specific names',()=>{const first=defaults('PROFILE');first.provider='x';assert.equal(defaults('PROFILE').provider,'oci');assert.equal(defaults('PROFILE').credential_name,'');assert.deepEqual(defaults('PROFILE').object_list,[]);for(const kind of ['TEAM','AGENT','TASK','TOOL'])assert.equal(typeof defaults(kind),'object');});
 test('JSON must be an object',()=>{assert.deepEqual(parseAttributes('{"annotations":false}'),{annotations:false});for(const text of ['null','[]','bad','1'])assert.throws(()=>parseAttributes(text));});
+test('profile preview omits unused optional fields after changing provider, preserving explicit values',()=>{
+  const input={...defaults('PROFILE'),provider:'openai',credential_name:'TEST_CRED',model:'test-model'};
+  const parsed=JSON.parse(creationAttributes('PROFILE',JSON.stringify(input)));
+  assert.equal(parsed.region,undefined);assert.equal(parsed.oci_compartment_id,undefined);
+  assert.equal(parsed.credential_name,'TEST_CRED');assert.equal(parsed.model,'test-model');
+  assert.equal(parsed.annotations,false);assert.deepEqual(parsed.object_list,[]);
+  assert.equal(JSON.parse(creationAttributes('PROFILE','{"region":"test-region","provider":"oci"}')).region,'test-region');
+  assert.equal(JSON.parse(creationAttributes('AGENT','{"role":""}')).role,'');
+  assert.throws(()=>creationAttributes('PROFILE','{"seed":9223372036854775807}'));
+});
 test('individual field edits cannot round large numeric inputs',()=>{assert.throws(()=>fieldValue(1,'9223372036854775807'));assert.throws(()=>fieldValue({},'{"v":0.1234567890123456789}'));assert.equal(fieldValue(1,'42'),42);assert.equal(fieldValue('','9223372036854775807'),'9223372036854775807');assert.equal(fieldValue(false,'',true),true);});
 test('typed fields refuse lossy numeric conversion while string instructions remain literal',()=>{for(const text of ['{"seed":9223372036854775807}','{"temperature":0.123456789012345678901}','{"v":1e400}'])assert.throws(()=>parseAttributes(text));assert.deepEqual(parseAttributes('{"instructions":"123456789012345678901"}'),{instructions:'123456789012345678901'});});
 test('copy requires affirmative cost and creation checks',()=>{const preview={feedback:[{}]};assert.equal(canCreate(preview,true,false,false,false),false);assert.equal(canCreate(preview,false,true,false,false),false);assert.equal(canCreate(preview,true,true,false,false),true);assert.equal(canCreate(preview,true,true,true,false),false);assert.equal(canCreate(preview,true,true,false,true),false);assert.equal(canCreate(null,true,true,false,false),false);});

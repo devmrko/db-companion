@@ -22,13 +22,15 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    SecurityFilterChain security(HttpSecurity http, HttpSessionSecurityContextRepository repository) throws Exception {
+    SecurityFilterChain security(HttpSecurity http, HttpSessionSecurityContextRepository repository,
+            org.springframework.web.servlet.LocaleResolver locales, tools.jackson.databind.json.JsonMapper json) throws Exception {
         return http.authorizeHttpRequests(auth -> auth
                     .requestMatchers("/login", "/language", "/i18n/messages.js", "/css/**", "/js/**", "/icons.svg", "/webjars/**", "/error").permitAll()
                     .anyRequest().authenticated())
                 .securityContext(context -> context.securityContextRepository(repository))
                 .requestCache(cache -> cache.disable())
-                .exceptionHandling(errors -> errors.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
+                .exceptionHandling(errors -> errors.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+                    .accessDeniedHandler(new SessionRequestDeniedHandler(locales,json)))
                 .headers(headers -> headers.contentSecurityPolicy(csp -> csp.policyDirectives(
                         "default-src 'self'; style-src 'self'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none'; base-uri 'self'")))
                 .logout(logout -> logout.logoutSuccessUrl("/login?logout").invalidateHttpSession(true).deleteCookies("JSESSIONID"))

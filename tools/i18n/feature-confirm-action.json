@@ -1,0 +1,5 @@
+{
+ "confirmAction.title":["작업 확인","Confirm action","确认操作","操作の確認"],
+ "confirmAction.cancel":["취소","Cancel","取消","キャンセル"],
+ "confirmAction.accept":["확인 후 실행","Confirm and continue","确认并执行","確認して実行"]
+}

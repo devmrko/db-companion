@@ -13,6 +13,13 @@ export function parseAttributes(text){
   }return data;
 }
 export const needsConsent=preview=>preview?.input?.kind==='PROFILE'||!!preview?.feedback?.length;
+export function creationAttributes(kind,text){
+  const data=parseAttributes(text);
+  if(kind==='PROFILE')for(const key of ['credential_name','model','region','oci_compartment_id']){
+    if(typeof data[key]==='string'&&!data[key].trim())delete data[key];
+  }
+  return JSON.stringify(data,null,2);
+}
 export const fieldValue=(current,text,checked)=>typeof current==='boolean'?checked:typeof current==='object'||typeof current==='number'?parseAttributes('{"value":'+text+'}').value:text;
 export const canCreate=(preview,confirmed,consent,busy,attempted)=>!!preview&&confirmed&&(!needsConsent(preview)||consent)&&!busy&&!attempted;
 export function resultUrl(kind,schema,name){return kind==='PROFILE'?'/ai-profiles/detail?'+new URLSearchParams({profile:name}):kind==='TEAM'?'/ai-agents/team?'+new URLSearchParams({schema,team:name}):'/ai-agents/object?'+new URLSearchParams({schema,kind,name});}
@@ -55,7 +62,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ai-creation]')
   get('attributes').addEventListener('input',()=>{invalidate();get('typed').replaceChildren();});
   get('apply-json').addEventListener('click',()=>{try{config=parseAttributes(get('attributes').value);fields();sync();message('');}catch(ex){message(ex.message,true);}});
   get('form').addEventListener('submit',async event=>{event.preventDefault();if(busy||attempted)return;busy=true;controls();message(tr('loading'));try{
-    const attributes=get('attributes').value;
+    const attributes=creationAttributes(kind,get('attributes').value);
     preview=await post('preview',{schema:root.dataset.schema,kind,source,sourceVersion:form.sourceVersion,name:get('name').value,description:get('description').value,status:get('status').value,attributes,copyFeedback:get('copy').checked});
     get('payload').textContent=JSON.stringify({...preview.input,sourceVersion:undefined,attributes:undefined},null,2)+'\n'+preview.input.attributes;
     get('feedback-detail').hidden=!preview.feedback.length;get('feedback-count').textContent=tr('feedbackCount',preview.feedback.length);get('feedback').textContent=JSON.stringify(preview.feedback.map(r=>({question:r.question,attributes:JSON.parse(r.attributes)})),null,2);get('consent-label').hidden=!needsConsent(preview);get('consent').checked=false;get('confirm').checked=false;get('review').hidden=false;message('');

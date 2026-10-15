@@ -1,7 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {profileBytes,validateProfileValue,profileRetryAllowed} from '../../main/resources/static/js/profile-editor.mjs';
+import {profileBytes,validateProfileValue,profileRetryAllowed,profileRestoreAllowed} from '../../main/resources/static/js/profile-editor.mjs';
+test('restore refuses concurrent changes different targets and an unset original value',()=>{
+  const original={target:{schema:'APP',profile:'DEMO',attribute:'comments'},value:'false'};
+  const current={...original,value:'true',version:'after-save'};
+  assert.equal(profileRestoreAllowed(original,current,'after-save'),true);
+  assert.equal(profileRestoreAllowed(original,{...current,version:'changed'},'after-save'),false);
+  assert.equal(profileRestoreAllowed(original,{...current,target:{...current.target,profile:'OTHER'}},'after-save'),false);
+  assert.equal(profileRestoreAllowed({...original,value:null},current,'after-save'),false);
+});
 test('long values are counted in UTF8 without clipping or normalizing',()=>{
   const value='지침 🌏\r\n  '+'x'.repeat(21000);
   assert.equal(profileBytes(value),Buffer.byteLength(value,'utf8'));

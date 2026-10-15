@@ -13,9 +13,9 @@ BEGIN
 FROM TABLE(SEM_MATCH(
   'PREFIX m: <urn:dbc:meta:>
    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-   SELECT ?capture_graph ?column_name_value ?datatype_value ?nullable_value ?comment_value ?ordinal_value
+   SELECT ?capture_graph ?capture_node ?column_name_value ?datatype_value ?nullable_value ?comment_value ?ordinal_value
    WHERE { GRAPH ?capture_graph {
-     ?capture_graph m:object ?object_node .
+     ?capture_node m:object ?object_node .
      ?object_node m:hasColumn ?column_node .
      ?column_node m:name ?column_name_value ; m:dataType ?datatype_value ;
                   m:nullable ?nullable_value ; m:ordinal ?ordinal_value .
@@ -23,7 +23,7 @@ FROM TABLE(SEM_MATCH(
    } }',
   SEM_MODELS('DBC_METADATA'), NULL, NULL, NULL, NULL,
   'DO_UNESCAPE=T', NULL, NULL, ~' || DBMS_ASSERT.ENQUOTE_LITERAL(USER) || q'~, 'DBC_META_RDF'))
-WHERE capture_graph = :snapshot
+WHERE capture_graph = :snapshot AND capture_node=capture_graph
 ORDER BY TO_NUMBER(ordinal_value)~';
   OPEN :columns FOR v_sql USING v_snapshot;
 END;

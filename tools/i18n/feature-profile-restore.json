@@ -1,0 +1,5 @@
+{
+ "profileRestore.prepare":["이 창의 변경 전 값으로 복구 준비","Prepare original value from this dialog","准备恢复此窗口的原值","この画面の変更前の値で復旧準備"],
+ "profileRestore.stale":["저장 이후 값이 바뀌었습니다. 창을 닫고 최신 값과 이력을 확인하세요.","The profile changed after saving. Close this dialog and review the latest values and history.","保存后配置已更改。请关闭窗口并检查最新值和历史。","保存後に変更されています。画面を閉じて最新の値と履歴を確認してください。"],
+ "profileRestore.review":["이 창을 열었을 때의 값입니다. 내용을 확인하고 저장하면 해당 속성만 복구합니다. 창을 닫으면 이 복구 준비는 사라집니다.","This is the value when this dialog opened. Review and save to restore only this attribute. Closing the dialog discards this recovery preparation.","这是打开此窗口时的值。确认并保存以仅恢复此属性。关闭窗口会丢弃此次恢复准备。","この画面を開いた時の値です。確認して保存すると、この属性のみ復旧します。画面を閉じるとこの復旧準備は失われます。"]
+}

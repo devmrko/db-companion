@@ -1,4 +1,5 @@
 import {t} from './i18n.mjs';
+import {confirmAction} from './confirm-action.mjs';
 import {assistantApi,assistantPost} from './ai-assistant.mjs';
 import {selectionItems,versionLabel} from './semantic-release.mjs';
 
@@ -12,11 +13,11 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-semantic-selec
     try{await work();}catch(error){get('message').textContent=error.message;}finally{busy=false;controls();}
   }
   get('select').addEventListener('click',()=>run(async()=>{
-    if(!confirm(label('confirmSelection')))return;
+    if(!await confirmAction(label('confirmSelection')))return;
     await assistantApi(root.dataset.base+'/select',assistantPost(get('csrf'),{selection:get('selection').value,expected:state.preference,confirmed:true}));
     location.reload();
   }));
-  run(async()=>{
+  const refresh=()=>run(async()=>{
     state=await assistantApi(root.dataset.base);
     get('selection').replaceChildren(...selectionItems(state.versions).map(([value,text])=>{
       const option=document.createElement('option');option.value=value;option.textContent=text;return option;
@@ -26,4 +27,6 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-semantic-selec
     get('current').textContent=label('current',name(state.head.releaseId)||'—',name(state.selected)||(state.preference.selection==='LIVE'?label('live'):label('pending')));
     get('message').textContent=state.storage!=='READY'?label('storage'):!state.head.releaseId?label('needsSetup'):'';
   });
+  document.addEventListener('app-storage-ready',refresh);
+  refresh();
 });

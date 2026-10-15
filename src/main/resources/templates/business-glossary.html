@@ -3,6 +3,7 @@
 <head th:replace="~{fragments/common :: head(#{businessGlossary.title})}"></head>
 <body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<div class="app-content"><section th:replace="~{fragments/semantic-release :: panel}"></section></div>
 <main class="app-content" data-glossary-manager>
   <div class="app-page-heading"><h1 th:text="#{businessGlossary.title}">업무 용어 사전</h1><a th:href="@{/ai-test}" th:text="#{businessGlossary.goTest}">Select AI 테스트</a></div>
   <p><a class="app-inline-link" th:href="@{/db/functions/ai-query}" th:text="#{callable.title}">사용자용 AI 함수</a></p>

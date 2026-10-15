@@ -26,10 +26,31 @@ public class NativeMetadataService {
         Ontology.name(schema);if(!schema.equals(s.metadata().selectedSchema()))throw new Ontology.Failure(409,"stale");
         if(!schema.equals(login(s)))throw new Ontology.Failure(403,"ownerRequired");
     }
-    private <T>T tx(PoolSession s,TransactionTemplate template,Supplier<T> action){source.bind(s.pool(),login(s));try{return template.execute(status->action.get());}finally{source.clear();}}
+    private <T>T tx(PoolSession s,TransactionTemplate template,Supplier<T> action){source.bind(s.pool(),login(s));try{return template.execute(status->JdbcNetworkTimeout.execute(source,130_000,action));}finally{source.clear();}}
     private State state(PoolSession s){return s.metadata().ontology().nativeMetadata();}
     public Status status(PoolSession s,String schema){synchronized(s){
-        scope(s,schema);return tx(s,read,()->{String storage=rdf.storage();return new Status(storage,true,rdf.api(),storage.equals("READY")?rdf.snapshots():List.of());});
+        scope(s,schema);return tx(s,read,()->{
+            String storage=rdf.storage(),runtime=rdf.javaState();
+            if(runtime.equals("READY"))state(s).javaRequested(false);
+            if(runtime.equals("MISSING")&&state(s).javaRequested())runtime="RESTART_REQUIRED";
+            boolean ready=runtime.equals("READY"),enable=runtime.equals("MISSING")&&login(s).equals("ADMIN")&&rdf.javaSetupAvailable();
+            List<Snapshot> snapshots=List.of();
+            if(storage.equals("READY")&&ready)try{snapshots=rdf.snapshots();}catch(org.springframework.dao.DataAccessException ex){
+                if(!missingRdfClass(ex))throw ex;
+                runtime="RDF_UNAVAILABLE";enable=false;
+            }
+            return new Status(storage,true,rdf.api(),snapshots,new RuntimeSupport(runtime,enable,enable?NativeMetadataRepository.ENABLE_JAVA:""));
+        });
+    }}
+    public static boolean missingRdfClass(Throwable error){for(Throwable cause=error;cause!=null;cause=cause.getCause())if(cause instanceof java.sql.SQLException sql&&sql.getErrorCode()==29540)return true;return false;}
+    public Status enableJava(PoolSession s,String schema,boolean confirmed){synchronized(s){
+        scope(s,schema);if(!confirmed)throw new Ontology.Failure(400,"confirmRequired");
+        if(!login(s).equals("ADMIN"))throw new Ontology.Failure(403,"native.javaAdmin");
+        tx(s,write,()->{
+            if(state(s).javaRequested()||!rdf.javaState().equals("MISSING")||!rdf.javaSetupAvailable())throw new Ontology.Failure(409,"stale");
+            rdf.enableJava();state(s).javaRequested(true);return true;
+        });
+        return status(s,schema);
     }}
     public Map<String,String> scripts(PoolSession s,String schema){synchronized(s){
         scope(s,schema);var scripts=new LinkedHashMap<String,String>();for(String file:List.of("setup","capture","read","snapshots","candidates"))scripts.put(file,NativeMetadataRepository.sql(file));return scripts;
@@ -47,6 +68,9 @@ public class NativeMetadataService {
     }}
     public List<Map<String,String>> columns(PoolSession s,String schema,String table){synchronized(s){
         scope(s,schema);Ontology.name(table);return tx(s,read,()->{rdf.require();var snapshot=rdf.snapshots().stream().filter(v->v.table().equals(table)).findFirst().orElseThrow(()->new Ontology.Failure(404,"notFound"));return rdf.columns(snapshot.iri());});
+    }}
+    public Map<String,Object> diagnostics(PoolSession s,String schema){synchronized(s){
+        scope(s,schema);return tx(s,read,()->rdf.diagnostics(login(s)));
     }}
     private List<Snapshot> selection(List<Snapshot> available,List<String> names){
         var values=new LinkedHashMap<String,Snapshot>();available.forEach(v->values.put(v.table(),v));
