@@ -183,10 +183,10 @@
     "他のスキーマは参照専用です。変更はログイン所有のテーブル・ビューのみです。"
   ],
   "vpd.executeRequired": [
-    "정책 조회는 가능하지만 DBMS_RLS EXECUTE 권한을 확인하지 못해 변경을 차단했습니다. DBA에게 확인하세요. 권한은 자동 부여하지 않습니다.",
-    "Policies can be inspected, but changes are blocked because a DBMS_RLS EXECUTE grant could not be confirmed. Ask your DBA; no grants are applied automatically.",
-    "可查看策略，但未确认 DBMS_RLS EXECUTE 权限，因此禁止变更。请联系 DBA；不会自动授予权限。",
-    "ポリシーは参照できますが、DBMS_RLS EXECUTE 権限を確認できないため変更を停止しました。DBA に確認してください。権限は自動付与しません。"
+    "DBMS_RLS EXECUTE 권한을 확인하지 못해 변경을 차단했습니다. ADMIN이 같은 DB의 계정 생성·권한 설정에서 대상 계정을 입력하고 VPD · SYS.DBMS_RLS를 선택한 뒤 권한 미리보기와 선택 권한 추가를 실행해야 합니다. 대상 계정은 재로그인 후 다시 조회하세요. 권한은 자동 부여하지 않습니다.",
+    "Changes are blocked because DBMS_RLS EXECUTE could not be confirmed. In this database, ADMIN must open Account setup, enter the target account, select VPD · SYS.DBMS_RLS, review the grant and apply selected privileges. Sign in again as the target account and refresh. Grants are not automatic.",
+    "未确认 DBMS_RLS EXECUTE 权限，因此禁止变更。ADMIN须在同一数据库的账户设置中输入目标账户，选择 VPD · SYS.DBMS_RLS，预览并添加所选权限。目标账户重新登录后刷新。不会自动授权。",
+    "DBMS_RLS EXECUTE 権限を確認できないため変更を停止しました。ADMINは同じDBのアカウント設定で対象アカウントを入力し、VPD · SYS.DBMS_RLSを選択して権限を確認・追加してください。対象アカウントで再ログインして更新してください。自動付与はしません。"
   ],
   "vpd.unsupported": [
     "그룹·namespace/attribute·상속·추가 속성 또는 현재 폼으로 보존할 수 없는 설정입니다. 전체 속성을 조회할 수 있으나 변경·삭제는 DBA 도구에서 검토해야 합니다.",

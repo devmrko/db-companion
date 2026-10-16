@@ -72,7 +72,20 @@ public class OrdsManagementRepository {
             if(sql.getErrorCode()==942)return "METADATA_UNAVAILABLE";
             if(sql.getErrorCode()==904||sql.getErrorCode()==6550)return "UNSUPPORTED";
             if(sql.getErrorCode()==8177)return "stale";
+            if(sql.getErrorCode()>0&&sql.getErrorCode()<=99999)return "ORA-"+String.format(Locale.ROOT,"%05d",sql.getErrorCode());
         }
         return "failed";
+    }
+    public static String safeDiagnostic(Throwable ex) {
+        // Only Oracle-owned package frames; never return SQL, bind values or free-form error text.
+        var frames=new LinkedHashSet<String>();
+        var pattern=java.util.regex.Pattern.compile("ORA-06512:.*?\"((?:ORDS_METADATA|SYS)\\.[A-Z][A-Z0-9_$#]{0,127})\"[^\\r\\n]*?([0-9]{1,9})[ \\t]*$");
+        for(Throwable cause=ex;cause!=null;cause=cause.getCause())if(cause instanceof SQLException sql){
+            for(String line:Objects.toString(sql.getMessage(),"").split("\\R")){
+                var matcher=pattern.matcher(line);
+                if(matcher.find()&&frames.size()<12)frames.add(matcher.group(1)+":"+matcher.group(2));
+            }
+        }
+        return String.join(", ",frames);
     }
 }

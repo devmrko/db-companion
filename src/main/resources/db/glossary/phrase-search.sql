@@ -26,8 +26,29 @@ BEGIN
     )
     SELECT DISTINCT TERM_ID,LABEL,KIND FROM labels
   ) LOOP
-    DECLARE spans CTX_DOC.HIGHLIGHT_TAB;
+    DECLARE spans CTX_DOC.HIGHLIGHT_TAB; literal_pos PLS_INTEGER; literal_length PLS_INTEGER;
     BEGIN
+    -- A lexer may omit a one-character token beside punctuation (O'Reilly).
+    -- Preserve a literal registered label, with word boundaries, in the same
+    -- native occurrence pipeline. Never join separated words or use definitions.
+    IF REGEXP_LIKE(r.LABEL,'[^[:alnum:][:space:]_]') THEN
+      literal_length:=LENGTH2(r.LABEL);
+      literal_pos:=INSTR2(question_text,r.LABEL);
+      WHILE literal_pos>0 LOOP
+        IF (literal_pos=1 OR NOT REGEXP_LIKE(SUBSTR2(question_text,literal_pos-1,1),'[[:alnum:]_]'))
+           AND (literal_pos+literal_length>LENGTH2(question_text)
+                OR NOT REGEXP_LIKE(SUBSTR2(question_text,literal_pos+literal_length,1),'[[:alnum:]_]')) THEN
+          item:=JSON_OBJECT_T();
+          item.put('termId',r.TERM_ID);item.put('label',r.LABEL);item.put('kind',r.KIND);
+          item.put('start',literal_pos);item.put('end',literal_pos+literal_length);
+          item.put('matched',SUBSTR2(question_text,literal_pos,literal_length));hits.append(item);
+          IF hits.get_size()>512 THEN
+            RAISE_APPLICATION_ERROR(-20001,'Dictionary phrase occurrence limit exceeded');
+          END IF;
+        END IF;
+        literal_pos:=INSTR2(question_text,r.LABEL,literal_pos+1);
+      END LOOP;
+    END IF;
     CTX_DOC.POLICY_HIGHLIGHT(
       policy_name=>'DBC_BT_KO_POLICY',document=>question_text,
       text_query=>'{'||REPLACE(REPLACE(r.LABEL,'\','\\'),'}','\}')||'}',

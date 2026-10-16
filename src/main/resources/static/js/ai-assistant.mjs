@@ -1,6 +1,16 @@
 import {t} from './i18n.mjs';
-export function assistantError(data,status){
-  const error=new Error(data.error||`HTTP ${status}`);
+export function adminRemedy(data,status,url,account){
+  if(account&&url.includes('/native/')&&/Check RDF owner creation privileges/.test(data.error||''))return t('adminHelp.rdfAction','ADMIN: {0}',`GRANT CREATE TABLE, CREATE VIEW, CREATE PROCEDURE, CREATE SEQUENCE, CREATE TRIGGER, CREATE TYPE TO "${account.replaceAll('"','""')}";`);
+  if(!account||!((status===403&&/권한|privilege|permission|権限|权限|CTX_DDL/i.test(data.error||''))||/ORA-0(?:1031|1045|1950|1536)/.test(data.error||'')||data.code==='ACCESS_DENIED'||[1031,1045,1950,1536].includes(data.oracleCode)))return '';
+  const target='"'+account.replaceAll('"','""')+'"';let sql='';
+  if(/CTXSYS\.CTX_DDL/i.test(data.error||''))sql=`GRANT EXECUTE ON CTXSYS.CTX_DDL TO ${target};`;
+  else if(url.startsWith('/db/functions/repair/')&&(data.oracleCode===1031||/ORA-01031/.test(data.error||'')))sql=`GRANT CREATE PROCEDURE TO ${target};`;
+  return t('adminHelp.inline','ADMIN: {0}',sql||t('adminHelp.title','ADMIN actions'));
+}
+export function assistantError(data,status,url=''){
+  const account=typeof document==='undefined'?'':document.querySelector?.('[data-admin-account]')?.dataset.adminAccount;
+  const remedy=adminRemedy(data,status,url,account);
+  const error=new Error((data.error||`HTTP ${status}`)+(remedy?'\n'+remedy:''));
   error.status=status;
   if(status===422&&data.diagnostic)error.diagnostic=data.diagnostic;
   return error;
@@ -9,7 +19,7 @@ export async function assistantApi(url,options={}){
   const response=await fetch(url,{cache:'no-store',credentials:'same-origin',headers:{Accept:'application/json'},...options});
   if(response.redirected||response.status===401)throw new Error(t('ui.b9c067f345b1','로그인 세션이 만료되었습니다. 다시 로그인해 주세요.'));
   if(!response.headers.get('content-type')?.includes('application/json'))throw new Error(t('ui.1930407cf479','응답을 확인하지 못했습니다. HTTP {0}',response.status));
-  const data=await response.json();if(!response.ok)throw assistantError(data,response.status);return data;
+  const data=await response.json();if(!response.ok)throw assistantError(data,response.status,url);return data;
 }
 export function assistantPost(csrf,data){return {method:'POST',headers:{'Content-Type':'application/json',[csrf.dataset.csrfHeader]:csrf.value},body:JSON.stringify(data)};}
 export function profileLabel(profile){return `${profile.name} · ${profile.provider}${profile.model?' / '+profile.model:''}`;}

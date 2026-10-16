@@ -35,6 +35,8 @@ public class BusinessGlossaryController {
     @PostMapping("/setup") @ResponseBody public ResponseEntity<?> setup(@RequestBody Apply v,HttpServletRequest r){return respond(r,()->service.setup(session(r),v.token(),v.consent()));}
     public record SearchRequest(String question,String profile,boolean useText) {}
     @PostMapping("/search") @ResponseBody public ResponseEntity<?> search(@RequestBody SearchRequest v,HttpServletRequest r){return respond(r,()->service.search(session(r),v.question(),v.profile(),v.useText()));}
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    @ResponseBody public ResponseEntity<?> invalidBody(){return error(400,com.dbcompanion.common.i18n.UiMessages.text("businessGlossary.invalidFields","Check the term, definition, aliases and revision."));}
     private ResponseEntity<?> respond(HttpServletRequest r,Supplier<?> work){
         if(session(r)==null)return error(401,"로그인 세션이 만료되었습니다.");
         try{return ResponseEntity.ok().header("Cache-Control","no-store").body(work.get());}

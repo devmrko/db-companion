@@ -36,9 +36,9 @@ public class AiAssistantController {
     });}
     @PostMapping("/ai-assistant/selection") @ResponseBody
     public ResponseEntity<?> select(@RequestBody Choose choice,HttpServletRequest request){return run(request,false,()->{service.select(session(request),choice.name());return Map.of("saved",true);});}
-    public record Prepare(String schema,String reference) {}
+    public record Prepare(String schema,String reference,String businessContext) {}
     @PostMapping("/db/functions/explain/preview") @ResponseBody
-    public ResponseEntity<?> preview(@RequestBody Prepare value,Locale locale,HttpServletRequest request){return run(request,false,()->service.preview(session(request),value.schema(),value.reference(),locale));}
+    public ResponseEntity<?> preview(@RequestBody Prepare value,Locale locale,HttpServletRequest request){return run(request,false,()->service.preview(session(request),value.schema(),value.reference(),value.businessContext(),locale));}
     public record Generate(String token,boolean consent) {}
     @PostMapping("/db/functions/explain") @ResponseBody
     public ResponseEntity<?> explain(@RequestBody Generate value,HttpServletRequest request){return run(request,true,()->service.explain(session(request),value.token(),value.consent()));}

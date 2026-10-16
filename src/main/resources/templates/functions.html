@@ -5,6 +5,7 @@
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
 <main class="app-content">
   <div class="app-page-heading"><h1 th:text="#{functions.title}">함수</h1><button th:replace="~{fragments/common :: sqlHelp('functions', 'list')}"></button></div>
+  <p><a class="btn app-btn app-btn-secondary" th:href="@{/db/functions/repair}" th:text="#{functionRepair.title}"></a></p>
   <div class="app-editor-actions"><a class="btn app-btn app-btn-primary" th:href="@{/db/functions/glossary-search}" th:text="#{glossaryFunction.title}">용어사전 검색 함수 만들기</a><a class="app-inline-link" th:href="@{/db/functions/ai-query}" th:text="#{callable.title}">사용자용 AI 함수</a></div>
   <p class="app-alert is-error" th:if="${schemaError}" th:text="${schemaError}"></p>
   <th:block th:replace="~{fragments/local-object-creation :: editor('FUNCTION')}"></th:block>
@@ -26,13 +27,21 @@
   <div class="app-preview-body">
     <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-ae-csrf>
     <p class="app-object-title" data-ae-target></p><p class="app-filter-message" data-ae-profile></p>
-    <p role="status" data-ae-message></p>
+    <p class="app-filter-message" th:text="#{assistant.codeHelp}"></p>
+    <p role="status" aria-live="polite" data-ae-message></p>
     <div data-ae-fields hidden>
-      <details data-ae-source-details><summary data-ae-scope></summary><pre class="app-preview-source" data-ae-source></pre></details>
+      <details class="app-disclosure" data-ae-source-details><summary data-ae-scope></summary><pre class="app-preview-source" data-code-language="json" data-ae-source></pre></details>
       <label class="app-assistant-consent"><input type="checkbox" class="form-check-input" data-ae-consent><span th:text="#{assistant.consent}"></span></label>
       <div class="app-editor-actions"><button type="button" class="btn app-btn app-btn-primary" data-ae-run disabled th:text="#{assistant.generate}">설명 생성</button></div>
     </div>
-    <div class="app-assistant-result" data-ae-result hidden></div>
+    <section class="app-section" data-ae-result-panel hidden><h3 th:text="#{assistant.codeResult}"></h3><div class="app-assistant-result" data-ae-result></div></section>
+    <section class="app-section" data-ae-business hidden>
+      <h3 th:text="#{assistant.businessTitle}"></h3>
+      <label class="app-field" for="function-business-context"><span th:text="#{assistant.businessLabel}"></span><textarea id="function-business-context" class="form-control" rows="5" maxlength="4000" aria-describedby="function-business-help" data-ae-context></textarea></label>
+      <p id="function-business-help" class="app-filter-message" th:text="#{assistant.businessHelp}"></p>
+      <div class="app-editor-actions"><button type="button" class="btn app-btn app-btn-secondary" data-ae-refine disabled th:text="#{assistant.businessPreview}"></button></div>
+    </section>
+    <section class="app-section" data-ae-refined-panel hidden><h3 th:text="#{assistant.businessResult}"></h3><div class="app-assistant-result" data-ae-refined></div></section>
     <a class="app-inline-link" th:href="@{/ai-assistant}" th:text="#{assistant.title}">AI 도우미 설정</a>
   </div>
 </dialog>

@@ -28,9 +28,10 @@ public class OrdsManagementController {
     private ResponseEntity<?> invoke(HttpServletRequest request,Function<PoolSession,?> action){
         var session=session(request);if(session==null)return error(401,"expired");
         try{return ResponseEntity.ok().header("Cache-Control","no-store").body(action.apply(session));}
-        catch(Failure ex){return error(ex.status(),ex.getMessage());}
+        catch(Failure ex){return error(ex.status(),ex.getMessage(),ex.diagnostic());}
         catch(RuntimeException ex){return error(503,"failed");}
     }
-    private ResponseEntity<?> error(int status,String key){return ResponseEntity.status(status).header("Cache-Control","no-store").body(Map.of("error",UiMessages.text("ords."+key,key),"code",key));}
+    private ResponseEntity<?> error(int status,String key){return error(status,key,"");}
+    private ResponseEntity<?> error(int status,String key,String diagnostic){String message=key.matches("ORA-[0-9]{5}")?UiMessages.text("ords.failed","ORDS operation could not be verified.")+" ("+key+")":UiMessages.text("ords."+key,key);return ResponseEntity.status(status).header("Cache-Control","no-store").body(Map.of("error",message+(diagnostic.isEmpty()?"":" ["+diagnostic+"]"),"code",key));}
     private PoolSession session(HttpServletRequest request){var http=request.getSession(false);return http==null?null:(PoolSession)http.getAttribute(PoolSession.ATTRIBUTE);}
 }

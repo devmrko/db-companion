@@ -1,0 +1,122 @@
+{
+  "functionRepair.title": [
+    "함수 소스 수정·복구",
+    "Edit and restore function source",
+    "修改及恢复函数源码",
+    "関数ソースの編集・復元"
+  ],
+  "functionRepair.help": [
+    "로그인 소유 스키마의 단독 FUNCTION만 수정합니다. 함수 본문을 실행하지 않고 CREATE OR REPLACE로 컴파일합니다. DDL은 자동 커밋되며 INVALID 상태가 될 수 있습니다. 첫 수정 전 원본은 이 로그인 세션에서만 복구할 수 있습니다. 로그아웃 전에 원본을 별도로 보관하세요. 패키지·프로시저·60,000자 초과 소스는 지원하지 않습니다.",
+    "Edits standalone functions owned by the login account. Compiles with CREATE OR REPLACE without invoking the function. DDL auto-commits and may leave an INVALID function. The first original source is recoverable only in this login session; save it separately before signing out. Packages, procedures and sources over 60,000 characters are unsupported.",
+    "仅修改登录账户拥有的独立FUNCTION。以CREATE OR REPLACE编译，不调用函数。DDL自动提交，可能留下INVALID函数。首次修改前的原稿仅在本次登录会话中可恢复，退出前请另存。不支持包、过程及超过60,000字符的源码。",
+    "ログイン所有の単独FUNCTIONのみ対象です。呼び出さずCREATE OR REPLACEでコンパイルします。DDLは自動コミットされINVALIDになる場合があります。初回変更前の原本はこのログインセッションでのみ復元可能です。ログアウト前に別途保存してください。パッケージ・プロシージャ・60,000字超は非対応です。"
+  ],
+  "functionRepair.name": [
+    "수정할 함수명",
+    "Function name",
+    "函数名",
+    "関数名"
+  ],
+  "functionRepair.load": [
+    "현재 소스 불러오기",
+    "Load current source",
+    "加载当前源码",
+    "現在のソースを読み込む"
+  ],
+  "functionRepair.source": [
+    "함수 전체 소스 (FUNCTION부터 입력)",
+    "Full source (start with FUNCTION)",
+    "完整源码（从FUNCTION开始）",
+    "全ソース（FUNCTIONから入力）"
+  ],
+  "functionRepair.preview": [
+    "변경 SQL 미리보기",
+    "Preview change SQL",
+    "预览修改SQL",
+    "変更SQLを確認"
+  ],
+  "functionRepair.restore": [
+    "세션 원본 복구 미리보기",
+    "Preview session original restore",
+    "预览会话原稿恢复",
+    "セッション原本の復元を確認"
+  ],
+  "functionRepair.before": [
+    "변경 전 소스",
+    "Source before change",
+    "修改前源码",
+    "変更前ソース"
+  ],
+  "functionRepair.after": [
+    "실행할 SQL",
+    "SQL to execute",
+    "将执行的SQL",
+    "実行するSQL"
+  ],
+  "functionRepair.consent": [
+    "대상 함수와 변경 전후 소스, DDL 자동 커밋 및 컴파일 오류 가능성을 확인했습니다.",
+    "I reviewed the target, before/after source, DDL auto-commit and possible compilation errors.",
+    "已确认目标、修改前后源码、DDL自动提交和编译错误风险。",
+    "対象・変更前後・DDL自動コミット・コンパイルエラーの可能性を確認しました。"
+  ],
+  "functionRepair.apply": [
+    "변경·컴파일 실행",
+    "Apply and compile",
+    "应用并编译",
+    "変更・コンパイルを実行"
+  ],
+  "functionRepair.working": [
+    "확인 중…",
+    "Working…",
+    "处理中…",
+    "確認中…"
+  ],
+  "functionRepair.loaded": [
+    "현재 소스와 컴파일 상태를 조회했습니다.",
+    "Loaded current source and compilation status.",
+    "已读取当前源码及编译状态。",
+    "現在のソースとコンパイル状態を取得しました。"
+  ],
+  "functionRepair.valid": [
+    "변경 후 VALID 상태를 재조회했습니다. 함수는 호출하지 않았습니다.",
+    "Verified VALID after the change. The function was not invoked.",
+    "修改后已确认VALID。未调用函数。",
+    "変更後のVALIDを確認しました。関数は呼び出していません。"
+  ],
+  "functionRepair.invalidResult": [
+    "소스는 변경됐지만 INVALID입니다. 아래 컴파일 오류를 수정하거나 세션 원본 복구를 미리 확인하세요.",
+    "Source changed but is INVALID. Fix the listed compiler errors or preview restoring the session original.",
+    "源码已修改但为INVALID。请修正下方编译错误或预览恢复会话原稿。",
+    "ソースは変更されましたがINVALIDです。エラー修正かセッション原本の復元を確認してください。"
+  ],
+  "functionRepair.scope": [
+    "로그인 계정 자신의 스키마에서만 수정할 수 있습니다. 자신의 스키마를 선택하세요.",
+    "Select the login account's own schema to edit.",
+    "仅可修改登录账户自身模式。请选择自身模式。",
+    "ログイン所有スキーマのみ編集できます。自分のスキーマを選択してください。"
+  ],
+  "functionRepair.invalid": [
+    "대상 이름과 일치하는 FUNCTION 전체 소스를 입력하세요. CREATE 문과 SQL 클라이언트의 / 구분자는 제외하며 최대 60,000자입니다.",
+    "Enter full FUNCTION source matching the target name, without CREATE or SQL-client slash separators; maximum 60,000 characters.",
+    "请输入与目标名一致的完整FUNCTION源码，不含CREATE及SQL客户端/分隔符，最多60,000字符。",
+    "対象名と一致するFUNCTION全文を入力してください。CREATE文や/区切りは不要です。最大60,000字です。"
+  ],
+  "functionRepair.missing": [
+    "해당 이름의 단독 함수가 없습니다. 함수 목록에서 이름과 소유 스키마를 확인하세요.",
+    "No standalone function with this name. Check its name and owner in the function list.",
+    "该名称的独立函数不存在。请核对名称和所属模式。",
+    "該当する単独関数がありません。名前と所有スキーマを確認してください。"
+  ],
+  "functionRepair.stale": [
+    "현재 소스가 변경됐거나 미리보기가 만료됐습니다. 현재 소스를 다시 불러와 변경 내용을 확인하세요. SQL은 실행하지 않았습니다.",
+    "Source changed or preview expired. Reload current source and review the change. No SQL was executed.",
+    "源码已变化或预览过期。请重新加载并审核。未执行SQL。",
+    "ソース変更またはプレビュー期限切れです。再取得して確認してください。SQLは実行していません。"
+  ],
+  "functionRepair.failed": [
+    "함수 변경·확인을 완료하지 못했습니다. 현재 소스를 다시 조회하고 Oracle 오류 번호와 대상 계정을 ADMIN에게 전달하세요. 결과를 확인하기 전 자동 재실행하지 않습니다.",
+    "Function change or verification failed. Reload source and provide the Oracle error number and account to ADMIN. No automatic retry occurs.",
+    "函数修改或验证失败。请重新读取源码，将Oracle错误号和账户交给ADMIN。不自动重试。",
+    "変更・確認を完了できませんでした。ソースを再取得しOracleエラー番号とアカウントをADMINに伝えてください。自動再試行しません。"
+  ]
+}

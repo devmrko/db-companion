@@ -1,5 +1,29 @@
 # Changelog
 
+## Unreleased
+
+- Extend Functions > AI code explanation with inputs/outputs, implemented validation,
+  ordered processing steps, exceptions and side effects, requesting references to
+  numbered source sections in the current UI language.
+- Add business-purpose input after the initial explanation. Review updated transmission
+  and give fresh consent to generate a separate context-aware explanation; retain the
+  initial code explanation for comparison. Context is temporary and does not update
+  routine code, comments or glossary definitions.
+- Read routine source and arguments afresh and reject changes before the AI call.
+  Enforce bounded context/payloads and the existing one-use consent ticket. No routine
+  execution or automatic AI retries.
+
+- Add ADMIN account setup and scoped privilege buttons, actionable ADMIN guidance,
+  SCOTT demo installation, RDF prerequisite setup, and session-expiry guidance.
+- Add credential change/recovery previews, function repair, and profile restoration
+  within an open editor, with identity and concurrent-change checks.
+- Fix RDF snapshot readback and relationship candidates for ordinary schema owners.
+
+Validation: Java 1,418 tests passed; JavaScript 689 passed, one optional test skipped.
+Build, PMD and publication checks passed. Isolated browser checks covered setup,
+metadata capture, candidate storage, recovery and JSON export. Actual credential
+secret changes, paid AI output and external integrations were not exercised.
+
 ## 0.1.0-alpha.16
 
 Prepared on 2026-10-14. Deployment numbering and setup feedback fixes; not production-certified.

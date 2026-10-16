@@ -1,0 +1,5 @@
+{
+ "requestDenied.csrf":["화면의 요청 확인 정보가 만료되었거나 일치하지 않습니다. 요청은 실행하지 않았습니다. 화면을 새로 열고 필요하면 다시 로그인한 뒤 내용을 확인해 주세요. 자동 재전송하지 마세요.","The page verification token expired or does not match. The request was not executed. Reopen the page, sign in if needed, and review your input. Do not automatically resubmit.","页面请求验证信息已过期或不匹配。未执行请求。请重新打开页面，必要时重新登录并检查输入。请勿自动重发。","画面のリクエスト確認情報が期限切れ、または一致しません。リクエストは実行していません。画面を開き直し、必要なら再ログインして入力を確認してください。自動再送しないでください。"],
+ "requestDenied.access":["이 요청을 수행할 권한이 없습니다. 로그인 계정과 ADMIN 조치 안내를 확인하세요.","You do not have permission for this request. Check the signed-in account and ADMIN actions guide.","无权执行此请求。请检查登录账户及ADMIN操作指南。","このリクエストの権限がありません。ログインアカウントとADMIN対応案内を確認してください。"],
+ "requestDenied.login":["로그인 화면 열기","Open sign-in page","打开登录页面","ログイン画面を開く"]
+}

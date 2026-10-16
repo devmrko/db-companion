@@ -8,7 +8,8 @@ public final class NativeMetadata {
     private NativeMetadata() { }
     public static final int MAX_OBJECTS=50, MAX_CANDIDATES=2000;
     public record Snapshot(String iri,String table,String kind,String capturedAt,String actor) { }
-    public record Status(String storage,boolean owner,boolean api,List<Snapshot> snapshots) {
+    public record RuntimeSupport(String state,boolean canEnable,String sql) { }
+    public record Status(String storage,boolean owner,boolean api,List<Snapshot> snapshots,RuntimeSupport runtime) {
         public Status { snapshots=List.copyOf(snapshots); }
     }
     public record Capture(String table,String iri,int triples) { }
@@ -33,6 +34,9 @@ public final class NativeMetadata {
     public static String baseType(String value){return value.replaceAll("\\([^)]*\\)","").strip();}
     public static final class State {
         private Pending pending;
+        private boolean javaRequested;
+        public synchronized boolean javaRequested(){return javaRequested;}
+        public synchronized void javaRequested(boolean value){javaRequested=value;}
         public synchronized void prepare(Pending value){pending=value;}
         public synchronized void clear(){pending=null;}
         public synchronized Pending consume(String schema,String token,boolean confirmed,Instant now){

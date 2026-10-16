@@ -719,6 +719,11 @@ textarea.form-control { resize: vertical; }
 .app-dds-pages > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .app-dds-detail { padding: 20px; margin-top: 18px; }
 .app-dds-detail[hidden] { display: none; }
+[data-ddsm] [hidden] { display: none !important; }
+[data-ddsm] > summary { cursor: pointer; font-weight: 600; }
+[data-ddsm] .app-creation-grid { margin: 16px 0; }
+[data-ddsm] [data-dm-review] { margin-top: 20px; }
+[data-ddsm] [data-dm-sql], [data-ddsm] [data-dm-before] { max-height: 320px; overflow: auto; }
 .app-dds-detail h2 { font-size: 16px; margin: 0 0 18px; }
 .app-dds-section + .app-dds-section { margin-top: 22px; }
 .app-dds-section h3 { font-size: 13px; margin-bottom: 8px; }
@@ -1387,3 +1392,7 @@ dialog.app-profile-editor-compact { width: min(640px, calc(100vw - 32px)); }
   font-weight: 400;
   min-width: 0;
 }
+[data-scheduler-manage] [hidden] { display: none !important; }
+[data-scheduler-manage] summary { cursor: pointer; font-weight: 600; }
+[data-scheduler-manage] pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 320px; overflow: auto; }
+[data-scheduler-manage] .app-field { margin-block: .5rem; }

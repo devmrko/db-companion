@@ -1,4 +1,5 @@
 import {t} from './i18n.mjs';
+import {confirmAction} from './confirm-action.mjs';
 import {assistantApi,assistantPost} from './ai-assistant.mjs';
 import {changeHistorySummary} from './change-history-summary.mjs';
 const label=(key,...args)=>t('semantic.'+key,key,...args);
@@ -64,7 +65,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-semantic-relea
     const token=storagePlan.token;storagePlan=null;get('storage-consent').checked=false;
     const updated=await post('/storage-install',{token,confirmed:true});get('storage-panel').hidden=true;render(updated);
   }));
-  get('initialize').addEventListener('click',()=>run(async()=>{if(!confirm(label('confirmInitialize')))return;await post('/initialize',{confirmed:true});render(await assistantApi(root.dataset.base));get('message').textContent=label('initialized');}));
+  get('initialize').addEventListener('click',()=>run(async()=>{if(!await confirmAction(label('confirmInitialize')))return;await post('/initialize',{confirmed:true});render(await assistantApi(root.dataset.base));get('message').textContent=label('initialized');}));
   get('load').addEventListener('click',()=>run(async()=>{
     editing='';members=[];get('members').replaceChildren();
     const parent=await assistantApi(root.dataset.base+'/'+encodeURIComponent(get('parent').value));
@@ -80,11 +81,11 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-semantic-relea
   get('parent').addEventListener('change',()=>{editing='';members=[];get('members').replaceChildren();controls();});
   get('revise').addEventListener('click',()=>run(async()=>{
     const chosen=members.filter(m=>m.included);if(!get('name').value.trim()||chosen.some(m=>!Number.isSafeInteger(m.revision)||m.revision<1))throw new Error(label('invalidRevision'));
-    if(!confirm(label('confirmRevise')))return;
+    if(!await confirmAction(label('confirmRevise')))return;
     await post('/revise',{parentId:editing,name:get('name').value,terms:chosen.filter(m=>m.kind==='term').map(m=>({id:m.id,revision:m.revision})),sources:chosen.filter(m=>m.kind==='source').map(m=>({table:m.id,revision:m.revision})),confirmed:true});
     editing='';members=[];get('members').replaceChildren();render(await assistantApi(root.dataset.base));
   }));
-  get('create').addEventListener('click',()=>run(async()=>{if(!get('name').value.trim()||!confirm(label('confirmCreate')))return;await post('/create',{name:get('name').value,confirmed:true});render(await assistantApi(root.dataset.base));}));
-  get('deploy').addEventListener('click',()=>run(async()=>{if(!get('reason').value.trim()||!confirm(label('confirmDeploy')))return;render(await post('/deploy',{id:get('target').value,expected:state.head,reason:get('reason').value,confirmed:true}));}));
+  get('create').addEventListener('click',()=>run(async()=>{if(!get('name').value.trim()||!await confirmAction(label('confirmCreate')))return;await post('/create',{name:get('name').value,confirmed:true});render(await assistantApi(root.dataset.base));}));
+  get('deploy').addEventListener('click',()=>run(async()=>{if(!get('reason').value.trim()||!await confirmAction(label('confirmDeploy')))return;render(await post('/deploy',{id:get('target').value,expected:state.head,reason:get('reason').value,confirmed:true}));}));
   run(async()=>render(await assistantApi(root.dataset.base)));
 });

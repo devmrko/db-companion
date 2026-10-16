@@ -97,6 +97,7 @@ public final class DatabaseSession {
         if(!functions.containsKey(schema))functions.put(schema,List.copyOf(loader.get()));
         return functions.get(schema);
     }
+    public synchronized void invalidateFunctions(String schema){functions.remove(schema);functionDetails.keySet().removeIf(key->key.schema().equals(schema));}
     public synchronized List<FunctionCatalog.Detail> functionDetails(String schema,List<String> reference,
             java.util.function.Supplier<List<FunctionCatalog.Detail>> loader) {
         var key=new FunctionKey(schema,reference);

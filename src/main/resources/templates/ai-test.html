@@ -58,6 +58,7 @@
       <button type="button" class="btn app-btn app-btn-quiet" data-test-condition-open th:text="#{aitest.condition.open}">짧은 조건 확인</button>
     </div>
     <p role="status" aria-live="polite" data-test-message></p>
+    <p><a th:href="@{/db/accounts#ai-network}" th:text="#{aiNetwork.title}"></a> · <a th:href="@{/db/admin-help}" th:text="#{adminHelp.title}"></a></p>
     <p class="app-filter-message app-test-readiness" role="status" aria-live="polite" data-test-readiness hidden></p>
     <details class="app-assistant-help"><summary th:text="#{aitest.helpTitle}">테스트 ?</summary><p th:text="#{aitest.help}"></p><p th:text="#{aitest.historyHelp}"></p><p th:text="#{aitest.reviewHelp}"></p></details>
   </section>

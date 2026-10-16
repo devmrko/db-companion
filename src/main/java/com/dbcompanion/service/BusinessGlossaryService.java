@@ -47,7 +47,7 @@ public class BusinessGlossaryService {
         var result=query(s,true,()->{
             String owner=owner(s);repository.requireTable(owner);Objects.requireNonNull(history).require(owner);
             Term before=id==null||id.isBlank()?null:repository.find(owner,id);
-            if(before!=null&&before.revision()!=revision)throw BusinessGlossary.stale();
+            if(before!=null&&before.revision()!=revision)throw BusinessGlossary.failure(409,com.dbcompanion.common.i18n.UiMessages.text("businessGlossary.editConflict","This term has changed. Close the editor, refresh the list and reopen the latest revision. Your changes have not been saved."));
             var rdf=value.rdf()==null&&before!=null?before.rdf():value.rdf();repository.validateRdf(owner,rdf);
             var saved=repository.save(owner,id,revision,value).withRdf(rdf);history.append(owner,before,saved);return saved;
         });

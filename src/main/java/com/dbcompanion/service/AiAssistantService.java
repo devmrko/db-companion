@@ -93,14 +93,16 @@ public class AiAssistantService {
             query(session,false,()->repository.profile(selection));state.select(selection);return selection;
         }
     }
-    public Preview preview(PoolSession session,String schema,String reference,Locale locale){
+    public Preview preview(PoolSession session,String schema,String reference,Locale locale){return preview(session,schema,reference,"",locale);}
+    public Preview preview(PoolSession session,String schema,String reference,String businessContext,Locale locale){
         if(schema==null||reference==null||schema.isBlank()||reference.isBlank())throw new IllegalArgumentException("Missing source reference");
+        String context=com.dbcompanion.model.FunctionExplanation.context(businessContext);
         synchronized(session){
             var state=session.metadata().assistant();var selected=state.selected();
             if(selected==null)throw new Failure(409,"assistant.chooseFirst","AI 도우미 설정에서 프로필을 먼저 선택해 주세요.");
-            var details=functions.detail(session,schema,reference);
+            var details=functions.freshDetail(session,schema,reference);
             if(details.size()!=1)throw new Failure(422,"assistant.ambiguous","함수 소스를 하나로 확인할 수 없습니다.");
-            var definition=details.getFirst().definition();String text=AiAssistant.source(definition);
+            var definition=details.getFirst().definition();String text=com.dbcompanion.model.FunctionExplanation.source(details.getFirst(),context);
             var profile=query(session,false,()->repository.profile(selected));
             return state.prepare(schema,profile,FunctionCatalog.reference(definition.owner(),definition.object(),definition.member()),
                     text,definition.member()!=null,com.dbcompanion.common.i18n.UiMessages.supported(locale).getLanguage(),Instant.now());
@@ -110,6 +112,8 @@ public class AiAssistantService {
         final Draft draft;final State state;
         synchronized(session){state=session.metadata().assistant();draft=state.consume(token,consent,session.metadata().selectedSchema(),Instant.now());}
         try{
+            var current=functions.freshDetail(session,draft.schema(),draft.preview().reference());
+            if(current.size()!=1||!draft.preview().source().equals(com.dbcompanion.model.FunctionExplanation.source(current.getFirst(),com.dbcompanion.model.FunctionExplanation.businessContext(draft.preview().source()))))throw AiAssistant.stale();
             return query(session,true,()->{
                 var before=draft.preview().profile();var now=repository.profile(before.selection());
                 if(!before.equals(now))throw AiAssistant.stale();

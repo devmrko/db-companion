@@ -1,0 +1,105 @@
+{
+  "adminHelp.inline": ["ADMIN 조치: 같은 DB에서 대상 계정을 확인한 뒤 필요한 권한만 적용하세요. {0} 적용 후 재로그인하고 상태를 다시 확인하세요. 자세한 절차는 상단 ADMIN 조치 안내에 있습니다.", "ADMIN action: verify the account in this database and apply only required grants. {0} Sign in again and refresh status. See ADMIN actions in the top bar.", "ADMIN操作：在同一数据库核对目标账户，仅授予必要权限。{0} 重新登录并刷新状态。详见顶部ADMIN操作说明。", "ADMIN対応：同じDBで対象アカウントを確認し必要な権限だけ付与してください。{0} 再ログインして状態を確認してください。詳細は上部のADMIN対応ガイドへ。"],
+  "adminHelp.title": [
+    "ADMIN 조치 안내",
+    "ADMIN actions",
+    "ADMIN操作说明",
+    "ADMIN対応ガイド"
+  ],
+  "adminHelp.scope": [
+    "현재 로그인 계정에 대한 기능별 필요 권한 안내입니다. 부족한 권한을 자동 판정한 결과가 아닙니다. ADMIN이 같은 DB에서 기존 권한과 사용 목적을 확인하고, 필요한 항목만 직접 부여하세요. 다른 스키마 접근 권한은 포함하지 않습니다.",
+    "These are feature requirements for the login account, not detected missing privileges. ADMIN must review existing grants and the intended operation in the same database, then grant only what is needed. Cross-schema access is excluded.",
+    "这是当前登录账户的功能权限要求，并非缺失权限检测结果。ADMIN应在同一数据库核对现有权限及用途，仅授予必要权限。不含跨模式访问。",
+    "ログインアカウントの機能別必要権限です。不足権限の検出結果ではありません。ADMINは同じDBで既存権限と用途を確認し、必要な項目だけ付与してください。他スキーマへのアクセスは含みません。"
+  ],
+  "adminHelp.steps": [
+    "적용 순서: ADMIN이 대상 DB·계정·SQL을 확인하여 실행 → 사용자는 로그아웃 후 같은 계정으로 다시 로그인 → 자신의 스키마 선택 → 실패했던 화면에서 상태 확인 후 다시 시도. 이 안내 화면은 SQL을 실행하지 않습니다.",
+    "Steps: ADMIN verifies database, account and SQL, then executes it. Sign out and sign in again with the same account, select your own schema, refresh the failed page's status and retry. This guide does not execute SQL.",
+    "步骤：ADMIN确认数据库、账户和SQL后执行；用户退出并以同一账户重新登录，选择自身模式，刷新失败页面状态后重试。本页面不执行SQL。",
+    "手順：ADMINがDB・対象アカウント・SQLを確認して実行。利用者は再ログインし、自分のスキーマを選択、失敗した画面の状態を更新して再試行してください。この画面はSQLを実行しません。"
+  ],
+  "adminHelp.quota": [
+    "테이블스페이스 할당량",
+    "Tablespace quota",
+    "表空间配额",
+    "表領域割当量"
+  ],
+  "adminHelp.quotaHelp": [
+    "ORA-01950 / ORA-01536: ADMIN이 DATA의 사용량과 현재 한도를 확인해 여유 공간을 배정해야 합니다. SCOTT 설치 상태 확인은 현재 사용량을 기준으로 약 100MiB의 여유를 확보하는 총 한도 SQL을 표시합니다. 실제 데이터 규모에 맞춰 검토하세요.",
+    "ORA-01950 / ORA-01536: ADMIN must review DATA usage and quota and allocate headroom. SCOTT status provides SQL for a total quota with about 100 MiB above current usage. Review it for the actual data size.",
+    "ORA-01950 / ORA-01536：ADMIN需核对DATA使用量和配额并分配余量。SCOTT状态提供比当前使用量多约100MiB的总配额SQL，请按数据规模审核。",
+    "ORA-01950 / ORA-01536：ADMINがDATA使用量と割当量を確認し余裕を確保します。SCOTT状態では現在使用量に約100MiBを加えた総割当量のSQLを表示します。データ量に応じて確認してください。"
+  ],
+  "adminHelp.scott": [
+    "아래 SQL은 현재 계정에서 확인된 부족 항목만 포함합니다. DATA 값은 추가량이 아닌 총 한도이며 현재 사용량보다 약 100MiB 크게 제안합니다. ADMIN이 같은 DB에서 검토·실행해야 합니다.",
+    "SQL below covers only detected missing requirements for this account. DATA is a total quota, not an increment, proposed about 100 MiB above current usage. ADMIN must review and execute it in this database.",
+    "下方SQL仅包含当前账户检测到的缺失项。DATA为总配额而非增量，建议比当前用量多约100MiB。请ADMIN在同一数据库审核后执行。",
+    "下記SQLはこのアカウントで検出された不足項目のみです。DATAは追加量ではなく総割当量で、使用量より約100MiB大きく提案します。同じDBでADMINが確認・実行してください。"
+  ],
+  "adminHelp.table": [
+    "저장소·용어사전·온톨로지·SCOTT 테이블 생성 (공간 할당량도 필요)",
+    "Repository, glossary, ontology and SCOTT tables (quota also required)",
+    "存储库、术语、本体及SCOTT表创建（亦需配额）",
+    "保存先・用語辞書・オントロジー・SCOTTのテーブル作成（割当量も必要）"
+  ],
+  "adminHelp.function": [
+    "Function·용어 검색 PL/SQL 설치",
+    "Function and glossary search PL/SQL installation",
+    "Function及术语搜索PL/SQL安装",
+    "Function・用語検索PL/SQLのインストール"
+  ],
+  "adminHelp.text": [
+    "Oracle Text 설정 (용어 테이블 설치 후)",
+    "Oracle Text setup (after glossary table installation)",
+    "Oracle Text配置（术语表安装后）",
+    "Oracle Text設定（用語テーブル作成後）"
+  ],
+  "adminHelp.credential": [
+    "Credential 생성",
+    "Create credentials",
+    "创建Credential",
+    "Credential作成"
+  ],
+  "adminHelp.profile": [
+    "Profile 생성·변경",
+    "Create and edit profiles",
+    "创建及修改Profile",
+    "Profile作成・変更"
+  ],
+  "adminHelp.agent": [
+    "Agent Tool·Task·Agent·Team 생성·변경",
+    "Create and edit agent tools, tasks, agents and teams",
+    "创建及修改Tool、Task、Agent及Team",
+    "Tool・Task・Agent・Team作成・変更"
+  ],
+  "adminHelp.job": [
+    "자신의 스키마에 스케줄 작업 생성",
+    "Create scheduled jobs in your own schema",
+    "在自身模式创建调度任务",
+    "自分のスキーマにスケジュールジョブを作成"
+  ],
+  "adminHelp.graph": [
+    "메타데이터 Property Graph·보조 뷰 생성",
+    "Create metadata property graphs and supporting views",
+    "创建元数据Property Graph和辅助视图",
+    "メタデータProperty Graph・補助ビュー作成"
+  ],
+  "adminHelp.adminOnly": [
+    "ADMIN이 직접 수행해야 하는 작업",
+    "Actions that ADMIN must perform",
+    "必须由ADMIN执行的操作",
+    "ADMINが直接行う操作"
+  ],
+  "adminHelp.adminOnlyHelp": [
+    "계정 생성·권한 설정은 ADMIN으로 로그인하고 ADMIN 스키마를 선택해야 합니다. RDF의 Oracle Java 설치 요청도 ADMIN이 온톨로지의 RDF 상태 화면에서 실행하며, 이후 별도 DB 재시작이 필요합니다. 일반 계정에 ADMIN 권한을 부여해 우회하지 마세요.",
+    "Account setup requires ADMIN login with the ADMIN schema selected. ADMIN also requests Oracle Java installation from the ontology RDF status screen; a separate database restart is then required. Do not grant administrative privileges to bypass these restrictions.",
+    "账户设置须以ADMIN登录并选择ADMIN模式。Oracle Java安装请求也须由ADMIN在本体RDF状态页面执行，之后需另行重启数据库。请勿向普通账户授予管理员权限绕过限制。",
+    "アカウント設定はADMINログインとADMINスキーマ選択が必要です。Oracle Javaの要求もADMINがRDF状態画面で実行し、その後別途DB再起動が必要です。一般ユーザーへの管理権限付与で回避しないでください。"
+  ],
+  "adminHelp.other": [
+    "권한 오류가 계속되면 오류 코드·작업·대상 객체를 ADMIN에게 전달하세요. ORA-24247은 외부 서비스의 정확한 호스트에 대한 네트워크 ACL 검토가 필요하며, 위 GRANT로 해결되지 않습니다. 실제 외부 호출에는 별도 Credential·제공자 설정이 필요합니다.",
+    "If access still fails, send the error code, operation and target object to ADMIN. ORA-24247 requires reviewing the network ACL for the exact external service host; the grants above do not resolve it. External calls also require credentials and provider setup.",
+    "若仍失败，请将错误代码、操作及目标对象交给ADMIN。ORA-24247需审核外部服务确切主机的网络ACL，上述GRANT无法解决。外部调用还需Credential及提供商设置。",
+    "失敗が続く場合はエラーコード・操作・対象オブジェクトをADMINへ伝えてください。ORA-24247は外部サービスの正確なホストへのネットワークACL確認が必要で、上記GRANTでは解決しません。外部呼出にはCredentialとプロバイダー設定も必要です。"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+ "aiNetwork.title":["AI 제공자 통신 권한 (네트워크 ACL)","AI provider access (network ACL)","AI 提供商访问权限（网络 ACL）","AI プロバイダー通信権限（ネットワーク ACL）"],
+ "aiNetwork.remedy":["ORA-24247: ADMIN → 계정 생성·권한 설정 → AI 제공자 통신 권한에서 호출 계정과 프로필의 제공자 호스트를 확인하고 권한 미리보기 → 추가를 실행하세요. /db/accounts#ai-network. DB 로그인 IP 허용 목록과 별개입니다.","ORA-24247: ADMIN → Account setup → AI provider access. Check the calling account and profile provider host, preview and add permission. /db/accounts#ai-network. Separate from the database login IP allowlist.","ORA-24247：ADMIN → 账户设置 → AI 提供商访问权限。核对调用账户和提供商主机，预览后添加。/db/accounts#ai-network。与数据库登录 IP 白名单不同。","ORA-24247: ADMIN → アカウント設定 → AI プロバイダー通信権限。呼出アカウントとホストを確認し、プレビュー後に追加。/db/accounts#ai-network。DB ログイン IP 許可リストとは別です。"],
+ "aiNetwork.scope":["선택 계정에 정확한 호스트 하나의 http 권한을 추가합니다. 포트 제한은 없으며 기존 ACL을 삭제·교체하지 않습니다. 와일드카드·임의 호스트·OCI GenAI 설정은 지원하지 않습니다. 자격정보나 유료 AI 호출은 생성하지 않습니다.","Adds http permission for one exact host to the selected account, without a port restriction. Preserves existing ACLs. Wildcards, custom hosts and OCI GenAI are unsupported. Does not create credentials or call AI.","为指定账户添加单个确切主机的 http 权限，不限制端口。保留现有 ACL。不支持通配符、自定义主机或 OCI GenAI。不创建凭证或调用 AI。","選択アカウントに1つの正確なホストの http 権限を追加。ポート制限はありません。既存 ACL は保持。ワイルドカード・任意ホスト・OCI GenAI は対象外。認証情報作成や AI 呼出はしません。"],
+ "aiNetwork.name":["통신 권한 대상 계정 (ADMIN 포함)","Outbound access account (including ADMIN)","通信权限目标账户（含 ADMIN）","通信権限対象アカウント（ADMIN 含む）"],
+ "aiNetwork.provider":["AI 제공자 호스트","AI provider host","AI 提供商主机","AI プロバイダーホスト"],
+ "aiNetwork.status":["통신 권한 조회","Check outbound permissions","查询通信权限","通信権限を照会"],
+ "aiNetwork.preview":["통신 권한 미리보기","Preview outbound permission","预览通信权限","通信権限プレビュー"],
+ "aiNetwork.consent":["대상 계정·외부 호스트·http 권한 범위를 확인했습니다.","I checked the account, external host and http permission scope.","已确认账户、外部主机及 http 权限范围。","アカウント・外部ホスト・http 権限範囲を確認しました。"],
+ "aiNetwork.apply":["확인한 통신 권한 추가","Add reviewed outbound permission","添加已确认的通信权限","確認した通信権限を追加"],
+ "aiNetwork.working":["통신 권한 처리 중…","Processing outbound permission…","正在处理通信权限…","通信権限を処理中…"],
+ "aiNetwork.checked":["정확한 계정·호스트의 ACL 항목입니다. 실제 통신 성공이나 자격정보 유효성을 확인한 결과는 아닙니다.","ACL entries for the exact account and host. This does not verify connectivity or credentials.","确切账户及主机的 ACL 条目。未验证连接或凭证有效性。","対象アカウント・ホストの ACL 項目です。通信成功・認証情報の有効性は未確認です。"],
+ "aiNetwork.done":["http 권한 항목 추가를 재조회로 확인했습니다. 기존 거부 규칙·네트워크 경로·자격정보에 따라 실제 호출은 실패할 수 있습니다. 원래 AI 화면에서 다시 실행하세요.","Readback confirms the http entry. Deny rules, routing or credentials may still block calls. Retry from the original AI screen.","重新查询已确认 http 权限条目。拒绝规则、路由或凭证仍可能阻止调用。请返回 AI 页面重新执行。","再照会で http 権限項目を確認。拒否規則・経路・認証情報で呼出が失敗する場合があります。元の AI 画面から再実行してください。"],
+ "aiNetwork.invalid":["대상 계정 또는 지원하는 제공자를 확인하세요.","Check the account and supported provider.","请检查目标账户和受支持提供商。","対象アカウントと対応プロバイダーを確認してください。"],
+ "aiNetwork.identity":["대상 일반 계정 또는 ADMIN이 없거나 식별 정보가 변경됐습니다.","The target ordinary account or ADMIN is missing or changed.","目标普通账户或 ADMIN 不存在或已更改。","対象一般アカウントまたは ADMIN が存在しないか変更されました。"],
+ "aiNetwork.exists":["같은 http 허용 항목이 이미 있습니다. 통신 권한 조회와 실제 오류를 확인하세요.","The same http grant already exists. Check permissions and the actual error.","相同的 http 授权已存在。请检查权限及实际错误。","同じ http 許可が既に存在します。権限と実際のエラーを確認してください。"],
+ "aiNetwork.changed":["계정·ACL 상태가 변경됐거나 관리 한도를 넘었습니다. 다시 조회·미리보기하세요.","Account or ACL state changed or exceeds the management limit. Reload and preview.","账户或 ACL 状态已变化或超出管理限制，请重新查询和预览。","アカウント・ACL 状態の変更または管理上限超過。再照会・プレビューしてください。"],
+ "aiNetwork.expired":["동의·미리보기 정보가 없거나 만료됐습니다. 다시 미리보기하세요.","Consent or preview is missing or expired. Preview again.","同意或预览信息缺失或过期，请重新预览。","同意・プレビューがないか期限切れです。再プレビューしてください。"],
+ "aiNetwork.failed":["통신 권한 적용 또는 재조회를 확인하지 못했습니다. 일부 변경이 남을 수 있으므로 먼저 권한을 조회하세요. 자동 재시도하지 않습니다.","Could not confirm permission application or readback. Changes may persist; check permissions first. No automatic retry.","无法确认权限应用或重新查询。可能已留下修改，请先查询权限。不自动重试。","権限適用・再照会を確認できませんでした。変更が残る可能性があります。先に権限を照会してください。自動再試行しません。"]
+}

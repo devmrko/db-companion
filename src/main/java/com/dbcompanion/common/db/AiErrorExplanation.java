@@ -31,6 +31,8 @@ public final class AiErrorExplanation {
             possible.add("an application or profile policy rejected the request; this alone does not prove an external object was used");
         if (original.contains("ORA-01031"))
             possible.add("the login account may not have the required privilege");
+        if (original.contains("ORA-24247"))
+            confirmed.add(com.dbcompanion.common.i18n.UiMessages.text("aiNetwork.remedy", "ADMIN: /db/accounts#ai-network — review the caller and provider host, then add outbound HTTP permission. This is separate from the database login IP allowlist."));
         return new Summary(stage, original, confirmed, possible);
     }
 }

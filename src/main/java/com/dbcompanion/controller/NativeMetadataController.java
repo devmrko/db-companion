@@ -21,8 +21,10 @@ public class NativeMetadataController {
     public record Save(String schema,String token,List<String> ids,Boolean confirmed) { }
     @GetMapping("/status") public ResponseEntity<?> status(@RequestParam String schema,HttpServletRequest r){return run(r,()->service.status(session(r),schema));}
     @GetMapping("/scripts") public ResponseEntity<?> scripts(@RequestParam String schema,HttpServletRequest r){return run(r,()->service.scripts(session(r),schema));}
+    @GetMapping("/diagnostics") public ResponseEntity<?> diagnostics(@RequestParam String schema,HttpServletRequest r){return run(r,()->service.diagnostics(session(r),schema));}
     @GetMapping("/columns") public ResponseEntity<?> columns(@RequestParam String schema,@RequestParam String table,HttpServletRequest r){return run(r,()->service.columns(session(r),schema,table));}
     @PostMapping("/install") public ResponseEntity<?> install(@RequestBody Change v,HttpServletRequest r){return run(r,()->service.install(session(r),v.schema(),Boolean.TRUE.equals(v.confirmed())));}
+    @PostMapping("/enable-java") public ResponseEntity<?> enableJava(@RequestBody Change v,HttpServletRequest r){return run(r,()->service.enableJava(session(r),v.schema(),Boolean.TRUE.equals(v.confirmed())));}
     @PostMapping("/capture") public ResponseEntity<?> capture(@RequestBody Change v,HttpServletRequest r){return run(r,()->service.capture(session(r),v.schema(),v.table(),Boolean.TRUE.equals(v.confirmed())));}
     @PostMapping("/preview") public ResponseEntity<?> preview(@RequestBody Scope v,HttpServletRequest r){return run(r,()->service.preview(session(r),v.schema(),v.tables()));}
     @PostMapping("/save") public ResponseEntity<?> save(@RequestBody Save v,HttpServletRequest r){return run(r,()->service.save(session(r),v.schema(),v.token(),v.ids(),Boolean.TRUE.equals(v.confirmed())));}

@@ -1,0 +1,4 @@
+{
+ "adminHelp.rdf":["Oracle RDF · 소유 스키마 객체 생성 권한 6종","Oracle RDF · six owner-schema creation privileges","Oracle RDF · 六种所有者模式创建权限","Oracle RDF・所有スキーマの作成権限6種"],
+ "adminHelp.rdfAction":["ADMIN이 계정 생성·권한 설정 → 기존 계정의 기능별 권한 설정 → Oracle RDF를 선택해 아래 권한을 검토·추가해야 합니다. 적용 후 대상 계정으로 다시 로그인하세요. DATA 공간 할당량도 필요합니다.\n{0}","ADMIN: Account setup → Existing-account privileges → Oracle RDF. Review and grant the privileges below, then sign in again as the target account. DATA quota is also required.\n{0}","ADMIN：账户设置 → 现有账户权限 → Oracle RDF。检查并授予以下权限，然后使用目标账户重新登录。还需DATA空间配额。\n{0}","ADMIN：アカウント設定 → 既存アカウントの権限 → Oracle RDFで以下を確認して付与し、対象アカウントで再ログインしてください。DATA割当量も必要です。\n{0}"]
+}

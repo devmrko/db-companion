@@ -1,0 +1,4 @@
+{
+  "businessGlossary.duplicateWarning": ["같은 대표 용어가 이미 있습니다. 계속하면 별도 항목으로 저장되며 기존 항목과 함께 검색될 수 있습니다. 기존 항목을 수정하려면 취소하고 목록에서 조회·편집을 선택하세요. 계속 저장할까요?", "A term with this name already exists. Continuing saves a separate entry that may appear alongside existing entries in search. To edit an existing entry, cancel and choose View/edit in the list. Continue saving?", "已存在同名术语。继续将保存为独立条目，搜索时可能与现有条目同时出现。如需修改现有条目，请取消并在列表中选择查看/编辑。继续保存吗？", "同じ代表用語が既にあります。続行すると別の項目として保存され、検索で既存の項目と一緒に表示される場合があります。既存項目を編集するにはキャンセルし、一覧の表示・編集を選んでください。保存を続けますか？"],
+  "businessGlossary.duplicateCheckIncomplete": ["중복 이름 확인을 완료하지 못했습니다. 목록에서 이름을 확인한 뒤 다시 시도해 주세요.", "The duplicate-name check could not finish. Check the name in the list and try again.", "无法完成重名检查。请在列表中检查名称后重试。", "重複名の確認を完了できませんでした。一覧で名前を確認してから再試行してください。"]
+}

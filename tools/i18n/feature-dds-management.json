@@ -1,0 +1,302 @@
+{
+  "ddsManage.title": [
+    "DDS 생성·변경",
+    "Create and edit DDS",
+    "创建与修改 DDS",
+    "DDS の作成・変更"
+  ],
+  "ddsManage.scope": [
+    "Role 값·OCI 그룹 매핑·Data Grant 조건과 대상 Role을 관리합니다. Python·Java 접속, OCI Domain 인증 및 그룹 멤버 관리는 외부에서 수행합니다.",
+    "Manage role values, OCI group mappings and data grant conditions/roles. Python/Java connections, OCI Domain authentication and group membership are managed externally.",
+    "管理角色属性、OCI 组映射及数据授权条件和角色。Python/Java 连接、OCI Domain 认证和组成员管理在外部进行。",
+    "ロール値・OCI グループ連携・Data Grant 条件とロールを管理します。接続・OCI Domain 認証・グループメンバー管理は外部で行います。"
+  ],
+  "ddsManage.adminHelp": [
+    "ADMIN 조치: 계정 생성·권한 설정 → DDS → 대상 계정 → 권한 미리보기 → 선택 권한 추가. CREATE DATA GRANT와 SYS.DBA_DATA_ROLES 조회 권한을 부여합니다. 로컬 역할은 CREATE DATA ROLE 권한이 있는 ADMIN이 이 화면에서 생성합니다. 뷰·SQL 미지원은 권한 추가로 해결되지 않습니다. ADMIN이 계정 생성·권한 설정 → DDS · 자기 스키마 Data Grant 관리 → 선택 권한 추가를 실행해야 합니다. 필요한 권한: ADMINISTER ANY DATA GRANT ON SCHEMA (로그인 계정). 다른 스키마 권한은 필요하지 않습니다.",
+    "ADMIN: Account setup → DDS → target account → preview → add selected privileges. This grants CREATE DATA GRANT and SELECT on SYS.DBA_DATA_ROLES. ADMIN with CREATE DATA ROLE creates local roles here. Unsupported views or SQL require a supported database version, not more grants. ADMIN must use Account setup → DDS · administer own-schema data grants → add selected privileges. Required: ADMINISTER ANY DATA GRANT ON SCHEMA (signed-in account). No other schema privileges are needed.",
+    "ADMIN：账户设置 → DDS → 目标账户 → 权限预览 → 添加所选权限。授予 CREATE DATA GRANT 和 SYS.DBA_DATA_ROLES 查询权限。拥有 CREATE DATA ROLE 的 ADMIN 可在此创建本地角色。不支持的视图或 SQL 需要受支持的数据库版本。 ADMIN 必须通过账户设置 → DDS · 管理自身模式的数据授权 → 添加所选权限执行。需要 ADMINISTER ANY DATA GRANT ON SCHEMA（登录账户），不需要其他模式权限。",
+    "ADMIN: アカウント設定 → DDS → 対象 → 権限プレビュー → 選択権限追加。CREATE DATA GRANT と SYS.DBA_DATA_ROLES の SELECT を付与します。CREATE DATA ROLE を持つ ADMIN がここでローカルロールを作成します。未対応のビューや SQL は権限追加では解決しません。 ADMIN がアカウント設定 → DDS · 自身のスキーマの Data Grant 管理 → 選択権限追加を実行してください。必要権限: ADMINISTER ANY DATA GRANT ON SCHEMA（ログインアカウント）。他のスキーマ権限は不要です。"
+  ],
+  "ddsManage.refresh": [
+    "관리 상태 조회",
+    "Load management state",
+    "查询管理状态",
+    "管理状態を照会"
+  ],
+  "ddsManage.kind": [
+    "관리 종류",
+    "Object kind",
+    "对象类型",
+    "管理対象"
+  ],
+  "ddsManage.action": [
+    "작업",
+    "Action",
+    "操作",
+    "操作"
+  ],
+  "ddsManage.create": [
+    "신규 생성",
+    "Create",
+    "新建",
+    "新規作成"
+  ],
+  "ddsManage.update": [
+    "기존 변경",
+    "Update existing",
+    "修改现有对象",
+    "既存の変更"
+  ],
+  "ddsManage.existing": [
+    "기존 대상",
+    "Existing object",
+    "现有对象",
+    "既存の対象"
+  ],
+  "ddsManage.name": [
+    "이름 (대문자·숫자·밑줄)",
+    "Name (uppercase, digits, underscore)",
+    "名称（大写字母、数字、下划线）",
+    "名前（大文字・数字・下線）"
+  ],
+  "ddsManage.enabled": [
+    "기본 활성화",
+    "Enabled by default",
+    "默认启用",
+    "既定で有効"
+  ],
+  "ddsManage.table": [
+    "소유 테이블",
+    "Owned table",
+    "自有表",
+    "所有テーブル"
+  ],
+  "ddsManage.role": [
+    "대상 Data Role",
+    "Target data role",
+    "目标数据角色",
+    "対象データロール"
+  ],
+  "ddsManage.column": [
+    "조건 컬럼",
+    "Condition column",
+    "条件列",
+    "条件列"
+  ],
+  "ddsManage.valueType": [
+    "비교값 종류",
+    "Value type",
+    "比较值类型",
+    "比較値の型"
+  ],
+  "ddsManage.value": [
+    "같음 (=) 비교값",
+    "Equals (=) value",
+    "等于 (=) 值",
+    "等値 (=) の値"
+  ],
+  "ddsManage.preview": [
+    "변경 SQL 미리보기",
+    "Preview change SQL",
+    "预览变更 SQL",
+    "変更 SQL のプレビュー"
+  ],
+  "ddsManage.restore": [
+    "직전 변경 이전 값 복구 미리보기",
+    "Preview restoring previous values",
+    "预览恢复上次值",
+    "直前の値への復元プレビュー"
+  ],
+  "ddsManage.warning": [
+    "실제 데이터 접근 권한이 변경됩니다. Oracle DDL은 자동 커밋되며 실패 시 롤백을 보장하지 않습니다. 실행 전 대상·조건·영향을 확인하세요. 복구는 같은 화면에서 직전 변경 이전 값을 다시 적용하며 외부 변경이 있으면 차단됩니다.",
+    "This changes real data access. Oracle DDL commits implicitly; rollback is not guaranteed. Review target, condition and impact. Restore reapplies previous values in this page and blocks if state changed externally.",
+    "此操作改变实际数据访问权限。Oracle DDL 隐式提交，失败不保证回滚。请检查目标、条件和影响。恢复会在本页面重新应用上次值；检测到外部变更时将阻止恢复。",
+    "実際のデータアクセス権限を変更します。Oracle DDL は暗黙的にコミットされ、ロールバックは保証されません。対象・条件・影響を確認してください。復元はこの画面で直前の値を再適用し、外部変更時は停止します。"
+  ],
+  "ddsManage.consent": [
+    "대상·SQL·보안 영향을 확인했습니다",
+    "I reviewed the target, SQL and security impact",
+    "已确认目标、SQL 和安全影响",
+    "対象・SQL・セキュリティへの影響を確認しました"
+  ],
+  "ddsManage.apply": [
+    "확인한 DDS 변경 적용",
+    "Apply reviewed DDS change",
+    "应用已确认的 DDS 变更",
+    "確認した DDS 変更を適用"
+  ],
+  "ddsManage.working": [
+    "조회·처리 중…",
+    "Working…",
+    "处理中…",
+    "処理中…"
+  ],
+  "ddsManage.loaded": [
+    "관리 상태를 조회했습니다.",
+    "Management state loaded.",
+    "已查询管理状态。",
+    "管理状態を取得しました。"
+  ],
+  "ddsManage.review": [
+    "SQL과 이전 값을 확인한 뒤 대상 문구를 입력하세요.",
+    "Review SQL and previous values, then enter the confirmation text.",
+    "确认 SQL 和原值后输入确认文本。",
+    "SQL と以前の値を確認し、確認文を入力してください。"
+  ],
+  "ddsManage.verified": [
+    "변경 적용 후 DB 재조회가 일치합니다.",
+    "Applied and verified by database readback.",
+    "已应用并通过数据库重新查询验证。",
+    "適用後の DB 再照会が一致しました。"
+  ],
+  "ddsManage.invalid": [
+    "필수 값·이름·비교값 형식을 확인하세요.",
+    "Check required values, names and value format.",
+    "请检查必填值、名称及比较值格式。",
+    "必須項目・名前・比較値の形式を確認してください。"
+  ],
+  "ddsManage.unsupported": [
+    "지원 범위를 벗어난 기존 정책입니다. 속성을 잃지 않도록 변경을 차단했습니다.",
+    "Existing policy is outside the supported subset; changes are blocked to preserve its attributes.",
+    "现有策略超出支持范围，已阻止修改以保留其属性。",
+    "既存ポリシーは対応範囲外です。属性を保持するため変更を停止しました。"
+  ],
+  "ddsManage.ownSchema": [
+    "로그인 계정 자신의 스키마를 선택하세요.",
+    "Select the signed-in account's own schema.",
+    "请选择登录账户自己的模式。",
+    "ログインアカウント自身のスキーマを選択してください。"
+  ],
+  "ddsManage.exists": [
+    "같은 이름이 존재합니다. 기존 변경을 선택하세요.",
+    "The name already exists. Choose update.",
+    "名称已存在，请选择修改。",
+    "同名の対象が存在します。既存の変更を選択してください。"
+  ],
+  "ddsManage.missing": [
+    "기존 대상이 없습니다. 새로 조회하세요.",
+    "Existing target is missing. Refresh state.",
+    "现有目标不存在，请刷新。",
+    "既存の対象がありません。再照会してください。"
+  ],
+  "ddsManage.adminRole": [
+    "로컬 Data Role 생성·변경은 ADMIN으로 로그인해 수행하세요.",
+    "Sign in as ADMIN to create or edit local data roles.",
+    "请以 ADMIN 登录来创建或修改本地数据角色。",
+    "ローカルデータロールの作成・変更は ADMIN で実行してください。"
+  ],
+  "ddsManage.rolePrivilege": [
+    "ADMIN에 CREATE DATA ROLE 권한이 필요합니다. DB 지원 버전과 권한을 확인하세요.",
+    "ADMIN needs CREATE DATA ROLE. Check database support and privileges.",
+    "ADMIN 需要 CREATE DATA ROLE 权限，请确认版本支持及权限。",
+    "ADMIN に CREATE DATA ROLE が必要です。DB の対応バージョンと権限を確認してください。"
+  ],
+  "ddsManage.grantPrivilege": [
+    "ADMIN이 계정 생성·권한 설정 → DDS → 선택 권한 추가로 CREATE DATA GRANT와 역할 조회 권한을 부여해야 합니다.",
+    "ADMIN must use Account setup → DDS → add selected privileges for CREATE DATA GRANT and role lookup.",
+    "ADMIN 必须通过账户设置 → DDS → 添加所选权限授予 CREATE DATA GRANT 和角色查询权限。",
+    "ADMIN がアカウント設定 → DDS → 選択権限追加で CREATE DATA GRANT とロール照会権限を付与してください。"
+  ],
+  "ddsManage.localRole": [
+    "대상 Role이 없습니다. 다시 조회하세요.",
+    "Target role missing. Reload state.",
+    "目标角色不存在，请刷新。",
+    "対象ロールがありません。再照会してください。"
+  ],
+  "ddsManage.columnType": [
+    "소유 테이블의 컬럼과 NUMBER/TEXT 종류를 확인하세요.",
+    "Check the owned table column and NUMBER/TEXT type.",
+    "请检查自有表的列及 NUMBER/TEXT 类型。",
+    "所有テーブルの列と NUMBER/TEXT 型を確認してください。"
+  ],
+  "ddsManage.verifyFailed": [
+    "실행 후 상태가 예상과 다릅니다. 재조회 후 검토하세요. 자동 재실행하지 않습니다.",
+    "Readback differs from the expected state. Refresh and review; no automatic retry.",
+    "执行后状态与预期不同。请重新查询并检查，不会自动重试。",
+    "実行後の状態が予想と異なります。再照会して確認してください。自動再実行はしません。"
+  ],
+  "ddsManage.expired": [
+    "로그인 또는 미리보기가 만료됐거나 이미 실행했습니다. 재조회하세요.",
+    "Login or preview expired, or already attempted. Refresh.",
+    "登录或预览已过期，或已执行过。请刷新。",
+    "ログインまたはプレビューが期限切れか、既に実行済みです。再照会してください。"
+  ],
+  "ddsManage.confirm": [
+    "대상 문구와 보안 영향 동의가 필요합니다.",
+    "Exact confirmation text and security consent are required.",
+    "需要准确的确认文本和安全影响同意。",
+    "正確な確認文とセキュリティへの影響への同意が必要です。"
+  ],
+  "ddsManage.stale": [
+    "DB 상태가 변경됐습니다. 새로 조회하고 미리보기를 다시 만드세요.",
+    "Database state changed. Refresh and create a new preview.",
+    "数据库状态已变化，请刷新并重新预览。",
+    "DB 状態が変わりました。再照会してプレビューを作り直してください。"
+  ],
+  "ddsManage.limit": [
+    "관리 조회가 5,000행을 초과했습니다. 부분 상태로 변경하지 않습니다.",
+    "Management query exceeds 5,000 rows. Partial state cannot be edited.",
+    "管理查询超过 5,000 行，不会修改部分状态。",
+    "管理照会が 5,000 行を超えています。部分状態での変更はしません。"
+  ],
+  "ddsManage.failed": [
+    "DDS 작업을 완료하지 못했습니다. 실제 상태를 재조회하세요. 자동 재실행하지 않습니다.",
+    "DDS operation could not be completed. Refresh actual state; no automatic retry.",
+    "DDS 操作未完成。请重新查询实际状态，不会自动重试。",
+    "DDS 操作を完了できませんでした。実際の状態を再照会してください。自動再実行はしません。"
+  ],
+  "ddsManage.policyPreset": [
+    "DDS · 자기 스키마 Data Grant 관리",
+    "DDS · administer own-schema data grants",
+    "DDS · 管理自身模式的数据授权",
+    "DDS · 自身のスキーマの Data Grant 管理"
+  ],
+  "ddsManage.policyPrivilege": [
+    "ADMIN이 계정 생성·권한 설정 → DDS · 자기 스키마 Data Grant 관리 → 선택 권한 추가를 실행해야 합니다. 필요한 권한: ADMINISTER ANY DATA GRANT ON SCHEMA (로그인 계정). 다른 스키마 권한은 필요하지 않습니다.",
+    "ADMIN must use Account setup → DDS · administer own-schema data grants → add selected privileges. Required: ADMINISTER ANY DATA GRANT ON SCHEMA (signed-in account). No other schema privileges are needed.",
+    "ADMIN 必须通过账户设置 → DDS · 管理自身模式的数据授权 → 添加所选权限执行。需要 ADMINISTER ANY DATA GRANT ON SCHEMA（登录账户），不需要其他模式权限。",
+    "ADMIN がアカウント設定 → DDS · 自身のスキーマの Data Grant 管理 → 選択権限追加を実行してください。必要権限: ADMINISTER ANY DATA GRANT ON SCHEMA（ログインアカウント）。他のスキーマ権限は不要です。"
+  ],
+  "ddsManage.roleMode": [
+    "Role 연결 방식",
+    "Role mapping type",
+    "角色映射类型",
+    "ロール連携方式"
+  ],
+  "ddsManage.local": [
+    "로컬 Role",
+    "Local role",
+    "本地角色",
+    "ローカルロール"
+  ],
+  "ddsManage.group": [
+    "OCI 그룹 식별자",
+    "OCI group identifier",
+    "OCI 组标识符",
+    "OCI グループ識別子"
+  ],
+  "ddsManage.mappingHelp": [
+    "OAuth: 설정된 Domain의 그룹 이름. OCI IAM 인증 토큰: 그룹 이름 또는 Domain/그룹. 이 화면은 DB 매핑만 변경합니다. 외부 Role에는 활성 체크를 적용하지 않습니다.",
+    "OAuth: group in configured domain. OCI IAM auth token: group or Domain/group. This page changes DB mappings only. External roles do not use the enabled checkbox.",
+    "OAuth：已配置域中的组。OCI IAM 认证令牌：组或 Domain/组。此页仅修改数据库映射。外部角色不使用启用复选框。",
+    "OAuth: 設定済み Domain のグループ。OCI IAM 認証トークン: グループまたは Domain/グループ。DB マッピングのみ変更します。外部ロールは有効チェックを使いません。"
+  ],
+  "ddsManage.mappingInvalid": [
+    "OCI 매핑 종류와 그룹 식별자를 확인하세요. OAuth에는 Domain/ 접두사를 넣지 않습니다.",
+    "Check OCI mapping type and group. OAuth does not accept a Domain/ prefix.",
+    "请检查 OCI 映射类型和组。OAuth 不接受 Domain/ 前缀。",
+    "OCI マッピング種類とグループを確認してください。OAuth に Domain/ は指定できません。"
+  ],
+  "ddsManage.roleType": [
+    "로컬·외부 Role 간 종류 변경은 지원하지 않습니다. 새 Role을 생성하세요.",
+    "Local and external role types cannot be converted. Create a new role.",
+    "本地与外部角色不能互相转换，请创建新角色。",
+    "ローカル・外部間の種類変更はできません。新規作成してください。"
+  ],
+  "ddsManage.mappingExists": [
+    "같은 외부 그룹에 연결된 다른 Role이 있습니다.",
+    "Another role already maps to this group.",
+    "已有其他角色映射到此组。",
+    "同じグループに別のロールが対応しています。"
+  ]
+}

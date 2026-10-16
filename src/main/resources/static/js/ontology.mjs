@@ -1,4 +1,5 @@
 import {t} from './i18n.mjs';
+import {confirmAction} from './confirm-action.mjs';
 import {changeHistoryFields} from './change-history-summary.mjs';
 import {editGuard} from './edit-guard.mjs';
 import {assistantApi,assistantPost} from './ai-assistant.mjs';
@@ -94,7 +95,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology]').fo
   root.querySelectorAll('[data-on-view]').forEach(button=>button.addEventListener('click',()=>work(async()=>{view=button.dataset.onView;applyView();if(view==='erd')await erd.show();if(view==='relationships')await relationships.show();if(view==='property-graphs')await graphManager.show();})));
   get('analyze').addEventListener('click',()=>work(async()=>{view='relationships';applyView();await relationships.all();}));
   async function reloadSaved(){erd.invalidate();relationships.invalidate();await load();}
-  get('install').addEventListener('click',()=>{if(window.confirm(label('installConfirm')+'\n'+schema+'.DBC_ONTOLOGY_CATALOG'))work(async()=>{await post('/install',{schema,confirmed:true});await reloadSaved();});});
+  get('install').addEventListener('click',async()=>{if(await confirmAction(label('installConfirm')+'\n'+schema+'.DBC_ONTOLOGY_CATALOG'))work(async()=>{await post('/install',{schema,confirmed:true});await reloadSaved();});});
   const importer=metadataImporter(get('import-dialog'),{schema,post,completed:reloadSaved,profiles:profile=>assistantApi(get('erd').dataset.profilesUrl+'?'+new URLSearchParams(profile===undefined?{schema}:{schema,profile}))});
   const wizard=ontologyWizard(get('wizard-dialog'),{schema,post,getOptions:value=>assistantApi(url('/wizard/options',{table:value.document.source.table,revision:value.revision})),saved:async table=>{await reloadSaved();await open(table);}});
   get('wizard').addEventListener('click',()=>{if(!busy&&!dirty&&editable(entry,latest))wizard.open(entry);});

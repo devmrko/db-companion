@@ -24,8 +24,11 @@ public final class OrdsManagement {
                           Map<String,Integer> affected, List<Statement> statements, boolean destructive) {}
     public static final class Failure extends RuntimeException {
         private final int status;
-        public Failure(int status,String key) {super(key);this.status=status;}
+        private final String diagnostic;
+        public Failure(int status,String key) {this(status,key,"");}
+        public Failure(int status,String key,String diagnostic) {super(key);this.status=status;this.diagnostic=diagnostic;}
         public int status() {return status;}
+        public String diagnostic() {return diagnostic;}
     }
     public static String digest(Object value) {
         try {return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(new JsonMapper().writeValueAsString(value).getBytes(StandardCharsets.UTF_8)));}
