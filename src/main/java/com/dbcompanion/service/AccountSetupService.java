@@ -14,7 +14,9 @@ public class AccountSetupService {
     public static List<String> privilegeSql(String name,String operation){
         AccountSetup.validate(new Input(name,Preset.LIMITED));
         if(operation==null)throw AccountSetup.error(400,"invalid");
-        String privilege=switch(operation){case "TEXT"->"EXECUTE ON CTXSYS.CTX_DDL";case "FUNCTION"->"CREATE PROCEDURE";case "TABLE"->"CREATE TABLE";case "PROFILE"->"EXECUTE ON DBMS_CLOUD_AI";case "AGENT"->"EXECUTE ON DBMS_CLOUD_AI_AGENT";case "CREDENTIAL"->"EXECUTE ON DBMS_CLOUD";case "JOB"->"CREATE JOB";case "GRAPH"->"CREATE PROPERTY GRAPH, CREATE VIEW";case "RDF"->"CREATE TABLE, CREATE VIEW, CREATE PROCEDURE, CREATE SEQUENCE, CREATE TRIGGER, CREATE TYPE";default->throw AccountSetup.error(400,"invalid");};
+        if(operation.equals("DDS"))return List.of("GRANT CREATE DATA GRANT TO \""+name+"\"","GRANT SELECT ON SYS.DBA_DATA_ROLES TO \""+name+"\"");
+        if(operation.equals("DDS_POLICY"))return List.of("GRANT ADMINISTER ANY DATA GRANT ON SCHEMA \""+name+"\" TO \""+name+"\"");
+        String privilege=switch(operation){case "VPD"->"EXECUTE ON SYS.DBMS_RLS";case "TEXT"->"EXECUTE ON CTXSYS.CTX_DDL";case "FUNCTION"->"CREATE PROCEDURE";case "TABLE"->"CREATE TABLE";case "PROFILE"->"EXECUTE ON DBMS_CLOUD_AI";case "AGENT"->"EXECUTE ON DBMS_CLOUD_AI_AGENT";case "CREDENTIAL"->"EXECUTE ON DBMS_CLOUD";case "JOB"->"CREATE JOB";case "GRAPH"->"CREATE PROPERTY GRAPH, CREATE VIEW";case "RDF"->"CREATE TABLE, CREATE VIEW, CREATE PROCEDURE, CREATE SEQUENCE, CREATE TRIGGER, CREATE TYPE";default->throw AccountSetup.error(400,"invalid");};
         return List.of("GRANT "+privilege+" TO \""+name+"\"");
     }
     private long ordinaryUserId(Connection c,String name)throws SQLException{

@@ -50,8 +50,13 @@ class VpdManagementTest {
         String recovery=VpdManagementRepository.add(policy.definition()).preview();
         assertThat(recovery).contains("function_schema => 'APP'","policy_function => 'SECURITY_PKG.PREDICATE'","statement_types => 'SELECT'","update_check => FALSE","enable => FALSE","policy_type => SYS.DBMS_RLS.SHARED_STATIC","long_predicate => TRUE","sec_relevant_cols => 'ID,SECRET'","sec_relevant_cols_opt => SYS.DBMS_RLS.ALL_ROWS");
     }
+    @Test void emptyEditionMetadataPreservesOrdinaryPolicyRoundTrip(){
+        var row=row(draft());row.put("EDITION_NAME","");
+        var policy=VpdManagementRepository.policies(policyRow(row)).getFirst();
+        assertThat(policy.editable()).isTrue();assertThat(policy.definition()).isEqualTo(draft());
+    }
     @Test void namespacesGroupsInheritanceUnknownFieldsMissingFlagsAndQuotedNamesBlockEditing(){
-        for(var change:List.of(Map.entry("POLICY_GROUP","CUSTOM"),Map.entry("COMMON","YES"),Map.entry("INHERITED","YES"),Map.entry("EDITION_NAME",""),Map.entry("FUTURE_FIELD",""),Map.entry("POLICY_TYPE","NEW_TYPE"),Map.entry("ENABLE",""),Map.entry("POLICY_NAME","Mixed Policy"))){
+        for(var change:List.of(Map.entry("POLICY_GROUP","CUSTOM"),Map.entry("COMMON","YES"),Map.entry("INHERITED","YES"),Map.entry("EDITION_NAME","TEST_EDITION"),Map.entry("FUTURE_FIELD",""),Map.entry("POLICY_TYPE","NEW_TYPE"),Map.entry("ENABLE",""),Map.entry("POLICY_NAME","Mixed Policy"))){
             var row=row(draft());row.put(change.getKey(),change.getValue());var policy=VpdManagementRepository.policies(policyRow(row)).getFirst();assertThat(policy.editable()).as(change.toString()).isFalse();assertThat(policy.properties()).containsEntry(change.getKey(),change.getValue());
         }
         var row=row(draft());row.remove("COMMON");assertThat(VpdManagementRepository.policies(policyRow(row)).getFirst().editable()).isFalse();

@@ -6,12 +6,25 @@ import {mountGlossaryTransfer} from './glossary-transfer.mjs';
 import {mountGlossaryDocument} from './glossary-document.mjs';
 import {mountGlossaryTools} from './glossary-tools.mjs';
 import {mountGlossaryRdf} from './glossary-rdf.mjs';
+import {confirmAction} from './confirm-action.mjs';
 
 const label=(key,fallback,...args)=>t('businessGlossary.'+key,fallback,...args);
 const el=(tag,text,css)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(css)node.className=css;return node;};
 const button=(text,fn)=>{const node=el('button',text,'btn app-btn app-btn-quiet');node.type='button';node.addEventListener('click',fn);return node;};
 const kind=value=>value==='TERM'?label('termMatch','대표 용어 일치'):value==='ALIAS'?label('aliasMatch','등록 별칭 일치'):label('textMatch','형태소 기반 설명 검색');
 export const MAX_GLOSSARY_DEFINITIONS=30;
+// Advisory only: duplicates remain allowed; this is not a uniqueness constraint.
+export async function hasDuplicateTerm(loadPage,name,id){
+  const filter=name.trim();if(!filter)return false;
+  for(let offset=0;offset<=100000;){
+    const page=await loadPage(filter,offset);
+    if(page.rows.some(row=>row.id!==id&&row.term.trim().toUpperCase()===filter.toUpperCase()))return true;
+    if(!page.more)return false;
+    if(!page.rows.length)break;
+    offset+=page.rows.length;
+  }
+  throw new Error(label('duplicateCheckIncomplete','중복 이름 확인을 완료하지 못했습니다. 목록에서 이름을 확인한 뒤 다시 시도해 주세요.'));
+}
 export const automaticSelection=search=>!search||search.more||search.hits.length>MAX_GLOSSARY_DEFINITIONS?null:search.hits.map(h=>h.term.id);
 export const validSelection=(search,ids,question,profile,now=Date.now())=>Boolean(search&&!search.more&&search.question===question&&search.profile===profile&&new Date(search.expires).getTime()>now&&ids.length===search.hits.length&&ids.length<=MAX_GLOSSARY_DEFINITIONS&&new Set(ids).size===ids.length&&ids.every(id=>search.hits.some(h=>h.term.id===id)));
 export const selectionRequest=(enabled,search,ids)=>({glossary:enabled?{enabled:true,searchId:search?.id,termIds:[...ids]}:{enabled:false}});
@@ -105,7 +118,7 @@ const lock=value=>{busy=value;for(const node of root.querySelectorAll('button,in
   function updateCounts(){for(const name of ['definition','criteria'])get(`${name}-count`).textContent=t('auditFixes.characters','{0} / {1}자 · 남은 {2}자',get(name).value.length,4000,4000-get(name).value.length);}
   for(const name of ['definition','criteria']){get(name).addEventListener('input',updateCounts);get(name).addEventListener('paste',event=>{const input=get(name),text=event.clipboardData?.getData('text')||'';if(input.value.length-(input.selectionEnd-input.selectionStart)+text.length>4000){event.preventDefault();get('edit-error').textContent=t('auditFixes.tooLong','입력 한도 4,000자를 초과합니다. 내용을 줄여 주세요. 원문을 잘라 저장하지 않습니다.');}});}
   get('new').addEventListener('click',()=>edit());get('edit-close').addEventListener('click',()=>get('editor').close());get('editor').addEventListener('cancel',event=>{if(busy)event.preventDefault();});get('save-consent').addEventListener('change',()=>lock(busy));
-  get('save').addEventListener('click',async()=>{if(busy||!get('save-consent').checked)return;lock(true);try{await post('save',{id:editing?.id,revision:editing?.revision||0,value:{term:get('term').value,aliases:get('aliases').value.split(/\r?\n/).map(v=>v.trim()).filter(Boolean),definition:get('definition').value,criteria:get('criteria').value,enabled:get('enabled').checked},consent:true});get('editor').close();await list();get('search-result').replaceChildren();show(label('saved','용어를 저장했습니다. 이전 검색 결과는 다시 조회해 주세요.'));}catch(ex){unknownWrite=!ex.status||ex.status>=500;get('edit-error').textContent=ex.message;get('save-consent').checked=false;}finally{lock(false);}});
+  get('save').addEventListener('click',async()=>{if(busy||!get('save-consent').checked)return;lock(true);try{const duplicate=await hasDuplicateTerm((filter,offset)=>assistantApi('/business-glossary/list?'+new URLSearchParams({filter,offset})),get('term').value,editing?.id);if(duplicate&&!await confirmAction(label('duplicateWarning','같은 대표 용어가 이미 있습니다. 계속하면 별도 항목으로 저장되며 기존 항목과 함께 검색될 수 있습니다. 기존 항목을 수정하려면 취소하고 목록에서 조회·편집을 선택하세요. 계속 저장할까요?'))){get('save-consent').checked=false;return;}await post('save',{id:editing?.id,revision:editing?.revision||0,value:{term:get('term').value,aliases:get('aliases').value.split(/\r?\n/).map(v=>v.trim()).filter(Boolean),definition:get('definition').value,criteria:get('criteria').value,enabled:get('enabled').checked},consent:true});get('editor').close();await list();get('search-result').replaceChildren();show(label('saved','용어를 저장했습니다. 이전 검색 결과는 다시 조회해 주세요.'));}catch(ex){unknownWrite=!ex.status||ex.status>=500;get('edit-error').textContent=ex.message;get('save-consent').checked=false;}finally{lock(false);}});
   async function prepare(operation){lock(true);try{setup=await post('setup-preview',{operation});get('setup-sql').textContent=setup.statements.map(sql=>sql.trim()+(sql.trim().endsWith('END;')?'\n/':';')).join('\n\n');get('setup-consent').checked=false;get('setup-dialog').showModal();}catch(ex){show(ex.message,true);}finally{lock(false);}}
   get('create').addEventListener('click',()=>prepare('TABLE'));get('text-setup').addEventListener('click',()=>prepare('TEXT'));get('history-setup').addEventListener('click',()=>prepare('HISTORY'));get('setup-close').addEventListener('click',()=>get('setup-dialog').close());get('setup-dialog').addEventListener('cancel',event=>{if(busy)event.preventDefault();});get('setup-consent').addEventListener('change',()=>lock(busy));
   get('apply').addEventListener('click',async()=>{if(busy||!setup||!get('setup-consent').checked)return;const token=setup.token;setup=null;lock(true);get('setup-dialog').close();try{status=await post('setup',{token,consent:true});await load();document.dispatchEvent(new Event('app-storage-ready'));}catch(ex){unknownWrite=true;show(ex.message,true);}finally{lock(false);}});

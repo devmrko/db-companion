@@ -16,6 +16,37 @@ FROM user_scheduler_job_run_details
 WHERE job_name = :job_name
 ORDER BY log_id DESC FETCH FIRST 10 ROWS ONLY;</pre></div></details></div>
   <p class="app-alert is-error" th:if="${schemaError}" th:text="${schemaError}"></p>
+  <details class="app-card" data-scheduler-manage th:attr="data-schema=${selectedSchema}">
+    <summary th:text="#{schedulerManage.title}"></summary>
+    <p th:text="#{schedulerManage.scope}"></p>
+    <p th:text="#{schedulerManage.privilege}"></p>
+    <input type="hidden" data-sm-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+    <button type="button" class="btn app-btn" data-sm-refresh th:text="#{schedulerManage.refresh}"></button>
+    <p role="status" data-sm-message></p>
+    <form data-sm-form hidden>
+      <div class="app-creation-grid">
+        <label class="app-field"><span th:text="#{schedulerManage.action}"></span><select class="form-select" data-sm-action><option value="CREATE" th:text="#{schedulerManage.create}"></option><option value="UPDATE" th:text="#{schedulerManage.update}"></option><option value="RUN" th:text="#{schedulerManage.run}"></option><option value="ENABLE" th:text="#{schedulerManage.enable}"></option><option value="DISABLE" th:text="#{schedulerManage.disable}"></option></select></label>
+        <label class="app-field" data-sm-existing-field hidden><span th:text="#{schedulerManage.existing}"></span><select class="form-select" data-sm-existing></select></label>
+        <label class="app-field"><span th:text="#{schedulerManage.name}"></span><input class="form-control" data-sm-name required maxlength="128"></label>
+      </div>
+      <div data-sm-settings>
+        <label class="app-field"><span th:text="#{schedulerManage.code}"></span><textarea class="form-control" data-sm-code rows="5" maxlength="16000"></textarea></label>
+        <div class="app-creation-grid">
+          <label class="app-field"><span th:text="#{schedulerManage.minutes}"></span><input class="form-control" data-sm-minutes type="number" min="1" max="10080" value="60"></label>
+          <label class="app-field"><span th:text="#{schedulerManage.comments}"></span><input class="form-control" data-sm-comments maxlength="500"></label>
+        </div>
+      </div>
+      <button class="btn app-btn" type="submit" data-sm-preview th:text="#{schedulerManage.preview}"></button>
+      <button class="btn app-btn" type="button" data-sm-restore hidden th:text="#{schedulerManage.restore}"></button>
+    </form>
+    <section data-sm-review hidden>
+      <p th:text="#{schedulerManage.warning}"></p>
+      <pre data-sm-sql></pre><h3 th:text="#{schedulerManage.code}"></h3><pre data-sm-execution></pre><pre data-sm-before></pre>
+      <label class="app-field"><span data-sm-confirm-label></span><input class="form-control" data-sm-confirm autocomplete="off"></label>
+      <label class="app-field"><span th:text="#{schedulerManage.consent}"></span><input type="checkbox" data-sm-consent></label>
+      <button class="btn app-btn" type="button" data-sm-apply disabled th:text="#{schedulerManage.apply}"></button>
+    </section>
+  </details>
   <section data-scheduler th:attr="data-schema=${selectedSchema},data-base=@{/db/scheduler}">
     <div class="app-card">
       <div class="app-dds-toolbar">
@@ -38,4 +69,4 @@ ORDER BY log_id DESC FETCH FIRST 10 ROWS ONLY;</pre></div></details></div>
       <div aria-live="polite" data-scheduler-panel></div><div data-scheduler-log hidden></div>
     </section>
   </section>
-</main></div><script type="module" th:src="@{/js/scheduler.mjs}"></script></body></html>
+</main></div><script type="module" th:src="@{/js/scheduler.mjs}"></script><script type="module" th:src="@{/js/scheduler-management.mjs}"></script></body></html>

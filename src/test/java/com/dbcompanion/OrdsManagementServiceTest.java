@@ -71,7 +71,9 @@ class OrdsManagementServiceTest {
             }
             f.after=snapshot(changed);var plan=f.preview(kind,action,values);int commits=f.commits;
             assertThat(f.calls).isZero();f.apply(plan);
-            assertThat(f.calls).isEqualTo(plan.statements().size());assertThat(f.commits).isEqualTo(commits+1);assertThat(f.rollbacks).isZero();assertThat(f.isolation).contains(Connection.TRANSACTION_SERIALIZABLE);
+            assertThat(f.calls).isEqualTo(plan.statements().size());assertThat(f.commits).isEqualTo(commits+1);assertThat(f.rollbacks).isZero();
+            if(kind==Kind.SCHEMA&&action==Action.CREATE)assertThat(f.isolation).doesNotContain(Connection.TRANSACTION_SERIALIZABLE);
+            else assertThat(f.isolation).contains(Connection.TRANSACTION_SERIALIZABLE);
             for(int i=0;i<f.sql.size();i++)assertThat(f.bound.get(i).size()).isEqualTo((int)f.sql.get(i).chars().filter(c->c=='?').count());
         }
     }

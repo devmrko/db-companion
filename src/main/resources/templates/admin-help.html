@@ -6,5 +6,6 @@
 <section class="app-module-card" th:each="item : ${instructions}"><h2 th:text="${#messages.msg('adminHelp.' + item.key)}"></h2><pre class="app-preview-source" data-code-language="sql" th:text="${item.sql}"></pre></section>
 <section class="app-module-card"><h2 th:text="#{adminHelp.adminOnly}"></h2><p th:text="#{adminHelp.adminOnlyHelp}"></p><a th:href="@{/db/accounts}" th:text="#{accountSetup.title}"></a></section>
 <p th:text="#{adminHelp.other}"></p>
+<section class="app-module-card"><h2 th:text="#{aiNetwork.title}"></h2><p th:text="#{aiNetwork.remedy}"></p><a th:href="@{/db/accounts#ai-network}" th:text="#{aiNetwork.title}"></a></section>
 <a href="https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/select-ai-manage-profiles.html" target="_blank" rel="noopener noreferrer">Oracle Select AI</a>
 </main></div></body></html>

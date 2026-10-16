@@ -15,7 +15,9 @@ class SchedulerTemplateTest {
         engine.setLinkBuilder(new org.thymeleaf.linkbuilder.StandardLinkBuilder(){@Override protected String computeContextPath(org.thymeleaf.context.IExpressionContext c,String b,Map<String,Object> p){return "";}});
         for(String language:List.of("ko","en","zh-CN","ja")){
             var context=new Context(Locale.forLanguageTag(language));context.setVariable("activePage","scheduler");context.setVariable("info",new DatabaseInfo("APP","APP","LOW","DB"));context.setVariable("schemas",List.of("<script>"));context.setVariable("selectedSchema","<script>");context.setVariable("languageReturn","/db/scheduler");
+            context.setVariable("_csrf",new org.springframework.security.web.csrf.DefaultCsrfToken("X-CSRF-TOKEN","_csrf","synthetic-test"));
             var html=engine.process("scheduler",context);
+            assertThat(html).contains("data-scheduler-manage","data-sm-confirm","data-sm-consent","data-sm-execution","data-csrf-header=\"X-CSRF-TOKEN\"").containsPattern("<input[^>]*data-sm-csrf[^>]*value=\"synthetic-test\"").doesNotContain("??schedulerManage.");
             assertThat(html).contains("&lt;script&gt;","data-scheduler","data-scheduler-tab=\"settings\"","data-scheduler-tab=\"code\"","data-scheduler-tab=\"history\"","user_scheduler_jobs","user_scheduler_job_run_details").doesNotContain("??scheduler.","th:","data-schema=\"<script>","RUN_JOB","STOP_JOB");
             assertThat(html.split("value=\"/db/scheduler\"",-1)).hasSize(4);
             assertThat(html).containsPattern("<a[^>]*href=\"/db/scheduler\"[^>]*aria-current=\"page\"[^>]*>");

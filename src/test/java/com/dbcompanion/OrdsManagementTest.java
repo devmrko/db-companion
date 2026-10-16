@@ -8,6 +8,15 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
 
 class OrdsManagementTest {
+    @Test void diagnosticFramesExcludePrivateSchemasAndFreeText(){
+        var error=new java.sql.SQLException("secret=never-output\nORA-06512: at \"ORDS_METADATA.ORDS\", line 123\nORA-06512: at \"PRIVATE_APP.SECRET\", line 456\nORA-06512: \"SYS.DBMS_SQL\", 789행\nORA-06512: at \"SYS.DBMS_SQL\", line 789", "state",6519);
+        assertThat(com.dbcompanion.repository.OrdsManagementRepository.safeDiagnostic(error)).isEqualTo("ORDS_METADATA.ORDS:123, SYS.DBMS_SQL:789");
+        assertThat(com.dbcompanion.repository.OrdsManagementRepository.safeDiagnostic(new RuntimeException("secret"))).isEmpty();
+    }
+    @Test void databaseDiagnosticsExposeOnlyNumericErrorCode(){
+        assertThat(com.dbcompanion.repository.OrdsManagementRepository.errorKey(new RuntimeException(new java.sql.SQLException("private SQL and credentials", "state",20000)))).isEqualTo("ORA-20000");
+        assertThat(com.dbcompanion.repository.OrdsManagementRepository.errorKey(new RuntimeException("private SQL"))).isEqualTo("failed");
+    }
     static final Set<String> APIS=Set.of("ENABLE_SCHEMA","DROP_REST_FOR_SCHEMA","DEFINE_MODULE","RENAME_MODULE","PUBLISH_MODULE","DELETE_MODULE","DEFINE_TEMPLATE","DELETE_TEMPLATE","DEFINE_HANDLER","DELETE_HANDLER","DEFINE_PARAMETER");
     static Map<String,String> row(String... pairs){var row=new TreeMap<String,String>();for(int i=0;i<pairs.length;i+=2)row.put(pairs[i],pairs[i+1]);return row;}
     static Map<String,List<Map<String,String>>> catalog(){

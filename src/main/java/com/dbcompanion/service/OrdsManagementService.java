@@ -18,12 +18,13 @@ public class OrdsManagementService {
     private final Map<PoolSession,Pending> pending=Collections.synchronizedMap(new WeakHashMap<>());
     private final SessionDataSource source;
     private final OrdsManagementRepository repository;
-    private final TransactionTemplate read,write;
+    private final TransactionTemplate read,write,createSchema;
     public OrdsManagementService(SessionDataSource source,OrdsManagementRepository repository) {
         this.source=source;this.repository=repository;
         var manager=new DataSourceTransactionManager(source);
         read=new TransactionTemplate(manager);read.setReadOnly(true);read.setTimeout(30);
         write=new TransactionTemplate(manager);write.setTimeout(60);write.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
+        createSchema=new TransactionTemplate(manager);createSchema.setTimeout(60);createSchema.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
     }
     private void scope(PoolSession session,String schema) {
         var metadata=session.metadata();
@@ -31,8 +32,11 @@ public class OrdsManagementService {
         OrdsManagement.require(Objects.equals(schema,metadata.info().username()),"ownSchema");
     }
     private <T>T transaction(PoolSession session,boolean mutation,Supplier<T> action) {
+        return transaction(session,mutation?write:read,action);
+    }
+    private <T>T transaction(PoolSession session,TransactionTemplate template,Supplier<T> action) {
         source.bind(session.pool(),session.metadata().info().username());
-        try{return (mutation?write:read).execute(status->action.get());}finally{source.clear();}
+        try{return template.execute(status->action.get());}finally{source.clear();}
     }
     public Snapshot list(PoolSession session,String schema) {
         synchronized(session){scope(session,schema);return transaction(session,false,repository::snapshot);}
@@ -53,7 +57,10 @@ public class OrdsManagementService {
             Preview preview=saved.preview();
             OrdsManagement.require(Objects.equals(preview.confirmation(),apply.confirmation()),"confirmationRequired");
             try {
-                transaction(session,true,()->{
+                // Initial registration invokes Oracle-owned autonomous work. Existing metadata edits
+                // retain SERIALIZABLE; creation still requires an absent schema and fresh revision.
+                boolean initialSchema=preview.input().kind()==Kind.SCHEMA&&preview.input().action()==Action.CREATE;
+                transaction(session,initialSchema?createSchema:write,()->{
                     Snapshot current=repository.snapshot();
                     OrdsManagement.require(current.status().equals("AVAILABLE"),current.status());
                     OrdsManagement.require(current.revision().equals(preview.revision()),"stale");
@@ -65,7 +72,7 @@ public class OrdsManagementService {
                 });
                 return Map.of("status","APPLIED");
             } catch(Failure ex) {throw ex;}
-            catch(RuntimeException ex) {throw new Failure(503,OrdsManagementRepository.errorKey(ex));}
+            catch(RuntimeException ex) {throw new Failure(503,OrdsManagementRepository.errorKey(ex),OrdsManagementRepository.safeDiagnostic(ex));}
         }
     }
     public static void validate(Input input) {

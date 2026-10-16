@@ -27,6 +27,9 @@ class AccountSetupTest {
     }
     PoolSession session(String user){var s=new PoolSession(new HikariDataSource(),"LOW",()->{});s.initialize(new DatabaseSession(new DatabaseInfo(user,user,"LOW","DB"),List.of(user)));return s;}
     @Test void fixedPresetsNeverGrantAdministrativeOrCrossSchemaPrivileges(){
+        assertThat(AccountSetupService.privilegeSql("APP_TEST","DDS")).containsExactly("GRANT CREATE DATA GRANT TO \"APP_TEST\"","GRANT SELECT ON SYS.DBA_DATA_ROLES TO \"APP_TEST\"");
+        assertThat(AccountSetupService.privilegeSql("APP_TEST","DDS_POLICY")).containsExactly("GRANT ADMINISTER ANY DATA GRANT ON SCHEMA \"APP_TEST\" TO \"APP_TEST\"");
+        assertThat(AccountSetupService.privilegeSql("APP_TEST","VPD")).containsExactly("GRANT EXECUTE ON SYS.DBMS_RLS TO \"APP_TEST\"");
         assertThat(AccountSetup.grants(new Input("APP_LIMITED",Preset.LIMITED))).containsExactly("GRANT CREATE SESSION TO \"APP_LIMITED\"");
         for(var preset:Preset.values()){
             String sql=String.join("\n",AccountSetup.plan(new Input("APP_TEST",preset)).statements());
