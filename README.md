@@ -105,7 +105,7 @@ No database credentials, Wallet, customer dataset, or private documentation are 
 
 First-use guide: [English](docs/GETTING-STARTED.md) · [한국어](docs/GETTING-STARTED.ko.md) · [简体中文](docs/GETTING-STARTED.zh-CN.md) · [日本語](docs/GETTING-STARTED.ja.md).
 
-The [unreleased changes](CHANGELOG.md#unreleased) add shared RDF question grounding,
+The [changelog](CHANGELOG.md) describes shared RDF question grounding,
 question-evidence graphs, glossary JSON transfer, column statistics and SQL-history
 candidate inspection. The optional [semantic-query Agent example](demos/semantic-query-agent/README.md)
 provides APEX result-recovery components; it requires explicit installation and app

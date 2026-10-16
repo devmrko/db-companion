@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+No additional changes recorded.
+
+## 0.1.0-alpha.17
+
+Prepared on 2026-10-16. Browser-driven database setup and management; not production-certified.
+
 - Extend Functions > AI code explanation with inputs/outputs, implemented validation,
   ordered processing steps, exceptions and side effects, requesting references to
   numbered source sections in the current UI language.
@@ -19,10 +25,25 @@
   within an open editor, with identity and concurrent-change checks.
 - Fix RDF snapshot readback and relationship candidates for ordinary schema owners.
 
-Validation: Java 1,418 tests passed; JavaScript 689 passed, one optional test skipped.
+- Add owner-scoped scheduler creation, editing, one-off execution, enable/disable
+  and previous-settings recovery, with disabled defaults and explicit confirmation.
+- Add DDS role settings, OCI group mapping previews and data-grant management;
+  restrict unsupported policies and keep connection/authentication management separate.
+- Add ADMIN-only fixed-provider outbound HTTP ACL lookup, preview and consented
+  addition, with single-use tickets, state checks and readback. Explain ORA-24247
+  and link to the required ADMIN action.
+- Fix initial ORDS schema registration transaction handling and safe Oracle error
+  details; support the nullable VPD edition catalog column without enabling editioned policies.
+- Warn before saving a duplicate glossary term while preserving intentional duplicates.
+
+Validation: Java 1,444 tests passed; JavaScript 699 passed, one optional test skipped.
 Build, PMD and publication checks passed. Isolated browser checks covered setup,
-metadata capture, candidate storage, recovery and JSON export. Actual credential
-secret changes, paid AI output and external integrations were not exercised.
+metadata capture, supported configuration recovery, JSON export, unpublished ORDS,
+VPD, local DDS operations, audit collection and scheduler execution/state changes.
+AI and Feedback calls were attempted but failed; successful paid AI output and
+Agent execution are not verified. Outbound ACL lookup/preview were exercised but
+actual application awaits approval. Credential secret changes, OCI group-mapping
+writes and public ORDS endpoint invocation remain unverified. See [validation](docs/validation.md).
 
 ## 0.1.0-alpha.16
 
