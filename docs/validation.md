@@ -1,5 +1,35 @@
 # Release validation
 
+## 0.1.0-alpha.17
+
+Candidate: **0.1.0-alpha.17** / tag **v0.1.0-alpha.17**. Prepared on 2026-10-16.
+
+- Java unit, integration and embedded HTTP tests: 1,444 passed.
+- JavaScript application tests: 699 passed; one optional real-JAR lifecycle test skipped.
+- Maven quality verify (executable JAR and PMD), publication guard and whitespace checks passed.
+- The tests use synthetic fixtures. Maven cache writes and process-inspection tests
+  required approved execution outside the restrictive sandbox.
+
+Actual isolated browser checks covered fresh storage/account setup, targeted grants,
+object/configuration creation and supported recovery, glossary/JSON/RDF, ontology
+deployment switching, audit collection, unpublished ORDS configuration, VPD, local
+DDS operations and scheduler execution/state changes. These observations do not
+certify other database versions, accounts or business results.
+
+Select AI returned an outbound ACL denial; Feedback also failed. Successful paid AI
+output and Agent execution remain unverified. The new outbound ACL screen was
+checked through lookup, preview and invalid-input rejection; its actual grant
+application awaits approval. Credential secret changes, OCI group-mapping writes
+and public ORDS endpoint calls remain unverified. No private captures or credentials
+are included. Publishing this version does not restart applications or change DB permissions.
+
+```sh
+mvn -Pquality verify
+node --test src/test/js/*.test.mjs
+node scripts/publication-check.cjs --working-tree
+git diff --check
+```
+
 ## 0.1.0-alpha.7
 
 Candidate: **0.1.0-alpha.7** / tag **v0.1.0-alpha.7**. Checked on 2026-10-13.
