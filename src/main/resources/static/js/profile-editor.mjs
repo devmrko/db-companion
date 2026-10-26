@@ -1,12 +1,15 @@
 import {t} from './i18n.mjs';
 import {profileField,booleanValue,validateTypedValue,credentialChoices,attachProfileHelp} from './profile-fields.mjs';
 import {objectPicker} from './profile-objects.mjs';
+import {validSources} from './semantic-context.mjs';
+import {semanticPicker} from './semantic-picker.mjs';
 export const profileBytes = value => new TextEncoder().encode(value).length;
 export function validateProfileValue(attribute,value,maxBytes=32767) {
   if (!value || !value.trim()) return t('ui.db6144584361', "값을 입력해 주세요. 빈 값 저장이나 속성 삭제는 지원하지 않습니다.");
   if (!value.isWellFormed() || value.includes('\0')) return t('ui.276b201421c0', "올바르지 않은 문자가 있습니다.");
   if (profileBytes(value)>maxBytes) return t('ui.2c41f4ca8f42', "내용은 UTF-8 기준 32,767바이트 이내로 입력해 주세요. 입력은 자르지 않습니다.");
   const typed=validateTypedValue(attribute,value);if(typed)return typed;
+  if(attribute==='semantic_source'&&!validSources(value))return t('semantic.invalidSources','Enter a JSON array of unique source names.');
   if (attribute==='object_list') {
     try { if (!Array.isArray(JSON.parse(value))) return t('ui.69ae71398505', "object_list는 JSON 배열로 입력해 주세요."); }
     catch { return t('ui.ddcee732ecb8', "object_list는 올바른 JSON 배열로 입력해 주세요."); }
@@ -35,7 +38,11 @@ function mount(dialog) {
     value.value=data.value??'';control=value;find('raw').hidden=!['multiline','objects'].includes(type);
     find('counter').hidden=!['multiline','objects'].includes(type);
     dialog.classList.toggle('app-profile-editor-compact',!['multiline','objects'].includes(type));
-    if(type==='boolean') {
+    if(attr==='semantic_source') {
+      cleanup=semanticPicker(host,value,data,read,count);
+      const details=element('details'),summary=element('summary',t('ui.7e7265068560','JSON 직접 편집'));details.append(summary);
+      find('raw').append(details);details.append(value);
+    }else if(type==='boolean') {
       const row=element('div',null,'form-check form-switch app-profile-switch');control=element('input',null,'form-check-input');control.type='checkbox';control.setAttribute('role','switch');control.checked=booleanValue(data.value)==='true';
       const status=element('span',String(control.checked));status.setAttribute('aria-live','polite');control.addEventListener('change',()=>{status.textContent=String(control.checked);count();});row.append(control,status);host.append(row);
     }else if(type==='select'||type==='credential') {

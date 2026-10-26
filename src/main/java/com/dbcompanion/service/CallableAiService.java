@@ -28,10 +28,11 @@ public class CallableAiService {
         if(!preview.owner().equals(owner(session))||!Instant.now().isBefore(preview.expires()))throw new IllegalArgumentException("Grant preview expired");
         return repository.grant(preview.username());
     });}
-    public String script(PoolSession session){return CallableAiSql.script(owner(session));}
+    public String script(PoolSession session){return bound(session,()->repository.installScript(owner(session)));}
     public Install preview(PoolSession session){return bound(session,()->{
-        if(!List.of("MISSING","INCOMPLETE").contains(repository.state(owner(session))))throw new IllegalArgumentException("Existing package is not replaced");
-        return new Install(UUID.randomUUID().toString(),owner(session),repository.fingerprint(),script(session),Instant.now().plusSeconds(300));
+        repository.requireSharedGlossary();
+        if(!List.of("MISSING","INCOMPLETE","UPDATE_AVAILABLE","UPGRADE_INCOMPLETE").contains(repository.state(owner(session))))throw new IllegalArgumentException("Existing package is not replaced");
+        return new Install(UUID.randomUUID().toString(),owner(session),repository.fingerprint(),repository.installScript(owner(session)),Instant.now().plusSeconds(300));
     });}
     public Status install(PoolSession session,Install preview){return bound(session,()->{
         check(session,preview.owner(),preview.fingerprint(),preview.expires());repository.install(owner(session));return repository.status(owner(session));

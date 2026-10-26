@@ -7,7 +7,7 @@ test('options stay independent and disabled ontology sends no stale table names'
   assert.deepEqual(requestOf({ontology:false,tables:['T']}).tables,[]);
 });
 test('only absent or recognized partial packages are installable',()=>{
-  for(const state of ['MISSING','INCOMPLETE'])assert.equal(canInstall({state}),true);
+  for(const state of ['MISSING','INCOMPLETE','UPDATE_AVAILABLE','UPGRADE_INCOMPLETE'])assert.equal(canInstall({state}),true);
   for(const state of ['READY','CONFLICT','INVALID',null])assert.equal(canInstall({state}),false);
   assert.equal(canInstall(null),false);
 });

@@ -32,6 +32,7 @@ public class ProfileEditService {
             ProfileEditPolicy.scope(session.metadata().info().username(),session.metadata().selectedSchema(),target);
             source.bind(session.pool(),target.schema());
             try { return read.execute(s -> {
+                repository.requireSemanticSupport(target);
                 archive.packageOwner(target.schema());
                 requireArchive(target);
                 var snapshot=archive.currentSnapshot(target.schema(),target.profile(),true);
@@ -59,6 +60,7 @@ public class ProfileEditService {
         }
     }
     private void requireCredential(Target target, String value) {
+        repository.requireSemanticSources(target, value);
         if ("credential_name".equals(target.attribute()) && !repository.credentialAvailable(value))
             throw new MetadataEditException(409,"Credential not available",UiMessages.text("ui.57e623fd5aeb", "선택한 Credential이 없거나 비활성 상태입니다. 목록을 다시 불러와 주세요. 프로필 변경은 실행하지 않았습니다."));
     }
@@ -78,6 +80,7 @@ public class ProfileEditService {
             var attempted=new AtomicBoolean();
             try {
                 Before before=write.execute(s -> {
+                    repository.requireSemanticSupport(target);
                     String owner=archive.packageOwner(target.schema()); requireArchive(target);
                     var current=archive.currentSnapshot(target.schema(),target.profile(),true);
                     String value=ProfileEditPolicy.value(current,target);

@@ -47,6 +47,9 @@ class ProfileLayoutTemplateTest {
                 NAME, "LONG_VALUE_".repeat(70), "&lt;script&gt;not-code&lt;/script&gt;", "app-card table-responsive",
                 "data-profile-editor", "data-ph-dialog", "data-profile-preflight", "data-edit-profile-attribute=\"object_list\"")
                 .doesNotContain("<script>not-code</script>", "??ui.", "th:");
+        assertThat(render(language,true,true)).contains("data-semantic-context", "/db/functions/glossary-search",
+                "data-edit-profile-attribute=\"semantic_source\"", "data-sem-enabled hidden")
+                .doesNotContain("??semantic.");
     }
     @Test void listDoesNotAcquireDetailLayoutRules() {
         assertThat(render("ko", false, true)).contains("data-list-row").doesNotContain("app-profile-detail-page", "data-profile-editor", "data-ph-dialog");

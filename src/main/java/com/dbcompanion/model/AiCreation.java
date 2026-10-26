@@ -21,7 +21,7 @@ public final class AiCreation {
     public enum Kind { PROFILE, TEAM, AGENT, TASK, TOOL }
     public static final int MAX_BYTES=262144, MAX_COPY_BYTES=2_000_000;
     private static final Set<String> NUMBERS=Set.of("temperature","max_tokens","seed","top_p","frequency_penalty","presence_penalty","short_term_memory_length","long_term_memory_length");
-    private static final Set<String> STRUCTURED=Set.of("object_list","tools","agents","tool_params","tool_inputs","stop_tokens");
+    private static final Set<String> STRUCTURED=Set.of("object_list","semantic_source","tools","agents","tool_params","tool_inputs","stop_tokens");
     public record Input(String schema,Kind kind,String source,String sourceVersion,String name,String description,String status,String attributes,@com.fasterxml.jackson.annotation.JsonProperty(required=true) boolean copyFeedback) {
         @com.fasterxml.jackson.annotation.JsonAnySetter public void reject(String key,Object value){throw new IllegalArgumentException("Unknown creation field: "+key);}
     }

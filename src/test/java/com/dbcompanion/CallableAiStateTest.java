@@ -23,6 +23,7 @@ class CallableAiStateTest {
     final SessionDataSource source=new SessionDataSource();final JsonMapper json=new JsonMapper();
     final CallableAiRepository repository=new CallableAiRepository(new JdbcTemplate(source),json,new SelectAiExecutionSettings(300)){
         @Override public String state(String owner){return current;}
+        @Override public void requireSharedGlossary(){}
         @Override public String fingerprint(){return fingerprint;}
         @Override public Status status(String owner){return new Status(owner,current,List.of(),List.of("P"),List.of("T"));}
         @Override public void install(String owner){assertThat(owner).isEqualTo("APP");installs++;current="READY";}

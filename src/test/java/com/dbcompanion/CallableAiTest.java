@@ -11,11 +11,13 @@ class CallableAiTest {
         var scripts=CallableAiSql.statements("DEMO_APP");assertThat(scripts).hasSize(2);
         assertThat(scripts.getFirst()).startsWith("CREATE PACKAGE \"DEMO_APP\".\"DBC_AI_QUERY\" AUTHID CURRENT_USER");
         String body=scripts.get(1);
-        assertThat(body).contains("CTX_DOC.POLICY_TOKENS","CTX_DOC.POLICY_HIGHLIGHT","CONTAINS(SEARCH_TEXT",":question_bind",":query_bind",":result_bind",
-            "IF p_use_glossary=1 THEN terms:=glossary", "IF p_use_ontology=1 THEN ont:=ontology", "IF p_mode<>'CONTEXT'", "action=>'showsql'", "OPEN rc FOR p_sql", "DBMS_SQL.TO_CURSOR_NUMBER");
+        assertThat(body).contains("local_object('DBC_GLOSSARY_API')", ".SEARCH(:question)", "USING OUT payload, IN p_question",
+            "IF p_use_glossary=1 THEN terms:=JSON_OBJECT_T.parse(LOOKUP_GLOSSARY", "IF p_use_ontology=1 THEN ont:=ontology", "IF p_mode<>'CONTEXT'", "action=>'showsql'", "OPEN rc FOR p_sql", "DBMS_SQL.TO_CURSOR_NUMBER");
         assertThat(body).doesNotContain("{{PHRASE_BLOCK}}","{{PACKAGE}}","action=>'runsql'","CREATE OR REPLACE","EXECUTE IMMEDIATE generated_sql"," :bind_value ");
-        assertThat(body.indexOf("glossary(question_text)")).isLessThan(body.indexOf("DBMS_CLOUD_AI.GENERATE"));
+        assertThat(body.indexOf("LOOKUP_GLOSSARY(question_text)")).isLessThan(body.indexOf("DBMS_CLOUD_AI.GENERATE"));
         assertThat(body).contains("state<>'APPROVED'","Latest revision first");
+        assertThat(body).doesNotContain("CTX_DOC.POLICY_TOKENS", "FUNCTION glossary(");
+        assertThat(CallableAiSql.legacyStatements("DEMO_APP").get(1)).contains("CTX_DOC.POLICY_TOKENS");
     }
     @Test void nativeOntologyUsesLatestApprovalsScopedTablesAndSafeColumns(){
         var body=CallableAiSql.resource("body.sql");

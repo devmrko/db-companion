@@ -16,9 +16,16 @@ public class ProfileEditRepository {
         this.jdbc=new JdbcTemplate(Objects.requireNonNull(jdbc.getDataSource())); this.jdbc.setQueryTimeout(10);
     }
     public void save(String packageOwner, Target target, String value) {
+        requireSemanticSources(target, value);
         jdbc.update(ProfileEditPolicy.sql(packageOwner), statement -> {
             statement.setString(1,target.profile()); statement.setString(2,target.attribute()); statement.setString(3,value);
         });
+    }
+    public void requireSemanticSources(Target target, String value) {
+        if ("semantic_source".equals(target.attribute())) new SemanticContextRepository(jdbc).requireSources(value);
+    }
+    public void requireSemanticSupport(Target target) {
+        if ("semantic_source".equals(target.attribute())) new SemanticContextRepository(jdbc).require();
     }
     public List<String> credentials() {
         return jdbc.queryForList("SELECT CREDENTIAL_NAME FROM SYS.USER_CREDENTIALS WHERE ENABLED = 'TRUE' ORDER BY CREDENTIAL_NAME", String.class);

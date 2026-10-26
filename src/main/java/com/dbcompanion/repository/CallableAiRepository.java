@@ -41,6 +41,12 @@ public class CallableAiRepository {
         var objects=jdbc.queryForList("SELECT OBJECT_TYPE FROM USER_OBJECTS WHERE OBJECT_NAME=? AND SUBOBJECT_NAME IS NULL ORDER BY OBJECT_TYPE",String.class,CallableAiSql.NAME);
         if(objects.isEmpty())return "MISSING";
         var ddl=CallableAiSql.statements(owner);
+        var legacy=CallableAiSql.legacyStatements(owner);
+        if(objects.contains("PACKAGE")&&objects.contains("PACKAGE BODY")&&objects.stream().allMatch(t->List.of("PACKAGE","PACKAGE BODY").contains(t))
+                &&(expected(owner,"PACKAGE BODY",legacy.get(1))||expected(owner,"PACKAGE BODY",CallableAiSql.legacyNumericBody(owner)))){
+            if(expected(owner,"PACKAGE",legacy.getFirst()))return "UPDATE_AVAILABLE";
+            if(expected(owner,"PACKAGE",ddl.getFirst()))return "UPGRADE_INCOMPLETE";
+        }
         if(!objects.contains("PACKAGE")||objects.stream().anyMatch(t->!List.of("PACKAGE","PACKAGE BODY").contains(t))||!expected(owner,"PACKAGE",ddl.getFirst()))return "CONFLICT";
         if(!objects.contains("PACKAGE BODY"))return "INCOMPLETE";
         if(!expected(owner,"PACKAGE BODY",ddl.get(1)))return "CONFLICT";
@@ -57,10 +63,27 @@ public class CallableAiRepository {
         return new Status(owner,state,errors,profiles,tables);
     }
     public void install(String owner){
+        requireSharedGlossary();
         String state=state(owner);var statements=CallableAiSql.statements(owner);
-        if(!List.of("MISSING","INCOMPLETE").contains(state))throw new IllegalArgumentException("Package already exists or differs");
+        if(!List.of("MISSING","INCOMPLETE","UPDATE_AVAILABLE","UPGRADE_INCOMPLETE").contains(state))throw new IllegalArgumentException("Package already exists or differs");
+        if(state.equals("UPDATE_AVAILABLE")||state.equals("UPGRADE_INCOMPLETE")){
+            // Only the exact shipped v1 source can be upgraded. Preserve ASK's public signature and grants.
+            if(state.equals("UPDATE_AVAILABLE"))jdbc.execute(statements.getFirst().replaceFirst("CREATE PACKAGE ","CREATE OR REPLACE PACKAGE "));
+            jdbc.execute(statements.get(1).replaceFirst("CREATE PACKAGE BODY ","CREATE OR REPLACE PACKAGE BODY "));
+            return;
+        }
         if(state.equals("MISSING"))jdbc.execute(statements.getFirst());
         jdbc.execute(statements.get(1));
+    }
+    public void requireSharedGlossary(){
+        Integer count=jdbc.queryForObject("SELECT COUNT(*) FROM USER_OBJECTS WHERE OBJECT_NAME='DBC_GLOSSARY_API' AND OBJECT_TYPE IN ('PACKAGE','PACKAGE BODY') AND STATUS='VALID'",Integer.class);
+        if(count==null||count!=2)throw new IllegalArgumentException("Install the shared glossary functions before updating DBC_AI_QUERY");
+        var args=jdbc.queryForList("SELECT DATA_TYPE||':'||IN_OUT FROM USER_ARGUMENTS WHERE PACKAGE_NAME='DBC_GLOSSARY_API' AND OBJECT_NAME='SEARCH' ORDER BY SEQUENCE",String.class);
+        if(!args.equals(List.of("CLOB:OUT","CLOB:IN")))throw new IllegalArgumentException("The shared glossary SEARCH signature differs");
+    }
+    public String installScript(String owner){
+        String script=CallableAiSql.script(owner);
+        return List.of("UPDATE_AVAILABLE","UPGRADE_INCOMPLETE").contains(state(owner))?script.replace("CREATE PACKAGE ","CREATE OR REPLACE PACKAGE "):script;
     }
     public JsonNode run(String owner,Request request){
         if(!state(owner).equals("READY"))throw new IllegalArgumentException("Package is not ready");

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{glossaryFunction.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content" data-glossary-function th:attr="data-base=@{/db/functions/glossary-search}">
+  <a class="app-inline-link" th:href="@{/db/functions}" th:text="#{glossaryFunction.back}">← 함수 목록</a>
+  <div class="app-page-heading"><h1 th:text="#{glossaryFunction.title}">용어사전 검색 함수 만들기</h1></div>
+  <p th:text="#{glossaryFunction.description}">자연어 질문 → 용어·별칭 검색 → 업무 정의·SQL 기준 JSON. AI 호출이나 SQL 실행은 하지 않습니다.</p>
+  <input type="hidden" data-gf-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+  <p role="status" aria-live="polite" data-gf-message></p>
+  <section class="app-card app-module-card">
+    <div class="app-card-heading"><h2 th:text="#{glossaryFunction.preflight}">1. 생성 조건 확인</h2><button type="button" class="btn app-btn app-btn-quiet" data-gf-refresh th:text="#{glossaryFunction.refresh}">다시 확인</button></div>
+    <p><code th:text="${info.username} + '.DBC_GLOSSARY_SEARCH'"></code></p>
+    <p th:text="#{glossaryFunction.scope}">로그인 소유 스키마에만 생성합니다. 기존 객체를 교체하거나 권한을 부여하지 않습니다.</p>
+    <dl class="app-module-status" data-gf-status></dl>
+    <ul data-gf-errors></ul>
+  </section>
+  <section class="app-card app-module-card">
+    <h2 th:text="#{glossaryFunction.code}">2. 함수 코드 확인</h2>
+    <p th:text="#{glossaryFunction.contract}">입력: 질문 CLOB(최대 8,000자). 출력: 질문·토큰·일치 용어·정의·SQL 기준을 담은 JSON CLOB. 활성 용어만 검색하며 30개 초과·근거 크기 초과는 오류로 알립니다.</p>
+    <details class="app-disclosure" open><summary th:text="#{glossaryFunction.flow}">처리 순서 · 패키지 SEARCH</summary><div class="app-disclosure-body"><pre class="app-preview-source" data-code-language="sql" data-gf-flow></pre></div></details>
+    <div class="app-module-code-parts" data-gf-code></div>
+    <p th:text="#{glossaryFunction.ddl}">생성은 DDL이며 암시적 COMMIT이 발생합니다. 실패해도 객체가 남을 수 있습니다. 자동 삭제·교체·재시도하지 않습니다.</p>
+    <button type="button" class="btn app-btn app-btn-secondary" data-gf-preview disabled th:text="#{glossaryFunction.preview}">생성 전 최종 확인</button>
+    <div data-gf-confirm hidden>
+      <p data-gf-expiry></p>
+      <details class="app-disclosure"><summary th:text="#{glossaryFunction.plan}">실제로 실행할 DDL</summary><div class="app-disclosure-body"><pre class="app-preview-source" data-code-language="sql" data-gf-plan></pre></div></details>
+      <label class="app-glossary-pick"><input type="checkbox" data-gf-consent><span th:text="#{glossaryFunction.consent}">표시된 코드·소유자·DDL 영향을 확인했고 함수 1개 생성에 동의합니다.</span></label>
+      <button type="button" class="btn app-btn app-btn-primary" data-gf-create disabled th:text="#{glossaryFunction.create}">함수 생성</button>
+    </div>
+  </section>
+  <section class="app-card app-module-card">
+    <h2 th:text="#{glossaryFunction.test}">3. 질문으로 검색 테스트</h2>
+    <p th:text="#{glossaryFunction.testNote}">설치된 코드가 이 버전과 일치할 때만 실행합니다. 사전 읽기만 수행하며 AI 비용은 발생하지 않습니다.</p>
+    <label class="app-module-question"><span th:text="#{glossaryFunction.question}">질문</span><textarea class="form-control" rows="3" maxlength="8000" data-gf-question></textarea></label>
+    <pre class="app-preview-source" data-code-language="sql" data-gf-example></pre>
+    <button type="button" class="btn app-btn app-btn-primary" data-gf-test disabled th:text="#{glossaryFunction.search}">사전 검색</button>
+    <div data-gf-result hidden><h3 th:text="#{glossaryFunction.result}">전달용 JSON · 실행된 SQL이 아님</h3><pre class="app-preview-source" data-gf-json></pre></div>
+  </section>
+</main></div><script type="module" th:src="@{/js/glossary-function.mjs}"></script></body></html>

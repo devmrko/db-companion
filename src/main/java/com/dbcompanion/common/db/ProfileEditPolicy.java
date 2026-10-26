@@ -52,6 +52,7 @@ public final class ProfileEditPolicy {
                 default -> { }
             }
         } catch (NumberFormatException ex) { throw invalid(UiMessages.text("ui.15f8a40b169f", "숫자 형식과 허용 범위를 확인해 주세요.")); }
+        if ("semantic_source".equals(target.attribute())) com.dbcompanion.model.SemanticContext.sources(value);
         if ("object_list".equals(target.attribute())) {
             boolean array;
             try { array = json.readTree(value).isArray(); }
@@ -70,6 +71,8 @@ public final class ProfileEditPolicy {
     public static String value(Map<String,Object> snapshot, Target target) {
         if (!Boolean.TRUE.equals(snapshot.get("exists")))
             throw new MetadataEditException(404, "Profile not found", UiMessages.text("ui.827fdc31d3d2", "프로필이 더 이상 존재하지 않습니다."));
+        if ("semantic_source".equals(target.attribute()) && snapshot.get("attributes") instanceof Map<?,?> fields
+                && !fields.containsKey(target.attribute())) return "[]";
         if (!(snapshot.get("attributes") instanceof Map<?,?> attributes) || !attributes.containsKey(target.attribute()))
             throw new MetadataEditException(409, "Attribute not found", UiMessages.text("ui.7ef8d5ba9f46", "속성이 더 이상 존재하지 않습니다. 상세 화면을 다시 열어 주세요."));
         Object value=attributes.get(target.attribute());
@@ -95,7 +98,7 @@ public final class ProfileEditPolicy {
         if (Objects.equals(desired,actual)) return true;
         if (desired==null || actual==null) return false;
         try {
-            if ("object_list".equals(attribute)) return json.readTree(desired).equals(json.readTree(actual));
+            if (Set.of("object_list", "semantic_source").contains(attribute)) return json.readTree(desired).equals(json.readTree(actual));
             if (Set.of("temperature","max_tokens","seed","top_p","frequency_penalty","presence_penalty").contains(attribute))
                 return new BigDecimal(desired.strip()).compareTo(new BigDecimal(actual.strip()))==0;
             if (BOOLEANS.contains(attribute))

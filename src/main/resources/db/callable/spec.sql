@@ -1,5 +1,6 @@
 CREATE PACKAGE {{PACKAGE}} AUTHID CURRENT_USER AS
-  -- DB Companion callable AI v1
+  -- DB Companion callable AI v2
+  FUNCTION LOOKUP_GLOSSARY(p_question CLOB) RETURN CLOB;
   -- CONTEXT: no AI. SQL: one showsql call. QUERY: same SQL, then one query.
   FUNCTION ASK(
     p_question CLOB,

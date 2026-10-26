@@ -3,7 +3,7 @@ import {t} from './i18n.mjs';
 const label=key=>t('callable.'+key,key);
 const node=(tag,text)=>{const n=document.createElement(tag);n.textContent=text;return n;};
 export function requestOf(values){return {question:values.question,profile:values.profile,glossary:Boolean(values.glossary),ontology:Boolean(values.ontology),tables:values.ontology?values.tables:[],mode:values.mode,maxRows:Number(values.maxRows)};}
-export function canInstall(status){return ['MISSING','INCOMPLETE'].includes(status?.state);}
+export function canInstall(status){return ['MISSING','INCOMPLETE','UPDATE_AVAILABLE','UPGRADE_INCOMPLETE'].includes(status?.state);}
 export function mountCallable(root){
   const get=name=>root.querySelector(`[data-ca-${name}]`),api=path=>assistantApi('/db/functions/ai-query/'+path),post=(path,value)=>assistantApi('/db/functions/ai-query/'+path,assistantPost(get('csrf'),value));
   let status=null,busy=false,preview=null,kind=null,timer=null,access=null;

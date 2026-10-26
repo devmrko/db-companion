@@ -59,7 +59,10 @@ public class AiCreationRepository {
     private static boolean signature(List<Argument> args,Map<String,String> expected){var groups=new HashMap<Integer,List<Argument>>();args.forEach(a->groups.computeIfAbsent(a.subprogram(),k->new ArrayList<>()).add(a));return groups.values().stream().anyMatch(g->g.size()==expected.size()&&g.stream().allMatch(a->"IN".equals(a.mode())&&Objects.equals(expected.get(a.name()),a.type()))&&g.stream().map(Argument::name).distinct().count()==expected.size());}
     public void validateReferences(Input in,JsonMapper json){
         var n=json.readTree(in.attributes());
-        if(in.kind()==Kind.PROFILE){if(n.has("credential_name")&&(!n.get("credential_name").isString()||!profileChoices.credentialAvailable(n.get("credential_name").stringValue())))throw AiCreation.error(409,"credentialUnavailable");return;}
+        if(in.kind()==Kind.PROFILE){
+            if(n.has("semantic_source"))profileChoices.requireSemanticSources(new ProfileEdit.Target(in.schema(),in.name(),"semantic_source"),n.get("semantic_source").toString());
+            if(n.has("credential_name")&&(!n.get("credential_name").isString()||!profileChoices.credentialAvailable(n.get("credential_name").stringValue())))throw AiCreation.error(409,"credentialUnavailable");return;
+        }
         var attrs=n.properties().stream().map(e->new AgentCatalog.Attribute(in.name(),e.getKey(),AiCreation.value(e.getValue()),null)).toList();
         var component=new AgentCatalog.Component(in.name(),null,attrs);
         if(in.kind()==Kind.TEAM){teams.validateReferences(new TeamEdit.Target(in.schema(),in.name(),"agents"),component,AiCreation.value(n.get("agents")),json);return;}

@@ -64,6 +64,7 @@
         </tbody>
       </table>
     </section>
+    <th:block th:if="${page != null}"><th:block th:replace="~{fragments/semantic-context :: panel}"></th:block></th:block>
     <th:block th:if="${page != null and profileName != null and profileEditable}"><th:block th:replace="~{fragments/profile-editor :: editor}"></th:block></th:block>
   </main>
 </div>

@@ -1,5 +1,6 @@
 import {t} from './i18n.mjs';
 const fields = {
+  semantic_source: ['multiline', t('semantic.attachNote','Source-name JSON array. [] detaches all sources.')],
   annotations: ['boolean', t('ui.8320d61d1e1a', "테이블·컬럼의 Annotation을 AI 질의 생성에 참고할 메타데이터로 포함합니다.")],
   comments: ['boolean', t('ui.203d8195608e', "테이블·컬럼 코멘트를 AI 질의 생성에 참고할 메타데이터로 포함합니다.")],
   conversation: ['boolean', t('ui.9176dc4a15ab', "이 프로필에서 대화 이력을 사용합니다.")],
