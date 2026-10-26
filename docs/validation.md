@@ -1,5 +1,20 @@
 # Release validation
 
+## 0.1.0-alpha.19
+
+- Java: 1,456 tests passed; no failures, errors or skips. Maven quality verify,
+  executable JAR and PMD passed.
+- JavaScript: 703 passed with the optional lifecycle case skipped in the full run;
+  the real alpha.19 JAR lifecycle suite was run separately.
+- Live UI: an existing profile without object_list opened an empty object picker;
+  an unset boolean required explicit selection; model/Credential/object_list and
+  additional instructions were editable on the selected profile. No settings were
+  saved during these browser checks and no paid AI calls were made.
+- Synthetic tests cover adding missing attributes, concurrent-change rejection,
+  unrelated-attribute preservation and display-only missing rows. A real DB save of
+  a previously absent attribute through this revised editor was not exercised.
+- Publication guard: 1,104 files, no findings; whitespace check passed.
+
 ## 0.1.0-alpha.18
 
 Candidate: **0.1.0-alpha.18** / tag **v0.1.0-alpha.18**, 2026-10-26.

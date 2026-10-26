@@ -35,9 +35,11 @@ function mount(dialog) {
     if(help)help.dataset.sqlHelpOperation=attr==='model'?'model':attr==='object_list'?'objects':'options';
     let type=spec.type;
     // Keep unfamiliar existing representations intact instead of silently converting them.
-    if(type==='boolean'&&booleanValue(data.value)===null)type='multiline';
+    if(type==='boolean'&&booleanValue(data.value)===null){
+      if(data.value==null){type='select';spec.choices=['true','false'];}else type='multiline';
+    }
     if(['text','suggest','number','integer'].includes(type)&&/[\r\n]/.test(data.value??''))type='multiline';
-    value.value=data.value??'';control=value;find('raw').hidden=!['multiline','objects'].includes(type);
+    value.value=data.value??(type==='objects'?'[]':'');control=value;find('raw').hidden=!['multiline','objects'].includes(type);
     find('counter').hidden=!['multiline','objects'].includes(type);
     dialog.classList.toggle('app-profile-editor-compact',!['multiline','objects'].includes(type));
     if(attr==='semantic_source') {

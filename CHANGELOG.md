@@ -4,6 +4,15 @@
 
 No additional changes recorded.
 
+## 0.1.0-alpha.19
+
+- Configure missing settings directly in each profile. Display unset model,
+  Credential, object_list and supported options without copying another profile.
+- Open an empty object picker for an absent object_list and require explicit
+  selection for unset boolean settings. Display provider-specific OCI/Azure fields.
+- Preserve owner checks, optimistic concurrency, history and unrelated-attribute
+  readback checks when adding a setting. Unknown missing attributes remain blocked.
+
 ## 0.1.0-alpha.18
 
 Prepared on 2026-10-26, integrating all alpha.17 changes.

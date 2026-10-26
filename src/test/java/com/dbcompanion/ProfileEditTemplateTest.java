@@ -11,6 +11,16 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ProfileEditTemplateTest {
+    @Test void minimalProfileHasIndependentSetupRowsWithoutInventedStoredValues() {
+        var stored=List.of(new AiProfileAttribute("provider","oci"),new AiProfileAttribute("semantic_source","[\"TERMS\"]"));
+        var rows=AiProfileAttribute.withConfiguration(stored);
+        assertThat(rows).extracting(AiProfileAttribute::name).contains("model","credential_name","object_list","oci_compartment_id","comments")
+                .doesNotHaveDuplicates().doesNotContain("azure_resource_name");
+        assertThat(rows.stream().filter(a->!List.of("provider","semantic_source").contains(a.name())))
+                .allMatch(a->a.value()==null);
+        assertThat(stored).hasSize(2);
+        assertThat(AiProfileAttribute.withConfiguration(rows)).isEqualTo(rows);
+    }
     private String render(boolean owner) {
         var resolver=new ClassLoaderTemplateResolver();resolver.setPrefix("templates/");resolver.setSuffix(".html");resolver.setCharacterEncoding("UTF-8");
         var engine=new SpringTemplateEngine(); engine.setTemplateEngineMessageSource(com.dbcompanion.common.i18n.UiMessages.source());engine.setTemplateResolver(resolver);

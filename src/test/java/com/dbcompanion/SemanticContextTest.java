@@ -37,6 +37,7 @@ class SemanticContextTest {
         assertThat(ProfileEditPolicy.value(before,target)).isEqualTo("[]");
         assertThat(ProfileEditPolicy.readbackMatches(target,before,after,"[\"TERMS\"]",json)).isTrue();
         assertThatThrownBy(() -> ProfileEditPolicy.verifyVersion(target,after,ProfileEditPolicy.version(target,before,json),json)).isInstanceOf(RuntimeException.class);
-        assertThatThrownBy(() -> ProfileEditPolicy.value(before,new Target("APP","PROFILE","model"))).isInstanceOf(RuntimeException.class);
+        assertThat(ProfileEditPolicy.value(before,new Target("APP","PROFILE","model"))).isNull();
+        assertThatThrownBy(() -> ProfileEditPolicy.value(before,new Target("APP","PROFILE","unknown_setting"))).isInstanceOf(RuntimeException.class);
     }
 }

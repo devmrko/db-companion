@@ -1,0 +1,4 @@
+{
+  "profileSetup.help": ["이 프로필의 설정입니다. 미설정 항목도 편집하여 추가할 수 있습니다. 제공자 → 모델·Credential → 대상 객체(object_list)를 설정하세요. 다른 프로필의 값은 자동으로 가져오지 않습니다.", "Configure this profile directly. Edit unset fields to add them: provider, model and Credential, then target objects (object_list). Values are never copied automatically from another profile.", "直接配置此配置文件。可编辑未设置项：提供者、模型和 Credential，然后选择目标对象（object_list）。不会自动复制其他配置文件的值。", "このプロファイルで未設定の項目も編集できます。provider、モデル・Credential、対象オブジェクト（object_list）を設定します。他のプロファイルの値は自動コピーしません。"],
+  "profileSetup.unset": ["미설정", "Not configured", "未设置", "未設定"]
+}

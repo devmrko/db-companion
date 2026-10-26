@@ -9,6 +9,19 @@ import tools.jackson.databind.json.JsonMapper;
 import static org.assertj.core.api.Assertions.*;
 
 class ProfileEditPolicyTest {
+    @Test void setupAddsOnlyRequestedAttributeAndRejectsConcurrentChanges() {
+        var before=Map.<String,Object>of("exists",true,"profile",Map.of("PROFILE_ID","1"),"attributes",Map.of("provider","oci"));
+        for(String name:List.of("model","credential_name","object_list","comments","oci_compartment_id")) {
+            var field=new Target("APP","P",name);
+            assertThat(ProfileEditPolicy.value(before,field)).isNull();
+            String value=name.equals("object_list")?"[{\"owner\":\"APP\",\"name\":\"ITEMS\"}]":name.equals("comments")?"true":"EXAMPLE";
+            var after=Map.<String,Object>of("exists",true,"profile",Map.of("PROFILE_ID","1"),"attributes",Map.of("provider","oci",name,value));
+            assertThat(ProfileEditPolicy.readbackMatches(field,before,after,value,json)).isTrue();
+            assertThatThrownBy(()->ProfileEditPolicy.verifyVersion(field,after,ProfileEditPolicy.version(field,before,json),json)).isInstanceOf(MetadataEditException.class);
+            var altered=Map.<String,Object>of("exists",true,"profile",Map.of("PROFILE_ID","1"),"attributes",Map.of("provider","openai",name,value));
+            assertThat(ProfileEditPolicy.readbackMatches(field,before,altered,value,json)).isFalse();
+        }
+    }
     @Test void absentTokenLimitCanBeAddedWithoutWeakeningVersionOrReadbackChecks(){
         var token=new Target("APP","P","max_tokens");
         var before=Map.<String,Object>of("exists",true,"profile",Map.of("PROFILE_ID","1"),"attributes",Map.of("model","MODEL"));
@@ -71,7 +84,8 @@ class ProfileEditPolicyTest {
     }
     @Test void absentProfileOrAttributeIsNotRecreated() {
         assertThatThrownBy(()->ProfileEditPolicy.value(Map.of("exists",false),target)).hasMessageContaining("not found");
-        assertThatThrownBy(()->ProfileEditPolicy.value(Map.of("exists",true,"attributes",Map.of()),target)).hasMessageContaining("not found");
+        assertThat(ProfileEditPolicy.value(Map.of("exists",true,"attributes",Map.of()),target)).isNull();
+        assertThatThrownBy(()->ProfileEditPolicy.value(Map.of("exists",true,"attributes",Map.of()),new Target("APP","P","unknown_setting"))).hasMessageContaining("not found");
         var attributes=new HashMap<String,String>();attributes.put(target.attribute(),null);
         assertThat(ProfileEditPolicy.value(Map.of("exists",true,"attributes",attributes),target)).isNull();
     }

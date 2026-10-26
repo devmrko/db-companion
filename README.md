@@ -1,6 +1,6 @@
 # DB Companion
 
-**Version: 0.1.0-alpha.13** · Java 21+ · Spring Boot · MIT
+**Version: 0.1.0-alpha.19** · Java 21+ · Spring Boot · MIT
 
 A self-hosted workbench for inspecting Oracle database metadata, Select AI configuration,
 feedback, execution information, and governed business definitions.
