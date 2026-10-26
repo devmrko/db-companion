@@ -16,7 +16,7 @@ export const preparationBlockers=(selected,question,busy,glossaryReady,ontologyR
   if(!selected)reasons.push(t('aitest.readyProfile','상단의 테스트 프로필을 선택해 주세요. A/B 프로필 선택과는 별개입니다.'));
   if(!validQuestion(question))reasons.push(t('aitest.readyQuestion','질문을 입력해 주세요 (최대 16,000자).'));
   if(!glossaryReady)reasons.push(t('aitest.readyGlossary','업무 용어 사전: 현재 질문·프로필로 검색해 주세요. 검색된 정의는 자동 첨부됩니다. 한도 초과 시 질문 범위를 좁혀 주세요.'));
-  if(!ontologyReady)reasons.push(t('aitest.readyOntology','온톨로지: 승인 정의를 선택·적용하거나 관계 경로를 선택해 주세요. 사용하지 않으면 체크를 해제하세요.'));
+  if(!ontologyReady)reasons.push(t('aitest.readyOntology','온톨로지: RDF 근거를 찾아 선택·적용해 주세요. 사용하지 않으면 체크를 해제하세요.'));
   return reasons;
 };
 export const canSend=(prepared,consent,busy)=>Boolean(prepared?.preview?.token)&&consent===true&&!busy;

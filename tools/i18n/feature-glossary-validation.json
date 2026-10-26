@@ -1,0 +1,4 @@
+{
+  "businessGlossary.invalidFields": ["대표 용어와 정의는 필수입니다. 대표 용어는 256자, 정의·SQL 기준은 각각 4,000자, 별칭은 각 256자·최대 20개입니다. 입력 형식과 버전을 확인해 주세요.", "Term and definition are required. Use up to 256 characters for the term, 4,000 each for the definition and SQL criteria, and up to 20 aliases of 256 characters each. Check the input format and revision.", "代表术语和定义为必填项。术语最多256个字符，定义和SQL条件各最多4,000个字符，别名最多20个且各最多256个字符。请检查输入格式和版本。", "代表用語と定義は必須です。用語は256文字、定義とSQL基準は各4,000文字、別名は各256文字で最大20件です。入力形式とバージョンを確認してください。"],
+  "businessGlossary.editConflict": ["다른 화면에서 이 용어가 변경되었습니다. 편집창을 닫고 목록을 새로고침한 뒤 최신 버전을 다시 열어 주세요. 현재 입력은 저장하지 않았습니다.", "This term changed in another editor. Close the editor, refresh the list and reopen the latest revision. Your changes have not been saved.", "此术语已在其他编辑窗口中更改。请关闭编辑窗口、刷新列表并重新打开最新版本。当前输入尚未保存。", "この用語は別の画面で変更されました。編集画面を閉じ、一覧を更新して最新バージョンを開いてください。現在の入力は保存していません。"]
+}

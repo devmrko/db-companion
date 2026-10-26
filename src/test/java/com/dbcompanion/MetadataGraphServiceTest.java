@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.*;
 
 class MetadataGraphServiceTest {
     final OntologyReadCacheTest db=new OntologyReadCacheTest();final MetadataGraphTest f=new MetadataGraphTest();
-    List<Ontology.Entry> entries=f.entries();boolean permission=true;int checks,creates;
+    List<Ontology.Entry> entries=f.entries();boolean permission=true;int checks,creates,lists,queries;
     final OntologyRepository catalog=new OntologyRepository(db.jdbc,db.json,new DatabaseRepository(db.jdbc),new TableStructureRepository(db.jdbc)){
         @Override public List<Ontology.Entry> relationshipEntries(String schema,String login){return entries;}
     };
@@ -17,6 +17,8 @@ class MetadataGraphServiceTest {
         @Override public MetadataGraph.Access access(MetadataGraph.Plan plan,String login){return new MetadataGraph.Access(true,true,permission,true,List.of());}
         @Override public void verifyProjection(MetadataGraph.Plan plan){checks++;}
         @Override public MetadataGraph.Created create(MetadataGraph.Plan plan){creates++;return new MetadataGraph.Created(plan.name(),List.of(plan.nodeView(),plan.edgeView(),plan.name()),plan.query());}
+        @Override public List<MetadataGraphRepository.Existing> existing(String schema){lists++;return List.of(new MetadataGraphRepository.Existing("META","VALID","VALID","VALID",true));}
+        @Override public MetadataGraphRepository.ReadResult query(String schema,String name){queries++;return new MetadataGraphRepository.ReadResult("METADATA",List.of(Map.of("EDGE_KIND","CONTAINS")));}
     };
     final MetadataGraphService service=new MetadataGraphService(db.source,catalog,graphs);
     @Test void previewIsReadOnlyAndCreateIsExplicitVersionBoundAndNotRetried(){try(var s=db.session()){
@@ -35,5 +37,13 @@ class MetadataGraphServiceTest {
     @Test void ownerAndSchemaMismatchFailBeforeConnecting(){try(var s=db.session()){
         assertThatThrownBy(()->service.preview(s,"OTHER","META")).isInstanceOf(Ontology.Failure.class);
         s.metadata().selectSchema("OTHER");assertThatThrownBy(()->service.preview(s,"OTHER","META")).isInstanceOf(Ontology.Failure.class);assertThat(db.connections).isZero();
+    }}
+    @Test void existingGraphsAndReadResultsRequireTheLoginOwnedSchema(){try(var s=db.session()){
+        assertThat(service.existing(s,"APP")).extracting(MetadataGraphRepository.Existing::name).containsExactly("META");
+        assertThat(service.query(s,"APP","META").rows()).hasSize(1);
+        assertThat(creates).isZero();assertThat(lists).isEqualTo(1);assertThat(queries).isEqualTo(1);
+        assertThatThrownBy(()->service.existing(s,"OTHER")).isInstanceOf(Ontology.Failure.class);
+        assertThatThrownBy(()->service.query(s,"OTHER","META")).isInstanceOf(Ontology.Failure.class);
+        assertThat(lists).isEqualTo(1);assertThat(queries).isEqualTo(1);
     }}
 }

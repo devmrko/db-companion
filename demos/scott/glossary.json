@@ -1,0 +1,9 @@
+{
+  "format": "dbcompanion.business-glossary",
+  "version": 1,
+  "terms": [
+    {"term":"직원 수","aliases":["사원 수","직원수","employee count"],"definition":"SCOTT 공개 샘플 EMP의 직원 식별자 EMPNO 건수. 부서별 조회에서는 직원이 없는 부서의 직원 수를 0으로 표시한다.","criteria":"전체 직원 수는 SELECT COUNT(EMPNO) FROM EMP. 직원이 없는 부서를 포함할 때 DEPT를 기준으로 EMP를 DEPTNO로 LEFT JOIN하고 COUNT(e.EMPNO)를 사용한다. 이 경우 COUNT(*)는 빈 부서도 1로 세므로 사용하지 않는다.","enabled":true},
+    {"term":"급여 합계","aliases":["총 급여","급여 총액","salary total"],"definition":"SCOTT 공개 샘플 EMP.SAL의 합계. 수당 COMM은 포함하지 않는다. 통화나 지급 주기는 별도로 명시하지 않은 경우 추정하지 않는다.","criteria":"SELECT SUM(SAL) FROM EMP. 부서별 급여는 EMP.DEPTNO별 SUM(SAL). 빈 부서를 포함하면 DEPT LEFT JOIN EMP 후 NVL(SUM(e.SAL),0). 기본 급여에 COMM을 임의로 더하지 않는다.","enabled":true},
+    {"term":"급여와 수당 합계","aliases":["수당 포함 급여","salary and commission"],"definition":"SCOTT 공개 샘플 EMP의 급여 SAL과 수당 COMM의 합계. 수당이 NULL인 직원은 수당을 0으로 계산한다.","criteria":"SELECT SUM(SAL+NVL(COMM,0)) FROM EMP. SUM(SAL+COMM)은 COMM이 NULL인 직원의 급여까지 누락하므로 사용하지 않는다.","enabled":true}
+  ]
+}

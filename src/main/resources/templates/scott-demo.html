@@ -1,0 +1,12 @@
+<!DOCTYPE html><html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/common :: head(#{scottSetup.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside><div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content" data-scott-setup>
+<h1 th:text="#{scottSetup.title}"></h1><p><strong th:text="${info.database}"></strong> · <strong th:text="${info.username}"></strong></p><p th:text="#{scottSetup.help}"></p>
+<input type="hidden" data-sc-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+<section class="app-card"><a th:href="@{/db/accounts}" th:text="#{accountSetup.title}"></a><p class="app-alert" th:text="#{scottSetup.owner}"></p>
+<button type="button" class="btn app-btn app-btn-quiet" data-sc-status th:text="#{scottSetup.status}"></button> <button type="button" class="btn app-btn app-btn-secondary" data-sc-preview disabled th:text="#{scottSetup.preview}"></button>
+<button type="button" class="btn app-btn app-btn-quiet" data-sc-verify disabled th:text="#{scottSetup.verify}"></button>
+<section data-sc-review hidden><pre class="app-preview-source" data-code-language="sql" data-sc-sql></pre><p class="app-alert" th:text="#{scottSetup.warning}"></p><label class="app-check-field"><input type="checkbox" data-sc-consent><span th:text="#{accountSetup.consent}"></span></label><button type="button" class="btn app-btn app-btn-primary" data-sc-install disabled th:text="#{scottSetup.install}"></button></section>
+<p role="status" aria-live="polite" data-sc-message></p><pre class="app-preview-source" data-code-language="json" data-sc-result></pre>
+<section data-sc-admin hidden><h2 th:text="#{adminHelp.title}"></h2><p th:text="#{adminHelp.scott}"></p><pre class="app-preview-source" data-code-language="sql" data-sc-admin-sql></pre><p th:text="#{adminHelp.steps}"></p><a th:href="@{/db/admin-help}" th:text="#{adminHelp.title}"></a></section>
+<p th:text="#{scottSetup.next}"></p><a th:href="@{/tables}" th:text="#{ui.31c660ef0b9a}"></a> · <a th:href="@{/ontology}" th:text="#{ontology.title}"></a> · <a th:href="@{/business-glossary}" th:text="#{businessGlossary.title}"></a>
+</section></main></div><script type="module" th:src="@{/js/scott-demo.mjs}"></script></body></html>

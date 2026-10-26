@@ -19,7 +19,9 @@ test('independent glossary and Select AI ontology evidence remain available',()=
   assert.match(service,/evidenceSearch/);assert.ok(service.includes('questionAnalysis).analyze'));
   assert.ok(!service.includes('glossary).analyze'));
   const inquiry=readFileSync('src/main/java/com/dbcompanion/service/OntologyQueryService.java','utf8');
-  assert.match(inquiry,/QuestionAnalysisService/);assert.doesNotMatch(inquiry,/BusinessGlossaryService/);
+  assert.match(inquiry,/QuestionAnalysisService/);assert.match(inquiry,/BusinessGlossaryService/);
+  assert.match(inquiry,/glossary\.interpret/);assert.match(inquiry,/glossary\.verifyTerms/);
+  assert.match(inquiry,/state\.grounding\(grounding\)/);
   const evidence=readFileSync('src/main/resources/static/js/select-ai-evidence.mjs','utf8');
-  assert.match(evidence,/ORACLE_TEXT_UNCONFIGURED/);
+  assert.match(evidence,/mountRdfEvidence as mountEvidence/);
 });

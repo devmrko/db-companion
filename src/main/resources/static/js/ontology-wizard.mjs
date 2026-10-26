@@ -65,7 +65,7 @@ export function ontologyWizard(dialog,{schema,getOptions,post,saved}){
     show(2);
   }
   get('local-consent').addEventListener('change',lock);get('consent').addEventListener('change',lock);
-  get('sample').addEventListener('click',()=>work(async()=>{await discard();preview=await post('/wizard/sample',sampleRequest(schema,entry,selected,get('count').value,get('local-consent').checked));spent=false;sampleView();}));
+  get('sample').addEventListener('click',()=>work(async()=>{await discard();preview=await post('/wizard/sample',{...sampleRequest(schema,entry,selected,get('count').value,get('local-consent').checked),statistics:get('statistics').checked});spent=false;sampleView();}));
   get('back').addEventListener('click',()=>work(async()=>{await discard();show(0);}));
   get('generate').addEventListener('click',()=>work(async()=>{
     if(spent||!preview||!get('consent').checked)return;spent=true;
@@ -81,7 +81,7 @@ export function ontologyWizard(dialog,{schema,getOptions,post,saved}){
   get('close').addEventListener('click',close);dialog.addEventListener('cancel',e=>{e.preventDefault();close();});
   dialog.addEventListener('close',()=>{entry=null;rows=[];selected=[];get('columns').replaceChildren();});
   return {async open(value){
-    if(busy)return;entry=value;selected=[];preview=null;proposal=null;rows=[];spent=false;get('local-consent').checked=false;get('consent').checked=false;get('count').value='10';
+    if(busy)return;entry=value;selected=[];preview=null;proposal=null;rows=[];spent=false;get('local-consent').checked=false;get('consent').checked=false;get('statistics').checked=false;get('count').value='10';
     get('target').textContent=schema+'.'+value.document.source.table+' · v'+value.revision;get('columns').replaceChildren();show(0);dialog.showModal();
     await work(async()=>{
       const options=await getOptions(value);

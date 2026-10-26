@@ -1,6 +1,8 @@
 package com.dbcompanion.service;
 
 import com.dbcompanion.model.QuestionLanguage;
+import com.dbcompanion.model.SemanticRelease;
+import com.dbcompanion.model.BusinessGlossary;
 
 import com.dbcompanion.common.db.*;
 import com.dbcompanion.common.config.SelectAiExecutionSettings;
@@ -27,6 +29,21 @@ import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class SelectAiTestService {
+    @org.springframework.beans.factory.annotation.Autowired(required=false) private SemanticReleaseService releases;
+    @org.springframework.beans.factory.annotation.Autowired(required=false) private PropertyGraphRepository semanticPhysical;
+    private SemanticRelease.Version release(PoolSession s){return releases==null?null:releases.active(s);}
+    private void versionRequest(PoolSession s,boolean enabled,BusinessGlossary.Selection terms){
+        if(release(s)!=null&&(!enabled||terms==null||!terms.enabled()))throw BusinessGlossary.failure(409,"시멘틱 버전 테스트는 업무 용어 사전과 온톨로지 근거를 모두 검색·선택한 뒤 실행해 주세요.");
+    }
+    private void liveComparison(PoolSession s){if(release(s)!=null)throw BusinessGlossary.failure(409,"프로필 A/B 비교는 현재 설정 모드입니다. 버전 비교는 버전을 각각 선택해 SQL 생성 후 저장된 실행을 비교해 주세요.");}
+    private void verifyVersionSql(PoolSession s,SelectAiEvidence.Snapshot evidence,String sql){
+        if(s.metadata().semanticRelease().selected()==null)return;
+        if(evidence==null||evidence.entries().isEmpty())throw SemanticRelease.invalid();
+        var parsed=SelectAiSqlReferences.analyze(Action.SQL,sql);
+        if(!parsed.status().equals("PARSED")||parsed.tables().isEmpty())throw SemanticRelease.invalid();
+        var names=evidence.entries().stream().map(e->e.document().source().table()).collect(java.util.stream.Collectors.toSet());
+        if(parsed.tables().stream().anyMatch(table->table.owner()!=null&&!table.owner().equals(evidence.schema())||!names.contains(table.name())))throw SemanticRelease.invalid();
+    }
     private final SessionDataSource source;
     private final AiAssistantRepository ai;
     private final DatabaseRepository database;
@@ -63,7 +80,7 @@ public class SelectAiTestService {
     }
     public int executionTimeoutSeconds(){return executionSettings.sqlTimeoutSeconds();}
     private <T>T query(PoolSession session,boolean generating,Supplier<T> work){
-        source.bind(session.pool(),session.metadata().info().username());
+        source.bind(session.pool(),session.metadata().info().username(),session.metadata().assistant());
         try{return (generating?generate:read).execute(status->generating
                 ?JdbcNetworkTimeout.execute(source,executionSettings.generateNetworkTimeoutMillis(),work):work.get());}finally{source.clear();}
     }
@@ -97,6 +114,8 @@ public class SelectAiTestService {
     }
     private OntologyInquiry.Dataset evidenceData(PoolSession session,String schema,boolean refresh){
         SelectAiEvidence.scope(schema,session.metadata().schemas());
+        var version=release(session);
+        if(version!=null)return session.metadata().aiTest().evidence().dataset(schema,refresh,()->{var entries=version.content().entries();var now=Instant.now().toString();return new OntologyInquiry.Dataset(schema,entries,OntologyRelations.analyze(session.metadata().info().database(),schema,entries,now),now);});
         return session.metadata().aiTest().evidence().dataset(schema,refresh,()->query(session,false,()->{
             var entries=ontology.relationshipEntries(schema,session.metadata().info().username());var now=Instant.now().toString();
             return new OntologyInquiry.Dataset(schema,entries,OntologyRelations.analyze(session.metadata().info().database(),schema,entries,now),now);
@@ -118,17 +137,32 @@ public class SelectAiTestService {
     }
     public SelectAiEvidence.Snapshot evidenceChoose(PoolSession session,String id,String route){
         var state=session.metadata().aiTest();synchronized(state){state.invalidateRequests();var result=state.evidence().choose(id,route,json);
-            SelectAiEvidence.scope(result.schema(),session.metadata().schemas());return result;
+            SelectAiEvidence.scope(result.schema(),session.metadata().schemas());return versionEvidence(session,result);
         }
     }
     public SelectAiEvidence.Snapshot evidenceDefinitions(PoolSession session,String schema,String question,List<String> tables){
         var state=session.metadata().aiTest();synchronized(state){state.idle();state.invalidateRequests();
             evidenceData(session,schema,false);
-            return state.evidence().definitions(schema,question,tables,json);
+            return versionEvidence(session,state.evidence().definitions(schema,question,tables,json));
         }
+    }
+    private SelectAiEvidence.Snapshot versionEvidence(PoolSession session,SelectAiEvidence.Snapshot value){
+        if(releases==null||session.metadata().semanticRelease().selected()==null)return value;
+        String payload=releases.stamp(session,value.source());
+        if(payload.length()>AiAssistant.MAX_SOURCE)throw SemanticRelease.invalid();
+        return session.metadata().aiTest().evidence().attach(new SelectAiEvidence.Snapshot(value.schema(),value.question(),value.route(),value.references(),OntologyQueryService.hash(payload),payload,value.entries(),value.terms()));
     }
     private void verifyEvidence(PoolSession session,SelectAiEvidence.Snapshot evidence){
         if(evidence==null)return;SelectAiEvidence.scope(evidence.schema(),session.metadata().schemas());
+        if(!evidence.terms().isEmpty())Objects.requireNonNull(glossary).verifyTermsInTransaction(session,evidence.terms());
+        var version=session.metadata().semanticRelease().selected();if(version!=null){
+            if(!evidence.schema().equals(version.content().owner()))throw SemanticRelease.invalid();
+            var marker=json.readTree(evidence.source()).path("semanticRelease");
+            if(!version.id().equals(marker.path("id").asString())||!version.hash().equals(marker.path("hash").asString()))throw SemanticRelease.invalid();
+            SemanticReleaseService.verifyEntries(version,evidence.entries());
+            Objects.requireNonNull(semanticPhysical).verifyMetadata(evidence.entries());return;
+        }
+        if(json.readTree(evidence.source()).has("semanticRelease"))throw SemanticRelease.invalid();
         ontology.require(evidence.schema(),session.metadata().info().username());
         var current=evidence.entries().stream().map(e->ontology.entry(evidence.schema(),e.document().source().table(),0)).toList();
         if(current.stream().anyMatch(Objects::isNull))throw SelectAiEvidence.stale();SelectAiEvidence.verify(evidence,current);
@@ -136,7 +170,8 @@ public class SelectAiTestService {
     public Prepared preview(PoolSession session,Action action,String question,boolean useOntology,String evidenceHash,Locale locale){
         return preview(session,action,question,useOntology,evidenceHash,locale,null);
     }
-    public Prepared preview(PoolSession session,Action action,String question,boolean useOntology,String evidenceHash,Locale locale,com.dbcompanion.model.BusinessGlossary.Selection terms){
+    public Prepared preview(PoolSession session,Action action,String question,boolean useOntology,String evidenceHash,Locale locale,BusinessGlossary.Selection terms){
+        versionRequest(session,useOntology,terms);
         SelectAiTest.question(question);if(action==null)throw new IllegalArgumentException("Missing action");
         var state=session.metadata().aiTest();synchronized(state){
             state.idle();var selected=selected(state);
@@ -150,7 +185,8 @@ public class SelectAiTestService {
     public Prepared conditionPreview(PoolSession session,Action action,String question,SelectAiTest.ConditionConfirmation confirmation,boolean useOntology,String evidenceHash,Locale locale){
         return conditionPreview(session,action,question,confirmation,useOntology,evidenceHash,locale,null);
     }
-    public Prepared conditionPreview(PoolSession session,Action action,String question,SelectAiTest.ConditionConfirmation confirmation,boolean useOntology,String evidenceHash,Locale locale,com.dbcompanion.model.BusinessGlossary.Selection terms){
+    public Prepared conditionPreview(PoolSession session,Action action,String question,SelectAiTest.ConditionConfirmation confirmation,boolean useOntology,String evidenceHash,Locale locale,BusinessGlossary.Selection terms){
+        versionRequest(session,useOntology,terms);
         SelectAiTest.question(question);if(action==null||confirmation==null)throw new AiAssistant.Failure(400,"aitest.conditionsInvalid","확인 질문·답변과 조건을 확인해 주세요.");
         if(json.writeValueAsString(Map.of("confirmationQuestion",confirmation.question(),"confirmationAnswer",confirmation.answer(),"conditions",confirmation.conditions())).length()>com.dbcompanion.model.ProblemQuestion.MAX_DESCRIPTION)throw new AiAssistant.Failure(413,"aitest.conditionsTooLong","확정 조건 보관 한도를 초과합니다. 내용을 줄여 주세요.");
         var state=session.metadata().aiTest();synchronized(state){
@@ -162,10 +198,12 @@ public class SelectAiTestService {
     }
     public void cancel(PoolSession session,String token){session.metadata().aiTest().cancel(token);}
     public SelectAiComparison.Plan comparisonPreview(PoolSession session,String left,String right,String question,Locale locale){
+        liveComparison(session);
         SelectAiTest.question(question);if(left==null||right==null||left.length()>128||right.length()>128)throw AiAssistant.stale();
         return query(session,false,()->{String owner=session.metadata().info().username();var a=ai.profile(new AiAssistant.Selection(owner,left));var b=ai.profile(new AiAssistant.Selection(owner,right));return session.metadata().aiComparison().prepare(a,b,question,UiMessages.supported(locale).getLanguage(),Instant.now());});
     }
     public SelectAiTest.Outcome comparisonGenerate(PoolSession session,String token,boolean consent){
+        liveComparison(session);
         var state=session.metadata().aiComparison();var preview=state.consume(token,consent,Instant.now());var started=Instant.now();long nanos=System.nanoTime();boolean[] called={false};SelectAiTest.Outcome result;
         try{String text=query(session,true,()->{if(!preview.profile().equals(ai.profile(preview.profile().selection())))throw AiAssistant.stale();called[0]=true;return ai.generate(packages.packageOwner(preview.profile().selection().owner()),preview.profile().selection().name(),preview.source(),SelectAiTest.Action.SQL,executionSettings.generateTimeoutSeconds());});boolean rejected=!SelectAiReview.sqlResponse(text);result=new SelectAiTest.Outcome(UUID.randomUUID().toString(),SelectAiTest.Action.SQL,preview.profile(),state.plan().question(),started,elapsed(nanos),text,rejected?UiMessages.text("aitest.notSql","SQL 생성 응답이 실행 가능한 SQL이 아닙니다. 원문을 확인해 주세요."):null,rejected?SelectAiReview.responseCode(text):null,rejected?"sql-response":"complete");}
         catch(RuntimeException ex){result=new SelectAiTest.Outcome(UUID.randomUUID().toString(),SelectAiTest.Action.SQL,preview.profile(),state.plan().question(),started,elapsed(nanos),null,!called[0]&&ex instanceof AiAssistant.Failure?ex.getMessage():UiMessages.text(called[0]?"aitest.callError":"aitest.preflightError",called[0]?"응답을 확인하지 못했습니다. 자동 재시도하지 않았습니다.":"호출 전 프로필 확인 단계에서 중단했습니다."),CredentialCatalogRepository.error(ex),called[0]?"generate":"preflight");}
@@ -173,6 +211,7 @@ public class SelectAiTestService {
     }
     public SelectAiComparison.ShowPromptPlan comparisonShowPromptPreview(PoolSession session,Locale locale){return session.metadata().aiComparison().prepareShowPrompt(UiMessages.supported(locale).getLanguage(),Instant.now());}
     public SelectAiTest.Outcome comparisonShowPrompt(PoolSession session,String token,boolean consent){
+        liveComparison(session);
         var state=session.metadata().aiComparison();var preview=state.consumePrompt(token,consent,Instant.now());var started=Instant.now();long nanos=System.nanoTime();boolean[] called={false};SelectAiTest.Outcome result;
         try{String text=query(session,true,()->{if(!preview.profile().equals(ai.profile(preview.profile().selection())))throw AiAssistant.stale();called[0]=true;return ai.generate(packages.packageOwner(preview.profile().selection().owner()),preview.profile().selection().name(),preview.source(),SelectAiTest.Action.PROMPT,executionSettings.generateTimeoutSeconds());});result=new SelectAiTest.Outcome(UUID.randomUUID().toString(),SelectAiTest.Action.PROMPT,preview.profile(),state.plan().question(),started,elapsed(nanos),text,null,null,"showprompt");}
         catch(RuntimeException ex){result=new SelectAiTest.Outcome(UUID.randomUUID().toString(),SelectAiTest.Action.PROMPT,preview.profile(),state.plan().question(),started,elapsed(nanos),null,!called[0]&&ex instanceof AiAssistant.Failure?ex.getMessage():UiMessages.text(called[0]?"aitest.callError":"aitest.preflightError",called[0]?"응답을 확인하지 못했습니다. 자동 재시도하지 않았습니다.":"호출 전 프로필 확인 단계에서 중단했습니다."),CredentialCatalogRepository.error(ex),called[0]?"showprompt":"preflight");}
@@ -275,6 +314,7 @@ public class SelectAiTestService {
     public ExecutionPreview executionPreview(PoolSession session,String id){
         var state=session.metadata().aiTest();synchronized(state){
             var outcome=state.executable(id);var checked=SelectAiReadSql.check(outcome.text());
+            verifyVersionSql(session,outcome.evidence(),checked.sql());
             query(session,false,()->{verifyEvidence(session,outcome.evidence());if(!outcome.profile().equals(ai.profile(outcome.profile().selection())))throw AiAssistant.stale();return true;});
             return state.prepareExecution(id,checked,Instant.now());
         }
@@ -288,12 +328,13 @@ public class SelectAiTestService {
         var trace=state.progress().begin(operationId,"EXECUTE");trace.step(Stage.CONNECTION);
         long nanos=System.nanoTime();ExecutionResult result=null;
         try{
-            source.bind(session.pool(),session.metadata().info().username());
+            source.bind(session.pool(),session.metadata().info().username(),session.metadata().assistant());
             var data=execute.execute(status->JdbcNetworkTimeout.execute(source,executionSettings.networkTimeoutMillis(),()->{
                 trace.step(Stage.PROFILE);
                 verifyEvidence(session,value.evidence());
                 if(!value.profile().equals(ai.profile(value.profile().selection())))throw AiAssistant.stale();
                 var checked=SelectAiReadSql.check(value.preview().sql());
+                verifyVersionSql(session,value.evidence(),checked.sql());
                 if(!OntologyQueryService.hash(checked.sql()).equals(value.preview().hash()))throw AiAssistant.stale();
                 trace.step(Stage.QUERY);
                 var resultRows=rows.execute(value.preview().resultId(),checked.sql(),value.preview().hash(),session.metadata().info().username(),executionSettings.sqlTimeoutSeconds(),()->trace.step(Stage.FETCH));
@@ -327,6 +368,12 @@ public class SelectAiTestService {
                 String owner=packages.packageOwner(before.selection().owner());
                 called[0]=true;
                 trace.step(Stage.AI);
+                if(session.metadata().semanticRelease().selected()!=null){
+                    if(prepared.evidence()==null||prepared.evidence().entries().isEmpty()||prepared.glossary()==null)throw SemanticRelease.invalid();
+                    var entries=prepared.evidence().entries();rows.profileScope(before.selection().name(),prepared.evidence().schema(),entries);rows.localTables(entries);
+                    String attributes=json.writeValueAsString(Map.of("conversation",false,"comments",false,"annotations",false,"enforce_object_list",true,"object_list",entries.stream().map(e->Map.of("owner",e.document().source().schema(),"name",e.document().source().table())).toList()));
+                    return ai.generate(owner,before.selection().name(),prepared.preview().source(),prepared.action(),executionSettings.generateTimeoutSeconds(),attributes);
+                }
                 return ai.generate(owner,before.selection().name(),prepared.preview().source(),prepared.action(),executionSettings.generateTimeoutSeconds());
             });
             trace.step(Stage.RESPONSE);

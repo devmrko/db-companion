@@ -23,7 +23,7 @@ public class OntologyWizardService {
         var manager=new DataSourceTransactionManager(source);read=new TransactionTemplate(manager);read.setReadOnly(true);read.setTimeout(15);write=new TransactionTemplate(manager);write.setTimeout(15);generate=new TransactionTemplate(manager);generate.setReadOnly(true);generate.setTimeout(90);
     }
     private void scope(PoolSession s,String schema){Ontology.name(schema);if(!schema.equals(s.metadata().selectedSchema()))throw new Failure(409,"stale");}
-    private <T>T query(PoolSession s,TransactionTemplate tx,Supplier<T> work){source.bind(s.pool(),s.metadata().info().username());try{return tx.execute(status->work.get());}finally{source.clear();}}
+    private <T>T query(PoolSession s,TransactionTemplate tx,Supplier<T> work){source.bind(s.pool(),s.metadata().info().username(),s.metadata().assistant());try{return tx.execute(status->work.get());}finally{source.clear();}}
     private Entry entry(PoolSession s,String schema,String table,int revision){
         Ontology.name(table);if(revision<1)throw new Failure(400,"invalid");repository.require(schema,s.metadata().info().username());
         var e=repository.entry(schema,table,0);if(e==null||e.revision()!=revision)throw new Failure(409,"stale");return e;
@@ -31,13 +31,21 @@ public class OntologyWizardService {
     public List<Map<String,String>> options(PoolSession s,String schema,String table,int revision){synchronized(s){scope(s,schema);return query(s,read,()->{
         var e=entry(s,schema,table,revision);return e.document().source().columns().stream().map(c->Map.of("name",c.name(),"type",c.dataType(),"blocked",OntologyWizard.blocked(c,e.document().meaning().columns().get(c.name())),"sensitivity",e.document().meaning().columns().get(c.name()).sensitivity())).toList();
     });}}
-    public OntologyWizard.Preview sample(PoolSession s,String schema,String table,int revision,List<String> columns,int count,boolean confirmed,Locale locale){synchronized(s){
+    public OntologyWizard.Preview sample(PoolSession s,String schema,String table,int revision,List<String> columns,int count,boolean confirmed,Locale locale){return sample(s,schema,table,revision,columns,count,confirmed,false,locale);}
+    public OntologyWizard.Preview sample(PoolSession s,String schema,String table,int revision,List<String> columns,int count,boolean confirmed,boolean statistics,Locale locale){synchronized(s){
         scope(s,schema);if(!confirmed)throw new Failure(400,"wizard.confirm");
         return query(s,read,()->{
             var e=entry(s,schema,table,revision);var selected=OntologyWizard.select(e,columns,confirmed,count);var assistant=s.metadata().assistant();
             if(assistant.selected()==null)throw new Failure(409,"chooseProfile");var profile=ai.profile(assistant.selected());
             var sample=OntologyWizard.sanitize(e,selected,samples.sample(e.document().source(),selected,count),Instant.now());
-            var request=assistant.prepare(schema,profile,table,OntologyWizard.payload(sample,e,json),false,locale.getLanguage(),Instant.now(),"ontology-wizard");
+            String payload=OntologyWizard.payload(sample,e,json);
+            if(statistics){
+                var safe=selected.stream().filter(c->sample.columns().stream().anyMatch(v->v.name().equals(c.name()))).toList();
+                var stats=OntologyStatistics.summarize(safe,samples.profileRows(e.document().source(),safe),Instant.now().toString());
+                payload=json.writeValueAsString(Map.of("context",json.readTree(payload),"statistics",OntologyStatistics.aiEvidence(stats),"statisticsMethod",stats.method(),"statisticsCheckedAt",stats.checkedAt(),"statisticsPolicy","Counts describe at most 1000 non-random rows, not population estimates. Additional raw values are not supplied. Never infer code meanings, uniqueness, approved rules or joins from statistics."));
+                if(payload.length()>AiAssistant.MAX_SOURCE)throw new Failure(413,"aiLimit");
+            }
+            var request=assistant.prepare(schema,profile,table,payload,false,locale.getLanguage(),Instant.now(),"ontology-wizard");
             var preview=new OntologyWizard.Preview(request.token(),sample,request);s.metadata().ontology().wizard().prepare(preview);return preview;
         });
     }}

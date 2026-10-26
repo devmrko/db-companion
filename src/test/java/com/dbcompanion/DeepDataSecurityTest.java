@@ -56,7 +56,7 @@ class DeepDataSecurityTest {
         String service=java.nio.file.Files.readString(java.nio.file.Path.of("src/main/java/com/dbcompanion/service/DeepDataSecurityService.java"));
         assertThat(service).contains("read.setReadOnly(true)","read.setTimeout(10)","finally{source.clear();}");
     }
-    @Test void fourLanguageRealTemplatesEscapeNamesAndOfferNoSecurityMutations(){
+    @Test void fourLanguageRealTemplatesEscapeNamesAndOfferSeparateReviewedManagement(){
         var resolver=new ClassLoaderTemplateResolver();resolver.setPrefix("templates/");resolver.setSuffix(".html");resolver.setCharacterEncoding("UTF-8");
         var engine=new SpringTemplateEngine();engine.setTemplateEngineMessageSource(com.dbcompanion.common.i18n.UiMessages.source());engine.setTemplateResolver(resolver);
         engine.setLinkBuilder(new org.thymeleaf.linkbuilder.StandardLinkBuilder(){@Override protected String computeContextPath(org.thymeleaf.context.IExpressionContext c,String b,java.util.Map<String,Object> p){return "";}});
@@ -64,8 +64,9 @@ class DeepDataSecurityTest {
         labels.forEach((language,label)->{
             var context=new Context(Locale.forLanguageTag(language));context.setVariable("activePage","security");context.setVariable("info",new DatabaseInfo("APP","APP","LOW","DB"));
             context.setVariable("schemas",List.of("<script>"));context.setVariable("selectedSchema","<script>");
+            context.setVariable("_csrf",Map.of("token","synthetic","headerName","X-CSRF-TOKEN"));
             String html=engine.process("deep-data-security",context);
-            assertThat(html).contains(label,"Deep Data Security","value=\"/db/security\"","data-schema").doesNotContain("??dds.","data-dds-save","th:");
+            assertThat(html).contains(label,"Deep Data Security","value=\"/db/security\"","data-schema","data-dm-role-mode","data-dm-group").doesNotContain("??dds.","??ddsManage.","data-dds-save").doesNotContainPattern("\\s+th:[a-z-]+=");
             assertThat(html).contains("&lt;script&gt;").doesNotContain("data-schema=\"<script>");
         });
     }

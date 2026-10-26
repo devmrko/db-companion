@@ -1,0 +1,1604 @@
+{
+  "sqlh.detail.parsingUser": [
+    "최초 파싱 사용자",
+    "Initial parsing user",
+    "首次解析用户",
+    "初回パースユーザー"
+  ],
+  "sqlh.detail.executions": [
+    "커서 누적 실행 횟수",
+    "Cumulative cursor executions",
+    "游标累计执行次数",
+    "カーソル累積実行回数"
+  ],
+  "sqlh.detail.elapsedTotal": [
+    "누적 DB 경과 시간 (초)",
+    "Cumulative DB elapsed time (seconds)",
+    "累计 DB 耗时（秒）",
+    "累積DB経過時間（秒）"
+  ],
+  "sqlh.detail.elapsedAverage": [
+    "누적 DB 시간 ÷ 실행 횟수 (초)",
+    "Cumulative DB time / executions (seconds)",
+    "累计 DB 耗时 ÷ 执行次数（秒）",
+    "累積DB時間 ÷ 実行回数（秒）"
+  ],
+  "sqlh.detail.cpu": [
+    "누적 CPU 시간 (초)",
+    "Cumulative CPU time (seconds)",
+    "累计 CPU 时间（秒）",
+    "累積CPU時間（秒）"
+  ],
+  "sqlh.detail.plsql": [
+    "누적 PL/SQL 시간 (초)",
+    "Cumulative PL/SQL time (seconds)",
+    "累计 PL/SQL 时间（秒）",
+    "累積PL/SQL時間（秒）"
+  ],
+  "sqlh.detail.rows": [
+    "커서 누적 처리 행 수",
+    "Cumulative cursor rows processed",
+    "游标累计处理行数",
+    "カーソル累積処理行数"
+  ],
+  "sqlh.detail.module": [
+    "최초 파싱 모듈",
+    "Module at initial parse",
+    "首次解析模块",
+    "初回パースのモジュール"
+  ],
+  "sqlh.detail.action": [
+    "최초 파싱 작업",
+    "Action at initial parse",
+    "首次解析操作",
+    "初回パースのアクション"
+  ],
+  "sqlh.detail.auditUser": [
+    "감사 기록의 실행 사용자",
+    "Executing user from audit record",
+    "审计记录的执行用户",
+    "監査記録の実行ユーザー"
+  ],
+  "sqlh.detail.mapped": [
+    "생성 SQL 근거 · Oracle SQL 매핑",
+    "Generated SQL evidence · Oracle SQL mapping",
+    "生成 SQL 依据 · Oracle SQL 映射",
+    "生成SQLの根拠 · Oracle SQLマッピング"
+  ],
+  "sqlh.detail.mappingFound": [
+    "원 SQL ID와 컨테이너가 일치하는 Oracle 변환 SQL입니다. 개별 실행별 생성 결과 목록은 아닙니다.",
+    "Oracle translations matching the original SQL ID and container. These are not per-execution generated results.",
+    "原始 SQL ID 和容器匹配的 Oracle 转换 SQL，并非每次执行的生成结果。",
+    "元のSQL IDとコンテナが一致するOracle変換SQLです。実行ごとの生成結果ではありません。"
+  ],
+  "sqlh.detail.mappingMissing": [
+    "이 SQL ID에 연결된 변환 SQL이 없습니다. 공유 SQL 원문만으로 GENERATE의 반환값을 복원할 수는 없습니다.",
+    "No mapped SQL was found for this SQL ID. Shared SQL text alone cannot reconstruct a GENERATE return value.",
+    "未找到此 SQL ID 对应的转换 SQL。仅凭共享 SQL 文本无法还原 GENERATE 返回值。",
+    "このSQL IDに対応する変換SQLはありません。共有SQLの原文だけではGENERATEの戻り値を復元できません。"
+  ],
+  "sqlh.detail.mappingUnavailable": [
+    "현재 계정에서 SQL 매핑을 조회할 수 없습니다. 생성 SQL이 없다는 뜻은 아닙니다.",
+    "This account cannot read SQL mappings. This does not mean no generated SQL exists.",
+    "当前账户无法读取 SQL 映射，这并不表示不存在生成 SQL。",
+    "現在のアカウントではSQLマッピングを参照できません。生成SQLが存在しないという意味ではありません。"
+  ],
+  "sqlh.detail.mappingUnconfirmed": [
+    "SQL 매핑을 확인하지 못했습니다. 호출 SQL과 조회된 통계만 표시합니다.",
+    "SQL mapping could not be checked. Only the call SQL and available statistics are shown.",
+    "未能确认 SQL 映射。仅显示调用 SQL 和已查询到的统计信息。",
+    "SQLマッピングを確認できませんでした。呼び出しSQLと取得済み統計のみ表示します。"
+  ],
+  "sqlh.detail.noSql": [
+    "변환 SQL 원문이 없습니다.",
+    "Mapped SQL text is unavailable.",
+    "转换 SQL 原文不可用。",
+    "変換SQLの原文がありません。"
+  ],
+  "sqlh.detail.mappingMore": [
+    "최대 10개 매핑을 표시합니다. SQL 매핑 탭에서 범위를 좁혀 확인하세요.",
+    "At most 10 mappings are shown. Narrow the search in the SQL mapping tab.",
+    "最多显示 10 条映射。请在 SQL 映射选项卡中缩小范围。",
+    "最大10件のマッピングを表示します。SQLマッピングタブで検索範囲を絞ってください。"
+  ],
+  "sqlh.detail.cacheNote": [
+    "공유 커서의 누적 통계입니다. 검색 기간이나 마지막 1회에 걸린 시간이 아닙니다. 파싱 사용자는 최초 커서 작성자이며 매 실행의 사용자 목록이 아닙니다. 시간에는 파싱·실행·인출이 포함되며 병렬 작업은 합산될 수 있습니다. GENERATE 호출 시간과 생성된 SQL의 조회 시간은 서로 다릅니다.",
+    "Shared-cursor cumulative statistics, not timings for the filter period or the last call. The parsing user originally built the cursor, not necessarily every executing user. DB time includes parse, execute and fetch; parallel workers may be summed. GENERATE call time differs from execution time of the generated SQL.",
+    "这是共享游标累计统计，并非筛选期间或最后一次调用的耗时。解析用户是最初创建游标的用户，不是每次执行的用户列表。DB 耗时包含解析、执行及提取，可能合计并行进程时间。GENERATE 调用耗时不同于生成 SQL 的查询耗时。",
+    "共有カーソルの累積統計であり、検索期間や直近1回の所要時間ではありません。パースユーザーは最初のカーソル作成者で、各実行者の一覧ではありません。DB時間はパース・実行・フェッチを含み、並列処理時間が合算される場合があります。GENERATE呼び出しと生成SQLの実行時間は異なります。"
+  ],
+  "sqlh.cache.scope": [
+    "공유 SQL은 로그인 스키마를 기본으로 검색합니다. 파싱 스키마를 비우면 조회 권한이 있는 전체 범위를 검색하므로 오래 걸릴 수 있습니다.",
+    "Shared SQL defaults to the login schema. Clearing Parsing schema searches all accessible schemas and may take longer.",
+    "共享 SQL 默认搜索登录模式。清空解析模式将搜索有权访问的全部模式，可能需要更长时间。",
+    "共有SQLはログインスキーマを初期条件にします。パーススキーマを空にすると参照可能な全スキーマを検索するため、時間がかかる場合があります。"
+  ],
+  "sqlh.cancelled": [
+    "조회 중단",
+    "Query cancelled",
+    "查询已中止",
+    "検索中断"
+  ],
+  "sqlh.detail.callSql": [
+    "호출 SQL 원문",
+    "Call SQL text",
+    "调用 SQL 原文",
+    "呼び出しSQL原文"
+  ],
+  "sqlh.detail.internal": [
+    "내부 식별자·추가 통계",
+    "Internal identifiers and additional statistics",
+    "内部标识及其他统计",
+    "内部識別子・追加統計"
+  ],
+  "sqlh.cancelled.help": [
+    "조회가 취소되었거나 제한 시간(10초)을 초과했습니다. 권한 부족을 뜻하지 않습니다. 파싱 스키마·SQL ID·기간을 좁혀 다시 검색해 주세요.",
+    "The query was cancelled or exceeded the 10-second limit. This does not indicate missing privileges. Narrow the schema, SQL ID or date range and search again.",
+    "查询已取消或超过 10 秒限制。这不表示权限不足。请缩小模式、SQL ID 或日期范围后重新搜索。",
+    "検索がキャンセルされたか、制限時間（10秒）を超えました。権限不足を意味しません。スキーマ・SQL ID・期間を絞って再検索してください。"
+  ],
+  "catalog.view.comments": [
+    "VIEW · 뷰·컬럼 코멘트의 편집과 변경 이력을 지원합니다. Annotation은 읽기 전용입니다.",
+    "VIEW · Edit view and column comments and track their changes. Annotations are read-only.",
+    "VIEW · 可编辑视图和列注释并记录更改历史。Annotation 为只读。",
+    "VIEW · ビューと列のコメントを編集し、変更履歴を記録できます。Annotation は参照のみです。"
+  ],
+  "catalog.view.comment": [
+    "뷰 코멘트",
+    "View comment",
+    "视图注释",
+    "ビューのコメント"
+  ],
+  "catalog.view.label": [
+    "뷰",
+    "View",
+    "视图",
+    "ビュー"
+  ],
+  "metadata.target.unsupported": [
+    "테이블 또는 뷰가 없거나 조회 권한이 없습니다. Synonym과 다른 객체 종류는 지원하지 않습니다.",
+    "Table or view is missing or inaccessible. Synonyms and other object types are unsupported.",
+    "表或视图不存在或无权访问。不支持同义词及其他对象类型。",
+    "テーブルまたはビューが存在しないか、参照権限がありません。Synonym と他の種類のオブジェクトは未対応です。"
+  ],
+  "metadata.view.annotationUnsupported": [
+    "뷰 Annotation 편집은 지원하지 않습니다. 뷰와 컬럼 코멘트를 편집해 주세요.",
+    "View annotation editing is unsupported. Edit view or column comments instead.",
+    "不支持编辑视图 Annotation。请编辑视图或列注释。",
+    "ビューの Annotation 編集は未対応です。ビューまたは列のコメントを編集してください。"
+  ],
+  "aitest.condition.open": [
+    "짧은 조건 확인",
+    "Confirm conditions",
+    "确认条件",
+    "条件を確認"
+  ],
+  "aitest.condition.title": [
+    "짧은 조건 확인",
+    "Confirm conditions",
+    "确认条件",
+    "条件を確認"
+  ],
+  "aitest.condition.help": [
+    "필요한 조건만 사용자가 선택·입력합니다. 앱은 날짜·게임·집계 단위 등을 추측하거나 이미 정해진 정보를 다시 묻지 않습니다.",
+    "Select and enter only the conditions you need. The app does not infer dates, business rules, or aggregation units, and does not ask again about values already decided.",
+    "仅选择并输入需要的实际条件。应用不会推测日期、业务规则或聚合单位，也不会重复询问已经确定的信息。",
+    "必要な条件だけを選択して実際の値を入力します。アプリが日付や業務規則、集計単位を推測したり、決定済みの情報を再質問したりすることはありません。"
+  ],
+  "aitest.condition.original": [
+    "원 질문",
+    "Original question",
+    "原始问题",
+    "元の質問"
+  ],
+  "aitest.condition.question": [
+    "확인 질문 (선택)",
+    "Confirmation question (optional)",
+    "确认问题（可选）",
+    "確認質問（任意）"
+  ],
+  "aitest.condition.answer": [
+    "사용자 답변 (확인 질문을 입력한 경우 필수)",
+    "User answer (required when a confirmation question is entered)",
+    "用户回答（输入确认问题时必填）",
+    "ユーザー回答（確認質問を入力した場合は必須）"
+  ],
+  "aitest.condition.items": [
+    "확정할 항목과 실제 값 (선택 항목 포함 최대 4개)",
+    "Items and actual values to confirm (up to 4 including free entries)",
+    "要确认的项目和实际值（含自由输入最多 4 项）",
+    "確認する項目と実際の値（自由入力を含め最大 4 件）"
+  ],
+  "aitest.condition.period": [
+    "기간 또는 기준 날짜",
+    "Period or reference date",
+    "期间或基准日期",
+    "期間または基準日"
+  ],
+  "aitest.condition.periodPlaceholder": [
+    "예: 2026-01-01~2026-01-31",
+    "Example: 2026-01-01~2026-01-31",
+    "示例: 2026-01-01~2026-01-31",
+    "例: 2026-01-01~2026-01-31"
+  ],
+  "aitest.condition.aggregation": [
+    "집계 단위 또는 기준",
+    "Aggregation unit or basis",
+    "聚合单位或依据",
+    "集計単位または基準"
+  ],
+  "aitest.condition.aggregationPlaceholder": [
+    "예: 일별",
+    "Example: daily",
+    "示例: 每日",
+    "例: 日次"
+  ],
+  "aitest.condition.scope": [
+    "대상 범위 또는 제외 조건",
+    "Scope or exclusion",
+    "范围或排除条件",
+    "対象範囲または除外条件"
+  ],
+  "aitest.condition.scopePlaceholder": [
+    "예: 취소 건 제외",
+    "Example: exclude cancelled items",
+    "示例: 排除已取消项目",
+    "例: 取消分を除外"
+  ],
+  "aitest.condition.ordering": [
+    "업무상 비교 또는 정렬 기준",
+    "Business comparison or ordering",
+    "业务比较或排序",
+    "業務上の比較または並び順"
+  ],
+  "aitest.condition.orderingPlaceholder": [
+    "예: 금액 내림차순",
+    "Example: amount descending",
+    "示例: 金额降序",
+    "例: 金額の降順"
+  ],
+  "aitest.condition.free": [
+    "자유 입력 확정 조건 (한 줄에 하나, 선택 항목 포함 최대 4개)",
+    "Free-form confirmed conditions (one per line; up to 4 including selected items)",
+    "自由输入的确认条件（每行一项，含选定项最多 4 项）",
+    "自由入力の確定条件（1 行に 1 件、選択項目を含め最大 4 件）"
+  ],
+  "aitest.condition.freePlaceholder": [
+    "예: 대상은 활성 계약만",
+    "Example: only active contracts",
+    "示例: 仅活动合同",
+    "例: 対象は有効な契約のみ"
+  ],
+  "aitest.condition.review": [
+    "최종 전송문 검토",
+    "Review final transmission",
+    "审阅最终传输内容",
+    "最終送信文を確認"
+  ],
+  "aitest.condition.freeItem": [
+    "자유 입력 조건 {0}",
+    "Free-form condition {0}",
+    "自由输入条件 {0}",
+    "自由入力条件 {0}"
+  ],
+  "aitest.condition.confirmed": [
+    "사용자 확정 조건",
+    "User-confirmed conditions",
+    "用户确认的条件",
+    "ユーザー確定条件"
+  ],
+  "aitest.condition.changed": [
+    "원 질문이 변경되었습니다. 조건 확인을 다시 열어 주세요.",
+    "The original question changed. Open condition confirmation again.",
+    "原始问题已变更。请重新打开条件确认。",
+    "元の質問が変更されました。条件確認をもう一度開いてください。"
+  ],
+  "aitest.condition.actualValue": [
+    "선택한 각 항목의 실제 값을 입력하고 조건은 최대 4개로 제한해 주세요.",
+    "Enter an actual value for every selected item; use at most four conditions.",
+    "请为每个选定项输入实际值，条件最多四项。",
+    "選択したすべての項目に実際の値を入力し、条件は 4 件までにしてください。"
+  ],
+  "aitest.condition.pair": [
+    "확인 질문과 사용자 답변은 함께 입력해 주세요.",
+    "Enter the confirmation question and user answer together.",
+    "请同时输入确认问题和用户回答。",
+    "確認質問とユーザー回答を一緒に入力してください。"
+  ],
+  "aitest.condition.required": [
+    "실제 값이 있는 확정 조건 또는 확인 질문·답변을 입력해 주세요.",
+    "Enter an actual confirmed value or a confirmation question and answer.",
+    "请输入有实际值的确认条件，或确认问题及回答。",
+    "実際の確定値、または確認質問と回答を入力してください。"
+  ],
+  "aitest.condition.stale": [
+    "질문·프로필 또는 조건이 변경되었습니다. 조건 확인을 다시 열어 주세요.",
+    "The question, profile, or conditions changed. Open condition confirmation again.",
+    "问题、配置文件或条件已变更。请重新打开条件确认。",
+    "質問、プロファイル、または条件が変更されました。条件確認をもう一度開いてください。"
+  ],
+  "aitest.condition.transmission": [
+    "아래 원 질문과 사용자가 확정한 조건이 제공자에게 전달됩니다. 조건 확인 자체는 AI 호출이 아니며, 다음 동의 후 SQL 생성 1회만 요청합니다.",
+    "The original question and user-confirmed conditions below will be sent to the provider. Confirmation itself makes no AI call; after consent, exactly one SQL generation request follows.",
+    "以下原始问题和用户确认条件将发送给提供方。条件确认本身不会调用 AI；同意后仅请求一次 SQL 生成。",
+    "以下の元の質問とユーザー確定条件がプロバイダーに送信されます。条件確認そのものは AI 呼び出しを行わず、同意後に SQL 生成を 1 回だけ要求します。"
+  ],
+  "aitest.comparison.note": [
+    "표시는 조회한 자료의 차이입니다. SQL 정답 여부나 실제 LLM 참고 여부를 판정하지 않습니다. SHOWPROMPT는 후속 재구성이며 과거 전송 원문이 아닙니다. 미조회·부분 조회는 같음으로 판정하지 않습니다.",
+    "This view compares data that was explicitly read. It does not judge SQL correctness or whether an LLM used it. SHOWPROMPT is a later reconstruction, not the historical request. Unread or partial data is never equal.",
+    "此视图比较已明确读取的资料，不判断 SQL 是否正确或 LLM 是否实际使用。SHOWPROMPT 是后续重构，不是历史传输原文。未读取或部分读取的资料不会判定为相同。",
+    "明示的に取得した資料の差分を表示します。SQL の正確性や LLM が実際に参照したかは判定しません。SHOWPROMPT は後続の再構成であり過去の送信原文ではありません。未取得・部分取得は同一と判定しません。"
+  ],
+  "aitest.comparison.saveResult": [
+    "{0} 결과를 문제 질문으로 저장",
+    "Save {0} result as a problem question",
+    "将 {0} 结果保存为问题",
+    "{0} の結果を問題質問として保存"
+  ],
+  "aitest.batch.plan": [
+    "준비 당시 프로필: {0}\n등록 질문 {1}건 · 최대 {1}회 SQL 생성 · 남은 질문 {2}건\n유료 호출이 발생할 수 있습니다. 생성 SQL은 자동 실행하지 않습니다. 결과는 별도 선택 저장합니다.",
+    "Prepared profile: {0}\nRegistered questions {1} · at most {1} SQL generations · remaining {2}\nPaid calls may occur. Generated SQL is not executed automatically. Save results separately by selection.",
+    "准备时的配置文件: {0}\n已登记问题 {1} 个 · 最多 {1} 次 SQL 生成 · 剩余 {2} 个\n可能产生付费调用。生成的 SQL 不会自动执行。结果需单独选择保存。",
+    "準備時のプロファイル: {0}\n登録済み質問 {1} 件・最大 {1} 回 SQL 生成・残り {2} 件\n有料呼び出しが発生する可能性があります。生成 SQL は自動実行しません。結果は別途選択保存します。"
+  ],
+  "aitest.batch.saved": [
+    "선택한 결과를 원래 문제 질문의 새 실행 기록으로 저장했습니다. 추가 AI 호출은 하지 않았습니다.",
+    "Saved the selected results as new attempts under their original problem questions. No additional AI call was made.",
+    "已将选定结果保存为原问题下的新执行记录。未进行额外 AI 调用。",
+    "選択結果を元の問題質問の新しい実行記録として保存しました。追加 AI 呼び出しはしていません。"
+  ],
+  "problemQuestion.saved": [
+    "문제 질문에 저장했습니다: {0}",
+    "Saved to problem question: {0}",
+    "已保存到问题: {0}",
+    "問題質問に保存しました: {0}"
+  ],
+  "problemQuestion.question": [
+    "질문",
+    "Question",
+    "问题",
+    "質問"
+  ],
+  "problemQuestion.status": [
+    "상태",
+    "Status",
+    "状态",
+    "状態"
+  ],
+  "problemQuestion.status.received": [
+    "접수",
+    "Received",
+    "已接收",
+    "受付"
+  ],
+  "problemQuestion.status.underReview": [
+    "검토 중",
+    "Under review",
+    "审核中",
+    "レビュー中"
+  ],
+  "problemQuestion.status.reviewed": [
+    "검토 완료",
+    "Reviewed",
+    "已审核",
+    "レビュー完了"
+  ],
+  "problemQuestion.status.onHold": [
+    "보류",
+    "On hold",
+    "暂停",
+    "保留"
+  ],
+  "problemQuestion.savedList": [
+    "저장된 문제 질문",
+    "Saved problem questions",
+    "已保存的问题",
+    "保存済み問題質問"
+  ],
+  "problemQuestion.attemptHelp": [
+    "이 기록은 현재 화면에서 사용자가 선택한 자료만 보관합니다. AI 호출이나 SQL 실행은 하지 않습니다.",
+    "This attempt retains only material selected in the current screen. It makes no AI call and executes no SQL.",
+    "此记录只保留当前页面选定的资料。不会调用 AI 或执行 SQL。",
+    "この記録には現在画面で選択した資料のみを保存します。AI 呼び出しや SQL 実行は行いません。"
+  ],
+  "problemQuestion.input": [
+    "실제 입력",
+    "Actual input",
+    "实际输入",
+    "実際の入力"
+  ],
+  "problemQuestion.conditions": [
+    "확정 조건 (선택)",
+    "Confirmed conditions (optional)",
+    "确认条件（可选）",
+    "確定条件（任意）"
+  ],
+  "problemQuestion.response": [
+    "응답 (선택)",
+    "Response (optional)",
+    "响应（可选）",
+    "応答（任意）"
+  ],
+  "problemQuestion.sql": [
+    "SQL (선택)",
+    "SQL (optional)",
+    "SQL（可选）",
+    "SQL（任意）"
+  ],
+  "problemQuestion.options": [
+    "옵션",
+    "Options",
+    "选项",
+    "オプション"
+  ],
+  "problemQuestion.prompt": [
+    "전체 PROMPT",
+    "Full PROMPT",
+    "完整 PROMPT",
+    "全体 PROMPT"
+  ],
+  "problemQuestion.metadata": [
+    "메타데이터",
+    "Metadata",
+    "元数据",
+    "メタデータ"
+  ],
+  "problemQuestion.feedback": [
+    "Feedback",
+    "Feedback",
+    "Feedback",
+    "Feedback"
+  ],
+  "problemQuestion.exportHelp": [
+    "선택한 항목만 내보냅니다. 사업 결과 행은 포함하지 않으며, 비밀값은 미리보기와 다운로드 직전에 제거합니다.",
+    "Exports selected items only. Business result rows are excluded, and secrets are removed in the preview and immediately before download.",
+    "仅导出选定项目。不包含业务结果行，并会在预览和下载前移除秘密值。",
+    "選択した項目だけを出力します。業務結果行は含めず、秘密値はプレビューとダウンロード直前に除去します。"
+  ],
+  "problemQuestion.exportQuestion": [
+    "질문·문제 설명·기대 동작",
+    "Question, problem description, and expected behavior",
+    "问题、问题说明和预期行为",
+    "質問・問題説明・期待動作"
+  ],
+  "problemQuestion.download": [
+    "다운로드",
+    "Download",
+    "下载",
+    "ダウンロード"
+  ],
+  "aitest.batch.title": [
+    "등록 질문 일괄 SQL 생성",
+    "Batch SQL generation for registered questions",
+    "已登记问题的批量 SQL 生成",
+    "登録済み質問の一括 SQL 生成"
+  ],
+  "aitest.batch.help": [
+    "위 목록에서 질문을 선택한 뒤 한 프로필로 순차 생성합니다. 생성 SQL을 자동 실행하거나 모든 결과를 자동 저장하지 않습니다.",
+    "Select questions above and generate sequentially with one profile. Generated SQL is not executed automatically and results are not all saved automatically.",
+    "从上方选择问题并使用一个配置文件顺序生成。不会自动执行生成的 SQL，也不会自动保存所有结果。",
+    "上の質問を選択し、一つのプロファイルで順次生成します。生成 SQL の自動実行や全結果の自動保存はしません。"
+  ],
+  "aitest.batch.selectionInitial": [
+    "선택 질문 0 / 최대 20",
+    "Selected questions 0 / maximum 20",
+    "已选问题 0 / 最多 20",
+    "選択質問 0 / 最大 20"
+  ],
+  "aitest.batch.loadProfiles": [
+    "프로필 목록 읽기",
+    "Read profile list",
+    "读取配置文件列表",
+    "プロファイル一覧を取得"
+  ],
+  "aitest.batch.profile": [
+    "사용할 프로필",
+    "Profile to use",
+    "使用的配置文件",
+    "使用するプロファイル"
+  ],
+  "aitest.batch.prepare": [
+    "전송 계획 확인",
+    "Review transmission plan",
+    "确认传输计划",
+    "送信計画を確認"
+  ],
+  "aitest.batch.restore": [
+    "세션 계획 다시 조회",
+    "Reload session plan",
+    "重新读取会话计划",
+    "セッション計画を再取得"
+  ],
+  "aitest.batch.consent": [
+    "표시된 질문·프로필·호출 수와 외부 전송·사용량 발생에 동의합니다.",
+    "I consent to the displayed questions, profile, call count, external transmission, and possible usage charges.",
+    "我同意显示的问题、配置文件、调用次数、外部传输和可能产生的使用量。",
+    "表示された質問・プロファイル・呼び出し回数、外部送信、および使用量発生に同意します。"
+  ],
+  "aitest.batch.run": [
+    "순차 SQL 생성 시작",
+    "Start sequential SQL generation",
+    "开始顺序 SQL 生成",
+    "順次 SQL 生成を開始"
+  ],
+  "aitest.batch.cancel": [
+    "남은 항목 취소",
+    "Cancel remaining items",
+    "取消剩余项目",
+    "残り項目を取り消す"
+  ],
+  "aitest.batch.saveConsent": [
+    "선택한 결과를 원래 문제 질문의 새 실행 기록으로 저장합니다.",
+    "Save selected results as new attempts under their original problem questions.",
+    "将选定结果保存为原问题下的新执行记录。",
+    "選択結果を元の問題質問の新しい実行記録として保存します。"
+  ],
+  "aitest.batch.save": [
+    "선택 결과 저장",
+    "Save selected results",
+    "保存选定结果",
+    "選択結果を保存"
+  ],
+  "aitest.comparison.title": [
+    "프로필 A/B SQL 비교",
+    "Profile A/B SQL comparison",
+    "配置文件 A/B SQL 比较",
+    "プロファイル A/B SQL 比較"
+  ],
+  "aitest.comparison.help": [
+    "기본 SQL 생성은 프로필별 1회씩, 총 2회입니다. 참고정보와 SHOWPROMPT는 아래에서 명시적으로 요청합니다.",
+    "Base SQL generation makes one call per profile, two total. Read reference data and SHOWPROMPT explicitly below.",
+    "基础 SQL 生成每个配置文件一次，共两次。请在下方明确请求参考资料和 SHOWPROMPT。",
+    "基本 SQL 生成は各プロファイル 1 回、合計 2 回です。参照情報と SHOWPROMPT は下で明示的に要求します。"
+  ],
+  "aitest.comparison.profileA": [
+    "프로필 A",
+    "Profile A",
+    "配置文件 A",
+    "プロファイル A"
+  ],
+  "aitest.comparison.profileB": [
+    "프로필 B",
+    "Profile B",
+    "配置文件 B",
+    "プロファイル B"
+  ],
+  "aitest.comparison.preview": [
+    "전송 계획 보기",
+    "Review transmission plan",
+    "审阅传输计划",
+    "送信計画を確認"
+  ],
+  "aitest.comparison.inspectionA": [
+    "프로필 A 참고정보 조회",
+    "Read Profile A reference data",
+    "读取配置文件 A 的参考资料",
+    "プロファイル A の参照情報を取得"
+  ],
+  "aitest.comparison.inspectionB": [
+    "프로필 B 참고정보 조회",
+    "Read Profile B reference data",
+    "读取配置文件 B 的参考资料",
+    "プロファイル B の参照情報を取得"
+  ],
+  "aitest.comparison.showpromptPreview": [
+    "SHOWPROMPT 2회 계획 보기",
+    "Review two SHOWPROMPT calls",
+    "审阅两次 SHOWPROMPT 计划",
+    "SHOWPROMPT 2 回の計画を確認"
+  ],
+  "aitest.comparison.aiPreview": [
+    "AI 비교 미리보기",
+    "Preview AI comparison",
+    "预览 AI 比较",
+    "AI 比較をプレビュー"
+  ],
+  "aitest.comparison.generateTitle": [
+    "A/B SQL 생성 확인",
+    "Confirm A/B SQL generation",
+    "确认 A/B SQL 生成",
+    "A/B SQL 生成の確認"
+  ],
+  "aitest.comparison.generateConsent": [
+    "각 프로필에 대한 외부 전송과 API 사용량을 확인했습니다.",
+    "I acknowledge external transmission and API usage for each profile.",
+    "我确认每个配置文件的外部传输和 API 使用量。",
+    "各プロファイルへの外部送信と API 使用量を確認しました。"
+  ],
+  "aitest.comparison.generateA": [
+    "프로필 A 생성",
+    "Generate Profile A",
+    "生成配置文件 A",
+    "プロファイル A を生成"
+  ],
+  "aitest.comparison.generateB": [
+    "프로필 B 생성",
+    "Generate Profile B",
+    "生成配置文件 B",
+    "プロファイル B を生成"
+  ],
+  "aitest.comparison.showpromptTitle": [
+    "A/B SHOWPROMPT 확인",
+    "Confirm A/B SHOWPROMPT",
+    "确认 A/B SHOWPROMPT",
+    "A/B SHOWPROMPT の確認"
+  ],
+  "aitest.comparison.showpromptHelp": [
+    "프로필별 SHOWPROMPT 추가 호출 2회입니다. SQL은 실행하지 않습니다.",
+    "This adds two SHOWPROMPT calls, one per profile. SQL is not executed.",
+    "每个配置文件增加一次 SHOWPROMPT 调用，共两次。不会执行 SQL。",
+    "プロファイルごとに SHOWPROMPT を 1 回、合計 2 回追加呼び出しします。SQL は実行しません。"
+  ],
+  "aitest.comparison.showpromptConsent": [
+    "외부 전송과 API 사용량을 확인했습니다.",
+    "I acknowledge external transmission and API usage.",
+    "我确认外部传输和 API 使用量。",
+    "外部送信と API 使用量を確認しました。"
+  ],
+  "aitest.comparison.showpromptA": [
+    "프로필 A SHOWPROMPT",
+    "Profile A SHOWPROMPT",
+    "配置文件 A SHOWPROMPT",
+    "プロファイル A SHOWPROMPT"
+  ],
+  "aitest.comparison.showpromptB": [
+    "프로필 B SHOWPROMPT",
+    "Profile B SHOWPROMPT",
+    "配置文件 B SHOWPROMPT",
+    "プロファイル B SHOWPROMPT"
+  ],
+  "aitest.comparison.aiTitle": [
+    "AI 비교 확인",
+    "Confirm AI comparison",
+    "确认 AI 比较",
+    "AI 比較の確認"
+  ],
+  "aitest.comparison.aiHelp": [
+    "추가 AI 비교 호출 1회입니다. SQL 실행·Feedback·프로필 변경은 하지 않습니다.",
+    "This makes one additional AI comparison call. It does not execute SQL or change Feedback or the profile.",
+    "额外 AI 比较调用一次。不会执行 SQL，也不会变更 Feedback 或配置文件。",
+    "追加 AI 比較呼び出しは 1 回です。SQL 実行、Feedback、プロファイル変更は行いません。"
+  ],
+  "aitest.comparison.aiTime": [
+    "시간",
+    "Time",
+    "时间",
+    "時間"
+  ],
+  "aitest.comparison.aiConsent": [
+    "외부 전송과 추가 API 사용량을 확인했습니다.",
+    "I acknowledge external transmission and additional API usage.",
+    "我确认外部传输和额外 API 使用量。",
+    "外部送信と追加 API 使用量を確認しました。"
+  ],
+  "aitest.comparison.aiRun": [
+    "AI 비교 요청",
+    "Request AI comparison",
+    "请求 AI 比较",
+    "AI 比較を要求"
+  ],
+  "problemQuestion.saveState": [
+    "상태·보존 저장",
+    "Save status and retention",
+    "保存状态和保留设置",
+    "状態・保持を保存"
+  ],
+  "problemQuestion.retained": [
+    "보존",
+    "Retained",
+    "保留",
+    "保持"
+  ],
+  "problemQuestion.attemptCount": [
+    "{0} · {1} attempts",
+    "{0} · {1} attempts",
+    "{0} · {1} 条执行记录",
+    "{0} · 実行記録 {1} 件"
+  ],
+  "problemQuestion.pickCompare": [
+    "비교할 실행 기록 선택",
+    "Select attempt to compare",
+    "选择要比较的执行记录",
+    "比較する実行記録を選択"
+  ],
+  "problemQuestion.profileMissing": [
+    "기록된 프로필 없음",
+    "profile not recorded",
+    "未记录配置文件",
+    "記録済みプロファイルなし"
+  ],
+  "problemQuestion.timeUnknown": [
+    "조회 시각 미확인",
+    "read time unknown",
+    "读取时间未知",
+    "取得時刻未確認"
+  ],
+  "problemQuestion.empty": [
+    "저장된 문제 질문이 없습니다.",
+    "There are no saved problem questions.",
+    "没有已保存的问题。",
+    "保存済み問題質問はありません。"
+  ],
+  "problemQuestion.batchPick": [
+    "일괄 테스트 질문 선택: {0}",
+    "Select question for batch test: {0}",
+    "选择批量测试问题: {0}",
+    "一括テスト質問を選択: {0}"
+  ],
+  "problemQuestion.created": [
+    "저장했습니다: {0}",
+    "Saved: {0}",
+    "已保存: {0}",
+    "保存しました: {0}"
+  ],
+  "problemQuestion.attemptSaved": [
+    "실행 기록을 저장했습니다.",
+    "Attempt saved.",
+    "已保存执行记录。",
+    "実行記録を保存しました。"
+  ],
+  "problemQuestion.exportSelect": [
+    "내보낼 실행 기록을 선택해 주세요.",
+    "Select attempts to export.",
+    "请选择要导出的执行记录。",
+    "出力する実行記録を選択してください。"
+  ],
+  "problemQuestion.compareSelect": [
+    "비교할 실행 기록 두 건을 선택해 주세요.",
+    "Select exactly two attempts to compare.",
+    "请选择恰好两条执行记录进行比较。",
+    "比較する実行記録を 2 件選択してください。"
+  ],
+  "aitest.comparison.evidenceUnsupported": [
+    "온톨로지 근거 비교는 A/B에서 아직 지원하지 않습니다. 근거 사용을 해제하거나 단일 테스트를 사용해 주세요.",
+    "Ontology-evidence comparison is not supported for A/B yet. Turn off evidence or use the single test.",
+    "A/B 比较暂不支持本体证据。请关闭证据或使用单项测试。",
+    "オントロジー根拠の A/B 比較はまだ対応していません。根拠の使用を解除するか、単体テストを使用してください。"
+  ],
+  "aitest.comparison.plan": [
+    "기본 SQL 생성 {0}회 · SHOWPROMPT {1}회 · AI 비교 {2}회",
+    "Base SQL generation {0} calls · SHOWPROMPT {1} calls · AI comparison {2} calls",
+    "基础 SQL 生成 {0} 次 · SHOWPROMPT {1} 次 · AI 比较 {2} 次",
+    "基本 SQL 生成 {0} 回 · SHOWPROMPT {1} 回 · AI 比較 {2} 回"
+  ],
+  "aitest.comparison.differencesOnly": [
+    "차이·미확인 항목만 보기",
+    "Show differences and unconfirmed items only",
+    "仅显示差异和未确认项",
+    "差分・未確認項目のみ表示"
+  ],
+  "aitest.comparison.inspection": [
+    "{0} 참고정보 추가 조회",
+    "Read additional inspection data for {0}",
+    "读取 {0} 的附加参考信息",
+    "{0} の追加参照情報を取得"
+  ],
+  "aitest.comparison.profile": [
+    "프로필·모델",
+    "Profile and model",
+    "配置文件和模型",
+    "プロファイル・モデル"
+  ],
+  "aitest.comparison.sql": [
+    "생성 SQL",
+    "Generated SQL",
+    "生成的 SQL",
+    "生成 SQL"
+  ],
+  "aitest.comparison.error": [
+    "오류",
+    "Error",
+    "错误",
+    "エラー"
+  ],
+  "aitest.comparison.time": [
+    "소요 시간 (ms)",
+    "Elapsed time (ms)",
+    "耗时 (ms)",
+    "所要時間 (ms)"
+  ],
+  "aitest.comparison.options": [
+    "프로필 옵션",
+    "Profile options",
+    "配置文件选项",
+    "プロファイル設定"
+  ],
+  "aitest.comparison.metadata": [
+    "테이블·컬럼·Annotation",
+    "Tables, columns, and annotations",
+    "表、列和注释",
+    "テーブル・列・Annotation"
+  ],
+  "aitest.comparison.feedback": [
+    "Feedback 질문·SQL·설명",
+    "Feedback question, SQL, and description",
+    "Feedback 问题、SQL 和说明",
+    "Feedback 質問・SQL・説明"
+  ],
+  "aitest.comparison.prompt": [
+    "재구성 SHOWPROMPT",
+    "Reconstructed SHOWPROMPT",
+    "重构的 SHOWPROMPT",
+    "再構成 SHOWPROMPT"
+  ],
+  "aitest.comparison.empty": [
+    "확보된 비교 자료에 차이가 없습니다. 결과의 정합성을 보증하지 않습니다.",
+    "The observed comparison data has no differences. This does not guarantee result correctness.",
+    "已获取的比较资料没有差异。这不保证结果正确。",
+    "取得済み比較資料に差分はありません。結果の正しさは保証しません。"
+  ],
+  "aitest.comparison.same": [
+    "조회값 같음",
+    "Observed values match",
+    "读取值相同",
+    "取得値は同じ"
+  ],
+  "aitest.comparison.different": [
+    "차이 또는 미확인",
+    "Different or unconfirmed",
+    "不同或未确认",
+    "差分または未確認"
+  ],
+  "aitest.comparison.observed": [
+    "조회/요청",
+    "Read/requested",
+    "读取/请求",
+    "取得/要求"
+  ],
+  "aitest.comparison.unconfirmed": [
+    "미확인",
+    "Unconfirmed",
+    "未确认",
+    "未確認"
+  ],
+  "aitest.comparison.noData": [
+    "자료 없음",
+    "No data",
+    "无资料",
+    "資料なし"
+  ],
+  "aitest.batch.profileUnknown": [
+    "준비 당시 프로필 정보 미확인",
+    "Prepared profile information is unavailable",
+    "无法确认准备时的配置文件信息",
+    "準備時のプロファイル情報を確認できません"
+  ],
+  "aitest.batch.consentRequired": [
+    "전송 동의가 필요합니다.",
+    "Transmission consent is required.",
+    "需要传输同意。",
+    "送信への同意が必要です。"
+  ],
+  "aitest.batch.planInvalid": [
+    "실행 계획을 확인해 주세요.",
+    "Check the run plan.",
+    "请检查执行计划。",
+    "実行計画を確認してください。"
+  ],
+  "aitest.batch.responseMismatch": [
+    "응답과 실행 계획이 다릅니다. 자동 재시도하지 않습니다.",
+    "The response does not match the run plan. It was not retried automatically.",
+    "响应与执行计划不一致。未自动重试。",
+    "応答と実行計画が一致しません。自動再試行はしません。"
+  ],
+  "aitest.batch.planChanged": [
+    "실행 계획이 변경되었습니다. 자동 재시도하지 않습니다.",
+    "The run plan changed. It was not retried automatically.",
+    "执行计划已变更。未自动重试。",
+    "実行計画が変更されました。自動再試行はしません。"
+  ],
+  "aitest.batch.selection": [
+    "선택 질문 {0} / 최대 20",
+    "Selected questions {0} / maximum 20",
+    "已选问题 {0} / 最多 20",
+    "選択した質問 {0} / 最大 20"
+  ],
+  "aitest.batch.noPlan": [
+    "아직 실행 계획이 없습니다.",
+    "There is no run plan yet.",
+    "尚无执行计划。",
+    "実行計画はまだありません。"
+  ],
+  "aitest.batch.pickSave": [
+    "이 결과를 저장 대상으로 선택",
+    "Select this result to save",
+    "选择此结果进行保存",
+    "この結果を保存対象として選択"
+  ],
+  "aitest.batch.maximum": [
+    "최대 20개 질문을 선택해 주세요.",
+    "Select at most 20 questions.",
+    "最多选择 20 个问题。",
+    "質問は最大 20 件まで選択してください。"
+  ],
+  "aitest.batch.profileChanged": [
+    "프로필이 변경되어 기존 실행 계획과 동의를 무효화했습니다. 다시 준비해 주세요.",
+    "The profile changed, so the existing plan and consent were invalidated. Prepare again.",
+    "配置文件已变更，现有计划和同意已失效。请重新准备。",
+    "プロファイルが変更されたため既存の実行計画と同意を無効にしました。もう一度準備してください。"
+  ],
+  "aitest.batch.profilesLoaded": [
+    "프로필 목록을 읽었습니다. AI 호출은 하지 않았습니다.",
+    "Profile list read. No AI call was made.",
+    "已读取配置文件列表。未调用 AI。",
+    "プロファイル一覧を取得しました。AI 呼び出しは行っていません。"
+  ],
+  "aitest.batch.prepareReady": [
+    "아래 질문과 호출 수를 확인한 뒤 전송에 동의해 주세요.",
+    "Review the questions and call count, then consent to transmission.",
+    "请确认问题和调用次数，然后同意传输。",
+    "質問と呼び出し回数を確認してから送信に同意してください。"
+  ],
+  "aitest.batch.restored": [
+    "현재 로그인 세션의 계획입니다. 새 AI 호출은 하지 않았습니다.",
+    "This is the current login-session plan. No new AI call was made.",
+    "这是当前登录会话的计划。未进行新的 AI 调用。",
+    "現在のログインセッションの計画です。新しい AI 呼び出しは行っていません。"
+  ],
+  "aitest.batch.noSessionPlan": [
+    "이 세션에 실행 계획이 없습니다.",
+    "There is no run plan in this session.",
+    "此会话中没有执行计划。",
+    "このセッションに実行計画はありません。"
+  ],
+  "aitest.batch.stopped": [
+    "남은 항목 처리를 중단했습니다. 이미 전송한 호출은 결과 확인이 필요합니다.",
+    "Stopped processing remaining items. Already sent calls still need result confirmation.",
+    "已停止处理未开始的项目。已发送的调用仍需确认结果。",
+    "未実行項目の処理を停止しました。送信済みの呼び出しは結果確認が必要です。"
+  ],
+  "aitest.batch.finished": [
+    "계획의 순차 처리를 마쳤습니다. 실패 항목은 자동 재시도하지 않았습니다.",
+    "Finished sequential processing. Failed items were not retried automatically.",
+    "已完成顺序处理。失败项目未自动重试。",
+    "順次処理を完了しました。失敗項目は自動再試行していません。"
+  ],
+  "aitest.batch.noRetryCheck": [
+    "자동 재시도하지 않았습니다. 세션 계획을 다시 조회해 상태를 확인해 주세요.",
+    "It was not retried automatically. Re-read the session plan to check status.",
+    "未自动重试。请重新读取会话计划以确认状态。",
+    "自動再試行していません。セッション計画を再取得して状態を確認してください。"
+  ],
+  "aitest.batch.cancelUnknown": [
+    "취소 후 상태를 확인하지 못했습니다. 세션 계획을 다시 조회해 주세요.",
+    "Could not confirm state after cancellation. Re-read the session plan.",
+    "取消后无法确认状态。请重新读取会话计划。",
+    "取消後の状態を確認できませんでした。セッション計画を再取得してください。"
+  ],
+  "aitest.batch.cancelled": [
+    "미실행 항목을 취소했습니다. 진행 중인 외부 호출은 취소됐다고 단정하지 않습니다.",
+    "Cancelled unstarted items. A call already in progress is not assumed cancelled.",
+    "已取消未开始的项目。不能断定正在进行的调用已经取消。",
+    "未実行項目を取り消しました。進行中の呼び出しが取り消されたとは断定しません。"
+  ],
+  "aitest.batch.screenStopped": [
+    "화면에서 다음 전송은 중단했습니다.",
+    "Further transmissions were stopped in this screen.",
+    "已在此页面停止后续传输。",
+    "この画面で以降の送信を停止しました。"
+  ],
+  "aitest.batch.saveUnknown": [
+    "저장 여부를 문제 질문 상세에서 확인해 주세요. 자동 재전송하지 않습니다.",
+    "Check the problem-question detail to confirm the save. It was not resent automatically.",
+    "请在问题详情中确认保存状态。未自动重发。",
+    "問題質問の詳細で保存状態を確認してください。自動再送信はしていません。"
+  ],
+  "problemQuestion.new": [
+    "새 문제 질문",
+    "New problem question",
+    "新问题",
+    "新しい問題質問"
+  ],
+  "problemQuestion.more": [
+    "이전 문제 질문 더 보기",
+    "Show earlier problem questions",
+    "显示更早的问题",
+    "以前の問題質問をさらに表示"
+  ],
+  "ontology.glossary.title": [
+    "승인 업무 용어 검색",
+    "Approved business glossary search",
+    "已批准业务术语搜索",
+    "承認済み業務用語検索"
+  ],
+  "ontology.glossary.help": [
+    "정확·등록 별칭 검색과 Oracle Text 검색은 별도 모드입니다. 원본 테이블 설명과 승인 정의를 혼동하지 마세요.",
+    "Exact/registered-alias and Oracle Text searches are separate modes. Do not confuse source-table descriptions with approved definitions.",
+    "精确/已登记别名搜索与 Oracle Text 搜索是独立模式。请勿混淆源表说明与已批准定义。",
+    "完全一致・登録済み別名検索と Oracle Text 検索は別モードです。元テーブルの説明と承認済み定義を混同しないでください。"
+  ],
+  "ontology.glossary.preview": [
+    "승인 정의 전송 미리보기",
+    "Reviewed definition transmission preview",
+    "已审核定义传输预览",
+    "承認済み定義の送信プレビュー"
+  ],
+  "ontology.glossary.consent": [
+    "검토한 승인 정의와 원 질문을 AI에 1회 전송하는 데 동의합니다.",
+    "I consent to send the reviewed approved definitions and original question to AI once.",
+    "我同意将已审核的批准定义和原始问题向 AI 发送一次。",
+    "確認済みの承認定義と元の質問を AI に1回送信することに同意します。"
+  ],
+  "ontology.glossary.oneSql": [
+    "SQL 생성은 1회만 요청하며 생성 SQL은 실행하지 않습니다.",
+    "SQL generation is requested once; generated SQL is not executed.",
+    "SQL 生成仅请求一次；不会执行生成的 SQL。",
+    "SQL 生成は1回だけ要求し、生成された SQL は実行しません。"
+  ],
+  "ontology.glossary.mode": [
+    "용어 검색 모드",
+    "Glossary search mode",
+    "术语搜索模式",
+    "用語検索モード"
+  ],
+  "ontology.glossary.exact": [
+    "정확·등록 별칭",
+    "Exact / registered alias",
+    "精确 / 已登记别名",
+    "完全一致・登録済み別名"
+  ],
+  "ontology.glossary.text": [
+    "Oracle Text (읽기 전용)",
+    "Oracle Text (read-only)",
+    "Oracle Text（只读）",
+    "Oracle Text（読み取り専用）"
+  ],
+  "ontology.glossary.scope": [
+    "승인된 테이블 범위",
+    "Approved table scope",
+    "已批准表范围",
+    "承認済みテーブル範囲"
+  ],
+  "ontology.glossary.searchPlaceholder": [
+    "질문 또는 업무 용어",
+    "Question or business term",
+    "问题或业务术语",
+    "質問または業務用語"
+  ],
+  "ontology.glossary.profilePlaceholder": [
+    "요청 profile",
+    "Requested profile",
+    "请求的 profile",
+    "要求プロファイル"
+  ],
+  "ontology.glossary.profile": [
+    "요청 프로필 (Oracle Text·AI)",
+    "Request profile (Oracle Text / AI)",
+    "请求配置文件（Oracle Text / AI）",
+    "要求プロファイル（Oracle Text / AI）"
+  ],
+  "ontology.glossary.scopeHint": [
+    "승인된 정의가 있는 테이블만 표시됩니다. 목록이 비어 있으면 먼저 정의를 승인해 주세요. Ctrl 또는 ⌘ 키로 여러 개를 선택할 수 있습니다.",
+    "Only tables with approved definitions are listed. If the list is empty, approve a definition first. Hold Ctrl or ⌘ to select multiple tables.",
+    "仅列出具有已批准定义的表。若列表为空，请先批准定义。按住 Ctrl 或 ⌘ 键可选择多个表。",
+    "承認済み定義のあるテーブルのみ表示します。空の場合は先に定義を承認してください。Ctrl または ⌘ キーで複数選択できます。"
+  ],
+  "ontology.glossary.profileHint": [
+    "정확·별칭 검색에는 선택 사항이며, Oracle Text 검색과 AI 생성에는 필요합니다.",
+    "Optional for exact/alias search; required for Oracle Text search and AI generation.",
+    "精确匹配/别名搜索可不填写；Oracle Text 搜索和 AI 生成需要此项。",
+    "完全一致・別名検索では任意です。Oracle Text 検索と AI 生成には必要です。"
+  ],
+  "ontology.glossary.contextHint": [
+    "검색 결과에서 승인 정의를 선택한 뒤 원 질문과 요청 프로필을 입력하세요. 전송 내용 확인과 동의 후에만 AI를 호출합니다.",
+    "Select approved definitions from the results, then enter the original question and request profile. AI is called only after reviewing the payload and consenting.",
+    "从搜索结果中选择已批准的定义，然后输入原始问题和请求配置文件。仅在审阅发送内容并同意后调用 AI。",
+    "検索結果から承認済み定義を選択し、元の質問と要求プロファイルを入力してください。送信内容の確認と同意後にのみ AI を呼び出します。"
+  ],
+  "ontology.glossary.admin": [
+    "Oracle Text 관리",
+    "Oracle Text administration",
+    "Oracle Text 管理",
+    "Oracle Text 管理"
+  ],
+  "ontology.glossary.adminHint": [
+    "일반 검색과 별도 작업입니다. 설치·동기화는 선택한 테이블과 프로필을 사용하며, 미리보기 후 별도 확인을 거쳐 DB에 반영합니다.",
+    "Separate from ordinary search. Installation and synchronization use the selected tables and profile, and write to the database only after preview and a separate confirmation.",
+    "与普通搜索分开。安装和同步使用所选表及配置文件，仅在预览并单独确认后写入数据库。",
+    "通常の検索とは別の操作です。インストール・同期には選択したテーブルとプロファイルを使用し、プレビューと別途確認後に DB に反映します。"
+  ],
+  "ontology.glossary.search": [
+    "검색",
+    "Search",
+    "搜索",
+    "検索"
+  ],
+  "ontology.glossary.guide": [
+    "Oracle Text 설치 안내",
+    "Oracle Text installation guide",
+    "Oracle Text 安装说明",
+    "Oracle Text インストール案内"
+  ],
+  "ontology.glossary.installPreview": [
+    "Text 설치 미리보기",
+    "Text installation preview",
+    "Text 安装预览",
+    "Text インストールのプレビュー"
+  ],
+  "ontology.glossary.syncPreview": [
+    "승인 용어 동기화 미리보기",
+    "Approved term sync preview",
+    "已批准术语同步预览",
+    "承認済み用語同期のプレビュー"
+  ],
+  "ontology.glossary.originalQuestion": [
+    "AI에 전달할 원 질문",
+    "Original question sent to AI",
+    "发送到 AI 的原始问题",
+    "AI に送信する元の質問"
+  ],
+  "ontology.drift": [
+    "메타데이터 변경 확인",
+    "Review metadata changes",
+    "检查元数据变更",
+    "メタデータ変更の確認"
+  ],
+  "profilePreflight.stale": [
+    "변경됨",
+    "Changed",
+    "已变更",
+    "変更済み"
+  ],
+  "profilePreflight.tone.GREEN": [
+    "확인됨",
+    "Checked",
+    "已检查",
+    "確認済み"
+  ],
+  "profilePreflight.tone.YELLOW": [
+    "확인 필요",
+    "Review needed",
+    "需要复核",
+    "確認が必要"
+  ],
+  "profilePreflight.tone.RED": [
+    "문제",
+    "Problem",
+    "问题",
+    "問題"
+  ],
+  "profilePreflight.tone.GREY": [
+    "미확인",
+    "Unknown",
+    "未知",
+    "不明"
+  ],
+  "sqlHelp.open": [
+    "SQL 도움말",
+    "SQL / PLSQL help",
+    "SQL / PLSQL 帮助",
+    "SQL / PLSQL ヘルプ"
+  ],
+  "sqlHelp.title": [
+    "SQL / PLSQL 도움말",
+    "SQL / PLSQL help",
+    "SQL / PLSQL 帮助",
+    "SQL / PLSQL ヘルプ"
+  ],
+  "sqlHelp.close": [
+    "닫기",
+    "Close",
+    "关闭",
+    "閉じる"
+  ],
+  "sqlHelp.purpose": [
+    "목적",
+    "Purpose",
+    "目的",
+    "目的"
+  ],
+  "sqlHelp.sql": [
+    "SQL·PLSQL",
+    "SQL / PLSQL",
+    "SQL·PLSQL",
+    "SQL・PLSQL"
+  ],
+  "sqlHelp.copy": [
+    "SQL 복사",
+    "Copy SQL",
+    "复制 SQL",
+    "SQL をコピー"
+  ],
+  "sqlHelp.variables": [
+    "변수",
+    "Variables",
+    "变量",
+    "変数"
+  ],
+  "sqlHelp.permission": [
+    "권한·실행 주체",
+    "Permission and actor",
+    "权限和执行主体",
+    "権限・実行主体"
+  ],
+  "sqlHelp.effects": [
+    "읽기·쓰기·외부 호출·비용",
+    "Reads, writes, external calls, and cost",
+    "读取、写入、外部调用和费用",
+    "読み取り・書き込み・外部呼び出し・費用"
+  ],
+  "sqlHelp.result": [
+    "결과 확인",
+    "Verify result",
+    "确认结果",
+    "結果の確認"
+  ],
+  "sqlHelp.doc": [
+    "Oracle 공식 문서",
+    "Official Oracle documentation",
+    "Oracle 官方文档",
+    "Oracle 公式ドキュメント"
+  ],
+  "ontology.drift.helpButton": [
+    "메타데이터 변경 확인 SQL ?",
+    "Metadata change SQL help",
+    "元数据变更 SQL 帮助",
+    "メタデータ変更のSQLヘルプ"
+  ],
+  "aitest.readyBusy": [
+    "요청 처리 중입니다.",
+    "A request is in progress.",
+    "正在处理请求。",
+    "リクエストを処理しています。"
+  ],
+  "aitest.readyProfile": [
+    "상단의 테스트 프로필을 선택해 주세요. A/B 프로필 선택과는 별개입니다.",
+    "Select the main test profile above. The A/B profile selection is separate.",
+    "请选择上方的测试配置文件。此选择与 A/B 配置文件独立。",
+    "上部のテストプロファイルを選択してください。A/B のプロファイル選択とは別です。"
+  ],
+  "aitest.readyQuestion": [
+    "질문을 입력해 주세요 (최대 16,000자).",
+    "Enter a question (up to 16,000 characters).",
+    "请输入问题（最多 16,000 个字符）。",
+    "質問を入力してください（最大16,000文字）。"
+  ],
+  "aitest.readyGlossary": [
+    "업무 용어 사전: 현재 질문·프로필로 검색해 주세요. 검색된 정의는 자동 첨부됩니다. 한도 초과 시 질문 범위를 좁혀 주세요.",
+    "Business glossary: search to attach matching definitions automatically. Narrow the question if the limit is exceeded.",
+    "业务术语词典：搜索后自动附加匹配定义。超出上限时请缩小问题范围。",
+    "業務用語辞書：検索すると一致した定義が自動添付されます。上限超過時は質問範囲を絞ってください。"
+  ],
+  "aitest.readyOntology": [
+    "온톨로지: RDF 근거를 찾아 선택·적용해 주세요. 사용하지 않으면 체크를 해제하세요.",
+    "Ontology: find, select and apply RDF evidence, or disable this option.",
+    "本体：查找、选择并应用 RDF 依据，或取消此选项。",
+    "オントロジー：RDF根拠を検索・選択・適用するか、このオプションを解除してください。"
+  ],
+  "aitest.evDefinitionsTitle": [
+    "승인 정의 직접 선택 · 관계 불필요",
+    "Select approved definitions · no relationship required",
+    "直接选择已批准定义 · 无需关系",
+    "承認済み定義を直接選択 · 関係は不要"
+  ],
+  "aitest.evDefinitionsHelp": [
+    "검색에 일치한 승인 정의는 자동 첨부됩니다. 필요하면 직접 선택·적용할 수 있습니다. 조인 관계는 추정하지 않으며 최대 10개입니다.",
+    "Matching approved definitions are attached automatically. Manual selection is available. No joins are inferred; maximum 10 tables.",
+    "匹配的已批准定义将自动附加，也可手动选择。不推断连接关系，最多10个表。",
+    "一致した承認済み定義は自動添付されます。手動選択も可能です。結合関係は推測しません。最大10件です。"
+  ],
+  "aitest.evDefinitionsApply": [
+    "선택 정의 적용",
+    "Apply selected definitions",
+    "应用所选定义",
+    "選択した定義を適用"
+  ],
+  "aitest.evDefinitionMatch": [
+    "검색 일치: {0}",
+    "Search match: {0}",
+    "搜索匹配：{0}",
+    "検索一致：{0}"
+  ],
+  "aitest.evDefinitionsLimit": [
+    "정의는 최대 10개까지 선택할 수 있습니다.",
+    "Select at most 10 definitions.",
+    "最多选择 10 个定义。",
+    "定義は最大10件まで選択できます。"
+  ],
+  "aitest.evDefinitionsEmpty": [
+    "선택할 승인 정의가 없습니다. 온톨로지 관리에서 정의를 승인해 주세요.",
+    "No approved definitions are available. Approve definitions in ontology management first.",
+    "没有可选的已批准定义。请先在本体管理中批准定义。",
+    "選択できる承認済み定義がありません。オントロジー管理で定義を承認してください。"
+  ],
+  "aitest.evChooseDefinitionHint": [
+    "근거 찾기를 누르면 일치한 승인 정의가 자동 첨부됩니다. 필요하면 직접 선택하거나 관계 경로를 지정할 수 있습니다.",
+    "Find evidence to attach matching approved definitions automatically. Manual definition or path selection is also available.",
+    "查找证据可自动附加匹配的已批准定义，也可手动选择定义或关系路径。",
+    "根拠を検索すると一致した承認済み定義が自動添付されます。手動選択や関係経路の指定も可能です。"
+  ],
+  "businessGlossary.autoLimit": [
+    "검색된 정의가 전송 한도를 초과했습니다. 일부만 첨부하지 않습니다. 질문 범위를 좁혀 다시 검색해 주세요.",
+    "Matches exceed the transmission limit. Nothing is partially attached. Narrow the question and search again.",
+    "匹配定义超过传输上限，不会仅附加部分结果。请缩小问题范围后重新搜索。",
+    "一致した定義が送信上限を超えました。一部だけの添付は行いません。質問範囲を絞って再検索してください。"
+  ],
+  "businessGlossary.autoAttached": [
+    "검색된 정의 {0}개를 자동 첨부합니다. 아래 내용을 확인해 주세요.",
+    "Automatically attaching {0} matched definitions. Review them below.",
+    "将自动附加{0}个匹配定义。请检查以下内容。",
+    "一致した定義{0}件を自動添付します。以下を確認してください。"
+  ],
+  "businessGlossary.autoEmpty": [
+    "일치하는 정의가 없어 용어 참고정보 없이 진행합니다.",
+    "No definitions matched. Continue without glossary evidence.",
+    "没有匹配定义，将不附加词典参考信息继续。",
+    "一致する定義がないため、用語の参考情報なしで続行します。"
+  ],
+  "aitest.evAutoLimit": [
+    "검색 범위가 한도를 초과하여 자동 첨부하지 않았습니다. 질문을 좁히거나 정의를 직접 선택해 주세요.",
+    "Search scope exceeds the limit; nothing was automatically attached. Narrow the question or select definitions manually.",
+    "搜索范围超过上限，未自动附加。请缩小问题范围或手动选择定义。",
+    "検索範囲が上限を超えたため自動添付しませんでした。質問を絞るか定義を手動で選択してください。"
+  ],
+  "aitest.evAutoAttached": [
+    "검색에 일치한 승인 정의 {0}개를 자동 첨부했습니다. 관계 경로는 자동으로 선택하지 않습니다.",
+    "Automatically attached {0} matching approved definitions. Relationship paths are not selected automatically.",
+    "已自动附加{0}个匹配的已批准定义。不会自动选择关系路径。",
+    "一致した承認済み定義{0}件を自動添付しました。関係経路は自動選択しません。"
+  ],
+  "aitest.evAutoEmpty": [
+    "일치하는 승인 정의가 없어 온톨로지 참고정보 없이 진행합니다.",
+    "No approved definitions matched. Continue without ontology evidence.",
+    "没有匹配的已批准定义，将不附加本体参考信息继续。",
+    "一致する承認済み定義がないため、オントロジー参考情報なしで続行します。"
+  ],
+  "aitest.evNoPathDefinitions": [
+    "연결 경로가 없습니다. 독립적인 집계는 승인 정의를 직접 선택·적용할 수 있습니다.",
+    "No connecting path found. For independent aggregates, select and apply approved definitions directly.",
+    "未找到连接路径。独立聚合可以直接选择并应用已批准定义。",
+    "接続経路がありません。独立した集計では承認済み定義を直接選択・適用できます。"
+  ],
+  "sqlh.capability.title": [
+    "조회 원천 접근 상태",
+    "History source access",
+    "历史来源访问状态",
+    "履歴ソースへのアクセス"
+  ],
+  "sqlh.capability.note": [
+    "로그인 계정으로 빈 결과 조회를 검사합니다. 조회 가능 여부와 기록 존재 여부는 별개입니다. 접근 불가만으로 DB 미지원이라고 판단하지 않습니다. 권한 변경 후 새로고침하세요.",
+    "Checks zero-row reads using the login account. Access does not imply records exist. Inaccessibility does not prove lack of database support. Refresh after permission changes.",
+    "使用登录账户检查零行读取。读取权限不代表存在记录。无法访问不代表数据库不支持。权限变更后请刷新。",
+    "ログインアカウントで0行の読み取りを確認します。権限と記録の有無は別です。アクセス不可だけでDB非対応とは判断しません。権限変更後に更新してください。"
+  ],
+  "sqlh.capability.blocked": [
+    "현재 계정으로 이 원천을 조회할 수 없어 조회 기능을 숨겼습니다. 아래 접근 상태를 확인하거나 사용 가능한 탭을 선택하세요.",
+    "This source cannot be read by this account. Query controls are hidden. Check access below or choose an available tab.",
+    "此账户无法读取该来源，已隐藏查询操作。请检查访问状态或选择可用标签。",
+    "このアカウントでは参照できないため検索操作を非表示にしました。アクセス状態を確認するか、利用可能なタブを選択してください。"
+  ],
+  "sqlh.capability.available": [
+    "조회 가능",
+    "Readable",
+    "可读取",
+    "参照可能"
+  ],
+  "sqlh.capability.required": [
+    "조회 권한 필요 · 관리자 확인",
+    "Read permission required · contact administrator",
+    "需要读取权限 · 请联系管理员",
+    "参照権限が必要 · 管理者に確認"
+  ],
+  "sqlh.capability.check": [
+    "뷰 지원 여부 또는 조회 권한 확인 필요",
+    "Check view availability or read permission",
+    "请确认视图支持情况或读取权限",
+    "ビューの対応状況または参照権限を確認"
+  ],
+  "sqlh.capability.unknown": [
+    "접근 확인 실패 · 연결 상태 확인",
+    "Access check failed · check connection",
+    "访问检查失败 · 请检查连接",
+    "アクセス確認失敗 · 接続を確認"
+  ],
+  "sqlh.candidates.title": [
+    "관련 SQL 후보 · 최대 3개",
+    "Related SQL candidates · Up to 3",
+    "相关 SQL 候选 · 最多 3 条",
+    "関連SQL候補 · 最大3件"
+  ],
+  "sqlh.candidates.warning": [
+    "생성 결과로 확정된 SQL이 아닙니다. 같은 세션도 다른 요청에 재사용됩니다. 후보를 선택해도 조회하거나 실행하지 않습니다.",
+    "These are not confirmed generated SQL results. Sessions can be reused by other requests. Opening a candidate does not execute its SQL.",
+    "这些不是已确认的生成 SQL。同一会话可能被其他请求复用。打开候选不会执行 SQL。",
+    "生成結果と確定されたSQLではありません。同じセッションは別の要求にも再利用されます。候補を開いてもSQLは実行しません。"
+  ],
+  "sqlh.candidates.scope": [
+    "동일 컨테이너·파싱 스키마에서 기준 커서의 마지막 활성 시각 전후 1분을 검색합니다. 가까운 40개 커서를 분석하고 세션 근거, 시간 근접 순으로 표시합니다. 캐시·표본 보존 여부와 조회 권한에 따라 누락될 수 있습니다.",
+    "Search the same container and parsing schema within one minute of the anchor cursor’s last activity. Analyze up to 40 nearby cursors; rank session evidence before time proximity. Cache retention, sampling and access may leave gaps.",
+    "在相同容器和解析模式中搜索基准游标最后活动时间前后一分钟。分析最近的最多 40 个游标，优先按会话依据，再按时间接近程度排列。缓存、采样保留和权限可能造成遗漏。",
+    "同じコンテナと解析スキーマで、基準カーソルの最終活動時刻の前後1分を検索します。近い40カーソルまで分析し、セッション根拠、時刻の順に表示します。キャッシュ・標本の保持期間や権限により漏れがあります。"
+  ],
+  "sqlh.candidates.load": [
+    "관련 SQL 후보 찾기",
+    "Find related SQL candidates",
+    "查找相关 SQL 候选",
+    "関連SQL候補を検索"
+  ],
+  "sqlh.candidates.stale": [
+    "기준 커서가 변경되었거나 만료됐습니다. 목록을 새로고침해 주세요.",
+    "The anchor cursor changed or expired. Refresh the list.",
+    "基准游标已更改或过期。请刷新列表。",
+    "基準カーソルが変更または失効しました。一覧を更新してください。"
+  ],
+  "sqlh.candidates.failed": [
+    "후보 조회를 완료하지 못했습니다. 기존 상세 정보는 그대로 확인할 수 있습니다.",
+    "Candidate lookup could not complete. Existing detail remains available.",
+    "候选查询未完成。现有详情仍可查看。",
+    "候補検索を完了できませんでした。既存の詳細は確認できます。"
+  ],
+  "sqlh.candidates.session": [
+    "ASH: 인스턴스·세션·일련번호 일치",
+    "ASH: instance, session and serial match",
+    "ASH：实例、会话和序列号一致",
+    "ASH: インスタンス・セッション・シリアル番号が一致"
+  ],
+  "sqlh.candidates.coordinator": [
+    "ASH: 병렬 조정 인스턴스·세션·일련번호 일치",
+    "ASH: parallel coordinator instance, session and serial match",
+    "ASH：并行协调实例、会话和序列号一致",
+    "ASH: 並列コーディネータのインスタンス・セッション・シリアル番号が一致"
+  ],
+  "sqlh.candidates.timeOnly": [
+    "같은 스키마·가까운 활성 시각만 일치 · 세션 연결 미확인",
+    "Same schema and nearby activity only · session link unconfirmed",
+    "仅模式和活动时间接近 · 会话关联未确认",
+    "スキーマと活動時刻のみ近接 · セッション関連は未確認"
+  ],
+  "sqlh.candidates.available": [
+    "일부 후보에 ASH 세션 근거가 있습니다. 동일 세션도 다른 요청에 재사용되므로 생성 결과를 증명하지 않습니다.",
+    "Some candidates have ASH session evidence. Session reuse means this does not prove the generated result.",
+    "部分候选有 ASH 会话依据。但会话可能复用，因此不能证明是生成结果。",
+    "一部の候補にASHセッション根拠があります。ただし再利用があるため生成結果の証明ではありません。"
+  ],
+  "sqlh.candidates.unavailable": [
+    "현재 계정은 ASH 세션 근거를 조회할 수 없습니다. 스키마·시간 기반 후보만 표시합니다.",
+    "This account cannot read ASH session evidence. Showing schema/time candidates only.",
+    "当前账户无法读取 ASH 会话依据。仅显示基于模式和时间的候选。",
+    "このアカウントではASHを参照できません。スキーマと時刻に基づく候補のみ表示します。"
+  ],
+  "sqlh.candidates.unconfirmed": [
+    "ASH 조회를 완료하지 못했습니다. 스키마·시간 기반 후보만 표시합니다.",
+    "ASH lookup could not complete. Showing schema/time candidates only.",
+    "ASH 查询未完成。仅显示基于模式和时间的候选。",
+    "ASH検索を完了できませんでした。スキーマと時刻に基づく候補のみ表示します。"
+  ],
+  "sqlh.candidates.noMatch": [
+    "연결되는 세션 표본을 확인하지 못했습니다. 표본이 없다는 것이 무관함을 뜻하지는 않습니다.",
+    "No linking session samples were found. Missing samples do not prove that SQL is unrelated.",
+    "未找到关联的会话样本。缺少样本不表示 SQL 无关。",
+    "関連するセッション標本は見つかりませんでした。標本がないことは無関係の証明ではありません。"
+  ],
+  "sqlh.candidates.offset": [
+    "기준 커서의 마지막 활성 시각 대비 {0}초 (실행 간격·소요시간 아님)",
+    "{0}s relative to anchor cursor’s last activity (not execution gap or duration)",
+    "相对基准游标最后活动时间 {0} 秒（不是执行间隔或耗时）",
+    "基準カーソルの最終活動時刻から {0}秒（実行間隔・所要時間ではありません）"
+  ],
+  "sqlh.candidates.empty": [
+    "이 범위에서 표시할 후보를 찾지 못했습니다. 생성 SQL이 없었다는 뜻은 아닙니다.",
+    "No displayable candidates in this scope. This does not mean no SQL was generated.",
+    "此范围内没有可显示的候选。这不表示没有生成 SQL。",
+    "この範囲に表示可能な候補はありません。SQLが生成されなかったという意味ではありません。"
+  ],
+  "sqlh.candidates.metrics": [
+    "마지막 활성(DB): {0} · 선택 커서 누적 실행: {1}회 · 누적 DB 시간: {2}초",
+    "Last active (DB): {0} · Selected cursor cumulative executions: {1} · Cumulative DB time: {2}s",
+    "最后活动(DB)：{0} · 所选游标累计执行：{1} 次 · 累计 DB 时间：{2} 秒",
+    "最終活動(DB): {0} · 選択カーソル累積実行: {1}回 · 累積DB時間: {2}秒"
+  ],
+  "sqlh.candidates.sql": [
+    "SQL 원문 보기 (실행하지 않음)",
+    "View SQL text (no execution)",
+    "查看 SQL 原文（不执行）",
+    "SQL原文を表示（実行しません）"
+  ],
+  "sqlh.candidates.limited": [
+    "검색·분석 또는 표시 한도를 적용했습니다. 전체 후보 목록이 아닙니다.",
+    "Search, analysis or display limits apply. This is not the complete candidate list.",
+    "已应用搜索、分析或显示上限。这不是完整候选列表。",
+    "検索・分析または表示件数を制限しています。候補の全件ではありません。"
+  ],
+  "sqlh.candidates.omitted": [
+    "중복 SQL ID는 합치고, 시스템·앱 관리 조회 또는 분석할 수 없는 SQL은 표시 대상에서 제외합니다. 제외 {0}개. 관련 없다는 판정은 아닙니다.",
+    "Duplicate SQL IDs are combined. System/app administration or unparseable SQL is omitted: {0}. Omission does not mean unrelated.",
+    "合并重复 SQL ID，并排除系统/应用管理或无法解析的 SQL：{0} 条。排除不代表无关。",
+    "SQL IDの重複をまとめ、システム・アプリ管理や解析不能なSQLを除外します。除外 {0}件。無関係と判定したわけではありません。"
+  ],
+  "sqlh.candidates.notChecked": [
+    "표시할 후보가 없어 세션 근거 조회는 생략했습니다.",
+    "Session evidence lookup was skipped because there are no displayable candidates.",
+    "没有可显示的候选，已跳过会话依据查询。",
+    "表示候補がないため、セッション根拠の検索を省略しました。"
+  ],
+  "businessGlossary.searchAgain": [
+    "현재 질문·프로필로 다시 검색해 주세요. 검색된 정의는 자동 첨부됩니다.",
+    "Search again with the current question and profile. Matches are attached automatically.",
+    "请使用当前问题和配置文件重新搜索。匹配定义将自动附加。",
+    "現在の質問・プロファイルで再検索してください。一致した定義は自動添付されます。"
+  ],
+  "businessGlossary.choose": [
+    "검색된 정의가 자동 첨부됩니다. 내용을 확인해 주세요.",
+    "Matched definitions are attached automatically. Review them below.",
+    "匹配定义将自动附加。请检查内容。",
+    "一致した定義が自動添付されます。内容を確認してください。"
+  ],
+  "ontology.discovery.response.EMPTY": [
+    "AI 관계 응답이 비어 있습니다. 저장하지 않았습니다.",
+    "The AI relationship response is empty. Nothing was saved.",
+    "AI 关系响应为空，未保存。",
+    "AI の関係応答が空です。保存していません。"
+  ],
+  "ontology.discovery.response.SIZE": [
+    "AI 관계 응답이 처리 한도를 넘었습니다. 원문을 표시하거나 저장하지 않았습니다.",
+    "The AI relationship response exceeds the size limit. It was not displayed or saved.",
+    "AI 关系响应超出大小限制，未显示或保存原文。",
+    "AI の関係応答がサイズ上限を超えています。原文の表示・保存はしていません。"
+  ],
+  "ontology.discovery.response.JSON": [
+    "AI 관계 응답이 올바른 JSON이 아닙니다. AI 응답 원문을 확인해 주세요.",
+    "The AI relationship response is not valid JSON. Check the raw AI response.",
+    "AI 关系响应不是有效的 JSON，请查看 AI 响应原文。",
+    "AI の関係応答が有効な JSON ではありません。AI 応答の原文を確認してください。"
+  ],
+  "ontology.discovery.response.ROOT": [
+    "AI 응답에는 relations 배열만 있는 JSON 객체가 필요합니다. 저장하지 않았습니다.",
+    "The AI response must be a JSON object containing only a relations array. Nothing was saved.",
+    "AI 响应必须是仅含 relations 数组的 JSON 对象，未保存。",
+    "AI 応答には relations 配列のみを含む JSON オブジェクトが必要です。保存していません。"
+  ],
+  "ontology.discovery.response.COUNT": [
+    "AI 응답의 관계가 호출당 100개 한도를 넘었습니다. 저장하지 않았습니다.",
+    "The AI response exceeds the limit of 100 relationships per call. Nothing was saved.",
+    "AI 响应超过每次调用 100 个关系的上限，未保存。",
+    "AI 応答の関係数が呼び出しごとの上限 100 件を超えています。保存していません。"
+  ],
+  "ontology.discovery.response.TYPE": [
+    "관계 응답의 필드가 필요한 문자열 형식이 아닙니다. 원문의 표시 위치를 확인해 주세요.",
+    "A relationship field is not a required string. Check the indicated location in the raw response.",
+    "关系字段不是所需的字符串类型，请检查原文中标示的位置。",
+    "関係応答のフィールドが必要な文字列形式ではありません。原文の指定位置を確認してください。"
+  ],
+  "ontology.discovery.response.TEXT": [
+    "관계 응답에 빈 값 또는 길이·줄바꿈 위반이 있습니다. 이름 128자, 관계명 80자, 근거·확인사항 각 120자 이내의 한 줄이 필요합니다.",
+    "A relationship value is blank or violates text limits: names 128, label 80, reason/uncertainty 120 characters each, on one line.",
+    "关系值为空或违反文本限制：名称 128、关系名 80、依据和待确认项各 120 字符以内，均须为单行。",
+    "関係応答に空値または文字数・改行の違反があります。名前 128、関係名 80、根拠・確認事項各 120 文字以内の 1 行が必要です。"
+  ],
+  "ontology.discovery.response.TABLE": [
+    "추천 테이블·뷰가 이번 호출에 전달한 목록에 없습니다. 원문의 표시 위치를 확인해 주세요.",
+    "A suggested table or view is outside the list sent in this call. Check the indicated location in the raw response.",
+    "推荐的表或视图不在本次调用发送的列表中，请检查原文中标示的位置。",
+    "推薦されたテーブル・ビューが今回の送信一覧にありません。原文の指定位置を確認してください。"
+  ],
+  "ontology.discovery.response.COLUMNS": [
+    "출발·도착 컬럼 목록이 잘못됐습니다. 중복 없는 1~32개 컬럼을 같은 개수로 매핑해야 하며 동일 컬럼끼리의 자기 연결은 허용하지 않습니다.",
+    "Invalid column lists: map 1–32 distinct columns on each side with equal counts; an identical self-mapping is not allowed.",
+    "列列表无效：两侧必须各有 1–32 个不重复的列且数量相同，不允许相同列的自身映射。",
+    "列一覧が不正です。両側を同じ件数の重複しない 1～32 列で対応付け、同一列同士の自己接続は指定できません。"
+  ],
+  "ontology.discovery.response.COLUMN": [
+    "추천 컬럼이 해당 테이블·뷰의 저장된 정의에 없습니다. 원문의 표시 위치를 확인해 주세요.",
+    "A suggested column is absent from the saved definition of its table or view. Check the indicated location in the raw response.",
+    "推荐列不在对应表或视图的已保存定义中，请检查原文中标示的位置。",
+    "推薦された列が対象テーブル・ビューの保存済み定義にありません。原文の指定位置を確認してください。"
+  ],
+  "ontology.discovery.response.DATATYPE": [
+    "출발·도착 컬럼의 자료형이 현재 지원하는 연결 기준과 맞지 않습니다. 원문의 표시 위치를 확인해 주세요.",
+    "The column types do not meet the currently supported mapping criteria. Check the indicated location in the raw response.",
+    "两侧列的数据类型不符合当前支持的映射条件，请检查原文中标示的位置。",
+    "両側の列型が現在対応する接続基準に合いません。原文の指定位置を確認してください。"
+  ],
+  "ords.confirmHelp": [
+    "다음 문구를 입력해 확인하세요:\\u0020",
+    "Type this phrase to confirm:\\u0020",
+    "输入以下文字确认：",
+    "次の確認文を入力してください："
+  ],
+  "problemQuestion.error": [
+    "오류 (선택)",
+    "Error (optional)",
+    "错误（可选）",
+    "エラー（任意）"
+  ]
+}

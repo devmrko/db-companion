@@ -1,0 +1,8 @@
+.app-sql-reference { max-width: 1000px; line-height: 1.7; }
+.app-sql-reference h1 { font-size: 1.65rem; margin-bottom: 20px; }
+.app-sql-reference h2 { font-size: 1.2rem; margin-bottom: 16px; }
+.app-sql-reference nav { margin: 24px 0; line-height: 2; }
+.app-sql-reference section { padding: 24px; margin: 20px 0; border: 1px solid var(--app-border); border-radius: var(--app-radius); background: var(--app-surface); scroll-margin-top: 20px; }
+.app-sql-reference code { overflow-wrap: anywhere; }
+.app-sql-reference p[lang="en"] { color: var(--app-muted); }
+@media (max-width: 600px) { .app-sql-reference section { padding: 18px; } }

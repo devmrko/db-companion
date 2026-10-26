@@ -4,6 +4,47 @@
 
 The generated PL/SQL is standalone: Oracle Text matching, definition retrieval, prompt composition, `DBMS_CLOUD_AI.GENERATE(action=>'showsql')`, and optional query execution happen inside Oracle. It does not call DB Companion or an application endpoint. Business rules stay in the dictionary, ontology, comments and profile Feedback, not in Java or the package source.
 
+## Search-only module
+
+**Functions → Create glossary search function** previews and creates one
+`DBC_GLOSSARY_SEARCH(p_question CLOB) RETURN CLOB AUTHID CURRENT_USER` function.
+It returns `formatVersion`, `question`, `schema`, `glossary` (tokens, matching
+targets, definitions and SQL criteria), and `aiCalled:false`. No profile is
+required; it does not generate or execute business SQL.
+
+```sql
+SELECT DBC_GLOSSARY_SEARCH(:question) AS EVIDENCE_JSON FROM DUAL;
+```
+
+The function is a short entry point calling `DBC_GLOSSARY_API.SEARCH`. The package
+body separates validation, tokenization, candidate retrieval, question matching,
+overlap removal, definition retrieval and response construction into named
+functions. SEARCH shows only their calling order. There is no generated anonymous
+PL/SQL block hidden inside a CLOB string. Only short owner-local SELECT statements
+are dynamic; values remain bound. The overlap query is ordinary static SQL.
+
+The response contract and phrase-matching behavior remain compatible with v1.
+The existing AI package retains its original implementation and is not implicitly
+upgraded to depend on this package. Prompt/SQL/execution remain in that pipeline.
+
+The wizard checks the owner-local dictionary, Oracle Text setup, session
+`CREATE PROCEDURE` privilege, object-name availability and stored source.
+Installation requires a five-minute, single-use preview and explicit DDL consent.
+The wizard separately shows the actual SEARCH flow, entry function, package
+specification, package body and planned DDL. Stored-source fingerprints invalidate
+changed previews. An exact, app-generated v1 function can be explicitly replaced
+with the v2 entry function; unrelated objects are blocked. Exact installed package
+parts are kept, and missing parts can be completed after fresh confirmation.
+DDL failure may leave partial objects; no automatic cleanup or retry occurs.
+Compilation errors remain visible. Search tests require all three valid,
+source-matching components. Back up source before a deliberate v1 migration;
+fingerprint checks are not a database-wide DDL lock.
+The limits and Oracle invocation-chain rules below still apply.
+
+SQL/PLSQL blocks use the common read-only source UI: line numbers, syntax
+highlighting, source search, optional wrapping and copying the original code.
+These display controls never execute code or modify its text.
+
 ## Options and modes
 
 | Argument | Meaning |
@@ -21,6 +62,15 @@ The generated PL/SQL is standalone: Oracle Text matching, definition retrieval, 
 The response is a JSON CLOB. Query output is an ordered column list plus arrays of cells, so duplicate column labels do not overwrite values. NUMBER cells are decimal strings to preserve Oracle precision through JavaScript/MCP clients. DATE/TIMESTAMP cells use explicit ISO-style formatting; database NULL is JSON null. Results support VARCHAR2/CHAR, NUMBER, DATE and TIMESTAMP; other types fail explicitly. There are at most 40 columns and 1,000,000 serialized result characters. `more=true` means additional rows exist; it does not indicate incomplete source data or make a missing value zero.
 
 ## Evidence and dependencies
+
+A fresh account needs Oracle Text setup privileges before creating its lexer,
+policy and index. The glossary setup preview and execution check effective
+`EXECUTE` access to `CTXSYS.CTX_DDL` (direct, PUBLIC, or an enabled role); they
+do not grant it. An administrator can grant `CTXAPP` and the required direct
+package privileges (`CTXSYS.CTX_DDL`, `CTXSYS.CTX_DOC`) to the intended local
+account after reviewing scope. Direct execution grants are required where
+stored PL/SQL cannot rely on role privileges. No `ANY` or PUBLIC grant is needed.
+See [Oracle Text user setup](https://docs.oracle.com/en/database/oracle/oracle-database/26/ccapp/creating-oracle-text-user.html).
 
 Glossary mode requires the existing owner-local `DBC_BUSINESS_TERM`, `DBC_BT_CTX` and `DBC_BT_KO_POLICY`. The package generator embeds the very same `db/glossary/phrase-search.sql` used by the app. Full phrase matches and longest overlapping spans are retained; generic token OR results are not directly attached as definitions. At most 30 definitions and 64 unique tokens are permitted. Korean lexer configuration is reused, not auto-installed or silently replaced by the UI language.
 

@@ -37,7 +37,7 @@ public class AppRecordRepository {
     public void install(String schema,String login){QueryArchive.owner(schema,login);var state=status(schema,login);if(state.equals("READY"))return;if(!state.equals("MISSING"))throw new Ontology.Failure(409,"mismatch");jdbc.execute(AppRecordSql.create(schema));require(schema,login);}
     private String encode(JsonNode payload){String value=json.writeValueAsString(payload);if(!payload.isObject()||value.length()>QueryArchive.MAX_JSON)throw new Ontology.Failure(413,"archive.limit");return value;}
     public void begin(String schema,String id,String type,JsonNode payload){
-        QueryArchive.id(id);if(!Set.of(QueryArchive.TYPE,QueryArchive.STORE,OntologyScope.TYPE,ProblemQuestion.TYPE,ProblemQuestion.ATTEMPT_TYPE,OntologyDiscoveryArchive.PLAN,OntologyDiscoveryArchive.CALL).contains(type))throw new Ontology.Failure(400,"archive.invalid");var value=encode(payload);
+        QueryArchive.id(id);if(!Set.of(QueryArchive.TYPE,QueryArchive.STORE,OntologyScope.TYPE,ProblemQuestion.TYPE,ProblemQuestion.ATTEMPT_TYPE,ProblemEvaluation.TYPE,OntologyDiscoveryArchive.PLAN,OntologyDiscoveryArchive.CALL).contains(type))throw new Ontology.Failure(400,"archive.invalid");var value=encode(payload);
         jdbc.update("INSERT INTO "+AppRecordSql.table(schema)+" (RECORD_ID,RECORD_TYPE,STATE,PAYLOAD) VALUES (?,?,'REQUESTED',?)",s->{s.setString(1,id);s.setString(2,type);s.setCharacterStream(3,new StringReader(value),value.length());});
     }
     /** Only transition a pending record; a late failure must never overwrite a committed success. */
@@ -89,11 +89,17 @@ public class AppRecordRepository {
     public ProblemQuestion.DeletePreview problemDeletePreview(String schema,List<String> ids){
         var safe=problemIds(ids);int records=0,attempts=0;
         for(String id:safe){var detail=problemDetail(schema,id);records++;attempts+=detail.attempts().size();}
-        String fingerprint=String.join("|",safe.stream().map(id->{var d=problemDetail(schema,id);return id+":"+d.parent().updatedAt()+":"+d.attempts().stream().map(ProblemQuestion.Attempt::id).sorted().reduce("",(a,b)->a+","+b);}).toList());return new ProblemQuestion.DeletePreview(safe,records,attempts,fingerprint);
+        var evaluationIds=new ArrayList<String>();for(String id:safe)evaluationIds.addAll(evaluations(schema,id).stream().map(ProblemEvaluation.Saved::id).toList());
+        String fingerprint=String.join("|",safe.stream().map(id->{var d=problemDetail(schema,id);return id+":"+d.parent().updatedAt()+":"+d.attempts().stream().map(ProblemQuestion.Attempt::id).sorted().reduce("",(a,b)->a+","+b);}).toList())+"|evaluations:"+String.join(",",evaluationIds.stream().sorted().toList());return new ProblemQuestion.DeletePreview(safe,records,attempts,evaluationIds.size(),fingerprint);
     }
     public int deleteProblems(String schema,List<String> ids,String fingerprint){
         var safe=problemIds(ids);for(String id:safe){var parent=lockProblem(schema,id);if(parent.retained())throw new AiAssistant.Failure(409,"problemQuestion.retained","보존 표시된 문제 질문은 삭제할 수 없습니다.");}var preview=problemDeletePreview(schema,safe);if(!Objects.equals(preview.fingerprint(),fingerprint))throw new AiAssistant.Failure(409,"problemQuestion.stale","삭제 대상이 변경되었습니다. 미리보기를 다시 확인해 주세요.");
-        int deleted=0;for(String id:safe){deleted+=jdbc.update("DELETE FROM "+AppRecordSql.table(schema)+" WHERE RECORD_TYPE=? AND JSON_VALUE(PAYLOAD,'$.parentId')=?",ProblemQuestion.ATTEMPT_TYPE,id);deleted+=jdbc.update("DELETE FROM "+AppRecordSql.table(schema)+" WHERE RECORD_ID=? AND RECORD_TYPE=?",id,ProblemQuestion.TYPE);}return deleted;
+        int deleted=0;for(String id:safe){deleted+=jdbc.update("DELETE FROM "+AppRecordSql.table(schema)+" WHERE RECORD_TYPE=? AND JSON_VALUE(PAYLOAD,'$.parentId')=?",ProblemEvaluation.TYPE,id);deleted+=jdbc.update("DELETE FROM "+AppRecordSql.table(schema)+" WHERE RECORD_TYPE=? AND JSON_VALUE(PAYLOAD,'$.parentId')=?",ProblemQuestion.ATTEMPT_TYPE,id);deleted+=jdbc.update("DELETE FROM "+AppRecordSql.table(schema)+" WHERE RECORD_ID=? AND RECORD_TYPE=?",id,ProblemQuestion.TYPE);}return deleted;
+    }
+    public List<ProblemEvaluation.Saved> evaluations(String schema,String parentId){
+        return jdbc.query("SELECT PAYLOAD FROM "+AppRecordSql.table(schema)+" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED' AND JSON_VALUE(PAYLOAD,'$.parentId')=? ORDER BY SEQ DESC FETCH FIRST 100 ROWS ONLY",(r,n)->{
+            var clob=r.getClob(1);try{return json.readValue(clobValue(clob),ProblemEvaluation.Saved.class);}finally{free(clob);}
+        },ProblemEvaluation.TYPE,ProblemQuestion.id(parentId));
     }
     /** Parent edits are optimistic: a stale detail cannot overwrite a newer status or retention choice. */
     public void updateProblem(String schema,ProblemQuestion.Parent value,Instant expectedUpdatedAt){String payload=encode(json.valueToTree(value));if(jdbc.update("UPDATE "+AppRecordSql.table(schema)+" SET PAYLOAD=?,UPDATED_AT=SYSTIMESTAMP WHERE RECORD_ID=? AND RECORD_TYPE=? AND STATE='SUCCEEDED' AND JSON_VALUE(PAYLOAD,'$.updatedAt')=?",s->{s.setCharacterStream(1,new StringReader(payload),payload.length());s.setString(2,value.id());s.setString(3,ProblemQuestion.TYPE);s.setString(4,expectedUpdatedAt.toString());})!=1)throw new AiAssistant.Failure(409,"problemQuestion.stale","문제 질문이 변경되었습니다. 다시 불러와 주세요.");}

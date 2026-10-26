@@ -1,0 +1,10 @@
+{
+  "fixture": "EMP/DEPT public SCOTT sample",
+  "questions": [
+    {"id":"employee-count","question":"전체 직원 수를 알려줘.","sql":"SELECT COUNT(EMPNO) AS EMPLOYEE_COUNT FROM EMP","expectedRows":[[14]]},
+    {"id":"salary-total","question":"전체 직원의 급여 합계를 알려줘. 수당은 제외해.","sql":"SELECT SUM(SAL) AS SALARY_TOTAL FROM EMP","expectedRows":[[29025]]},
+    {"id":"salary-commission","question":"전체 직원의 급여와 수당 합계를 알려줘.","sql":"SELECT SUM(SAL+NVL(COMM,0)) AS PAY_TOTAL FROM EMP","expectedRows":[[31225]]},
+    {"id":"department-zero","question":"직원이 없는 부서도 포함해서 부서별 직원 수와 급여 합계를 알려줘.","sql":"SELECT d.DEPTNO, COUNT(e.EMPNO) AS EMPLOYEE_COUNT, NVL(SUM(e.SAL),0) AS SALARY_TOTAL FROM DEPT d LEFT JOIN EMP e ON e.DEPTNO=d.DEPTNO GROUP BY d.DEPTNO ORDER BY d.DEPTNO","expectedRows":[[10,3,8750],[20,5,10875],[30,6,9400],[40,0,0]]},
+    {"id":"salary-filter","question":"급여가 3000 이상인 직원 수를 알려줘.","sql":"SELECT COUNT(EMPNO) AS EMPLOYEE_COUNT FROM EMP WHERE SAL>=3000","expectedRows":[[3]]}
+  ]
+}

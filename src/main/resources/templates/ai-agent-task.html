@@ -5,7 +5,7 @@
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
   <main class="app-content">
     <a class="app-back-link" th:href="@{/ai-agents/team(schema=${targetSchema},team=${teamName})}">← <span th:text="${teamName}"></span></a>
-    <div class="app-page-heading"><h1 class="app-object-title" th:text="${taskName}"></h1><button th:replace="~{fragments/common :: sqlHelp('executions', 'agent-runs')}"></button><a class="btn app-btn app-btn-secondary" th:href="@{/ai-agents/task(schema=${targetSchema},team=${teamName},task=${taskName})}" th:text="#{ui.8259f9d35351}">새로고침</a></div>
+    <div class="app-page-heading"><h1 class="app-object-title" th:text="${taskName}"></h1><button th:replace="~{fragments/common :: sqlHelp('agents', 'task-definition')}"></button><a class="btn app-btn app-btn-secondary" th:href="@{/ai-agents/task(schema=${targetSchema},team=${teamName},task=${taskName})}" th:text="#{ui.8259f9d35351}">새로고침</a></div>
     <div class="app-alert is-error" role="alert" th:if="${loadError}" th:text="${loadError}"></div>
     <th:block th:if="${taskPage != null}">
       <section th:replace="~{fragments/agent :: component(${taskPage.task}, 'Task')}"></section>

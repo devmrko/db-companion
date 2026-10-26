@@ -2,7 +2,7 @@ import {t} from './i18n.mjs';
 import {assistantApi,assistantPost} from './ai-assistant.mjs';
 export function canGrant(preview,user,consent,busy,now=Date.now()) {return !!preview&&preview.username===user&&consent&&!busy&&now<Date.parse(preview.expires);}
 export function mountAccess(root){
- const get=k=>root.querySelector(`[data-sa-${k}]`),label=k=>t('semantic.'+k,k);
+ const get=k=>root.querySelector(`[data-sa-${k}]`),label=k=>t('semanticContext.'+k,k);
  let busy=false,preview=null,checked=null,timer;
  const api=(path,data)=>assistantApi('/ai-profiles/semantic/access'+path,data===undefined?undefined:assistantPost(get('csrf'),data));
  const say=v=>{get('message').textContent=v;};

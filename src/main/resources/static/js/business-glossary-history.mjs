@@ -1,4 +1,5 @@
 import {t} from './i18n.mjs';
+import {changeHistorySummary} from './change-history-summary.mjs';
 const label=(key,fallback,...args)=>t('businessGlossary.history.'+key,fallback,...args);
 const el=(tag,text,css)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(css)node.className=css;return node;};
 export function historyStoragePresentation(storage,table){
@@ -17,7 +18,8 @@ export function snapshotFields(term){
     [t('businessGlossary.aliases','별칭'),term.aliases.join('\n')],
     [t('businessGlossary.definition','업무 정의'),term.definition],
     [t('businessGlossary.criteria','집계·필터·SQL 기준 (실행하지 않음)'),term.criteria],
-    [t('businessGlossary.state','상태'),term.enabled?t('businessGlossary.active','사용'):t('businessGlossary.inactive','비활성')]
+    [t('businessGlossary.state','상태'),term.enabled?t('businessGlossary.active','사용'):t('businessGlossary.inactive','비활성')],
+    ...(term.rdf?[[t('auditFixes.rdf.meaning','업무 정의 RDF'),[term.rdf.domain,term.rdf.unit,term.rdf.scope,term.rdf.grain,...term.rdf.rules,...term.rdf.citations].filter(Boolean).join('\n')],[t('auditFixes.rdf.mapping','테이블·컬럼 매핑 RDF'),term.rdf.mappings.map(m=>`${m.schema}.${m.table}.${m.column} | ${m.role} | ${m.aggregation}`).join('\n')]]:[])
   ]:[];
 }
 function snapshot(title,term){
@@ -31,7 +33,7 @@ export function renderHistory(host,entries){
     const c=entry.change,details=el('details',undefined,'app-disclosure');
     details.open=host.childElementCount===0;
     const action=c.operation==='CREATE'?label('created','등록'):label('updated','수정');
-    details.append(el('summary',`${action} · ${c.before?'v'+c.before.revision+' → ':''}v${c.after.revision} · ${entry.recordedAt} · ${entry.actor}`));
+    details.append(el('summary',changeHistorySummary({actor:entry.actor,at:entry.recordedAt,content:`${action} · ${c.before?'v'+c.before.revision+' → ':''}v${c.after.revision}`}), 'app-change-history-summary'));
     const grid=el('div',undefined,'app-glossary-history-grid');
     grid.append(snapshot(label('before','변경 전'),c.before),snapshot(label('after','변경 후'),c.after));
     details.append(grid);host.append(details);

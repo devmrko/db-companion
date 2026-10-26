@@ -9,6 +9,12 @@ class Node {
   get childNodes(){return this.children;}
   append(...nodes){this.children.push(...nodes);}
   replaceChildren(...nodes){this.children=nodes;}
+  after(value){this.afterNode=value;}
+  closest(){return new Node('fieldset');}
+  setAttribute(name,value){this[name]=value;}
+  hasAttribute(name){return name==='data-local-disabled'&&'localDisabled' in this.dataset;}
+  showModal(){this.open=true;}
+  close(){this.open=false;}
   addEventListener(name,fn){this.handlers[name]=fn;}
   async fire(name){if(!this.disabled)await this.handlers[name]?.();}
   querySelectorAll(tag){return this.children.flatMap(n=>[...(n.tag===tag?[n]:[]),...n.querySelectorAll(tag)]);}
@@ -62,20 +68,29 @@ test('late glossary response cannot revive definitions for a changed question',a
   assert.equal(component.ready(),false);assert.equal(get('results').children.length,0);
 }));
 
-test('ontology search displays native tokens and auto-attaches matched approved definitions without choosing a route',async()=>dom(async()=>{
-  const root=new Node(),get=n=>root.querySelector(`[data-test-evidence-${n}]`);let busy=false,component,empty=false,limited=false;
-  const rows=['A','B'].map(name=>({name,state:'APPROVED',concept:name}));rows.push({name:'C',state:'DRAFT',concept:'C'});
-  globalThis.fetch=async()=>response({tables:rows,checkedAt:'2028-01-01'});const calls=[];
+test('RDF flow previews before paid call, shows draft sources, attaches only after selection and invalidates edits',async()=>dom(async()=>{
+  const root=new Node(),get=n=>root.querySelector(`[data-test-evidence-${n}]`);let busy=false,component,q='q';const calls=[];
+  const source={name:'A',state:'DRAFT',concept:'Metric',revision:1,recommended:true,description:'Draft only',columns:[]};
+  const summary={sources:[source],rules:[{term:'Metric',definition:'Count users.',criteria:'COUNT(DISTINCT ID)'}],relations:[]};
+  globalThis.fetch=async(url,options)=>{
+    const data=options?.body?JSON.parse(options.body):null;calls.push({url,data});
+    if(url.includes('/options?'))return response({tables:[source],checkedAt:'2028-01-01'});
+    if(url.endsWith('/interpret'))return response({id:'dict',targets:[],hits:[],more:false,question:q});
+    if(url.includes('/ai-interpret-preview?'))return response({mode:'INTERPRET',request:{token:'token',source:'{}',profile:{selection:{owner:'APP',name:'LLM'},provider:'oci',model:'test'}}});
+    if(url.endsWith('/assistant-generate'))return response({interpretation:{summary:'Find metric metadata',questions:[]},result:{search:{id:'search'},summary,rdf:{terms:['Metric'],hits:[],limited:false}}});
+    if(url.endsWith('/test-evidence'))return response({schema:'APP',question:q,hash:'hash',route:'RDF_INDEPENDENT',references:[{table:'A',revision:1}],source:'{"evidence":[]}'});
+    throw Error('Unexpected '+url);
+  };
   get('schema').value='APP';get('enabled').checked=true;
-  component=mountEvidence(root,{isBusy:()=>busy,setBusy:v=>{busy=v;component.controls(v);},changed:()=>component?.controls(busy),message:()=>{},question:()=> 'q',post:async(path,value)=>{
-    calls.push({path,value});
-    if(path==='evidence/search?language=ko')return {id:'s',routes:[],limited,analysis:{mode:'ORACLE_TEXT',tokens:[{token:'SHOW'},{token:'AUGUST'}]},concepts:empty?[]:[{term:'metric',targets:rows.map(r=>({table:r.name}))}]};
-    return {schema:'APP',question:'q',hash:'hash',route:'DEFINITIONS',references:value.tables.map(table=>({table,revision:1})),source:'{"evidence":[]}'};
-  }});
+  component=mountEvidence(root,{isBusy:()=>busy,setBusy:v=>{busy=v;component.controls(v);},changed:()=>component?.controls(busy),message:text=>{if(/Unexpected/.test(text))throw Error(text);},question:()=>q});
   await component.restore({schemas:['APP'],evidenceSchema:'APP'});await get('find').fire('click');
-  assert.equal(component.ready(),true);assert.deepEqual(calls.at(-1),{path:'evidence/definitions',value:{schema:'APP',question:'q',tables:['A','B']}});
-  assert.match(texts(get('tokens')),/SHOW/);assert.match(texts(get('tokens')),/AUGUST/);
-  assert.ok(calls.every(c=>c.path!=='evidence/choose'));assert.equal(get('definitions').querySelectorAll('input').filter(n=>n.checked).length,2);
-  empty=true;await get('find').fire('click');assert.equal(component.ready(),true);assert.deepEqual(calls.at(-1).value.tables,[]);
-  limited=true;await get('find').fire('click');assert.equal(component.ready(),false);assert.equal(calls.at(-1).path,'evidence/search?language=ko');
+  assert.equal(component.ready(),false);assert.equal(calls.filter(c=>c.url.endsWith('/assistant-generate')).length,0);
+  const dialog=root.children.find(n=>n.tag==='dialog'),consent=dialog.children.find(n=>n.tag==='label').children[0],send=dialog.children.find(n=>n.tag==='button');
+  assert.equal(dialog.open,true);assert.equal(send.disabled,true);consent.checked=true;await consent.fire('change');await send.fire('click');
+  assert.equal(calls.filter(c=>c.url.endsWith('/assistant-generate')).length,1);assert.equal(component.ready(),false);
+  // The panel was inserted after checked; capture it through the DOM stub.
+  const panel=get('checked').afterNode;assert.match(texts(panel),/DRAFT/);
+  const apply=panel.querySelectorAll('button').find(n=>n.textContent==='선택 근거 적용');await apply.fire('click');
+  assert.equal(component.ready(),true);assert.deepEqual(calls.at(-1).data,{id:'search',mode:'INDEPENDENT',tables:['A'],relations:[]});
+  q='changed';component.invalidate();assert.equal(component.ready(),false);
 }));

@@ -1,0 +1,140 @@
+{
+  "localCreate.credential": [
+    "Credential 새로 만들기",
+    "Create credential",
+    "创建 Credential",
+    "Credentialを作成"
+  ],
+  "localCreate.function": [
+    "Function 새로 만들기",
+    "Create function",
+    "创建 Function",
+    "Functionを作成"
+  ],
+  "localCreate.help": [
+    "로그인 소유 스키마에 새 객체만 생성합니다. 기존 객체는 교체하지 않습니다. DDL은 커밋되며 실패해도 객체가 남을 수 있습니다.",
+    "Create new objects in the login schema only. Existing objects are not replaced. DDL commits; objects may remain after failure.",
+    "仅在登录用户架构中新建，不替换现有对象。DDL 会提交，失败后对象可能仍然保留。",
+    "ログインスキーマに新規作成します。既存オブジェクトは置換しません。DDLはコミットされ、失敗時もオブジェクトが残る場合があります。"
+  ],
+  "localCreate.name": [
+    "객체 이름 (영문 대문자)",
+    "Object name (uppercase)",
+    "对象名称（大写）",
+    "名前（英大文字）"
+  ],
+  "localCreate.template": [
+    "재사용 템플릿",
+    "Reusable template",
+    "可复用模板",
+    "再利用テンプレート"
+  ],
+  "localCreate.basic": [
+    "사용자명 + 비밀번호 / API 키",
+    "Username + password / API key",
+    "用户名 + 密码 / API 密钥",
+    "ユーザー名 + パスワード / APIキー"
+  ],
+  "localCreate.echo": [
+    "입력 그대로 반환",
+    "Return input unchanged",
+    "原样返回输入",
+    "入力をそのまま返す"
+  ],
+  "localCreate.glossary": [
+    "설치된 용어사전 검색 호출",
+    "Call installed glossary search",
+    "调用已安装的术语搜索",
+    "インストール済み用語検索を呼び出す"
+  ],
+  "localCreate.username": [
+    "사용자명",
+    "Username",
+    "用户名",
+    "ユーザー名"
+  ],
+  "localCreate.signature": [
+    "입력 p_input CLOB → 반환 CLOB · 호출자 권한(AUTHID CURRENT_USER). 아래에는 선언부와 BEGIN…END;를 입력합니다. 함수는 생성만 하며 실행하지 않습니다. 용어사전 템플릿은 DBC_GLOSSARY_API 설치가 필요합니다.",
+    "Input p_input CLOB → output CLOB, AUTHID CURRENT_USER. Enter declarations and BEGIN…END; below. Creation does not execute the function. The glossary template requires DBC_GLOSSARY_API.",
+    "输入 p_input CLOB → 返回 CLOB，AUTHID CURRENT_USER。输入声明和 BEGIN…END;，只创建不执行。术语搜索模板需要 DBC_GLOSSARY_API。",
+    "入力 p_input CLOB → 戻り値 CLOB、AUTHID CURRENT_USER。宣言部と BEGIN…END; を入力します。作成のみで実行しません。用語検索には DBC_GLOSSARY_API が必要です。"
+  ],
+  "localCreate.loadTemplate": [
+    "선택한 템플릿으로 편집기 채우기",
+    "Load selected template into editor",
+    "将模板载入编辑器",
+    "テンプレートをエディターに読み込む"
+  ],
+  "localCreate.body": [
+    "함수 선언부·본문 (SQL)",
+    "Function declarations and body (SQL)",
+    "函数声明与正文（SQL）",
+    "関数の宣言部・本体（SQL）"
+  ],
+  "localCreate.preview": [
+    "실행 코드 확인",
+    "Preview code",
+    "预览代码",
+    "コードを確認"
+  ],
+  "localCreate.secretHelp": [
+    "비밀값은 생성 요청에서만 전송합니다. 미리보기·이력·서버 세션에 저장하지 않습니다. 실제 서비스 접속은 테스트하지 않습니다.",
+    "Secret is sent only with creation; it is excluded from preview, history and server session. External authentication is not tested.",
+    "秘密值仅在创建时发送，不写入预览、历史或服务器会话。不测试外部服务连接。",
+    "秘密値は作成時のみ送信し、プレビュー・履歴・サーバーセッションには保存しません。外部接続はテストしません。"
+  ],
+  "localCreate.secret": [
+    "비밀번호 / API 키",
+    "Password / API key",
+    "密码 / API 密钥",
+    "パスワード / APIキー"
+  ],
+  "localCreate.consent": [
+    "대상·코드와 DDL 영향을 확인했습니다.",
+    "I reviewed the target, code and DDL effects.",
+    "已确认目标、代码及 DDL 影响。",
+    "対象・コード・DDLの影響を確認しました。"
+  ],
+  "localCreate.create": [
+    "새 객체 생성",
+    "Create new object",
+    "创建新对象",
+    "新規作成"
+  ],
+  "localCreate.detail": [
+    "생성 객체 확인",
+    "View created object",
+    "查看已创建对象",
+    "作成したオブジェクトを確認"
+  ],
+  "localCreate.working": [
+    "처리 중…",
+    "Working…",
+    "处理中…",
+    "処理中…"
+  ],
+  "localCreate.review": [
+    "코드를 확인한 후 생성에 동의해 주세요.",
+    "Review the code and confirm creation.",
+    "请检查代码并确认创建。",
+    "コードを確認して作成に同意してください。"
+  ],
+  "localCreate.success": [
+    "생성 후 DB 재조회 확인 완료",
+    "Created and verified by database readback",
+    "创建及数据库回读确认完成",
+    "作成後のDB再照会が完了しました"
+  ],
+  "localCreate.invalid": [
+    "객체 상태를 확인하세요. INVALID 함수는 생성되어 남아 있으며 아래 컴파일 오류를 확인해야 합니다.",
+    "Inspect object status. An INVALID function remains in the database; review compilation errors below.",
+    "请检查对象状态。INVALID 函数仍保留在数据库中，请检查编译错误。",
+    "状態を確認してください。INVALID関数はDBに残ります。コンパイルエラーを確認してください。"
+  ],
+  "localCreate.uncertain": [
+    "생성을 확인하지 못했습니다. 다시 생성하기 전에 객체 목록을 확인하세요.",
+    "Creation unconfirmed. Inspect the object list before trying again.",
+    "无法确认创建。重试前请检查对象列表。",
+    "作成を確認できません。再試行前にオブジェクト一覧を確認してください。"
+  ]
+}

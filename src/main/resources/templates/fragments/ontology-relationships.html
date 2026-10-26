@@ -5,7 +5,8 @@
     <h2 id="ontology-relationships-title" th:text="#{ontology.relationships.title}"></h2>
     <button type="button" class="btn app-btn app-btn-secondary" data-rel-manual th:text="#{ontology.relationships.manual}"></button>
     <button type="button" class="btn app-btn app-btn-secondary" data-rel-discover th:text="#{ontology.discovery.title}"></button>
-    <button type="button" class="btn app-btn app-btn-primary" data-rel-graph th:text="#{ontology.pg.title}"></button>
+    <button th:replace="~{fragments/common :: sqlHelp('ontology', 'discovery-history')}"></button>
+    <button type="button" class="btn app-btn app-btn-primary" data-rel-graph th:text="#{ontology.mg.tab}">Property Graph</button>
     <button type="button" class="btn app-btn app-btn-quiet" data-rel-fit th:text="#{ontology.erd.fit}"></button>
     <button type="button" class="btn app-btn app-btn-quiet" data-rel-focus th:text="#{ontology.erd.focus}"></button>
     <button type="button" class="btn app-btn app-btn-quiet" data-rel-layout th:text="#{ontology.erd.layout}"></button>

@@ -10,7 +10,9 @@ import tools.jackson.databind.json.JsonMapper;
 public final class BusinessGlossary {
     private BusinessGlossary() {}
     public static final int MAX_TERMS=2000, MAX_HITS=30, MAX_SELECTED=MAX_HITS, MAX_TOKENS=64;
-    public record Draft(String term,List<String> aliases,String definition,String criteria,boolean enabled) {
+    public record Draft(String term,List<String> aliases,String definition,String criteria,boolean enabled,GlossaryRdf.Definition rdf) {
+        public Draft(String term,List<String> aliases,String definition,String criteria,boolean enabled){this(term,aliases,definition,criteria,enabled,null);}
+        public Draft withRdf(GlossaryRdf.Definition value){return new Draft(term,aliases,definition,criteria,enabled,value);}
         public Draft {
             term=text(term,256,true);definition=text(definition,4000,true);criteria=text(criteria,4000,false);
             if(aliases==null)aliases=List.of();
@@ -18,9 +20,11 @@ public final class BusinessGlossary {
             aliases=aliases.stream().map(a->text(a,256,true)).distinct().toList();
         }
     }
-    public record Term(String id,long revision,String term,List<String> aliases,String definition,String criteria,boolean enabled,String updatedAt) {
+    public record Term(String id,long revision,String term,List<String> aliases,String definition,String criteria,boolean enabled,String updatedAt,GlossaryRdf.Definition rdf) {
+        public Term(String id,long revision,String term,List<String> aliases,String definition,String criteria,boolean enabled,String updatedAt){this(id,revision,term,aliases,definition,criteria,enabled,updatedAt,null);}
         public Term { aliases=List.copyOf(aliases); }
-        public Draft draft(){return new Draft(term,aliases,definition,criteria,enabled);}
+        public Draft draft(){return new Draft(term,aliases,definition,criteria,enabled,rdf);}
+        public Term withRdf(GlossaryRdf.Definition value){return new Term(id,revision,term,aliases,definition,criteria,enabled,updatedAt,value);}
     }
     public record Key(String id,long revision,String term,List<String> aliases) { public Key { aliases=List.copyOf(aliases); } }
     public record Status(String owner,String table,String text,String message) {}
@@ -42,11 +46,26 @@ public final class BusinessGlossary {
     }
     public record Setup(String token,String owner,String operation,List<String> statements,Instant expires) { public Setup { statements=List.copyOf(statements); } }
     public static final class State {
-        private Search search;
+        // Select AI and RDF grounding can search independently in the same login session.
+        // Keep bounded, ID-addressed tickets; never substitute the latest search for an older ID.
+        private static final int MAX_SEARCHES=16;
+        private final LinkedHashMap<String,Search> searches=new LinkedHashMap<>();
         private Setup setup;
-        public synchronized Search remember(Search value){search=value;return value;}
+        public synchronized Search remember(Search value){
+            searches.put(value.id(),value);
+            while(searches.size()>MAX_SEARCHES)searches.pollFirstEntry();
+            return value;
+        }
         public synchronized Search resolve(String id,String owner,String profile,String question,Instant now){
-            if(search==null||!Objects.equals(search.id(),id)||!search.owner().equals(owner)||!search.profile().equals(profile)||!search.question().equals(question)||!now.isBefore(search.expires()))throw stale();return search;
+            var search=searches.get(id);
+            if(search==null)throw failure(409,"업무 용어 사전 검색을 찾을 수 없습니다. 검색이 초기화되었거나 보관 한도를 초과했습니다. 사전을 다시 검색해 주세요.");
+            if(!search.owner().equals(owner))throw stale();
+            if(!now.isBefore(search.expires())){
+                searches.remove(id);
+                throw failure(409,"업무 용어 사전 검색의 유효 시간이 만료되었습니다. 사전을 다시 검색해 주세요.");
+            }
+            if(!search.profile().equals(profile)||!search.question().equals(question))throw failure(409,"업무 용어 사전 검색 당시의 질문·프로필과 현재 선택이 다릅니다. 현재 질문·프로필로 사전을 다시 검색해 주세요.");
+            return search;
         }
         public synchronized Setup setup(Setup value){setup=value;return value;}
         public synchronized Setup consume(String token,String owner,boolean consent,Instant now){
@@ -54,7 +73,7 @@ public final class BusinessGlossary {
             var value=setup;setup=null;
             if(value==null||!value.token().equals(token)||!value.owner().equals(owner)||!now.isBefore(value.expires()))throw stale();return value;
         }
-        public synchronized void clear(){search=null;setup=null;}
+        public synchronized void clear(){searches.clear();setup=null;}
     }
     public static String text(String value,int max,boolean required){
         String result=Objects.toString(value,"").trim();

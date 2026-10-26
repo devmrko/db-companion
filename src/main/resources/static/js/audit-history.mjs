@@ -22,14 +22,16 @@ export function rlsFields(raw){
 export const validAuditSettings=(minutes,days)=>Number.isInteger(Number(minutes))&&Number(minutes)>=5&&Number(minutes)<=1440&&Number.isInteger(Number(days))&&Number(days)>=0&&Number(days)<=3650;
 export const auditSucceeded=code=>code!=null&&String(code).trim()!==''&&Number(code)===0;
 export function mountAudit(root){
- const get=k=>root.querySelector('[data-au-'+k+']'),api=p=>assistantApi('/db/audit/'+p),post=(p,v)=>assistantApi('/db/audit/'+p,assistantPost(get('csrf'),v));
+ const get=k=>root.querySelector('[data-au-'+k+']'),api=p=>assistantApi('/db/audit/'+(p==='help'?'help?'+new URLSearchParams({source:readFilters().source}):p)),post=(p,v)=>assistantApi('/db/audit/'+p,assistantPost(get('csrf'),v));
  let busy=false,state=null,preview=null,filters=null,page=1,more=false;
  const readFilters=()=>Object.fromEntries(['source','from','to','scope','dbUser','endUser','objectOwner','objectName','outcome','context'].map(k=>[k,get('filters').elements.namedItem(k).value]));
  function message(v,error=false){get('message').textContent=v;get('message').className=error?'app-alert is-error':'app-filter-message';}
  function lock(v){busy=v;root.setAttribute('aria-busy',String(v));for(const n of root.querySelectorAll('button,input,select'))n.disabled=v;
   const controls=auditControls(state,v);for(const b of root.querySelectorAll('[data-au-op]')){b.disabled=!controls[b.dataset.auOp];b.hidden=b.dataset.auOp==='INSTALL'&&state?.store==='READY'&&state?.jobState==='READY';}
   get('prev').disabled=v||page<=1||!filters;get('next').disabled=v||!more||page>=1000;get('apply').disabled=v||!preview||!get('consent').checked;
-  const archived=get('filters').elements.namedItem('source').value==='archive';get('filters').elements.namedItem('scope').disabled=v||archived;if(archived)get('filters').elements.namedItem('scope').value='dds';
+  const sourceSelect=get('filters').elements.namedItem('source');for(const option of sourceSelect.options)option.disabled=option.value==='original'?state?.sourceState!=='READY':state?.store!=='READY';
+  const archived=sourceSelect.value==='archive';get('filters').elements.namedItem('scope').disabled=v||archived;if(archived)get('filters').elements.namedItem('scope').value='dds';
+  get('filters').querySelector('button[type="submit"]').disabled=v||(archived?state?.store!=='READY':state?.sourceState!=='READY');
  }
  function renderStatus(s){state=s;const rows=[
   ['owner',s.database+' · '+s.owner],['sourceState',s.source+' · '+s.sourceState],['store',s.store+' / '+s.packageState],['job',s.jobState+' · '+(s.enabled?text('enabled'):text('disabled'))],
@@ -37,7 +39,8 @@ export function mountAudit(root){
   ['next',s.job.NEXT_RUN||'—'],['result',[s.job.STATUS,s.job['ERROR#']].filter(v=>v!=null).join(' · ')||'—'],['permissions',s.missingPrivileges.join(', ')||text('ready')]];
   get('status').replaceChildren();for(const [key,value]of rows){const box=el('div');box.append(el('dt',text(key)),el('dd',String(value)));get('status').append(box);}
   if(s.config.INTERVAL_MINUTES!=null)get('minutes').value=s.config.INTERVAL_MINUTES;if(s.config.RETENTION_DAYS!=null)get('retention').value=s.config.RETENTION_DAYS;
-  if(s.error)get('status').append(el('p',s.error,'app-alert is-error'));
+  if(s.error){const detail=el('details');detail.append(el('summary',t('auditFixes.errorDetail','오류 상세')),el('pre',s.error));get('status').append(detail);}
+  const sourceSelect=get('filters').elements.namedItem('source');if(s.sourceState!=='READY'&&s.store==='READY')sourceSelect.value='archive';
  }
  function clearRows(){get('rows').replaceChildren();get('page').textContent='';get('empty').textContent='';more=false;}
  async function list(){clearRows();const result=await api('list?'+new URLSearchParams({...filters,page}));more=result.more;
@@ -68,7 +71,7 @@ export function mountAudit(root){
  get('filters').addEventListener('submit',e=>{e.preventDefault();search();});get('filters').elements.namedItem('source').addEventListener('change',()=>lock(busy));
  get('refresh').addEventListener('click',load);
  for(const b of root.querySelectorAll('[data-au-op]'))b.addEventListener('click',()=>prepare(b.dataset.auOp));
- get('help').addEventListener('click',async()=>{if(busy)return;lock(true);message(text('loading'));try{const data=await api('help');dialog('SQL / PLSQL');get('detail').append(el('p',text('helpNote')),el('pre',data.sql));message('');}catch(e){message(e.message,true);}finally{lock(false);}});
+ get('help').addEventListener('click',async()=>{if(busy)return;lock(true);message(text('loading'));try{const data=await api('help');dialog('SQL / PLSQL');const select=el('select',undefined,'form-select'),sql=el('pre'),note=el('p');for(const key of Object.keys(data.sections||{READ:data.sql})){const option=el('option',t(`auditFixes.audit.${key}`,key));option.value=key;select.append(option);}const update=()=>{sql.textContent=data.sections?.[select.value]??data.sql;note.textContent=select.value==='READ'?t('auditFixes.audit.binds','현재 검색값 (UTC): {0}. :이름 바인드에 이 값을 입력하세요. 조회 SQL만 표시하며 실행하지 않습니다.',JSON.stringify(readFilters())):text('helpNote');};select.addEventListener('change',update);get('detail').append(select,note,sql);update();message('');}catch(e){message(e.message,true);}finally{lock(false);}});
  get('close').addEventListener('click',()=>{if(!busy){preview=null;get('dialog').close();}});get('dialog').addEventListener('cancel',e=>{if(busy)e.preventDefault();else preview=null;});
  get('consent').addEventListener('change',()=>lock(busy));
  get('apply').addEventListener('click',async()=>{if(busy||!preview||!get('consent').checked)return;const token=preview.token;preview=null;lock(true);message(text('applying'));try{renderStatus(await post('apply',{token,consent:true}));get('dialog').close();message(text('applied'));}catch(e){state=null;get('dialog').close();message(e.message,true);}finally{lock(false);}});

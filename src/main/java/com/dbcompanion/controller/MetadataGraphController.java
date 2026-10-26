@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.*;
 public class MetadataGraphController {
     private final MetadataGraphService service;
     public MetadataGraphController(MetadataGraphService service){this.service=service;}
-    public record Request(String schema,String name,String token,Boolean confirmed) { }
-    @PostMapping("/preview") public ResponseEntity<?> preview(@RequestBody Request v,HttpServletRequest r){return run(r,()->service.preview(session(r),v.schema(),v.name()));}
+    public record Request(String schema,String name,String token,Boolean confirmed,List<String> relations) { }
+    @PostMapping("/preview") public ResponseEntity<?> preview(@RequestBody Request v,HttpServletRequest r){return run(r,()->service.preview(session(r),v.schema(),v.name(),v.relations()));}
     @PostMapping("/create") public ResponseEntity<?> create(@RequestBody Request v,HttpServletRequest r){return run(r,()->service.create(session(r),v.schema(),v.token(),Boolean.TRUE.equals(v.confirmed())));}
+    @PostMapping("/list") public ResponseEntity<?> existing(@RequestBody Request v,HttpServletRequest r){return run(r,()->service.existing(session(r),v.schema()));}
+    @PostMapping("/query") public ResponseEntity<?> query(@RequestBody Request v,HttpServletRequest r){return run(r,()->service.query(session(r),v.schema(),v.name()));}
     private PoolSession session(HttpServletRequest r){var s=r.getSession(false);return s==null?null:(PoolSession)s.getAttribute(PoolSession.ATTRIBUTE);}
     private ResponseEntity<?> error(int status,String text){return ResponseEntity.status(status).header("Cache-Control","no-store").body(Map.of("error",text));}
     private ResponseEntity<?> run(HttpServletRequest r,Supplier<?> action){

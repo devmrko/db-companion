@@ -10,7 +10,8 @@ import java.util.stream.Collectors;
 public final class PropertyGraph {
     private PropertyGraph(){}
     public record Item(String kind,String name,String alias,String status,String reason){}
-    public record Definition(String schema,String name,String sql,List<Item> items,int vertices,int edges){public Definition{items=List.copyOf(items);}}
+    public record Choice(String id,String name) { }
+    public record Definition(String schema,String name,String sql,List<Item> items,int vertices,int edges,List<Choice> available,List<String> selected){public Definition{items=List.copyOf(items);available=List.copyOf(available);selected=List.copyOf(selected);}}
     public record Access(boolean supported,boolean owner,boolean privilege,boolean exists,String existingStatus){public boolean allowed(){return supported&&owner&&privilege&&!exists;}}
     public record Preview(String token,Definition definition,Access access,Instant expires,boolean canCreate){}
     public record Draft(String token,String schema,Definition definition,List<Entry> entries,Instant expires){public Draft{entries=List.copyOf(entries);}}
@@ -22,10 +23,13 @@ public final class PropertyGraph {
     private static boolean keyType(String value){return value!=null&&value.toUpperCase(Locale.ROOT).matches("(?:NUMBER|FLOAT|VARCHAR2|NVARCHAR2|CHAR|NCHAR|BINARY_FLOAT|BINARY_DOUBLE|DATE|TIMESTAMP)(?:\\([^)]*\\))?");}
     private static boolean unique(Key k,Map<String,ColumnInfo> columns){return Set.of("P","U").contains(k.type())&&"ENABLED".equals(k.status())&&"VALIDATED".equals(k.validated())&&!k.columns().isEmpty()&&k.columns().size()<=32&&k.columns().stream().allMatch(n->{var c=columns.get(n);return c!=null&&"N".equals(c.nullable())&&keyType(c.dataType());});}
     private static List<String> vertexKey(Entry entry){var fields=columns(entry);return entry.document().source().keys().stream().filter(k->unique(k,fields)).sorted(Comparator.comparing((Key k)->!k.type().equals("P")).thenComparing(Key::name)).map(Key::columns).findFirst().orElse(List.of());}
-    public static Definition build(String schema,String requested,List<Entry> entries,Analysis analysis){
+    public static Definition build(String schema,String requested,List<Entry> entries,Analysis analysis){return build(schema,requested,entries,analysis,null);}
+    public static Definition build(String schema,String requested,List<Entry> entries,Analysis analysis,List<String> relationIds){
         String name=graphName(requested);if(!analysis.schema().equals(schema))throw new Failure(409,"stale");
+        if(relationIds!=null&&(relationIds.size()>Ontology.GRAPH_EDGE_LIMIT||new HashSet<>(relationIds).size()!=relationIds.size()))throw new Failure(400,"invalid");
+        var requestedIds=relationIds==null?null:new HashSet<>(relationIds);
         var tables=new LinkedHashMap<String,Entry>();entries.forEach(e->{if(!e.document().source().schema().equals(schema)||tables.putIfAbsent(e.document().source().table(),e)!=null)throw new Failure(409,"stale");});
-        var keys=new LinkedHashMap<String,List<String>>();var aliases=new HashMap<String,String>();var items=new ArrayList<Item>();var vertices=new ArrayList<String>();var edges=new ArrayList<String>();
+        var keys=new LinkedHashMap<String,List<String>>();var aliases=new HashMap<String,String>();var items=new ArrayList<Item>();var vertices=new ArrayList<String>();var edges=new ArrayList<String>();var available=new ArrayList<Choice>();var selected=new ArrayList<String>();
         for(var table:tables.entrySet()){
             var key=vertexKey(table.getValue());String alias="V"+(vertices.size()+1);
             if(key.isEmpty()){items.add(new Item("TABLE",table.getKey(),"","EXCLUDED","KEY_REQUIRED"));continue;}
@@ -46,12 +50,16 @@ public final class PropertyGraph {
                 else for(int i=0;i<r.sourceColumns().size();i++){var a=from.get(r.sourceColumns().get(i));var b=fields.get(r.targetColumns().get(i));if(a==null||b==null||!OntologyRelations.compatible(a.dataType(),b.dataType()))reason="MAPPING";}
             }
             if(!reason.isEmpty()){items.add(new Item("RELATION",display,"","EXCLUDED",reason));continue;}
+            available.add(new Choice(r.id(),display));
+            if(requestedIds!=null&&!requestedIds.contains(r.id()))continue;
+            selected.add(r.id());
             String alias="E"+(edges.size()+1);
             edges.add(quote(schema)+"."+quote(r.source())+" AS "+quote(alias)+" KEY ("+cols(keys.get(r.source()))+")\n    SOURCE KEY ("+cols(keys.get(r.source()))+") REFERENCES "+quote(aliases.get(r.source()))+" ("+cols(keys.get(r.source()))+")\n    DESTINATION KEY ("+cols(r.sourceColumns())+") REFERENCES "+quote(aliases.get(r.target()))+" ("+cols(r.targetColumns())+") LABEL "+quote(alias)+" NO PROPERTIES");
             items.add(new Item("RELATION",display,alias,"INCLUDED",""));
         }
+        if(requestedIds!=null&&!new HashSet<>(available.stream().map(Choice::id).toList()).containsAll(requestedIds))throw new Failure(409,"stale");
         String sql=vertices.isEmpty()?"":"CREATE PROPERTY GRAPH "+quote(schema)+"."+quote(name)+"\nVERTEX TABLES (\n  "+String.join(",\n  ",vertices)+"\n)"+(edges.isEmpty()?"":"\nEDGE TABLES (\n  "+String.join(",\n  ",edges)+"\n)")+"\nOPTIONS (TRUSTED MODE)";
-        if(sql.length()>500_000)throw new Failure(413,"limit");return new Definition(schema,name,sql,items,vertices.size(),edges.size());
+        if(sql.length()>500_000)throw new Failure(413,"limit");return new Definition(schema,name,sql,items,vertices.size(),edges.size(),available,selected);
     }
     public static boolean sameDefinitions(List<Entry> before,List<Entry> after){
         if(before.size()!=after.size())return false;var refs=new HashMap<String,Entry>();before.forEach(e->refs.put(e.document().source().table(),e));

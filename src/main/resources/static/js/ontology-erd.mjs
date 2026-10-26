@@ -94,7 +94,7 @@ export function ontologyErd(root,{schema,base}) {
     if(typeof globalThis.cytoscape!=='function')throw new Error(label('libraryError'));
     const theme=getComputedStyle(root),color=(name,fallback)=>theme.getPropertyValue(name).trim()||fallback;
     cy=globalThis.cytoscape({container:get('canvas'),elements:graphElements(view),minZoom:0.1,maxZoom:2.5,
-      boxSelectionEnabled:false,autounselectify:false,wheelSensitivity:0.2,
+      boxSelectionEnabled:false,autounselectify:false,
       layout:{name:'grid',padding:35,avoidOverlap:true},
       style:[
         {selector:'node',style:{shape:'roundrectangle',width:280,height:'data(height)',label:'data(label)',

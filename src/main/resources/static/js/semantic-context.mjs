@@ -9,7 +9,7 @@ export function validSources(value) {
   catch { return false; }
 }
 export function mountSemantic(root) {
-  const get=n=>root.querySelector(`[data-sem-${n}]`),label=k=>t('semantic.'+k,k);
+  const get=n=>root.querySelector(`[data-sem-${n}]`),label=k=>t('semanticContext.'+k,k);
   let busy=false,locked=false,ready=false;
   const message=text=>{get('message').textContent=text;};
   const controls=()=>{for(const n of get('enabled').querySelectorAll('input,select,textarea,button'))n.disabled=busy||!ready;get('refresh').disabled=busy;get('save').disabled=busy||locked||!ready;};

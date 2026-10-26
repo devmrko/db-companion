@@ -1,4 +1,5 @@
 import {t} from './i18n.mjs';
+import {changeHistorySummary} from './change-history-summary.mjs';
 import {valueChange,compactRows} from './profile-diff.mjs';
 
 export function rowHistoryControls(state,busy=false) {
@@ -80,7 +81,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-row-history]')
       for(const entry of data.entries){
         const article=node('article','','app-history-entry'),button=node('button',t('ui.d8291eb080d2','변경 내용'),'btn app-btn app-btn-quiet');
         const operation={I:t('ui.bb216f104fde','등록'),U:t('ui.3537f0cc3ec9','수정'),D:t('ui.6139b6c3ed73','삭제')}[entry.operation]??entry.operation;
-        article.append(node('h3',`#${entry.seq} · ${entry.eventAt} · ${entry.actor}`),node('p',`${operation} · ${t('rowHistory.tableId','테이블 ID {0}',entry.tableId)}`,'app-muted'));
+        article.append(node('h3',`#${entry.seq}`),node('p',changeHistorySummary({actor:entry.actor,at:entry.eventAt,content:`${operation} · ${t('rowHistory.tableId','테이블 ID {0}',entry.tableId)}`}), 'app-change-history-summary'));
         button.type='button';button.addEventListener('click',()=>choose(entry.seq));article.append(button);find('entries').append(article);
       }
     }catch(ex){if(ex.name!=='AbortError'&&version===generation)find('message').textContent=ex.message;}finally{if(version===generation)pager(false);}

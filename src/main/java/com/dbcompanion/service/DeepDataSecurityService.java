@@ -34,6 +34,7 @@ public class DeepDataSecurityService {
             return session.metadata().security(kind,schema,refresh,()->query(session,schema,()->repository.list(kind,schema)));
         }
     }
+    public java.util.Map<String,String> capabilities(PoolSession session){synchronized(session){return query(session,session.metadata().info().username(),repository::capabilities);}}
     public Detail detail(PoolSession session,String schema,Kind kind,String name,String owner){
         identifier(name);if(kind==Kind.grants)identifier(owner);
         synchronized(session){

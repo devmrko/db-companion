@@ -26,6 +26,8 @@ class AiSqlHistoryTemplateTest {
         context.setVariable("activePage", "executions"); context.setVariable("result", page); context.setVariable("policies", policies);
         context.setVariable("q", new Query(source,LocalDate.of(2026,9,15),LocalDate.of(2026,9,21),"","<script>filter</script>","",page==null?1:page.number(),match));
         context.setVariable("awrAllowed", false); context.setVariable("load", page != null);
+        var allowed=com.dbcompanion.service.AiSqlHistoryAccessService.Access.allowed();
+        context.setVariable("sqlCapabilities", java.util.Map.of("mapping",allowed,"cache",allowed,"awr",allowed,"audit",allowed,"policies",allowed));
         return engine.process("ai-sql-history",context);
     }
     private Page page(Failure failure) { return new Page(List.of(),1,false,Instant.parse("2026-09-21T00:00:00Z"),failure); }
@@ -34,6 +36,7 @@ class AiSqlHistoryTemplateTest {
             String html = render(source,null,null,locale);
             assertThat(html).contains("data-execution-mode=\"history\"", "source=cache", "source=awr", "source=audit", "data-execution-help")
                     .doesNotContain("??", "th:", "<script>filter</script>", "name=\"schema\"");
+            assertThat(html).contains("data-sql-help-for=\"executions\" data-sql-help-operation=\""+source.name()+"\"");
         }
     }
     @Test void initialVisitDoesNotClaimEmptySuccessOrAutomaticallyConfirmAwr() {
@@ -52,6 +55,16 @@ class AiSqlHistoryTemplateTest {
         String html = render(Source.cache,new Page(List.of(row),2,true,Instant.now(),null),null,Locale.KOREAN);
         assertThat(html).contains("page=1", "page=3", "from=2026-09-15", "data-execution-id=\"safe-id\"", "&lt;script&gt;sql", "파싱 스키마", "마지막 활성 (DB)")
                 .doesNotContain("<script>sql</script>", "private-composite-key", "name=\"awrAllowed\"");
+    }
+    @Test void cancellationIsNotReportedAsMissingPrivilegesOrAnEmptySuccess() {
+        for (var locale : List.of(Locale.KOREAN, Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.JAPANESE)) {
+            String html = render(Source.cache,page(new Failure(1013,"ORA-01013 <cancel>")),null,locale);
+            assertThat(html).contains("data-access=\"cancelled\"", "ORA-01013 &lt;cancel&gt;")
+                    .doesNotContain("??", "data-access=\"unknown\"", "data-access=\"required\"", "data-access=\"available\"");
+        }
+        assertThat(render(Source.cache,page(new Failure(1013,"ORA-01013")),null,Locale.KOREAN))
+                .contains("제한 시간(10초)", "권한 부족을 뜻하지 않습니다.")
+                .doesNotContain("원천의 지원 여부와 조회 권한을 확인해 주세요.", "조건에 맞는 기록이 없습니다.");
     }
     @Test void auditDoesNotShowSqlIdFilterAndPolicyErrorsDoNotHideLogList() {
         String html = render(Source.audit,page(null),new Policies(List.of(),false,Instant.now(),new Failure(942,"ORA-00942 policy")),Locale.KOREAN);

@@ -73,7 +73,10 @@ public final class ProfileEditPolicy {
             throw new MetadataEditException(404, "Profile not found", UiMessages.text("ui.827fdc31d3d2", "프로필이 더 이상 존재하지 않습니다."));
         if ("semantic_source".equals(target.attribute()) && snapshot.get("attributes") instanceof Map<?,?> fields
                 && !fields.containsKey(target.attribute())) return "[]";
-        if (!(snapshot.get("attributes") instanceof Map<?,?> attributes) || !attributes.containsKey(target.attribute()))
+        if (!(snapshot.get("attributes") instanceof Map<?,?> attributes))
+            throw new MetadataEditException(409, "Attribute not found", UiMessages.text("ui.7ef8d5ba9f46", "속성이 더 이상 존재하지 않습니다. 상세 화면을 다시 열어 주세요."));
+        // max_tokens is an explicitly supported optional setting. Its absence means provider default.
+        if (!attributes.containsKey(target.attribute()) && !"max_tokens".equals(target.attribute()))
             throw new MetadataEditException(409, "Attribute not found", UiMessages.text("ui.7ef8d5ba9f46", "속성이 더 이상 존재하지 않습니다. 상세 화면을 다시 열어 주세요."));
         Object value=attributes.get(target.attribute());
         if (value != null && !(value instanceof String)) throw new IllegalStateException("Unexpected profile attribute type");

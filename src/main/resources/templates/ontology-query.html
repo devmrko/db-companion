@@ -3,6 +3,7 @@
 <head th:replace="~{fragments/common :: head(#{ontology.query.title})}"></head>
 <body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside><div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content">
   <div class="app-page-heading"><h1 th:text="#{ontology.query.title}"></h1><button th:replace="~{fragments/common :: sqlHelp('ontology-query', 'definitions')}"></button><details class="app-dds-help"><summary th:aria-label="#{ontology.query.helpTitle}">?</summary><div><p th:text="#{ontology.query.help}"></p><p th:text="#{ontology.query.skos}"></p><p th:text="#{ontology.query.limits}"></p></div></details></div>
+  <section th:replace="~{fragments/semantic-release :: panel}"></section>
   <section data-ontology-query th:attr="data-schema=${selectedSchema},data-base=@{/ontology-query},data-rdf=@{/ontology/rdf}">
     <input type="hidden" data-oq-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
     <section class="app-card">
@@ -20,7 +21,7 @@
       <div data-oq-tokens aria-live="polite"></div>
       <p class="app-filter-message" data-oq-path-note></p><div data-oq-routes></div>
       <details class="app-query-alternatives" data-oq-alternatives hidden><summary th:text="#{ontology.query.paths.alternatives}"></summary><div data-oq-other-routes></div></details>
-      <p class="app-filter-message" th:text="#{ontology.query.paths.confirmMeaning}"></p>
+      <p class="app-filter-message" data-oq-route-guidance th:text="#{ontology.query.paths.confirmMeaning}"></p>
       <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-secondary" data-oq-answer disabled th:text="#{ontology.query.explain}"></button><button type="button" class="btn app-btn app-btn-primary" data-oq-sql disabled th:text="#{ontology.query.makeSql}"></button><button type="button" class="btn app-btn app-btn-quiet" data-oa-preview disabled th:text="#{ontology.archive.preview}"></button></div>
     </section>
     <section class="app-card" data-oq-answer-panel hidden><h2 th:text="#{ontology.query.explanation}"></h2><div data-oq-answer-body></div><p class="app-filter-message" data-oq-answer-meta></p></section>
@@ -51,4 +52,4 @@
       </section>
     </dialog>
   </section>
-</main></div><script type="module" th:src="@{/js/ontology-query.mjs}"></script></body></html>
+</main></div><script th:src="@{/webjars/cytoscape/3.34.1/dist/cytoscape.min.js}"></script><script type="module" th:src="@{/js/ontology-query.mjs}"></script></body></html>

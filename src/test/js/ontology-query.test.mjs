@@ -9,7 +9,7 @@ test('missing Oracle analysis is distinct from a completed search with no matche
   assert.equal(analysisMissing(null),false);
   const code=readFileSync('src/main/resources/static/js/ontology-query.mjs','utf8');
   assert.match(code,/search\.routes\.length\|\|analysisMissing\(search\)\?'':q\('paths.noRoute'\)/);
-  assert.match(code,/get\('anchor'\)\.value\|\|analysisMissing\(search\)\?'':q\('noMatch'\)/);
+  assert.match(code,/ai-interpret-preview/);assert.match(code,/interpretation\.questions\.length/);
 });
 
 test('route selection groups tables and preserves actual foreign key direction',()=>{

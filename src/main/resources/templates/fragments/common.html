@@ -27,6 +27,7 @@
     <a class="app-nav-item" th:classappend="${activePage == 'business-glossary'} ? 'is-active'" th:href="@{/business-glossary}" th:attr="aria-current=${activePage == 'business-glossary' ? 'page' : null}" th:aria-label="#{businessGlossary.title}" th:title="#{businessGlossary.title}"><svg th:replace="~{fragments/common :: icon('search')}"></svg><span class="app-nav-text" th:text="#{businessGlossary.title}">업무 용어 사전</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'ontology'} ? 'is-active'" th:href="@{/ontology}" th:attr="aria-current=${activePage == 'ontology' ? 'page' : null}" th:aria-label="#{ontology.title}" th:title="#{ontology.title}"><svg th:replace="~{fragments/common :: icon('layers')}"></svg><span class="app-nav-text" th:text="#{ontology.title}">온톨로지</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'ontology-query'} ? 'is-active'" th:href="@{/ontology-query}" th:attr="aria-current=${activePage == 'ontology-query' ? 'page' : null}" th:aria-label="#{ontology.query.title}" th:title="#{ontology.query.title}"><svg th:replace="~{fragments/common :: icon('search')}"></svg><span class="app-nav-text" th:text="#{ontology.query.title}">온톨로지 질의</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'semantic-versions'} ? 'is-active'" th:href="@{/semantic-versions}" th:attr="aria-current=${activePage == 'semantic-versions' ? 'page' : null}" th:title="#{semantic.management}"><svg th:replace="~{fragments/common :: icon('history')}"></svg><span class="app-nav-text" th:text="#{semantic.management}">배포 버전 관리</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'assistant'} ? 'is-active'" th:href="@{/ai-assistant}" th:attr="aria-current=${activePage == 'assistant' ? 'page' : null}" th:aria-label="#{assistant.title}" th:title="#{assistant.title}"><svg th:replace="~{fragments/common :: icon('layers')}"></svg><span class="app-nav-text" th:text="#{assistant.title}">AI 도우미 설정</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'vectors'} ? 'is-active'" th:href="@{/vector-search}" th:attr="aria-current=${activePage == 'vectors' ? 'page' : null}" th:aria-label="#{ui.fee12485ed4c}" th:title="#{ui.fee12485ed4c}"><svg th:replace="~{fragments/common :: icon('search')}"></svg><span class="app-nav-text" th:text="#{ui.fee12485ed4c}">벡터 검색</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'tables'} ? 'is-active'" th:href="@{/tables}" th:attr="aria-current=${activePage == 'tables' ? 'page' : null}" th:aria-label="#{ui.31c660ef0b9a}" th:title="#{ui.31c660ef0b9a}"><svg th:replace="~{fragments/common :: icon('table')}"></svg><span class="app-nav-text" th:text="#{ui.31c660ef0b9a}">테이블·컬럼</span></a>
@@ -39,6 +40,8 @@
   </nav>
   <p class="app-nav-label app-nav-group" th:text="#{functions.nav}">DB 관리</p>
   <nav th:aria-label="#{functions.nav}">
+    <a class="app-nav-item" th:classappend="${activePage == 'scott-demo'} ? 'is-active'" th:href="@{/db/scott-demo}"><svg th:replace="~{fragments/common :: icon('code')}"></svg><span class="app-nav-text" th:text="#{scottSetup.title}">SCOTT 데모 설치</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'accounts'} ? 'is-active'" th:href="@{/db/accounts}" th:attr="aria-current=${activePage == 'accounts' ? 'page' : null}"><svg th:replace="~{fragments/common :: icon('code')}"></svg><span class="app-nav-text" th:text="#{accountSetup.title}">계정 생성·권한 설정</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'scheduler'} ? 'is-active'" th:href="@{/db/scheduler}" th:attr="aria-current=${activePage == 'scheduler' ? 'page' : null}" th:aria-label="#{scheduler.title}" th:title="#{scheduler.title}"><svg th:replace="~{fragments/common :: icon('history')}"></svg><span class="app-nav-text" th:text="#{scheduler.title}">스케줄러</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'ords'} ? 'is-active'" th:href="@{/db/ords}" th:attr="aria-current=${activePage == 'ords' ? 'page' : null}" th:aria-label="#{ords.title}" th:title="#{ords.title}"><svg th:replace="~{fragments/common :: icon('database')}"></svg><span class="app-nav-text" th:text="#{ords.title}">ORDS</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'external'} ? 'is-active'" th:href="@{/db/external-sources}" th:attr="aria-current=${activePage == 'external' ? 'page' : null}" th:aria-label="#{external.title}" th:title="#{external.title}"><svg th:replace="~{fragments/common :: icon('database')}"></svg><span class="app-nav-text" th:text="#{external.title}">외부 데이터 소스</span></a>
@@ -49,12 +52,13 @@
     <a class="app-nav-item" th:classappend="${activePage == 'functions'} ? 'is-active'" th:href="@{/db/functions}" th:attr="aria-current=${activePage == 'functions' ? 'page' : null}" th:aria-label="#{functions.title}" th:title="#{functions.title}"><svg th:replace="~{fragments/common :: icon('code')}"></svg><span class="app-nav-text" th:text="#{functions.title}">함수</span></a>
   </nav>
 </aside>
-<header th:fragment="topbar" class="app-topbar">
+<header th:fragment="topbar" class="app-topbar" th:attr="data-admin-account=${info != null ? info.username : ''}">
   <div class="app-breadcrumb">
     <button class="btn app-btn app-btn-quiet app-icon-button" type="button" data-sidebar-toggle aria-controls="app-sidebar" aria-expanded="true" th:aria-label="#{ui.9f6ec12024c7}" th:title="#{ui.9f6ec12024c7}"><svg th:replace="~{fragments/common :: icon('sidebar')}"></svg></button>
     <strong th:if="${info != null}" th:text="${info.username}"></strong>
   </div>
   <div class="app-topbar-actions">
+    <a th:if="${info != null}" class="btn app-btn app-btn-quiet" th:href="@{/db/admin-help}" th:text="#{adminHelp.title}"></a>
     <form th:replace="~{fragments/common :: language}"></form>
     <form th:if="${schemas != null}" th:action="@{/schema}" method="post" class="app-schema-form" data-schema-form>
       <label for="schema" th:text="#{ui.3f863f643fcc}">스키마</label>

@@ -1,4 +1,5 @@
 import {t} from './i18n.mjs';
+import {changeHistorySummary} from './change-history-summary.mjs';
 import {snapshotChanges,compactRows} from './profile-diff.mjs';
 
 export function trackingActions(state={}) {
@@ -69,7 +70,8 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-feedback-track
       find('message').textContent=data.entries.length?'':t('ui.80168c9d1394', "보관된 이력이 없습니다.");
       for(const entry of data.entries) {
         const article=node('article','','app-history-entry'),button=node('button',t('ui.d8291eb080d2', "변경 내용"),'btn app-btn app-btn-quiet');
-        article.append(node('h3',`#${entry.seq} · ${entry.eventAt} · ${entry.actor}`),node('p',t('ui.3a119bfbba90', "{0} · 프로필 ID {1}", ({I:t('ui.bb216f104fde', "등록"),U:t('ui.3537f0cc3ec9', "수정"),D:t('ui.6139b6c3ed73', "삭제")})[entry.operation]??entry.operation, entry.profileId),'app-muted'));
+        const content=t('ui.3a119bfbba90', "{0} · 프로필 ID {1}", ({I:t('ui.bb216f104fde', "등록"),U:t('ui.3537f0cc3ec9', "수정"),D:t('ui.6139b6c3ed73', "삭제")})[entry.operation]??entry.operation, entry.profileId);
+        article.append(node('h3',`#${entry.seq}`),node('p',changeHistorySummary({actor:entry.actor,at:entry.eventAt,content}),'app-change-history-summary'));
         button.type='button';button.addEventListener('click',()=>choose(entry.seq));article.append(button);find('entries').append(article);
       }
     }catch(error){if(error.name!=='AbortError'&&version===generation)find('message').textContent=error.message;}

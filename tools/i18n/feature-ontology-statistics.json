@@ -1,0 +1,86 @@
+{
+  "ontology.statistics.title": [
+    "통계 근거 확인",
+    "Inspect statistical evidence",
+    "查看统计依据",
+    "統計根拠を確認"
+  ],
+  "ontology.statistics.bounded": [
+    "최대 1,000행의 제한행 분석입니다. 무작위 표본이나 전체 통계가 아닙니다. 로컬 일반 테이블·검증된 단순 뷰를 지원하며 민감 값·긴 값은 숨깁니다. 결과는 저장하거나 AI에 자동 전송하지 않습니다.",
+    "Limited to 1,000 non-random rows, not whole-table statistics. Local ordinary tables and verified projection-only views. Sensitive or long values are withheld. Results are not saved or automatically sent to AI.",
+    "最多分析 1,000 行，非随机样本或全表统计。支持本地普通表及已验证的简单视图；隐藏敏感值和长值。不保存结果或自动发送给 AI。",
+    "最大 1,000 行の非ランダム分析です。全体統計ではありません。ローカル通常テーブル・検証済み単純ビューに対応し、機密値・長い値は非表示。保存や AI への自動送信は行いません。"
+  ],
+  "ontology.statistics.column": [
+    "분석 컬럼",
+    "Column to analyze",
+    "分析列",
+    "分析する列"
+  ],
+  "ontology.statistics.consent": [
+    "선택 컬럼을 최대 1,000행 읽어 분석하는 데 동의합니다.",
+    "I agree to read up to 1,000 rows of the selected column.",
+    "同意读取所选列最多 1,000 行。",
+    "選択列を最大 1,000 行読み取ることに同意します。"
+  ],
+  "ontology.statistics.analyze": [
+    "통계 확인",
+    "Inspect statistics",
+    "查看统计",
+    "統計を確認"
+  ],
+  "ontology.statistics.observed": [
+    "관측 행 수",
+    "Observed rows",
+    "观测行数",
+    "観測行数"
+  ],
+  "ontology.statistics.nulls": [
+    "NULL 건수",
+    "NULL count",
+    "NULL 数",
+    "NULL 件数"
+  ],
+  "ontology.statistics.nullRatio": [
+    "관측 범위 NULL 비율",
+    "NULL ratio in observed rows",
+    "观测范围 NULL 比例",
+    "観測範囲の NULL 比率"
+  ],
+  "ontology.statistics.withheld": [
+    "값 비공개 건수",
+    "Withheld values",
+    "隐藏值数",
+    "非表示の値の件数"
+  ],
+  "ontology.statistics.distinct": [
+    "공개 가능한 관측 값 종류 수",
+    "Distinct publishable observed values",
+    "可公开观测值种类数",
+    "公開可能な観測値の種類数"
+  ],
+  "ontology.statistics.minimum": [
+    "관측 최솟값 (숫자·날짜)",
+    "Observed minimum (numeric/date)",
+    "观测最小值（数字/日期）",
+    "観測最小値（数値・日付）"
+  ],
+  "ontology.statistics.maximum": [
+    "관측 최댓값 (숫자·날짜)",
+    "Observed maximum (numeric/date)",
+    "观测最大值（数字/日期）",
+    "観測最大値（数値・日付）"
+  ],
+  "ontology.statistics.frequency": [
+    "관측 값 상위 5개 · 건수 (따옴표로 공백 구분)",
+    "Top 5 observed values · Counts (quoted to show spaces)",
+    "观测值前 5 项 · 数量（引号显示空格）",
+    "観測値上位 5 件・件数（空白を引用符で表示）"
+  ],
+  "ontology.statistics.aiOption": [
+    "통계 근거로 보강: 선택 컬럼을 최대 1,000행 추가 조회합니다. AI에는 건수·빈도 요약만 추가하며, 전송 미리보기에서 확인합니다. 전체 분포나 의미를 확정하지 않습니다.",
+    "Add statistical evidence: read up to 1,000 additional rows for selected columns. Only count/frequency summaries are added to the AI preview, not additional raw values. This does not establish population distributions or meanings.",
+    "补充统计依据：额外读取所选列最多 1,000 行。AI 预览仅添加数量和频次摘要，不添加额外原始值。不确定整体分布或含义。",
+    "統計根拠で補強：選択列を最大 1,000 行追加照会します。AI 送信プレビューには件数・頻度要約のみ追加し、追加の生値は送りません。全体分布や意味の確定ではありません。"
+  ]
+}

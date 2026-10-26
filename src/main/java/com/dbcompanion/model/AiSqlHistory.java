@@ -38,7 +38,9 @@ public final class AiSqlHistory {
     public record Item(String id, String time, String sqlId, String actor, String kind, String count, String preview, List<String> keys) {
         public Item { keys = List.copyOf(keys); }
     }
-    public record Failure(int code, String details) {}
+    public record Failure(int code, String details) {
+        public boolean cancelled() { return code == 1013; }
+    }
     public static final class AmbiguousRecord extends RuntimeException {}
     public static final class SourceUnavailable extends RuntimeException {
         public SourceUnavailable(String message) { super(message); }
@@ -50,7 +52,21 @@ public final class AiSqlHistory {
         }
     }
     public record Field(String name, String value) {}
-    public record Detail(List<Field> fields, String sql) {}
+    public record Translation(String sqlId, String translated, String method, String sql) {}
+    public record Mapping(String status, List<Translation> items, boolean more) {
+        public Mapping { items = List.copyOf(items); }
+    }
+    public record Detail(List<Field> fields, String sql, String source, Mapping mapping) {
+        public Detail(List<Field> fields, String sql) { this(fields, sql, "", null); }
+    }
+    public record SqlCandidate(String sqlId, String sql, List<String> objects, String lastActive,
+            long offsetSeconds, String executions, String elapsedSeconds, String evidence) {
+        public SqlCandidate { objects = List.copyOf(objects); }
+    }
+    public record Candidates(String anchorTime, String schema, String sessionEvidence, List<SqlCandidate> items,
+            boolean limited, int omitted) {
+        public Candidates { items = List.copyOf(items); }
+    }
     public record Policies(List<List<Field>> rows, boolean more, Instant observed, Failure failure) {
         public Policies { rows = rows.stream().map(List::copyOf).toList(); }
     }
@@ -60,7 +76,10 @@ public final class AiSqlHistory {
         private Policies policies;
         public synchronized Page page(Query query, Supplier<Page> loader) {
             if (!pages.containsKey(query)) {
-                pages.put(query, loader.get());
+                var loaded = loader.get();
+                // A subsequent explicit search may retry a cancelled query; never retry automatically.
+                if (loaded.failure() != null && loaded.failure().cancelled()) return loaded;
+                pages.put(query, loaded);
                 while (pages.size() > 12) pages.remove(pages.keySet().iterator().next());
             }
             return pages.get(query);

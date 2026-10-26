@@ -7,6 +7,22 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
 
 class CallableAiTest {
+    @Test void binaryResultsUseNativeBuffersAndPreserveNumericStringContract(){
+        String body=CallableAiSql.resource("body.sql");
+        for(var entry:Map.of(100,"float",101,"double").entrySet()){
+            String value="value_"+entry.getValue();
+            assertThat(body).contains("WHEN "+entry.getKey()+" THEN DBMS_SQL.DEFINE_COLUMN(cursor_no,i,"+value+")",
+                "DBMS_SQL.COLUMN_VALUE(cursor_no,i,"+value+")",
+                "IF "+value+" IS NULL THEN row_json.append_null",
+                "ELSIF "+value+" IS NAN OR "+value+" IN (BINARY_"+entry.getValue().toUpperCase(Locale.ROOT)+"_INFINITY,-BINARY_"+entry.getValue().toUpperCase(Locale.ROOT)+"_INFINITY)",
+                "Non-finite BINARY_"+entry.getValue().toUpperCase(Locale.ROOT)+" result at column ",
+                "TO_CHAR("+value+",'TM9','NLS_NUMERIC_CHARACTERS=''.,''')");
+            assertThat(body).doesNotContain("TO_NUMBER("+value, "CAST("+value);
+        }
+        assertThat(body).contains("TO_CHAR(value_number,'TM9','NLS_NUMERIC_CHARACTERS=''.,''')",
+            "IF rows_json.get_size>=p_limit THEN more:=TRUE;EXIT; END IF", "Unsupported result type: ",
+            "DBMS_SQL.CLOSE_CURSOR(cursor_no)");
+    }
     @Test void scriptsContainNativeSearchIndependentOptionsAndInvokerRights(){
         var scripts=CallableAiSql.statements("DEMO_APP");assertThat(scripts).hasSize(2);
         assertThat(scripts.getFirst()).startsWith("CREATE PACKAGE \"DEMO_APP\".\"DBC_AI_QUERY\" AUTHID CURRENT_USER");

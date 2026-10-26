@@ -19,9 +19,10 @@ export function helpFor(feature,locale='ko',operation) {
   if(!item)return null;
   const lang=localeKey(locale),ko=lang==='ko',ui=labels[lang];
   const placeholders=[...new Set((item.sql+'\n'+(item.verify||'')).match(/<[A-Z][A-Z0-9_]*>|(?<![\w:]):[a-z][a-z0-9_]*/g)||[])];
-  return {...item,title:local(item.title,lang),purpose:local(item.purpose,lang),labels:ui,
+  const projectDoc={ko:'DB Companion 구현 문서',en:'DB Companion implementation guide',ja:'DB Companion 実装ガイド',zh:'DB Companion 实现文档'};
+  return {...item,title:local(item.title,lang),purpose:local(item.purpose,lang),labels:{...ui,doc:item.docKind==='project'?projectDoc[lang]:ui.doc},
     variables:(placeholders.length?placeholders.join(', '):ko?'별도 입력값 없음.':'No input placeholders.')+'\n'+(ko?'꺾쇠 예시는 실제 값으로 바꾸고, :이름은 SQLcl/JDBC에서 알맞은 타입으로 바인드하세요. 문자열의 작은따옴표는 두 번 써서 이스케이프합니다. SET/VARIABLE/PRINT 및 /는 SQLcl 명령이며 JDBC 구문에는 포함하지 않습니다.':'Replace angle-bracket placeholders; bind :names with suitable types in SQLcl/JDBC. Escape literal single quotes by doubling them. SET/VARIABLE/PRINT and / are SQLcl commands, not JDBC SQL.'),
-    permission:ko?'조회는 대상 사전 뷰·테이블 SELECT 권한이 필요합니다(ORA-00942는 권한 또는 객체 가용성 확인 필요). 변경은 소유자·해당 패키지 EXECUTE/DDL 권한이 필요하며, ADMIN·IAM 설정이 필요한 예제는 별도로 표시합니다. USER_*는 로그인 사용자 기준입니다.':'Requires SELECT on the referenced views/tables; ORA-00942 may indicate unavailable objects or privileges. Changes require owner/package EXECUTE/DDL privileges; ADMIN/IAM steps are noted separately. USER_* refers to the logged-in user.',
+    permission:local(item.permission,lang)||(ko?'조회는 대상 사전 뷰·테이블 SELECT 권한이 필요합니다(ORA-00942는 권한 또는 객체 가용성 확인 필요). 변경은 소유자·해당 패키지 EXECUTE/DDL 권한이 필요하며, ADMIN·IAM 설정이 필요한 예제는 별도로 표시합니다. USER_*는 로그인 사용자 기준입니다.':'Requires SELECT on the referenced views/tables; ORA-00942 may indicate unavailable objects or privileges. Changes require owner/package EXECUTE/DDL privileges; ADMIN/IAM steps are noted separately. USER_* refers to the logged-in user.'),
     effects:ui[item.risk]+' · '+ui.notice,
     result:local(item.note,lang),verify:item.verify||'',source:item.source
   };

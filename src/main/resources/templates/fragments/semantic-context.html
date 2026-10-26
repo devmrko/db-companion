@@ -2,47 +2,47 @@
 <html xmlns:th="http://www.thymeleaf.org"><body>
 <section th:fragment="panel" class="app-card mt-3 p-3" data-semantic-context th:attr="data-schema=${selectedSchema}">
   <div class="app-card-heading"><h2>Semantic Context</h2><button type="button" class="btn app-btn app-btn-secondary" data-sem-refresh th:text="#{ui.8259f9d35351}">새로고침</button></div>
-  <p th:text="#{semantic.intro}"></p>
+  <p th:text="#{semanticContext.intro}"></p>
   <p class="app-muted" data-sem-status role="status" aria-live="polite"></p>
-  <p class="app-muted" th:text="#{semantic.baseline}"></p>
+  <p class="app-muted" th:text="#{semanticContext.baseline}"></p>
   <section class="border rounded p-3 mb-3" th:if="${info != null and info.username == 'ADMIN'}" data-sem-access>
-    <h3 th:text="#{semantic.accessTitle}"></h3><p th:text="#{semantic.accessHelp}"></p>
+    <h3 th:text="#{semanticContext.accessTitle}"></h3><p th:text="#{semanticContext.accessHelp}"></p>
     <input type="hidden" data-sa-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
-    <label><span th:text="#{semantic.accessUser}"></span><select class="form-select" data-sa-user></select></label>
-    <button type="button" class="btn app-btn" data-sa-check th:text="#{semantic.accessCheck}"></button>
-    <button type="button" class="btn app-btn" data-sa-preview disabled th:text="#{semantic.accessPreview}"></button>
+    <label><span th:text="#{semanticContext.accessUser}"></span><select class="form-select" data-sa-user></select></label>
+    <button type="button" class="btn app-btn" data-sa-check th:text="#{semanticContext.accessCheck}"></button>
+    <button type="button" class="btn app-btn" data-sa-preview disabled th:text="#{semanticContext.accessPreview}"></button>
     <p data-sa-message role="status" aria-live="polite"></p>
     <div data-sa-review hidden><pre data-sa-sql class="app-preview-source"></pre>
-      <label><input type="checkbox" data-sa-consent> <span th:text="#{semantic.accessConfirm}"></span></label>
-      <button type="button" class="btn app-btn app-btn-primary" data-sa-grant disabled th:text="#{semantic.accessGrant}"></button>
+      <label><input type="checkbox" data-sa-consent> <span th:text="#{semanticContext.accessConfirm}"></span></label>
+      <button type="button" class="btn app-btn app-btn-primary" data-sa-grant disabled th:text="#{semanticContext.accessGrant}"></button>
     </div>
   </section>
   <div data-sem-enabled hidden>
-    <p><a class="btn app-btn app-btn-secondary" th:href="@{/db/functions/glossary-search}" th:text="#{semantic.function}"></a></p>
-    <p th:text="#{semantic.functionNote}"></p>
-    <div class="table-responsive"><table class="table app-table"><thead><tr><th th:text="#{semantic.name}"></th><th th:text="#{semantic.type}"></th><th th:text="#{ui.e10195a1239f}"></th><th>Function</th></tr></thead><tbody data-sem-sources></tbody></table></div>
-    <p th:if="${profileName != null and profileEditable}"><button type="button" class="btn app-btn app-btn-secondary" data-edit-profile-attribute="semantic_source" th:text="#{semantic.attach}"></button></p>
-    <p th:text="#{semantic.pickerHelp}"></p>
-    <details><summary th:text="#{semantic.create}"></summary>
+    <p><a class="btn app-btn app-btn-secondary" th:href="@{/db/functions/glossary-search}" th:text="#{semanticContext.function}"></a></p>
+    <p th:text="#{semanticContext.functionNote}"></p>
+    <div class="table-responsive"><table class="table app-table"><thead><tr><th th:text="#{semanticContext.name}"></th><th th:text="#{semanticContext.type}"></th><th th:text="#{ui.e10195a1239f}"></th><th>Function</th></tr></thead><tbody data-sem-sources></tbody></table></div>
+    <p th:if="${profileName != null and profileEditable}"><button type="button" class="btn app-btn app-btn-secondary" data-edit-profile-attribute="semantic_source" th:text="#{semanticContext.attach}"></button></p>
+    <p th:text="#{semanticContext.pickerHelp}"></p>
+    <details><summary th:text="#{semanticContext.create}"></summary>
       <form data-sem-form class="app-editor-form">
         <input type="hidden" data-sem-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
-        <label for="sem-name" th:text="#{semantic.name}"></label><input id="sem-name" data-sem-name class="form-control" required pattern="[A-Z][A-Z0-9_$#]{0,124}" maxlength="125">
-        <label for="sem-type" th:text="#{semantic.type}"></label><select id="sem-type" data-sem-type class="form-select"><option value="custom">Custom PL/SQL callback</option><option value="mcp">MCP</option></select>
+        <label for="sem-name" th:text="#{semanticContext.name}"></label><input id="sem-name" data-sem-name class="form-control" required pattern="[A-Z][A-Z0-9_$#]{0,124}" maxlength="125">
+        <label for="sem-type" th:text="#{semanticContext.type}"></label><select id="sem-type" data-sem-type class="form-select"><option value="custom">Custom PL/SQL callback</option><option value="mcp">MCP</option></select>
         <div data-sem-custom>
-          <p th:text="#{semantic.setupHelp}"></p>
-          <label for="sem-callback" th:text="#{semantic.callback}"></label>
+          <p th:text="#{semanticContext.setupHelp}"></p>
+          <label for="sem-callback" th:text="#{semanticContext.callback}"></label>
           <input id="sem-callback" data-sem-callback class="form-control" list="sem-functions" pattern="[A-Za-z][A-Za-z0-9_$#]*(\.[A-Za-z][A-Za-z0-9_$#]*){0,2}" required>
           <p class="app-muted">global · (p_context CLOB) RETURN CLOB · [{"term":"…","definition":"…","applies_to":[]}]</p>
           <datalist id="sem-functions" data-sem-functions></datalist>
-          <a data-sem-function-link target="_blank" rel="noopener" th:text="#{semantic.inspectFunction}"></a>
+          <a data-sem-function-link target="_blank" rel="noopener" th:text="#{semanticContext.inspectFunction}"></a>
         </div>
         <label for="sem-description" th:text="#{ui.8c3f651d3083}"></label><input id="sem-description" data-sem-description class="form-control" maxlength="1000">
-        <details data-sem-json><summary th:text="#{semantic.attributes}"></summary>
-        <label for="sem-attributes" th:text="#{semantic.attributes}"></label><textarea id="sem-attributes" data-sem-attributes class="form-control" rows="12" spellcheck="false" required></textarea>
-        <p th:text="#{semantic.configNote}"></p>
+        <details data-sem-json><summary th:text="#{semanticContext.attributes}"></summary>
+        <label for="sem-attributes" th:text="#{semanticContext.attributes}"></label><textarea id="sem-attributes" data-sem-attributes class="form-control" rows="12" spellcheck="false" required></textarea>
+        <p th:text="#{semanticContext.configNote}"></p>
         </details>
-        <label><input type="checkbox" data-sem-confirm required> <span th:text="#{semantic.confirm}"></span></label>
-        <button type="submit" class="btn app-btn app-btn-primary" data-sem-save th:text="#{semantic.create}"></button>
+        <label><input type="checkbox" data-sem-confirm required> <span th:text="#{semanticContext.confirm}"></span></label>
+        <button type="submit" class="btn app-btn app-btn-primary" data-sem-save th:text="#{semanticContext.create}"></button>
       </form>
     </details>
   </div>

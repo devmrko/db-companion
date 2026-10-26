@@ -13,7 +13,7 @@ class AiSqlHistoryHttpTest {
     @LocalServerPort int port;
     @Test void allSupplementalReadsRequireLoginAndHaveNoWriteEndpoint() throws Exception {
         var client=HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();
-        for (String path: new String[]{"/ai-executions/sql/sources?source=cache&load=true&match=generate", "/ai-executions/sql/sources?source=awr&load=true&awrAllowed=true&match=all", "/ai-executions/sql/sources?source=audit&policies=true&match=select_ai", "/ai-executions/sql/sources/detail?id=0"}) {
+        for (String path: new String[]{"/ai-executions/sql/sources?source=cache&load=true&match=generate", "/ai-executions/sql/sources?source=awr&load=true&awrAllowed=true&match=all", "/ai-executions/sql/sources?source=audit&policies=true&match=select_ai", "/ai-executions/sql/sources/detail?id=0", "/ai-executions/sql/sources/candidates?id=0", "/help/sql-reference.html"}) {
             var uri=URI.create("http://127.0.0.1:"+port+path);
             var response=client.send(HttpRequest.newBuilder(uri).GET().build(),HttpResponse.BodyHandlers.ofString());
             assertThat(response.statusCode()).isEqualTo(302);

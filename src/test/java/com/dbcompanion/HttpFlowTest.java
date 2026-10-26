@@ -71,6 +71,18 @@ class HttpFlowTest {
         assertThat(response.headers().firstValue("cache-control").orElse("")).contains("no-store");
     }
 
+    @Test void invalidCsrfRemainsForbiddenButExplainsRecoveryWithoutEchoingInput() throws Exception {
+        var form=post("/login","username=private-user&password=synthetic-secret&_csrf=invalid-token");
+        assertThat(form.statusCode()).isEqualTo(403);
+        assertThat(form.body()).contains("요청은 실행하지 않았습니다","로그인 화면 열기").doesNotContain("synthetic-secret","private-user","invalid-token");
+        var response=client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/db/credentials/edit/apply"))
+                .header("Content-Type","application/json").header("X-CSRF-TOKEN","invalid-token")
+                .POST(HttpRequest.BodyPublishers.ofString("{\"value\":\"synthetic-secret\"}")).build(),HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode()).isEqualTo(403);
+        assertThat(response.headers().firstValue("content-type").orElse("")).contains("application/json");
+        assertThat(response.body()).contains("REQUEST_VERIFICATION_FAILED","요청은 실행하지 않았습니다").doesNotContain("synthetic-secret","invalid-token");
+    }
+
     @Test void localBootstrapCssAndIconsAreServed() throws Exception {
         assertThat(get("/webjars/bootstrap/5.3.8/css/bootstrap.min.css").statusCode()).isEqualTo(200);
         assertThat(get("/css/common.css").body()).contains("--app-accent", ".app-btn", ".app-card");

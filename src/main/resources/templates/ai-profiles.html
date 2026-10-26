@@ -58,7 +58,7 @@
       <table class="table app-table">
         <caption class="visually-hidden" th:text="#{ui.827b08f12021}">선택한 프로필 설정</caption>
         <thead><tr><th th:text="#{ui.286d43f0f3cf}">속성</th><th th:text="#{ui.b19ddf94b4c9}">값</th><th th:if="${profileEditable}"><span class="visually-hidden" th:text="#{ui.87b0acef85a7}">편집</span></th></tr></thead>
-        <tbody><tr th:each="attribute : ${page.attributes}"><td class="app-profile-attribute-name" th:attr="data-profile-attribute-name=${attribute.name}"><span th:text="${attribute.name}"></span></td><td class="app-metadata-text" th:text="${attribute.value}"></td>
+        <tbody><tr th:each="attribute : ${page.attributes}"><td class="app-profile-attribute-name" th:attr="data-profile-attribute-name=${attribute.name}"><span th:text="${attribute.name}"></span></td><td class="app-metadata-text" th:text="${attribute.name == 'max_tokens' and attribute.value == null ? #messages.msg('assistant.tokens.default') : attribute.value}"></td>
           <td class="app-profile-edit-action" th:if="${profileEditable}"><button th:if="${editableAttributes.contains(attribute.name)}" type="button" class="btn app-btn app-btn-quiet" th:attr="data-edit-profile-attribute=${attribute.name},aria-label=${attribute.name + #messages.msg('ui.12b90692ea79')}" th:text="#{ui.87b0acef85a7}">편집</button></td></tr>
           <tr th:if="${#lists.isEmpty(page.attributes)}"><td th:attr="colspan=${profileEditable ? 3 : 2}" class="app-empty" th:text="#{ui.d14b7f78faa4}">등록된 속성이 없습니다.</td></tr>
         </tbody>

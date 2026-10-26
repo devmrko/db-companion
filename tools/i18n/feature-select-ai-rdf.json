@@ -1,0 +1,6 @@
+{
+  "aitest.rdfSearch": ["AI 검색 질문 생성 · RDF 검색", "Generate AI search question · Search RDF", "生成 AI 检索问题 · 检索 RDF", "AI検索質問を生成 · RDF検索"],
+  "aitest.rdfHint": ["용어사전으로 검색 질문을 보강한 뒤 RDF 근거를 찾고 적용하세요. AI 호출 전에 전송 내용을 확인합니다.", "Enrich the search question with glossary definitions, find RDF evidence and apply it. Review the payload before calling AI.", "使用术语定义补充检索问题，查找并应用 RDF 依据。调用 AI 前确认发送内容。", "用語定義で検索質問を補強し、RDF根拠を検索して適用します。AI呼び出し前に送信内容を確認します。"],
+  "aitest.rdfApply": ["선택 근거 적용", "Apply selected evidence", "应用所选依据", "選択した根拠を適用"],
+  "aitest.rdfAttached": ["선택한 RDF 근거를 첨부했습니다. 테스트 프로필로 SQL을 생성할 수 있습니다.", "Selected RDF evidence attached. You can generate SQL with the test profile.", "已附加所选 RDF 依据。可以使用测试配置生成 SQL。", "選択したRDF根拠を添付しました。テストプロファイルでSQLを生成できます。"]
+}

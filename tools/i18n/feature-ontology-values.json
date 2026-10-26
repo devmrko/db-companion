@@ -1,23 +1,128 @@
 {
-  "ontology.values.title":["값·용어 매핑 (선택)","Value terminology (optional)","值与术语映射（可选）","値・用語マッピング（任意）"],
-  "ontology.values.optionalHelp":["특정 값에 별도 업무 용어를 연결할 때만 사용합니다. 모든 값을 등록할 필요는 없습니다. 컬럼 전체의 의미는 ‘컬럼 정의 마법사’에서 작성합니다.","Use only when a particular value needs a business term. You do not need to register every value. Use the column definition wizard to define the meaning of a column as a whole.","仅在需要将某个值与业务术语关联时使用，无需登记所有值。请使用列定义向导定义整列含义。","特定の値に業務用語を対応付ける場合のみ使用します。全値の登録は不要です。列全体の意味は列定義ウィザードで定義します。"],
-  "ontology.values.help":["업무 용어를 실제 컬럼·코드값에 연결합니다. 코드값·대표명·유사표현은 선택 스키마의 DBC_ONTOLOGY_CATALOG.PAYLOAD에 버전별 JSON으로 저장됩니다. 초안 저장은 보관만 하며, 승인 저장은 이 문서 전체를 승인합니다. 승인된 매핑만 질문 근거에 사용합니다. 코드 조회는 로컬 일반 테이블의 최대 20행이며 전체 코드나 유일성을 보장하지 않습니다. 민감·과도하게 긴 값은 제외합니다. 조회만으로 저장·AI 호출은 하지 않습니다.","Map business terms to actual columns and codes. Codes, preferred labels and aliases are stored as versioned JSON in the selected schema’s DBC_ONTOLOGY_CATALOG.PAYLOAD. Save draft only retains them; approve approves the entire document. Only approved mappings enter question evidence. Lookup reads at most 20 rows from a local ordinary table, not a complete or uniqueness-verified code list. Sensitive or oversized values are excluded. Lookup neither saves nor calls AI.","将业务术语关联到实际列及代码值。代码、首选名称和别名按版本以 JSON 保存在所选架构的 DBC_ONTOLOGY_CATALOG.PAYLOAD 中。保存草稿仅保留内容；批准会批准整个文档。仅已批准映射用于问题依据。查询最多读取本地普通表的20行，不保证完整性或唯一性。排除敏感或过长的值。查询不会保存或调用AI。","業務用語を実際の列・コード値に対応付けます。コード・代表名・別名は選択スキーマの DBC_ONTOLOGY_CATALOG.PAYLOAD にバージョン別JSONで保存されます。下書き保存は保管のみ、承認保存は文書全体の承認です。承認済みの対応のみを質問の根拠に使います。取得はローカル通常表の最大20行で、全コードや一意性を保証しません。機密値・長すぎる値は除外します。取得だけでは保存やAI呼び出しは行いません。"],
-  "ontology.values.codeColumn":["코드 컬럼","Code column","代码列","コード列"],
-  "ontology.values.labelColumn":["명칭 컬럼","Label column","名称列","名称列"],
-  "ontology.values.code":["실제 값","Stored value","实际值","実際の値"],
-  "ontology.values.label":["대표명","Preferred label","首选名称","代表名"],
-  "ontology.values.aliases":["유사표현 · 한 줄에 하나","Aliases · one per line","别名 · 每行一个","類似表現・1行に1つ"],
-  "ontology.values.description":["업무 의미","Business meaning","业务含义","業務上の意味"],
-  "ontology.values.consent":["민감정보가 아닌 코드·명칭을 최대 20행 조회합니다.","Read up to 20 rows of non-sensitive codes and labels.","读取最多20行非敏感代码和名称。","機密情報ではないコード・名称を最大20行取得します。"],
-  "ontology.values.lookup":["코드 조회","Look up codes","查询代码","コード取得"],
-  "ontology.values.preview":["{0}행 조회 · {1}행 제외 · 저장 전 검토","{0} rows read · {1} excluded · review before saving","已读取{0}行 · 排除{1}行 · 保存前请审核","{0}行取得・{1}行除外・保存前に確認"],
-  "ontology.values.add":["추가","Add","添加","追加"],
-  "ontology.values.manual":["직접 추가","Add manually","手动添加","手動追加"],
-  "ontology.values.remove":["제거","Remove","移除","削除"],
-  "ontology.values.empty":["등록된 값·용어 매핑이 없습니다.","No value mappings.","暂无值与术语映射。","値・用語マッピングはありません。"],
-  "ontology.values.invalid":["컬럼·타입·값을 확인해 주세요. 민감정보, 빈 값, 중복값, 너무 긴 값은 저장할 수 없습니다.","Check column, type and value. Sensitive, empty, duplicate or oversized values cannot be saved.","请检查列、类型和值。无法保存敏感、空、重复或过长的值。","列・型・値を確認してください。機密値・空値・重複値・長すぎる値は保存できません。"],
-  "ontology.values.limit":["테이블당 최대 100개를 등록할 수 있습니다.","Up to 100 mappings per table.","每表最多100个映射。","1テーブルにつき最大100件です。"],
-  "ontology.values.duplicate":["이미 추가된 컬럼·값입니다.","This column and value already exist.","该列和值已存在。","この列と値は追加済みです。"],
-  "ontology.values.ambiguous":["같은 용어가 서로 다른 컬럼·값에 연결됩니다. 매핑이나 질문 범위를 구체화해 주세요.","A term maps to different columns or values. Clarify the mappings or question scope.","同一术语对应不同列或值。请明确映射或问题范围。","同じ用語が異なる列・値に対応しています。マッピングや質問の範囲を明確にしてください。"],
-  "ontology.query.paths.basis.VALUE_TERM":["승인된 코드·용어","Approved code term","已批准代码术语","承認済みコード用語"]
+  "ontology.values.title": [
+    "값·용어 매핑 (선택)",
+    "Value terminology (optional)",
+    "值与术语映射（可选）",
+    "値・用語マッピング（任意）"
+  ],
+  "ontology.values.optionalHelp": [
+    "특정 값에 별도 업무 용어를 연결할 때만 사용합니다. 모든 값을 등록할 필요는 없습니다. 컬럼 전체의 의미는 ‘컬럼 정의 마법사’에서 작성합니다.",
+    "Use only when a particular value needs a business term. You do not need to register every value. Use the column definition wizard to define the meaning of a column as a whole.",
+    "仅在需要将某个值与业务术语关联时使用，无需登记所有值。请使用列定义向导定义整列含义。",
+    "特定の値に業務用語を対応付ける場合のみ使用します。全値の登録は不要です。列全体の意味は列定義ウィザードで定義します。"
+  ],
+  "ontology.values.help": [
+    "업무 용어를 실제 컬럼·코드값에 연결합니다. 코드값·대표명·유사표현은 선택 스키마의 DBC_ONTOLOGY_CATALOG.PAYLOAD에 버전별 JSON으로 저장됩니다. 초안 저장은 보관만 하며, 승인 저장은 이 문서 전체를 승인합니다. 승인된 매핑만 질문 근거에 사용합니다. 코드 조회는 로컬 일반 테이블·검증된 단순 뷰의 최대 20행이며 전체 코드나 유일성을 보장하지 않습니다. 민감·과도하게 긴 값은 제외합니다. 조회만으로 저장·AI 호출은 하지 않습니다.",
+    "Map business terms to actual columns and codes. Codes, preferred labels and aliases are stored as versioned JSON in the selected schema’s DBC_ONTOLOGY_CATALOG.PAYLOAD. Save draft only retains them; approve approves the entire document. Only approved mappings enter question evidence. Lookup reads at most 20 rows from a local ordinary table or verified projection-only view, not a complete or uniqueness-verified code list. Sensitive or oversized values are excluded. Lookup neither saves nor calls AI.",
+    "将业务术语关联到实际列及代码值。代码、首选名称和别名按版本以 JSON 保存在所选架构的 DBC_ONTOLOGY_CATALOG.PAYLOAD 中。保存草稿仅保留内容；批准会批准整个文档。仅已批准映射用于问题依据。查询最多读取本地普通表或已验证简单视图的20行，不保证完整性或唯一性。排除敏感或过长的值。查询不会保存或调用AI。",
+    "業務用語を実際の列・コード値に対応付けます。コード・代表名・別名は選択スキーマの DBC_ONTOLOGY_CATALOG.PAYLOAD にバージョン別JSONで保存されます。下書き保存は保管のみ、承認保存は文書全体の承認です。承認済みの対応のみを質問の根拠に使います。取得はローカル通常表・検証済み単純ビューの最大20行で、全コードや一意性を保証しません。機密値・長すぎる値は除外します。取得だけでは保存やAI呼び出しは行いません。"
+  ],
+  "ontology.values.codeColumn": [
+    "코드 컬럼",
+    "Code column",
+    "代码列",
+    "コード列"
+  ],
+  "ontology.values.labelColumn": [
+    "명칭 컬럼",
+    "Label column",
+    "名称列",
+    "名称列"
+  ],
+  "ontology.values.code": [
+    "실제 값",
+    "Stored value",
+    "实际值",
+    "実際の値"
+  ],
+  "ontology.values.label": [
+    "대표명",
+    "Preferred label",
+    "首选名称",
+    "代表名"
+  ],
+  "ontology.values.aliases": [
+    "유사표현 · 한 줄에 하나",
+    "Aliases · one per line",
+    "别名 · 每行一个",
+    "類似表現・1行に1つ"
+  ],
+  "ontology.values.description": [
+    "업무 의미",
+    "Business meaning",
+    "业务含义",
+    "業務上の意味"
+  ],
+  "ontology.values.consent": [
+    "민감정보가 아닌 코드·명칭을 최대 20행 조회합니다.",
+    "Read up to 20 rows of non-sensitive codes and labels.",
+    "读取最多20行非敏感代码和名称。",
+    "機密情報ではないコード・名称を最大20行取得します。"
+  ],
+  "ontology.values.lookup": [
+    "코드 조회",
+    "Look up codes",
+    "查询代码",
+    "コード取得"
+  ],
+  "ontology.values.preview": [
+    "{0}행 조회 · {1}행 제외 · 저장 전 검토",
+    "{0} rows read · {1} excluded · review before saving",
+    "已读取{0}行 · 排除{1}行 · 保存前请审核",
+    "{0}行取得・{1}行除外・保存前に確認"
+  ],
+  "ontology.values.add": [
+    "추가",
+    "Add",
+    "添加",
+    "追加"
+  ],
+  "ontology.values.manual": [
+    "직접 추가",
+    "Add manually",
+    "手动添加",
+    "手動追加"
+  ],
+  "ontology.values.remove": [
+    "제거",
+    "Remove",
+    "移除",
+    "削除"
+  ],
+  "ontology.values.empty": [
+    "등록된 값·용어 매핑이 없습니다.",
+    "No value mappings.",
+    "暂无值与术语映射。",
+    "値・用語マッピングはありません。"
+  ],
+  "ontology.values.invalid": [
+    "컬럼·타입·값을 확인해 주세요. 민감정보, 빈 값, 중복값, 너무 긴 값은 저장할 수 없습니다.",
+    "Check column, type and value. Sensitive, empty, duplicate or oversized values cannot be saved.",
+    "请检查列、类型和值。无法保存敏感、空、重复或过长的值。",
+    "列・型・値を確認してください。機密値・空値・重複値・長すぎる値は保存できません。"
+  ],
+  "ontology.values.limit": [
+    "테이블당 최대 100개를 등록할 수 있습니다.",
+    "Up to 100 mappings per table.",
+    "每表最多100个映射。",
+    "1テーブルにつき最大100件です。"
+  ],
+  "ontology.values.duplicate": [
+    "이미 추가된 컬럼·값입니다.",
+    "This column and value already exist.",
+    "该列和值已存在。",
+    "この列と値は追加済みです。"
+  ],
+  "ontology.values.ambiguous": [
+    "같은 용어가 서로 다른 컬럼·값에 연결됩니다. 매핑이나 질문 범위를 구체화해 주세요.",
+    "A term maps to different columns or values. Clarify the mappings or question scope.",
+    "同一术语对应不同列或值。请明确映射或问题范围。",
+    "同じ用語が異なる列・値に対応しています。マッピングや質問の範囲を明確にしてください。"
+  ],
+  "ontology.query.paths.basis.VALUE_TERM": [
+    "승인된 코드·용어",
+    "Approved code term",
+    "已批准代码术语",
+    "承認済みコード用語"
+  ]
 }

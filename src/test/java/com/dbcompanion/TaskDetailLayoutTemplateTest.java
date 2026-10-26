@@ -71,6 +71,8 @@ class TaskDetailLayoutTemplateTest {
     }
     @Test void linkedToolsAndBackLinksArePreservedWithoutAddingStandaloneClone() {
         assertThat(render("ko", "linked-detail")).contains("data-object-kind=\"TOOL\"", "MISSING_APP_", "참조된 항목이 없거나 조회 권한이 없습니다.", "/ai-agents/team?schema=APP", "/ai-agents/task?schema=APP")
+                .contains("data-sql-help-for=\"agents\" data-sql-help-operation=\"task-definition\"")
+                .doesNotContain("data-sql-help-operation=\"agent-runs\"")
                 .doesNotContain("data-ai-create=");
         assertThat(render("ko", "linked-empty")).contains("연결된 Tool이 없습니다.");
         assertThat(render("en", "standalone-detail")).contains("/ai-agents/objects?kind=TASK", "data-ai-create=\"TASK\"").doesNotContain("data-object-kind=\"TOOL\"");

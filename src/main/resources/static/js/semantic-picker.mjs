@@ -19,7 +19,7 @@ export function semanticPicker(host,value,data,read,count) {
   read('/ai-profiles/semantic?'+new URLSearchParams({schema:data.target.schema}),{signal:controller.signal}).then(result=>{
     const selected=()=>{try{return JSON.parse(value.value);}catch{return [];}};
     const boxes=[];
-    status.textContent=t('semantic.pickerHelp','소스를 선택하면 연결된 Function이 함께 표시됩니다. 모두 해제하면 프로필 연결을 제거합니다.');
+    status.textContent=t('semanticContext.pickerHelp','소스를 선택하면 연결된 Function이 함께 표시됩니다. 모두 해제하면 프로필 연결을 제거합니다.');
     for(const source of result.sources){
       const row=document.createElement('div');row.className='border rounded p-2 mb-2';
       const label=document.createElement('label'),box=document.createElement('input');box.type='checkbox';box.value=source.name;

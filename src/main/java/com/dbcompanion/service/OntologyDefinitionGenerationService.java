@@ -32,7 +32,7 @@ public class OntologyDefinitionGenerationService {
         generate=new TransactionTemplate(manager);generate.setReadOnly(true);generate.setTimeout(100);
     }
     private <T>T query(PoolSession s,TransactionTemplate tx,Supplier<T> work){
-        source.bind(s.pool(),s.metadata().info().username());
+        source.bind(s.pool(),s.metadata().info().username(),s.metadata().assistant());
         try{return tx.execute(v->JdbcNetworkTimeout.execute(source,tx==generate?110_000:40_000,work));}
         finally{source.clear();}
     }

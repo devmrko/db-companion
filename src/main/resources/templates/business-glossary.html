@@ -3,6 +3,7 @@
 <head th:replace="~{fragments/common :: head(#{businessGlossary.title})}"></head>
 <body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<div class="app-content"><section th:replace="~{fragments/semantic-release :: panel}"></section></div>
 <main class="app-content" data-glossary-manager>
   <div class="app-page-heading"><h1 th:text="#{businessGlossary.title}">업무 용어 사전</h1><a th:href="@{/ai-test}" th:text="#{businessGlossary.goTest}">Select AI 테스트</a></div>
   <p><a class="app-inline-link" th:href="@{/db/functions/ai-query}" th:text="#{callable.title}">사용자용 AI 함수</a></p>
@@ -66,11 +67,35 @@ END;
     <div class="app-glossary-toolbar"><label><span th:text="#{businessGlossary.mode}">검색 방식</span><select class="form-select" data-glossary-mode><option value="EXACT" th:text="#{businessGlossary.exact}">정확·등록 별칭</option><option value="TEXT" th:text="#{businessGlossary.combined}">정확·별칭 + Oracle 형태소 검색</option></select></label><button type="button" class="btn app-btn app-btn-primary" data-glossary-search th:text="#{businessGlossary.find}">검색</button></div>
     <div data-glossary-search-result></div>
   </section>
+  <section class="app-card app-glossary-card app-glossary-tools">
+    <div class="app-glossary-tool-tabs" role="tablist" th:aria-label="#{glossaryDocument.tools}" aria-label="용어 사전 보강 방법">
+      <button type="button" role="tab" id="glossary-document-tab" aria-controls="glossary-document-panel" aria-selected="true" data-glossary-tool-tab th:text="#{glossaryDocument.title}">문서로 용어 사전 보강</button>
+      <button type="button" role="tab" id="glossary-transfer-tab" aria-controls="glossary-transfer-panel" aria-selected="false" tabindex="-1" data-glossary-tool-tab th:text="#{glossaryTransfer.title}">내보내기 · 가져오기</button>
+    </div>
+    <div id="glossary-document-panel" role="tabpanel" aria-labelledby="glossary-document-tab" data-glossary-tool-panel>
+      <div data-glossary-document></div>
+    </div>
+    <div id="glossary-transfer-panel" role="tabpanel" aria-labelledby="glossary-transfer-tab" data-glossary-tool-panel data-glossary-transfer hidden>
+    <h2 th:text="#{glossaryTransfer.title}">내보내기 · 가져오기</h2>
+    <p th:text="#{glossaryTransfer.note}">JSON으로 용어·별칭·정의·SQL 기준·활성 상태를 이동합니다. 대상 사전의 ID와 버전은 유지하며, 선택한 변경만 이력과 함께 저장합니다. SQL 기준은 실행하지 않습니다.</p>
+    <div class="app-glossary-toolbar app-glossary-transfer-toolbar">
+      <button type="button" class="btn app-btn app-btn-secondary" data-transfer-export disabled th:text="#{glossaryTransfer.export}">JSON 내보내기</button>
+      <label><span th:text="#{glossaryTransfer.import}">JSON 가져오기</span><input class="form-control app-glossary-file" type="file" accept=".json,application/json" data-transfer-file disabled></label>
+    </div>
+    <p th:text="#{glossaryTransfer.limit}">JSON 파일 한도는 4 MB, 용어는 500개입니다.</p>
+    <p role="status" data-transfer-message></p><div data-transfer-preview></div>
+    <div class="app-glossary-transfer-footer" data-transfer-footer hidden>
+      <label class="app-glossary-pick"><input type="checkbox" data-transfer-consent disabled><span th:text="#{glossaryTransfer.consent}">선택한 항목의 등록·변경 및 활성 상태를 확인했습니다.</span></label>
+      <button type="button" class="btn app-btn app-btn-primary" data-transfer-apply disabled th:text="#{glossaryTransfer.apply}">선택 항목 저장</button>
+    </div>
+    </div>
+  </section>
   <dialog class="app-preview-dialog" data-glossary-editor aria-labelledby="glossary-edit-title"><div class="app-preview-header"><h2 id="glossary-edit-title" data-glossary-edit-title></h2><button type="button" class="btn app-btn app-btn-quiet" data-glossary-edit-close th:text="#{businessGlossary.close}">닫기</button></div><div class="app-preview-body app-glossary-form">
+    <p class="app-filter-message" th:text="#{auditFixes.text.scope}"></p>
     <label><span th:text="#{businessGlossary.term}">대표 용어</span><input class="form-control" data-glossary-term maxlength="256" required></label>
     <label><span th:text="#{businessGlossary.aliasLines}">별칭·다른 표현 (한 줄에 하나, 최대 20개)</span><textarea class="form-control" rows="3" data-glossary-aliases maxlength="5200"></textarea></label>
-    <label><span th:text="#{businessGlossary.definition}">업무 정의</span><textarea class="form-control" rows="4" data-glossary-definition maxlength="4000" required></textarea></label>
-    <label><span th:text="#{businessGlossary.criteria}">집계·필터·SQL 기준 (실행하지 않음)</span><textarea class="form-control" rows="4" data-glossary-criteria maxlength="4000"></textarea></label>
+    <label><span th:text="#{businessGlossary.definition}">업무 정의</span><textarea class="form-control" rows="4" data-glossary-definition maxlength="4000" required aria-describedby="definition-count"></textarea><small id="definition-count" data-glossary-definition-count></small></label>
+    <label><span th:text="#{businessGlossary.criteria}">집계·필터·SQL 기준 (실행하지 않음)</span><textarea class="form-control" rows="4" data-glossary-criteria maxlength="4000" aria-describedby="criteria-count"></textarea><small id="criteria-count" data-glossary-criteria-count></small></label>
     <label class="app-glossary-pick"><input type="checkbox" data-glossary-enabled checked><span th:text="#{businessGlossary.enabled}">검색에 사용 (해제하면 비활성화, 삭제하지 않음)</span></label>
     <label class="app-glossary-pick"><input type="checkbox" data-glossary-save-consent><span th:text="#{businessGlossary.saveConsent}">이 내용을 로그인 소유 스키마의 사전에 저장합니다.</span></label>
     <p data-glossary-edit-error role="alert" class="app-alert is-error"></p><button type="button" class="btn app-btn app-btn-primary" data-glossary-save disabled th:text="#{businessGlossary.save}">저장</button>

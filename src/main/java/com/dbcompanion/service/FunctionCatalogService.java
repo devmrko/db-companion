@@ -42,4 +42,11 @@ public class FunctionCatalogService {
                     ()->query(session,schema,()->routines.source(schema,name,2_000_000).definitions().stream().map(repository::detail).toList()));
         }
     }
+    /** Explanation consent is bound to current source, not the browsing cache. */
+    public List<Detail> freshDetail(PoolSession session,String schema,String name){
+        synchronized(session){
+            scope(session.metadata().selectedSchema(),schema);
+            return query(session,schema,()->routines.source(schema,name,2_000_000).definitions().stream().map(repository::detail).toList());
+        }
+    }
 }

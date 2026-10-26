@@ -10,6 +10,19 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import static org.assertj.core.api.Assertions.*;
 
 class CallableAiTemplateTest {
+    @Test void glossaryCreationWizardRendersInEveryLanguageAndHasNoAiControls(){
+        var resolver=new ClassLoaderTemplateResolver();resolver.setPrefix("templates/");resolver.setSuffix(".html");resolver.setCharacterEncoding("UTF-8");
+        var engine=new SpringTemplateEngine();engine.setTemplateResolver(resolver);engine.setTemplateEngineMessageSource(com.dbcompanion.common.i18n.UiMessages.source());
+        engine.setLinkBuilder(new org.thymeleaf.linkbuilder.StandardLinkBuilder(){@Override protected String computeContextPath(org.thymeleaf.context.IExpressionContext c,String b,Map<String,Object> p){return "";}});
+        for(String language:List.of("ko","en","zh-CN","ja")){
+            var c=new Context(Locale.forLanguageTag(language));c.setVariable("activePage","functions");c.setVariable("info",new DatabaseInfo("APP","OTHER","LOW","DB"));
+            c.setVariable("_csrf",new org.springframework.security.web.csrf.DefaultCsrfToken("X-CSRF-TOKEN","_csrf","test-token"));
+            assertThat(engine.process("glossary-function",c)).contains("data-gf-consent","data-gf-create","data-gf-question","data-code-language=\"sql\"","APP.DBC_GLOSSARY_SEARCH")
+                .doesNotContain("??glossaryFunction.","th:","data-ca-profile","SGMP");
+        }
+        assertThat(LanguageController.safeReturn("/db/functions/glossary-search")).isEqualTo("/db/functions/glossary-search");
+        assertThat(LanguageController.safeReturn("/db/functions/glossary-search/create")).isEqualTo("/login");
+    }
     @Test void allLanguagesShowIndependentOptionsAndAdminOnlyPrivileges(){
         var resolver=new ClassLoaderTemplateResolver();resolver.setPrefix("templates/");resolver.setSuffix(".html");resolver.setCharacterEncoding("UTF-8");
         var engine=new SpringTemplateEngine();engine.setTemplateResolver(resolver);engine.setTemplateEngineMessageSource(com.dbcompanion.common.i18n.UiMessages.source());

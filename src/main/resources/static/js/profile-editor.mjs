@@ -9,7 +9,7 @@ export function validateProfileValue(attribute,value,maxBytes=32767) {
   if (!value.isWellFormed() || value.includes('\0')) return t('ui.276b201421c0', "올바르지 않은 문자가 있습니다.");
   if (profileBytes(value)>maxBytes) return t('ui.2c41f4ca8f42', "내용은 UTF-8 기준 32,767바이트 이내로 입력해 주세요. 입력은 자르지 않습니다.");
   const typed=validateTypedValue(attribute,value);if(typed)return typed;
-  if(attribute==='semantic_source'&&!validSources(value))return t('semantic.invalidSources','Enter a JSON array of unique source names.');
+  if(attribute==='semantic_source'&&!validSources(value))return t('semanticContext.invalidSources','Enter a JSON array of unique source names.');
   if (attribute==='object_list') {
     try { if (!Array.isArray(JSON.parse(value))) return t('ui.69ae71398505', "object_list는 JSON 배열로 입력해 주세요."); }
     catch { return t('ui.ddcee732ecb8', "object_list는 올바른 JSON 배열로 입력해 주세요."); }
@@ -17,17 +17,19 @@ export function validateProfileValue(attribute,value,maxBytes=32767) {
   return '';
 }
 export const profileRetryAllowed = status => status===400;
+export const profileRestoreAllowed=(original,current,version)=>Boolean(original&&current&&version&&current.version===version&&JSON.stringify(original.target)===JSON.stringify(current.target)&&!validateProfileValue(original.target.attribute,original.value));
 
 function mount(dialog) {
   const find=name=>dialog.querySelector(`[data-pe-${name}]`);
   const fields=find('fields'), value=find('value'), save=find('save'), close=find('close'), message=find('message');
-  let state=null, initial='', pending=null, generation=0, saving=false, locked=false, reload=false, control=value, cleanup=()=>{};
+  let state=null, original=null, savedVersion=null, initial='', pending=null, generation=0, saving=false, locked=false, reload=false, control=value, cleanup=()=>{};
   const show=(text,error=false)=>{message.textContent=text; message.hidden=!text; message.className=error?'app-alert is-error':'app-alert';};
   const currentValue=()=>control.type==='checkbox'?String(control.checked):control.value;
   const dirty=()=>state && currentValue()!==initial;
   const count=()=>{find('bytes').textContent=profileBytes(currentValue()); save.disabled=!state||saving||locked||!dirty();};
   const element=(tag,text,className)=>{const node=document.createElement(tag);if(text)node.textContent=text;if(className)node.className=className;return node;};
   function prepare(data) {
+    cleanup();cleanup=()=>{};find('raw').append(value);find('raw').querySelector('details')?.remove();find('control').replaceChildren();
     const attr=data.target.attribute,spec=profileField(attr),host=find('control');
     const help=dialog.querySelector('[data-sql-help-for="profiles"]');
     if(help)help.dataset.sqlHelpOperation=attr==='model'?'model':attr==='object_list'?'objects':'options';
@@ -61,6 +63,7 @@ function mount(dialog) {
       if(type==='integer')control.inputMode='numeric';if(type==='number')control.inputMode='decimal';
       for(const key of ['min','max','step'])if(spec[key])control.setAttribute(key,spec[key]);
       control.value=data.value??'';
+      if(attr==='max_tokens'&&data.value==null)control.placeholder=t('assistant.tokens.default','기본값 (미설정)');
       if(control.value!==(data.value??'')){control.type='text';control.value=data.value??'';}
       host.append(control);control.addEventListener('input',count);
       if(type==='suggest'){
@@ -84,7 +87,8 @@ function mount(dialog) {
   document.querySelectorAll('[data-edit-profile-attribute]').forEach(button=>button.addEventListener('click',async()=>{
     pending?.abort(); pending=new AbortController(); const id=++generation;
     cleanup();cleanup=()=>{};find('raw').append(value);find('raw').querySelector('details')?.remove();find('control').replaceChildren();find('help').replaceChildren();
-    control=value;state=null; locked=false; reload=false; fields.disabled=true; value.value=''; initial=''; count();
+    control=value;state=null;original=null;savedVersion=null;find('restore').hidden=true; locked=false; reload=false; fields.disabled=true; value.value=''; initial=''; count();
+    find('raw').hidden=true;find('counter').hidden=true;
     find('object').textContent=`${dialog.dataset.schema}.${dialog.dataset.profile}`;
     find('label').textContent=button.dataset.editProfileAttribute; find('hint').textContent='';
     show(t('ui.8bf609c884ca', "불러오는 중…")); dialog.showModal();
@@ -92,7 +96,7 @@ function mount(dialog) {
     for(const [key,item] of Object.entries({schema:dialog.dataset.schema,profile:dialog.dataset.profile,attribute:button.dataset.editProfileAttribute})) url.searchParams.set(key,item);
     try {
       const data=await read(url,{signal:pending.signal}); if(id!==generation||!dialog.open)return;
-      prepare(data);state=data;
+      prepare(data);state=data;original=data;
       fields.disabled=false; count(); show(''); if(control===value&&profileField(data.target.attribute).type==='objects')find('control').querySelector('select')?.focus();else control.focus();
     } catch(error){if(error.name!=='AbortError'&&id===generation)show(error.message,true);}
   }));
@@ -106,8 +110,23 @@ function mount(dialog) {
       const result=await read(dialog.dataset.url,{method:'POST',headers:{'Content-Type':'application/json',[csrf.dataset.csrfHeader]:csrf.value},
         body:JSON.stringify({...state.target,value:submitted,version:state.version})});
       locked=true; reload=result.verified; if(result.verified)initial=submitted; show(result.message,!result.verified);
+      if(result.verified){
+        const url=new URL(dialog.dataset.url,location.origin);for(const [key,item] of Object.entries(state.target))url.searchParams.set(key,item);
+        const latest=await read(url);savedVersion=latest.value===submitted?latest.version:null;
+        find('restore').hidden=!profileRestoreAllowed(original,latest,savedVersion)||latest.value===original.value;
+      }
     } catch(error){locked=!profileRetryAllowed(error.status);show(error.message,true);}
     finally{saving=false;close.disabled=false;fields.disabled=false;count();}
+  });
+  find('restore').addEventListener('click',async()=>{
+    if(saving||!savedVersion)return;saving=true;close.disabled=true;fields.disabled=true;count();
+    try{
+      const url=new URL(dialog.dataset.url,location.origin);for(const [key,item] of Object.entries(state.target))url.searchParams.set(key,item);
+      const latest=await read(url);
+      if(!profileRestoreAllowed(original,latest,savedVersion))throw new Error(t('profileRestore.stale','저장 이후 값이 바뀌었습니다. 창을 닫고 최신 값과 이력을 확인하세요.'));
+      state=latest;prepare({...latest,value:original.value});initial=latest.value;locked=false;find('restore').hidden=true;savedVersion=null;
+      show(t('profileRestore.review','이 창을 열었을 때의 값입니다. 내용을 확인하고 저장하면 해당 속성만 복구합니다. 창을 닫으면 이 복구 준비는 사라집니다.'));
+    }catch(error){locked=true;show(error.message,true);}finally{saving=false;close.disabled=false;fields.disabled=false;count();}
   });
   const canClose=()=>!saving && (!dirty() || confirm(t('ui.1e0b7aee0c56', "입력을 닫을까요? 저장 결과를 확인하고 필요한 내용은 먼저 복사해 주세요.")));
   close.addEventListener('click',()=>{if(canClose())dialog.close();});

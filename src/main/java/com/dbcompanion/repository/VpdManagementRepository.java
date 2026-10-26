@@ -100,7 +100,11 @@ public class VpdManagementRepository {
         var attributes=snapshot.attributes().stream().filter(r->Objects.equals(name,r.get("POLICY_NAME"))&&Objects.equals(group,r.get("POLICY_GROUP"))).toList();
         Draft definition=null;String reason="";
         try{
-            if(!POLICY_FIELDS.equals(row.keySet())||!"SYS_DEFAULT".equals(group)||!local(row)||!attributes.isEmpty())throw new IllegalArgumentException("metadata");
+            var fields=new HashSet<>(row.keySet());
+            // Newer Oracle catalogs include this nullable column for ordinary tables.
+            // An actual edition still requires support beyond this editor.
+            if(fields.remove("EDITION_NAME")&&!Objects.toString(row.get("EDITION_NAME"),"").isEmpty())throw new IllegalArgumentException("edition");
+            if(!POLICY_FIELDS.equals(fields)||!"SYS_DEFAULT".equals(group)||!local(row)||!attributes.isEmpty())throw new IllegalArgumentException("metadata");
             for(String field:List.of("SEL","INS","UPD","DEL","IDX","CHK_OPTION","ENABLE","STATIC_POLICY","LONG_PREDICATE"))
                 if(!Set.of("YES","NO").contains(row.get(field)))throw new IllegalArgumentException("flag");
             for(var col:relevant)if(!COLUMN_FIELDS.equals(col.keySet())||!local(col)||!Set.of("NONE","ALL_ROWS").contains(col.get("COLUMN_OPTION")))throw new IllegalArgumentException("columns");

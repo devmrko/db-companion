@@ -9,6 +9,46 @@
     <details class="app-dds-help"><summary aria-label="Deep Data Security ?">?</summary><div th:text="#{dds.help}"></div></details>
   </div>
   <p class="app-alert is-error" th:if="${schemaError}" th:text="${schemaError}"></p>
+  <details class="app-card" data-ddsm th:attr="data-schema=${selectedSchema},data-user=${info.username}">
+    <summary th:text="#{ddsManage.title}">DDS 생성·변경</summary>
+    <p th:text="#{ddsManage.scope}"></p>
+    <p th:text="#{ddsManage.adminHelp}"></p>
+    <a class="btn app-btn app-btn-secondary" th:href="@{/db/accounts}" th:text="#{accountSetup.title}"></a>
+    <input type="hidden" data-dm-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+    <button type="button" class="btn app-btn" data-dm-refresh th:text="#{ddsManage.refresh}"></button>
+    <p role="status" data-dm-message></p>
+    <form data-dm-form hidden>
+      <div class="app-creation-grid">
+        <label class="app-field"><span th:text="#{ddsManage.kind}"></span><select class="form-select" data-dm-kind><option value="GRANT">SELECT Data Grant</option><option value="ROLE">Data Role · ADMIN</option></select></label>
+        <label class="app-field"><span th:text="#{ddsManage.action}"></span><select class="form-select" data-dm-action><option value="CREATE" th:text="#{ddsManage.create}"></option><option value="UPDATE" th:text="#{ddsManage.update}"></option></select></label>
+        <label class="app-field"><span th:text="#{ddsManage.existing}"></span><select class="form-select" data-dm-existing></select></label>
+        <label class="app-field"><span th:text="#{ddsManage.name}"></span><input class="form-control" data-dm-name required maxlength="128" pattern="[A-Z][A-Z0-9_]{0,127}"></label>
+        <div data-dm-role-field>
+          <label class="app-field"><span th:text="#{ddsManage.roleMode}"></span><select class="form-select" data-dm-role-mode><option value="LOCAL" th:text="#{ddsManage.local}"></option><option value="IAM_OAUTH_GROUP">OCI OAuth · IAM_OAUTH_GROUP</option><option value="IAM_GROUP_NAME">OCI IAM · IAM_GROUP_NAME</option></select></label>
+          <label class="app-field" data-dm-group-field hidden><span th:text="#{ddsManage.group}"></span><input class="form-control" data-dm-group maxlength="480"></label>
+          <p th:text="#{ddsManage.mappingHelp}"></p>
+          <label class="app-field" data-dm-enabled-field><span th:text="#{ddsManage.enabled}"></span><input type="checkbox" data-dm-enabled checked></label>
+        </div>
+      </div>
+      <div class="app-creation-grid" data-dm-grant-fields>
+        <label class="app-field"><span th:text="#{ddsManage.table}"></span><select class="form-select" data-dm-table></select></label>
+        <label class="app-field"><span th:text="#{ddsManage.role}"></span><select class="form-select" data-dm-role></select></label>
+        <label class="app-field"><span th:text="#{ddsManage.column}"></span><select class="form-select" data-dm-column></select></label>
+        <label class="app-field"><span th:text="#{ddsManage.valueType}"></span><select class="form-select" data-dm-value-type><option>NUMBER</option><option>TEXT</option></select></label>
+        <label class="app-field"><span th:text="#{ddsManage.value}"></span><input class="form-control" data-dm-value maxlength="500"></label>
+      </div>
+      <button class="btn app-btn" type="submit" data-dm-preview th:text="#{ddsManage.preview}"></button>
+      <button class="btn app-btn app-btn-secondary" type="button" data-dm-restore hidden th:text="#{ddsManage.restore}"></button>
+    </form>
+    <section data-dm-review hidden>
+      <p class="app-alert" th:text="#{ddsManage.warning}"></p>
+      <pre data-dm-sql style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+      <pre data-dm-before style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+      <label class="app-field"><span data-dm-confirm-label></span><input class="form-control" data-dm-confirm autocomplete="off"></label>
+      <label class="app-field"><span th:text="#{ddsManage.consent}"></span><input type="checkbox" data-dm-consent></label>
+      <button class="btn app-btn" type="button" data-dm-apply disabled th:text="#{ddsManage.apply}"></button>
+    </section>
+  </details>
   <section data-dds th:attr="data-schema=${selectedSchema},data-base=@{/db/security}">
     <nav class="app-dds-tabs" th:aria-label="#{dds.sections}">
       <button type="button" data-dds-tab="roles" aria-pressed="true" th:text="#{dds.roles}">역할</button>
@@ -29,4 +69,4 @@
     </div>
     <section class="app-card app-dds-detail" data-dds-detail aria-live="polite" hidden></section>
   </section>
-</main></div><script type="module" th:src="@{/js/deep-data-security.mjs}"></script></body></html>
+</main></div><script type="module" th:src="@{/js/deep-data-security.mjs}"></script><script type="module" th:src="@{/js/dds-management.mjs}"></script></body></html>

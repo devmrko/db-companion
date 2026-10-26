@@ -1,0 +1,31 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body><th:block th:fragment="editor(kind)">
+<section th:if="${info.username == selectedSchema}" class="app-card" data-local-create th:attr="data-kind=${kind},data-schema=${selectedSchema},data-base=@{/db/objects/create}">
+  <details class="app-disclosure" data-lc-panel><summary th:text="${kind == 'CREDENTIAL'} ? #{localCreate.credential} : #{localCreate.function}">신규 생성</summary>
+    <div class="app-disclosure-body">
+      <p class="app-muted" th:text="#{localCreate.help}"></p>
+      <input type="hidden" data-lc-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+      <form data-lc-form class="app-editor-form">
+        <fieldset data-lc-fields>
+          <div class="app-creation-grid">
+            <label><span th:text="#{localCreate.name}"></span><input class="form-control" data-lc-name required maxlength="125" pattern="[A-Z][A-Z0-9_$#]{0,124}" autocomplete="off"></label>
+            <label><span th:text="#{localCreate.template}"></span><select class="form-select" data-lc-template><option th:if="${kind == 'CREDENTIAL'}" value="BASIC" th:text="#{localCreate.basic}"></option><th:block th:if="${kind == 'FUNCTION'}"><option value="ECHO" th:text="#{localCreate.echo}"></option><option value="GLOSSARY" th:text="#{localCreate.glossary}"></option></th:block></select></label>
+          </div>
+          <label th:if="${kind == 'CREDENTIAL'}"><span th:text="#{localCreate.username}"></span><input class="form-control" data-lc-username required maxlength="256" autocomplete="off"></label>
+          <th:block th:if="${kind == 'FUNCTION'}"><p th:text="#{localCreate.signature}"></p><button type="button" class="btn app-btn app-btn-secondary" data-lc-template-apply th:text="#{localCreate.loadTemplate}"></button><label><span th:text="#{localCreate.body}"></span><textarea class="form-control app-editor-value" data-lc-body rows="10" required spellcheck="false" maxlength="60000"></textarea></label></th:block>
+          <button type="submit" class="btn app-btn app-btn-secondary" data-lc-preview th:text="#{localCreate.preview}"></button>
+        </fieldset>
+      </form>
+      <p data-lc-message role="status" aria-live="polite"></p>
+      <section data-lc-review hidden>
+        <pre class="app-preview-source" data-code-language="sql" data-lc-sql></pre>
+        <p th:if="${kind == 'CREDENTIAL'}" th:text="#{localCreate.secretHelp}"></p>
+        <label th:if="${kind == 'CREDENTIAL'}"><span th:text="#{localCreate.secret}"></span><input class="form-control" type="password" data-lc-secret autocomplete="new-password" maxlength="4000"></label>
+        <label class="app-glossary-pick"><input type="checkbox" data-lc-consent><span th:text="#{localCreate.consent}"></span></label>
+        <button type="button" class="btn app-btn app-btn-primary" data-lc-create disabled th:text="#{localCreate.create}"></button>
+      </section>
+      <pre class="app-preview-source" data-code-language="text" data-lc-result hidden></pre>
+      <a class="app-inline-link" data-lc-detail hidden th:text="#{localCreate.detail}"></a>
+    </div>
+  </details>
+</section><script type="module" th:src="@{/js/local-object-creation.mjs}"></script>
+</th:block></body></html>

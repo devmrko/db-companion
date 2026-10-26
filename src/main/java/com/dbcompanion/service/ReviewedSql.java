@@ -14,7 +14,7 @@ public final class ReviewedSql {
     private record Column(String alias,String name){}
     private record Pair(Column a,Column b){}
     private record Join(String alias,List<Pair> pairs){}
-    private static final Set<String> FUNCTIONS=Set.of("COUNT","SUM","AVG","MIN","MAX","ROUND","TRUNC","COALESCE","NVL","NULLIF","UPPER","LOWER","LENGTH","ABS");
+    private static final Set<String> FUNCTIONS=Set.of("COUNT","SUM","AVG","MIN","MAX","ROUND","TRUNC","COALESCE","NVL","NULLIF","UPPER","LOWER","LENGTH","ABS","TRIM");
     private static final Set<String> RESERVED=Set.of("SELECT","FROM","WHERE","GROUP","BY","HAVING","ORDER","ASC","DESC","NULLS","FIRST","LAST","FETCH","ROWS","ROW","ONLY","JOIN","INNER","LEFT","OUTER","ON","AND","OR","NOT","IS","NULL","IN","LIKE","BETWEEN","AS","DISTINCT","DATE","TIMESTAMP","SYSDATE","CURRENT_DATE");
     private static final Pattern LEX=Pattern.compile("\\G(?:\\s+|('(?:''|[^'])*')|(\"(?:\"\"|[^\"])+\")|([A-Za-z][A-Za-z0-9_$#]*)|([0-9]+(?:\\.[0-9]+)?)|(<=|>=|<>|!=|[(),.+*/=<>-]))");
     private static Failure invalid(){return new Failure(422,"query.sqlBlocked");}
@@ -37,7 +37,17 @@ public final class ReviewedSql {
             else if(matcher.group(5)!=null)tokens.add(new Token("SYMBOL",matcher.group(5)));
             if(tokens.size()>4000)throw invalid();
         }
-        var parser=new Parser(tokens,scope);parser.select();return new Checked(sql,new ArrayList<>(new LinkedHashSet<>(parser.aliases.values())));
+        var tables=new LinkedHashSet<String>();int start=0,branches=0;
+        for(int i=0;i<=tokens.size();i++){
+            if(i<tokens.size()&&!(tokens.get(i).kind().equals("WORD")&&tokens.get(i).value().equals("UNION")))continue;
+            var parser=new Parser(tokens.subList(start,i),scope);parser.select();tables.addAll(parser.aliases.values());
+            if(++branches>10)throw invalid();
+            if(i<tokens.size()){
+                if(i+1>=tokens.size()||!tokens.get(i+1).kind().equals("WORD")||!tokens.get(i+1).value().equals("ALL"))throw invalid();
+                i++;start=i+1;
+            }
+        }
+        return new Checked(sql,new ArrayList<>(tables));
     }
     private static final class Parser {
         final List<Token> tokens;final Scope scope;int at=0,depth=0;final Map<String,String> aliases=new LinkedHashMap<>();final List<Column> columns=new ArrayList<>();final List<Join> joins=new ArrayList<>();

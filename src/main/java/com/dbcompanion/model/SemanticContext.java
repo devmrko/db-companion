@@ -23,7 +23,7 @@ public final class SemanticContext {
     public record Create(String schema, String name, String type, String attributes, String description, boolean confirmed) {}
     public record Result(boolean verified, String message) {}
     public static MetadataEditException error(int status, String key) {
-        return new MetadataEditException(status, key, UiMessages.text("semantic." + key, key));
+        return new MetadataEditException(status, key, UiMessages.text("semanticContext." + key, key));
     }
     /** Conservative tested baseline, not a claim about Oracle's earliest supported release. */
     public static boolean versionSupported(String version) {

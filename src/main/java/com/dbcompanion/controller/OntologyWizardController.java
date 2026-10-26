@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.*;
 public class OntologyWizardController {
     private final OntologyWizardService service;
     public OntologyWizardController(OntologyWizardService service){this.service=service;}
-    public record SampleRequest(String schema,String table,int revision,List<String> columns,int count,boolean confirmed){}
+    public record SampleRequest(String schema,String table,int revision,List<String> columns,int count,boolean confirmed,Boolean statistics){}
     public record Generate(String token,boolean consent){}
     public record Apply(String schema,String table,int revision,String token,List<OntologyWizard.Edit> edits){}
     public record Cancel(String token){}
     @GetMapping("/options") @ResponseBody public ResponseEntity<?> options(@RequestParam String schema,@RequestParam String table,@RequestParam int revision,HttpServletRequest r){return run(r,()->service.options(session(r),schema,table,revision));}
-    @PostMapping("/sample") @ResponseBody public ResponseEntity<?> sample(@RequestBody SampleRequest v,Locale locale,HttpServletRequest r){return run(r,()->service.sample(session(r),v.schema(),v.table(),v.revision(),v.columns(),v.count(),v.confirmed(),locale));}
+    @PostMapping("/sample") @ResponseBody public ResponseEntity<?> sample(@RequestBody SampleRequest v,Locale locale,HttpServletRequest r){return run(r,()->service.sample(session(r),v.schema(),v.table(),v.revision(),v.columns(),v.count(),v.confirmed(),Boolean.TRUE.equals(v.statistics()),locale));}
     @PostMapping("/generate") @ResponseBody public ResponseEntity<?> generate(@RequestBody Generate v,HttpServletRequest r){return run(r,()->service.generate(session(r),v.token(),v.consent()));}
     @PostMapping("/apply") @ResponseBody public ResponseEntity<?> apply(@RequestBody Apply v,HttpServletRequest r){return run(r,()->service.apply(session(r),v.schema(),v.table(),v.revision(),v.token(),v.edits()));}
     @PostMapping("/cancel") @ResponseBody public ResponseEntity<?> cancel(@RequestBody Cancel v,HttpServletRequest r){return run(r,()->{service.cancel(session(r),v.token());return Map.of("cancelled",true);});}

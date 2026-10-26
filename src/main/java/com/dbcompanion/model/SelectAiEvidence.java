@@ -10,8 +10,9 @@ import tools.jackson.databind.json.JsonMapper;
 public final class SelectAiEvidence {
     private SelectAiEvidence() {}
     public record Snapshot(String schema,String question,String route,List<OntologyAnalysis.Reference> references,
-                           String hash,String source,@JsonIgnore List<Ontology.Entry> entries) {
-        public Snapshot { references=List.copyOf(references);entries=List.copyOf(entries); }
+                           String hash,String source,@JsonIgnore List<Ontology.Entry> entries,@JsonIgnore List<BusinessGlossary.Term> terms) {
+        public Snapshot(String schema,String question,String route,List<OntologyAnalysis.Reference> references,String hash,String source,List<Ontology.Entry> entries){this(schema,question,route,references,hash,source,entries,List.of());}
+        public Snapshot { references=List.copyOf(references);entries=List.copyOf(entries);terms=List.copyOf(terms); }
     }
     public static String key(Snapshot value){return value==null?"":value.hash();}
     public static boolean same(Snapshot a,Snapshot b){return key(a).equals(key(b));}
@@ -27,6 +28,7 @@ public final class SelectAiEvidence {
         private OntologyInquiry.Search search;
         private Snapshot selected;
         public synchronized Snapshot selected(){return selected;}
+        public synchronized Snapshot attach(Snapshot value){invalidate();return selected=Objects.requireNonNull(value);}
         public synchronized void invalidate(){search=null;selected=null;}
         public synchronized void clear(){data=null;invalidate();}
         public synchronized OntologyInquiry.Dataset dataset(String schema,boolean refresh,Supplier<OntologyInquiry.Dataset> loader){

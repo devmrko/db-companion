@@ -6,6 +6,7 @@
   <div class="app-page-heading"><h1 th:text="#{aitest.title}">Select AI 테스트</h1><button th:replace="~{fragments/common :: sqlHelp('ai-test', 'showsql')}"></button><a th:href="@{/ai-executions/sql}" th:text="#{aitest.history}">실행 이력</a></div>
   <p><a class="app-inline-link" th:href="@{/db/functions/ai-query}" th:text="#{callable.test}">DB 함수 호출 테스트</a></p>
   <th:block th:replace="~{fragments/select-ai-setup :: guide}"></th:block>
+  <section th:replace="~{fragments/semantic-release :: panel}"></section>
   <section class="app-card app-test-card app-test-progress" data-test-progress hidden>
     <h2 th:text="#{aitest.progress.title}">단계별 처리 시간</h2>
     <p class="app-filter-message" th:text="#{aitest.progress.help}">현재 로그인 세션의 최근 8회입니다. 서버에서 측정한 단계 시간이며 DB 실행계획의 세부 시간이 아닙니다. SQL 실행과 결과 읽기 모두 DB 작업·네트워크 대기를 포함할 수 있습니다.</p>
@@ -57,6 +58,7 @@
       <button type="button" class="btn app-btn app-btn-quiet" data-test-condition-open th:text="#{aitest.condition.open}">짧은 조건 확인</button>
     </div>
     <p role="status" aria-live="polite" data-test-message></p>
+    <p><a th:href="@{/db/accounts#ai-network}" th:text="#{aiNetwork.title}"></a> · <a th:href="@{/db/admin-help}" th:text="#{adminHelp.title}"></a></p>
     <p class="app-filter-message app-test-readiness" role="status" aria-live="polite" data-test-readiness hidden></p>
     <details class="app-assistant-help"><summary th:text="#{aitest.helpTitle}">테스트 ?</summary><p th:text="#{aitest.help}"></p><p th:text="#{aitest.historyHelp}"></p><p th:text="#{aitest.reviewHelp}"></p></details>
   </section>
@@ -92,7 +94,7 @@
     <p role="status" data-test-execute-message></p>
     <div data-test-rows></div>
     <section class="app-inspection" data-result-review-panel hidden>
-      <h3 th:text="#{aitest.resultReview.title}">결과 설명·AI 검토</h3>
+      <div class="app-card-heading"><h3 th:text="#{aitest.resultReview.title}">결과 설명·AI 검토</h3><button th:replace="~{fragments/common :: sqlHelp('ai-test', 'result-review')}"></button></div>
       <p class="app-filter-message" th:text="#{aitest.resultReview.help}"></p>
       <details><summary th:text="#{aitest.resultReview.baseline}">비교할 대시보드 기준 (선택)</summary>
         <label class="d-block"><span th:text="#{aitest.resultReview.baselineHelp}"></span><textarea class="form-control" rows="4" maxlength="16000" data-result-review-baseline></textarea></label>
@@ -142,4 +144,4 @@
       <div class="app-editor-actions"><button type="button" class="btn app-btn app-btn-primary" data-test-execution-run disabled th:text="#{aitest.execute}">SQL 실행</button></div>
     </div>
   </dialog>
-</main></div><script type="module" th:src="@{/js/select-ai-test.mjs}"></script></body></html>
+</main></div><script th:src="@{/webjars/cytoscape/3.34.1/dist/cytoscape.min.js}"></script><script type="module" th:src="@{/js/select-ai-test.mjs}"></script></body></html>

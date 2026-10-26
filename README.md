@@ -1,6 +1,6 @@
 # DB Companion
 
-**Version: 0.1.0-alpha.3** · Java 21+ · Spring Boot · MIT
+**Version: 0.1.0-alpha.13** · Java 21+ · Spring Boot · MIT
 
 A self-hosted workbench for inspecting Oracle database metadata, Select AI configuration,
 feedback, execution information, and governed business definitions.
@@ -49,6 +49,48 @@ vendor support commitment. Product names identify the systems with which it work
   storage is reused. Earlier changes and direct SQL edits are not retroactively
   captured, and version numbers alone do not imply historical snapshots exist.
 
+## Glossary transfer and document enrichment
+
+In **Business glossary**, JSON export/import moves terms, aliases, definitions,
+criteria and enabled state, not database-specific row IDs or revisions. Imports
+show new, changed, unchanged and conflicting entries before saving selected rows.
+Limits are 4 MB / 500 terms; export refuses an oversized dictionary rather than
+silently exporting only part of it. Existing glossary and history storage is required
+for writes. The destination is always the login owner's glossary.
+
+**Enrich glossary from a document** supports UTF-8 TXT/Markdown, DOCX body/table
+text and text PDFs (4 MB, 40,000 extracted characters, at most 80 PDF pages).
+Scans/OCR, encrypted PDFs, legacy Office files and spreadsheets are not supported.
+Review extracted text: images, layout and DOCX headers/footnotes are not extracted.
+
+Document enrichment and JSON transfer have separate tabs. Document work shows one
+step at a time: upload, review AI input, review candidates, and compare/save. Source
+chunks, search and embedding are optional advanced settings; an unavailable local
+embedding model does not prevent the default AI extraction workflow. AI consent
+appears only after payload preparation, and save consent only after comparison.
+
+1. Upload a document. The app keeps source chunks, locations and a text hash in the
+   login session and builds a keyword index. No AI call or database write occurs.
+2. Optionally select an accessible DB-local ONNX embedding model and consent to
+   DB resource use. Vectors remain in session memory; no DB vector table/index is
+   created. Semantic search uses cosine similarity; keyword search remains available
+   without an embedding model. No models are installed and no external embedding
+   provider is called by this feature.
+3. Select source chunks and review the AI payload. The current **AI Assistant**
+   profile receives those chunks only after consent. One `chat` generation produces
+   a summary and up to 30 business-concept / detailed-rule proposals. There is no
+   automatic retry or summary-only substitution for the underlying source.
+4. Inspect definitions, rules and source quotes; select candidates and compare them
+   with existing glossary entries. New candidates are inactive by default. Select
+   the final rows and consent to save; source quotes are retained in the criteria
+   and changes are recorded atomically with the existing glossary history.
+
+Document work expires after 30 minutes or session termination. Clear the document
+to remove pending source/index/candidates; previously saved terms are not deleted.
+AI profile changes invalidate a prepared request, and unknown or fabricated source
+citations are rejected. An exact quotation match is **not** a business-correctness
+check. No SQL embedded in a document or glossary criterion is executed.
+
 ## Requirements
 
 - JDK 21 or later and Maven 3.9+.
@@ -60,6 +102,15 @@ vendor support commitment. Product names identify the systems with which it work
   may send approved context to an external provider and may incur charges.
 
 No database credentials, Wallet, customer dataset, or private documentation are included.
+
+First-use guide: [English](docs/GETTING-STARTED.md) · [한국어](docs/GETTING-STARTED.ko.md) · [简体中文](docs/GETTING-STARTED.zh-CN.md) · [日本語](docs/GETTING-STARTED.ja.md).
+
+The [changelog](CHANGELOG.md) describes shared RDF question grounding,
+question-evidence graphs, glossary JSON transfer, column statistics and SQL-history
+candidate inspection. The optional [semantic-query Agent example](demos/semantic-query-agent/README.md)
+provides APEX result-recovery components; it requires explicit installation and app
+integration. [Reporting and threshold alerts](docs/explanation/reporting-and-alerts.md)
+describes a deployment-neutral integration pattern, not an installed scheduler job.
 
 ## Build and run
 
@@ -140,7 +191,7 @@ An optional runtime integration suite starts and stops isolated app instances on
 ports (never your already running app):
 
 ```sh
-RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.3.jar node --test src/test/js/app-runtime.test.mjs
+RUNTIME_TEST_JAR=target/db-manage-companion-0.1.0-alpha.13.jar node --test src/test/js/app-runtime.test.mjs
 ```
 
 Translation sources are public development assets under `tools/i18n`, not private

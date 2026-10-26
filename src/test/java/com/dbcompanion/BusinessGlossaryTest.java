@@ -51,6 +51,38 @@ class BusinessGlossaryTest {
         assertThat(state.consume("s","APP",true,now).operation()).isEqualTo("TABLE");
         assertThatThrownBy(()->state.consume("s","APP",true,now)).isInstanceOf(AiAssistant.Failure.class);
     }
+    private Search ticket(String key,String profile,Instant expires){
+        var original=search();return new Search(key,original.owner(),profile,original.question(),original.mode(),original.targets(),original.tokens(),original.textQuery(),original.hits(),false,expires);
+    }
+    @Test void independentTicketsRemainBoundToTheirOwnProfileAndSession(){
+        var state=new State();var first=state.remember(search());var rdf=state.remember(ticket("rdf","",now.plusSeconds(900)));
+        assertThat(state.resolve(first.id(),"APP","PROFILE",first.question(),now)).isEqualTo(first);
+        assertThat(state.resolve(rdf.id(),"APP","",rdf.question(),now)).isEqualTo(rdf);
+        assertThatThrownBy(()->state.resolve(first.id(),"APP","",first.question(),now)).isInstanceOf(AiAssistant.Failure.class);
+        assertThatThrownBy(()->state.resolve(rdf.id(),"APP","PROFILE",rdf.question(),now)).isInstanceOf(AiAssistant.Failure.class);
+        assertThatThrownBy(()->new State().resolve(first.id(),"APP","PROFILE",first.question(),now)).isInstanceOf(AiAssistant.Failure.class);
+        assertThatThrownBy(()->state.resolve("unknown","APP","PROFILE",first.question(),now)).isInstanceOf(AiAssistant.Failure.class);
+    }
+    @Test void expirationOfOneTicketDoesNotRemoveAnUnexpiredTicket(){
+        var state=new State();state.remember(search());var fresh=state.remember(ticket("fresh","",now.plusSeconds(1800)));
+        assertThatThrownBy(()->state.resolve("search","APP","PROFILE",search().question(),now.plusSeconds(900)))
+                .isInstanceOf(AiAssistant.Failure.class).hasMessageContaining("유효 시간이 만료");
+        assertThat(state.resolve("fresh","APP","",fresh.question(),now.plusSeconds(900))).isEqualTo(fresh);
+    }
+    @Test void ticketStorageIsBoundedAndEvictionNeverUsesAnotherSearch(){
+        var state=new State();
+        for(int i=0;i<17;i++)state.remember(ticket("search-"+i,"PROFILE",now.plusSeconds(900)));
+        assertThatThrownBy(()->state.resolve("search-0","APP","PROFILE",search().question(),now))
+                .isInstanceOf(AiAssistant.Failure.class).hasMessageContaining("보관 한도");
+        for(int i=1;i<17;i++)assertThat(state.resolve("search-"+i,"APP","PROFILE",search().question(),now).id()).isEqualTo("search-"+i);
+    }
+    @Test void clearInvalidatesEverySearchAndSetupTicket(){
+        var state=new State();state.remember(search());state.remember(ticket("rdf","",now.plusSeconds(900)));
+        state.setup(new Setup("setup","APP","TABLE",List.of("ddl"),now.plusSeconds(60)));state.clear();
+        assertThatThrownBy(()->state.resolve("search","APP","PROFILE",search().question(),now)).isInstanceOf(AiAssistant.Failure.class);
+        assertThatThrownBy(()->state.resolve("rdf","APP","",search().question(),now)).isInstanceOf(AiAssistant.Failure.class);
+        assertThatThrownBy(()->state.consume("setup","APP",true,now)).isInstanceOf(AiAssistant.Failure.class);
+    }
     @Test void snapshotKeepsOriginalAndImmutableDefinitionsAndDoesNotChangeSqlGuards(){
         var snapshot=BusinessGlossary.snapshot(search(),search().hits(),new JsonMapper(),now);
         String prompt=BusinessGlossary.append(SelectAiTest.prompt(SelectAiTest.Action.SQL,search().question(),"ko"),snapshot);

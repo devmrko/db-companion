@@ -1,5 +1,6 @@
 import {t} from './i18n.mjs';
 import {pageOf} from './table-list.mjs';
+import {internalObject} from './internal-objects.mjs';
 import {publicCatalog,publicModelState,MANUAL_MODEL,publicRegions,publicRegionState,MANUAL_REGION} from './embedding-catalog.mjs';
 
 export function embeddingOptions(provider) {
@@ -27,8 +28,10 @@ if(typeof document!=='undefined') {
   if(list) {
     const items=[...list.querySelectorAll('[data-vector-row]')].map(row=>({row,name:row.dataset.name,description:row.dataset.description}));
     let page=1;
+    const all=document.createElement('input');all.type='checkbox';
+    const allLabel=document.createElement('label');allLabel.className='app-glossary-pick';allLabel.append(all,document.createTextNode(t('auditFixes.internal.show','내부 관리 객체도 표시')));list.querySelector('[data-filter]').closest('.app-table-toolbar').append(allLabel);
     const render=()=>{
-      const result=pageOf(items,list.querySelector('[data-filter]').value,page);page=result.page;
+      const result=pageOf(items.filter(item=>all.checked||!internalObject(item.name)),list.querySelector('[data-filter]').value,page);page=result.page;
       const visible=new Set(result.items);items.forEach(item=>item.row.hidden=!visible.has(item));
       list.querySelector('[data-empty]').hidden=result.total!==0;
       list.querySelector('[data-summary]').textContent=t('ui.f32c9f13d498', "{0}–{1} / {2}개", result.from, result.to, result.total);
@@ -36,6 +39,7 @@ if(typeof document!=='undefined') {
       list.querySelector('[data-prev]').disabled=page<=1;list.querySelector('[data-next]').disabled=page>=result.pages;
     };
     list.querySelector('[data-filter]').addEventListener('input',()=>{page=1;render();});
+    all.addEventListener('change',()=>{page=1;render();});
     list.querySelector('[data-prev]').addEventListener('click',()=>{page--;render();});
     list.querySelector('[data-next]').addEventListener('click',()=>{page++;render();});render();
   }

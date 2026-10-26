@@ -1,8 +1,34 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {profileLabel,assistantPost} from '../../main/resources/static/js/ai-assistant.mjs';
-import {explanationRequest} from '../../main/resources/static/js/function-explain.mjs';
+import {profileLabel,assistantPost,tokenValue,adminRemedy} from '../../main/resources/static/js/ai-assistant.mjs';
+test('RDF owner prerequisite error gives the fixed owner grants only in RDF operations',()=>{
+  const error={error:'ORA-20004: Check RDF owner creation privileges before setup.'};
+  const guidance=adminRemedy(error,503,'/ontology/native/install','APP_TEST');
+  assert.match(guidance,/CREATE TRIGGER, CREATE TYPE TO "APP_TEST"/);assert.doesNotMatch(guidance,/ANY|DBA/);
+  assert.equal(adminRemedy(error,503,'/other','APP_TEST'),'');
+  assert.equal(adminRemedy(error,503,'/ontology/native/install',''),'');
+});
+test('token entry distinguishes inheritance from positive integer output limits',()=>{
+  assert.equal(tokenValue(''),null);assert.equal(tokenValue(' 4096 '),4096);
+  for(const value of ['0','-1','1.5','1e4','NaN','2147483648','3;DROP'])assert.throws(()=>tokenValue(value));
+});
+test('profile persistence requires separate explicit consent and does not run AI',()=>{
+  const code=fs.readFileSync('src/main/resources/static/js/ai-assistant.mjs','utf8');
+  assert.match(code,/persistent&&\(maxTokens===null\|\|!consent\)/);
+  assert.match(code,/version:tokens.version/);assert.match(code,/tokens-reset/);
+  assert.doesNotMatch(code,/innerHTML|localStorage|sessionStorage|\/generate/);
+});
+import {explanationRequest,explanationPreviewRequest} from '../../main/resources/static/js/function-explain.mjs';
+test('business context is reviewed separately and never part of the execution request',()=>{
+  assert.deepEqual(explanationPreviewRequest('APP','F'),{schema:'APP',reference:'F',businessContext:''});
+  assert.equal(explanationPreviewRequest('APP','F','<script>context').businessContext,'<script>context');
+  const code=fs.readFileSync('src/main/resources/static/js/function-explain.mjs','utf8');
+  assert.match(code,/get\('context'\).addEventListener\('input'.*preview=null.*get\('consent'\).checked=false/);
+  assert.match(code,/if\(refining\).*get\('refined'\).textContent=result.text/);
+  assert.match(code,/get\('context'\).value=''/);
+  assert.match(code,/get\('context'\).disabled=busy/);
+});
 test('explanation sends only explicit consent and a one-use token, not editable source or action',()=>{
   assert.deepEqual(explanationRequest({token:'one-use',source:'private',profile:'OTHER',action:'runsql'},true),{token:'one-use',consent:true});
   assert.equal(explanationRequest({token:'one-use'},'true').consent,false);

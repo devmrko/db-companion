@@ -1,34 +1,470 @@
 {
-  "ontology.mg.mode": ["그래프 종류", "Graph kind", "图类型", "グラフの種類"],
-  "ontology.mg.metadata": ["메타데이터 관계 그래프", "Metadata relationship graph", "元数据关系图", "メタデータ関係グラフ"],
-  "ontology.mg.business": ["업무 데이터 행 그래프", "Business-row graph", "业务数据行图", "業務データ行グラフ"],
-  "ontology.mg.help": ["저장된 테이블·뷰·컬럼을 노드로, 포함 관계와 승인 관계를 간선으로 만듭니다. Oracle SQL이 온톨로지 저장소를 조회하며 원본 업무 행·PK는 사용하지 않습니다. 네이티브 RDF 후보도 검토·승인되어 온톨로지에 저장된 후 포함됩니다.", "Nodes represent saved objects/columns, not business rows. Oracle SQL projects the ontology catalog into containment and approved links; source PKs are unnecessary. Native RDF candidates enter after review and approval in the catalog.", "节点代表已保存对象和列，而非业务行。Oracle SQL 从本体目录生成包含及已批准关系，无需源主键。原生 RDF 候选须先审核批准。", "保存済みの対象・列をノードとし、包含・承認済み関係を接続します。Oracle SQL が定義を取得し、業務行や元の PK は使いません。RDF 候補は保存・承認後に対象となります。"],
-  "ontology.mg.businessHelp": ["이 방식은 원본 테이블·뷰의 각 행을 노드로 사용합니다. 기존 자동 생성기는 선언된 PK·NOT NULL UK와 확정된 조인만 지원합니다. 메타데이터 관계를 보려면 위에서 메타데이터 그래프를 선택하세요.", "Each source row is a vertex. This existing generator requires declared PK/non-null UK and confirmed joins. Choose metadata graph above to explore schema relationships.", "每个源数据行是一个节点。现有生成器需要已声明主键/非空唯一键及确认的连接。查看模式关系请选元数据图。", "元データの各行がノードです。既存生成器は宣言済み PK・非 NULL UK と確定結合を必要とします。定義の関係にはメタデータグラフを選択してください。"],
-  "ontology.mg.name": ["그래프 이름", "Graph name", "图名称", "グラフ名"],
-  "ontology.mg.preview": ["대상·SQL 확인", "Preview objects and SQL", "预览对象及 SQL", "対象・SQL 確認"],
-  "ontology.mg.working": ["메타데이터 그래프 확인 중…", "Checking metadata graph…", "正在检查元数据图…", "メタデータグラフを確認中…"],
-  "ontology.mg.summary": ["메타데이터 노드 {0}개 · 간선 {1}개", "Metadata nodes {0} · edges {1}", "元数据节点 {0} · 边 {1}", "メタデータノード {0} 件・接続 {1} 件"],
-  "ontology.mg.counts": ["테이블·뷰 {0} · 컬럼 {1} · 확정 관계 {2} · 관계의 컬럼 쌍 {3} · 제외 후보 {4}", "Objects {0} · columns {1} · confirmed links {2} · column pairs {3} · excluded {4}", "对象 {0} · 列 {1} · 确认关系 {2} · 列对 {3} · 排除 {4}", "対象 {0}・列 {1}・確定関係 {2}・列の組 {3}・除外 {4}"],
-  "ontology.mg.snapshot": ["생성 시점의 저장 버전을 고정합니다. 이후 정의·승인 변경은 자동 반영하지 않으며 갱신하려면 새 이름으로 생성하세요. 복합 조인의 각 컬럼 쌍은 동일 RELATION_ID와 MAPPING_COUNT로 묶이며, 조건은 설명으로 보관할 뿐 실행하지 않습니다.", "Pins saved revisions at creation. Later changes are not automatic; create a new name to refresh. Composite pairs share RELATION_ID/MAPPING_COUNT. Conditions remain descriptive metadata, never executable filters.", "固定创建时保存的版本，后续修改不自动更新，请用新名称创建。复合连接列对共享 RELATION_ID/MAPPING_COUNT，条件仅作说明而不执行。", "作成時の保存版を固定します。更新は別名で作成してください。複合結合は RELATION_ID・MAPPING_COUNT で束ね、条件は説明として保持し実行しません。"],
-  "ontology.mg.noRelations": ["아직 포함할 확정 관계가 없습니다. 테이블·뷰와 컬럼의 포함 관계는 만들 수 있으며, 미승인 후보를 승인 관계로 간주하지 않습니다.", "No confirmed relationships yet. Object-to-column containment can still be created; candidates are not treated as approved.", "暂无确认关系，仍可创建对象与列的包含关系；候选不会视为已批准。", "確定関係はありませんが、対象と列の包含関係は作成できます。候補を承認済みとは扱いません。"],
-  "ontology.mg.supported": ["DB 버전", "DB version", "数据库版本", "DB バージョン"],
-  "ontology.mg.owner": ["로그인 소유 스키마", "Login-owned schema", "登录所属模式", "ログイン所有スキーマ"],
-  "ontology.mg.graphPrivilege": ["CREATE PROPERTY GRAPH", "CREATE PROPERTY GRAPH", "CREATE PROPERTY GRAPH", "CREATE PROPERTY GRAPH"],
-  "ontology.mg.viewPrivilege": ["CREATE VIEW", "CREATE VIEW", "CREATE VIEW", "CREATE VIEW"],
-  "ontology.mg.namesFree": ["그래프·뷰 이름 사용 가능", "Graph/view names available", "图及视图名称可用", "グラフ・ビュー名使用可"],
-  "ontology.mg.yes": ["확인", "Ready", "就绪", "確認済み"],
-  "ontology.mg.no": ["미충족", "Not ready", "未满足", "未準備"],
-  "ontology.mg.permissionHelp": ["관리자가 필요한 CREATE VIEW·CREATE PROPERTY GRAPH 권한을 부여해야 합니다. 앱은 권한을 자동 부여하지 않습니다. 뷰 기반 SQL Property Graph를 지원하는 Oracle DB가 필요합니다.", "An administrator must grant missing CREATE VIEW/CREATE PROPERTY GRAPH privileges. No automatic grants. Requires Oracle SQL Property Graph support for views.", "管理员须授予缺少的 CREATE VIEW/CREATE PROPERTY GRAPH 权限。不会自动授权，需要支持视图图形的 Oracle。", "不足権限は管理者が付与してください。自動付与はしません。ビューを使う SQL Property Graph 対応 Oracle が必要です。"],
-  "ontology.mg.excluded": ["제외된 관계 {0}개 보기", "Show {0} excluded relationships", "显示 {0} 个排除关系", "除外関係 {0} 件を表示"],
-  "ontology.mg.sql": ["실행할 SQL · 뷰 2개 + 그래프 1개", "SQL · two views and one graph", "SQL · 两个视图和一个图", "実行 SQL・ビュー 2 件とグラフ 1 件"],
-  "ontology.mg.consent": ["표시된 이름으로 메타데이터 조회용 뷰 2개와 Property Graph 1개를 생성합니다. 원본 업무 데이터는 변경하지 않습니다. DDL은 커밋되며 중간 실패 시 일부 객체가 남을 수 있습니다. 기존 객체는 교체하지 않습니다.", "Create two metadata views and one Property Graph with these names. Source business data is unchanged. DDL commits; partial objects may remain after failure. Existing objects are never replaced.", "按显示名称创建两个元数据视图及一个图，不修改业务数据。DDL 提交，失败可能留下部分对象，不替换已有对象。", "表示名でメタデータビュー 2 件とグラフ 1 件を作成します。業務データは変更しません。DDL はコミットされ途中失敗時に一部が残る場合があります。既存は置換しません。"],
-  "ontology.mg.create": ["메타데이터 그래프 생성", "Create metadata graph", "创建元数据图", "メタデータグラフ作成"],
-  "ontology.mg.creating": ["뷰·그래프 생성 중…", "Creating views and graph…", "正在创建视图和图…", "ビュー・グラフを作成中…"],
-  "ontology.mg.created": ["{0} 생성 완료 · 아래 GRAPH_TABLE SQL로 조회할 수 있습니다.", "Created {0}. Query with the GRAPH_TABLE SQL below.", "已创建 {0}，可使用下方 GRAPH_TABLE SQL 查询。", "{0} 作成完了。下の GRAPH_TABLE SQL で取得できます。"],
-  "ontology.mg.verified": ["Oracle SQL 조회 검증 완료 · 아직 객체를 생성하지 않았습니다.", "Oracle SQL projection verified; no objects created yet.", "Oracle SQL 投影已验证，尚未创建对象。", "Oracle SQL の取得検証完了。オブジェクトは未作成です。"],
-  "ontology.mg.empty": ["저장된 온톨로지가 필요합니다(최대 500개).", "Saved ontology required (maximum 500 objects).", "需要已保存的本体（最多 500 个）。", "保存済み定義が必要です（最大 500 件）。"],
-  "ontology.mg.projection": ["메타데이터 노드·관계 수 또는 고유 식별자가 예상과 다릅니다. 생성하지 않았습니다.", "Metadata projection counts/identities differ; creation stopped.", "元数据数量或标识不符，已停止创建。", "メタデータ数・識別子が不一致のため作成を停止しました。"],
-  "ontology.mg.invalidObject": ["생성 객체의 VALID 상태를 확인하지 못했습니다.", "Created object is not confirmed VALID.", "未确认创建对象为 VALID。", "作成対象の VALID を確認できません。"],
-  "ontology.mg.partial": ["생성을 완료하지 못했습니다. 아래 완료 객체와 DB 상태를 확인하세요. 자동 삭제·재시도하지 않았습니다.", "Creation incomplete. Inspect the completed objects below and DB state. No automatic cleanup or retry.", "创建未完成，请检查下方已完成对象及数据库状态。未自动清理或重试。", "作成未完了。完了対象と DB 状態を確認してください。自動削除・再試行はしません。"],
-  "ontology.mg.error": ["메타데이터 그래프 요청을 완료하지 못했습니다.", "Metadata graph request failed.", "元数据图请求失败。", "メタデータグラフ処理に失敗しました。"]
+  "ontology.mg.tab": [
+    "Property Graph",
+    "Property Graph",
+    "Property Graph",
+    "Property Graph"
+  ],
+  "ontology.mg.mode": [
+    "그래프 종류",
+    "Graph kind",
+    "图类型",
+    "グラフの種類"
+  ],
+  "ontology.mg.metadata": [
+    "메타데이터 관계 그래프",
+    "Metadata relationship graph",
+    "元数据关系图",
+    "メタデータ関係グラフ"
+  ],
+  "ontology.mg.business": [
+    "업무 데이터 행 그래프",
+    "Business-row graph",
+    "业务数据行图",
+    "業務データ行グラフ"
+  ],
+  "ontology.mg.help": [
+    "확정·제안 관계를 기본 포함합니다. 정의가 바뀐 제안은 재검토 필요(STALE) 상태로 포함하며 승인하지 않습니다. 제외한 관계·오래된 승인 관계·유효하지 않은 컬럼 연결은 제외합니다.",
+    "Includes confirmed and proposed relationships. Stale proposals remain STALE and unapproved. Rejected links, stale approvals and invalid column mappings are excluded.",
+    "默认包含确认和建议关系。过期建议保持 STALE 且未批准；排除已拒绝关系、过期批准关系和无效列映射。",
+    "確定・提案関係を含めます。古い提案は未承認の STALE として保持し、却下・古い承認関係・無効な列対応は除外します。"
+  ],
+  "ontology.mg.businessHelp": [
+    "이 방식은 원본 테이블·뷰의 각 행을 노드로 사용합니다. 기존 자동 생성기는 선언된 PK·NOT NULL UK와 확정된 조인만 지원합니다. 메타데이터 관계를 보려면 위에서 메타데이터 그래프를 선택하세요.",
+    "Each source row is a vertex. This existing generator requires declared PK/non-null UK and confirmed joins. Choose metadata graph above to explore schema relationships.",
+    "每个源数据行是一个节点。现有生成器需要已声明主键/非空唯一键及确认的连接。查看模式关系请选元数据图。",
+    "元データの各行がノードです。既存生成器は宣言済み PK・非 NULL UK と確定結合を必要とします。定義の関係にはメタデータグラフを選択してください。"
+  ],
+  "ontology.mg.name": [
+    "그래프 이름",
+    "Graph name",
+    "图名称",
+    "グラフ名"
+  ],
+  "ontology.mg.preview": [
+    "대상·SQL 확인",
+    "Preview objects and SQL",
+    "预览对象及 SQL",
+    "対象・SQL 確認"
+  ],
+  "ontology.mg.working": [
+    "메타데이터 그래프 확인 중…",
+    "Checking metadata graph…",
+    "正在检查元数据图…",
+    "メタデータグラフを確認中…"
+  ],
+  "ontology.mg.summary": [
+    "메타데이터 노드 {0}개 · 간선 {1}개",
+    "Metadata nodes {0} · edges {1}",
+    "元数据节点 {0} · 边 {1}",
+    "メタデータノード {0} 件・接続 {1} 件"
+  ],
+  "ontology.mg.counts": [
+    "테이블·뷰 {0} · 컬럼 {1} · 포함 관계 {2} · 관계의 컬럼 쌍 {3} · 제외 후보 {4}",
+    "Objects {0} · columns {1} · included links {2} · column pairs {3} · excluded {4}",
+    "对象 {0} · 列 {1} · 包含关系 {2} · 列对 {3} · 排除 {4}",
+    "対象 {0}・列 {1}・対象関係 {2}・列の組 {3}・除外 {4}"
+  ],
+  "ontology.mg.snapshot": [
+    "생성 시점의 저장 버전을 고정합니다. 이후 정의·승인 변경은 자동 반영하지 않으며 갱신하려면 새 이름으로 생성하세요. 복합 조인의 각 컬럼 쌍은 동일 RELATION_ID와 MAPPING_COUNT로 묶이며, 조건은 설명으로 보관할 뿐 실행하지 않습니다.",
+    "Pins saved revisions at creation. Later changes are not automatic; create a new name to refresh. Composite pairs share RELATION_ID/MAPPING_COUNT. Conditions remain descriptive metadata, never executable filters.",
+    "固定创建时保存的版本，后续修改不自动更新，请用新名称创建。复合连接列对共享 RELATION_ID/MAPPING_COUNT，条件仅作说明而不执行。",
+    "作成時の保存版を固定します。更新は別名で作成してください。複合結合は RELATION_ID・MAPPING_COUNT で束ね、条件は説明として保持し実行しません。"
+  ],
+  "ontology.mg.noRelations": [
+    "포함할 관계가 없습니다. 저장된 제안·확정 관계와 제외 사유를 확인하세요.",
+    "No eligible relationships. Check saved proposals, confirmed links and exclusions.",
+    "没有可包含的关系。请检查保存的建议、确认关系和排除原因。",
+    "対象の関係がありません。保存済み提案・確定関係と除外理由を確認してください。"
+  ],
+  "ontology.mg.supported": [
+    "DB 버전",
+    "DB version",
+    "数据库版本",
+    "DB バージョン"
+  ],
+  "ontology.mg.owner": [
+    "로그인 소유 스키마",
+    "Login-owned schema",
+    "登录所属模式",
+    "ログイン所有スキーマ"
+  ],
+  "ontology.mg.graphPrivilege": [
+    "CREATE PROPERTY GRAPH",
+    "CREATE PROPERTY GRAPH",
+    "CREATE PROPERTY GRAPH",
+    "CREATE PROPERTY GRAPH"
+  ],
+  "ontology.mg.viewPrivilege": [
+    "CREATE VIEW",
+    "CREATE VIEW",
+    "CREATE VIEW",
+    "CREATE VIEW"
+  ],
+  "ontology.mg.namesFree": [
+    "그래프·뷰 이름 사용 가능",
+    "Graph/view names available",
+    "图及视图名称可用",
+    "グラフ・ビュー名使用可"
+  ],
+  "ontology.mg.yes": [
+    "확인",
+    "Ready",
+    "就绪",
+    "確認済み"
+  ],
+  "ontology.mg.no": [
+    "미충족",
+    "Not ready",
+    "未满足",
+    "未準備"
+  ],
+  "ontology.mg.permissionHelp": [
+    "관리자가 필요한 CREATE VIEW·CREATE PROPERTY GRAPH 권한을 부여해야 합니다. 앱은 권한을 자동 부여하지 않습니다. 뷰 기반 SQL Property Graph를 지원하는 Oracle DB가 필요합니다.",
+    "An administrator must grant missing CREATE VIEW/CREATE PROPERTY GRAPH privileges. No automatic grants. Requires Oracle SQL Property Graph support for views.",
+    "管理员须授予缺少的 CREATE VIEW/CREATE PROPERTY GRAPH 权限。不会自动授权，需要支持视图图形的 Oracle。",
+    "不足権限は管理者が付与してください。自動付与はしません。ビューを使う SQL Property Graph 対応 Oracle が必要です。"
+  ],
+  "ontology.mg.excluded": [
+    "제외된 관계 {0}개 보기",
+    "Show {0} excluded relationships",
+    "显示 {0} 个排除关系",
+    "除外関係 {0} 件を表示"
+  ],
+  "ontology.mg.sql": [
+    "실행할 SQL · 뷰 2개 + 그래프 1개",
+    "SQL · two views and one graph",
+    "SQL · 两个视图和一个图",
+    "実行 SQL・ビュー 2 件とグラフ 1 件"
+  ],
+  "ontology.mg.consent": [
+    "표시된 이름으로 메타데이터 조회용 뷰 2개와 Property Graph 1개를 생성합니다. 원본 업무 데이터는 변경하지 않습니다. DDL은 커밋되며 중간 실패 시 일부 객체가 남을 수 있습니다. 기존 객체는 교체하지 않습니다.",
+    "Create two metadata views and one Property Graph with these names. Source business data is unchanged. DDL commits; partial objects may remain after failure. Existing objects are never replaced.",
+    "按显示名称创建两个元数据视图及一个图，不修改业务数据。DDL 提交，失败可能留下部分对象，不替换已有对象。",
+    "表示名でメタデータビュー 2 件とグラフ 1 件を作成します。業務データは変更しません。DDL はコミットされ途中失敗時に一部が残る場合があります。既存は置換しません。"
+  ],
+  "ontology.mg.create": [
+    "메타데이터 그래프 생성",
+    "Create metadata graph",
+    "创建元数据图",
+    "メタデータグラフ作成"
+  ],
+  "ontology.mg.creating": [
+    "뷰·그래프 생성 중…",
+    "Creating views and graph…",
+    "正在创建视图和图…",
+    "ビュー・グラフを作成中…"
+  ],
+  "ontology.mg.created": [
+    "{0} 생성 완료 · 아래 GRAPH_TABLE SQL로 조회할 수 있습니다.",
+    "Created {0}. Query with the GRAPH_TABLE SQL below.",
+    "已创建 {0}，可使用下方 GRAPH_TABLE SQL 查询。",
+    "{0} 作成完了。下の GRAPH_TABLE SQL で取得できます。"
+  ],
+  "ontology.mg.verified": [
+    "이번 미리보기의 Oracle SQL 조회 검증 완료 · 이번 요청에서 객체를 생성하지 않았습니다.",
+    "Oracle SQL projection verified for this preview; this request created no objects.",
+    "本次预览的 Oracle SQL 查询验证完成；本次请求未创建对象。",
+    "今回のプレビューで Oracle SQL 取得検証完了。この要求ではオブジェクトを作成していません。"
+  ],
+  "ontology.mg.empty": [
+    "저장된 온톨로지가 필요합니다(최대 500개).",
+    "Saved ontology required (maximum 500 objects).",
+    "需要已保存的本体（最多 500 个）。",
+    "保存済み定義が必要です（最大 500 件）。"
+  ],
+  "ontology.mg.projection": [
+    "메타데이터 노드·관계 수 또는 고유 식별자가 예상과 다릅니다. 생성하지 않았습니다.",
+    "Metadata projection counts/identities differ; creation stopped.",
+    "元数据数量或标识不符，已停止创建。",
+    "メタデータ数・識別子が不一致のため作成を停止しました。"
+  ],
+  "ontology.mg.invalidObject": [
+    "생성 객체의 VALID 상태를 확인하지 못했습니다.",
+    "Created object is not confirmed VALID.",
+    "未确认创建对象为 VALID。",
+    "作成対象の VALID を確認できません。"
+  ],
+  "ontology.mg.partial": [
+    "생성을 완료하지 못했습니다. 아래 완료 객체와 DB 상태를 확인하세요. 자동 삭제·재시도하지 않았습니다.",
+    "Creation incomplete. Inspect the completed objects below and DB state. No automatic cleanup or retry.",
+    "创建未完成，请检查下方已完成对象及数据库状态。未自动清理或重试。",
+    "作成未完了。完了対象と DB 状態を確認してください。自動削除・再試行はしません。"
+  ],
+  "ontology.mg.error": [
+    "메타데이터 그래프 요청을 완료하지 못했습니다.",
+    "Metadata graph request failed.",
+    "元数据图请求失败。",
+    "メタデータグラフ処理に失敗しました。"
+  ],
+  "ontology.mg.nameCollision": [
+    "이름이 중복되어 생성할 수 없습니다. 기존 객체를 확인하거나 새 이름을 입력하세요.",
+    "Name collision prevents creation. Inspect existing objects or enter a new name.",
+    "名称重复，无法创建。请检查现有对象或输入新名称。",
+    "名前が重複しているため作成できません。既存オブジェクトを確認するか新しい名前を入力してください。"
+  ],
+  "ontology.mg.relationScope": [
+    "포함할 확정 관계",
+    "Confirmed relationships to include",
+    "要包含的已确认关系",
+    "含める確定関係"
+  ],
+  "ontology.mg.allRelations": [
+    "확정·제안 관계 전체 포함",
+    "Include confirmed and proposed relationships",
+    "包含已确认和建议关系",
+    "確定・提案関係をすべて含める"
+  ],
+  "ontology.mg.selectedRelations": [
+    "선택한 관계만",
+    "Selected relationships only",
+    "仅选定的关系",
+    "選択した関係のみ"
+  ],
+  "ontology.mg.selectionHelp": [
+    "체크 해제는 이번 그래프에서만 제외합니다. 계속 제외하려면 관계도의 검토에서 제외를 저장하세요. 변경 후 미리보기를 다시 실행하세요.",
+    "Unchecking excludes a link only from this graph. Save a rejection in relationship review to keep it excluded from future drafts. Preview again after changing selection.",
+    "取消勾选仅影响本次图。请在关系审核中保存拒绝状态以持续排除。更改后重新预览。",
+    "チェック解除は今回のグラフのみです。継続して除外するには関係レビューで却下を保存してください。変更後は再プレビューしてください。"
+  ],
+  "ontology.mg.selectionChanged": [
+    "관계 선택이 바뀌었습니다. 대상·SQL 확인을 다시 실행하세요.",
+    "Relationship selection changed. Preview objects and SQL again.",
+    "关系选择已更改，请重新预览对象和 SQL。",
+    "関係の選択が変更されました。対象と SQL を再確認してください。"
+  ],
+  "ontology.mg.graphsTitle": [
+    "기존 Property Graph",
+    "Existing Property Graphs",
+    "现有 Property Graph",
+    "既存の Property Graph"
+  ],
+  "ontology.mg.existingHelp": [
+    "로그인 소유 스키마의 VALID 그래프를 조회할 수 있습니다. 대응하는 두 뷰가 VALID이면 메타데이터 관계를, 그 외에는 그래프 ID만 표시합니다. 이름만으로 앱 생성 출처를 보증하지 않습니다.",
+    "Query VALID graphs owned by the login schema. Matching VALID views allow metadata relationship results; otherwise only graph IDs are shown. Names alone do not prove app provenance.",
+    "可查询登录用户模式中的 VALID 图。若对应两个视图均为 VALID，则显示元数据关系；否则仅显示图 ID。名称不能证明创建来源。",
+    "ログイン所有スキーマの VALID グラフを照会できます。対応する 2 つのビューが VALID ならメタデータ関係を、それ以外はグラフ ID のみ表示します。名前だけでは作成元を証明できません。"
+  ],
+  "ontology.mg.refreshGraphs": [
+    "목록 새로고침",
+    "Refresh list",
+    "刷新列表",
+    "一覧を更新"
+  ],
+  "ontology.mg.newGraph": [
+    "새 그래프 생성",
+    "Create new graph",
+    "创建新图",
+    "新しいグラフを作成"
+  ],
+  "ontology.mg.loadingGraphs": [
+    "기존 그래프 조회 중…",
+    "Loading existing graphs…",
+    "正在加载现有图…",
+    "既存グラフを取得中…"
+  ],
+  "ontology.mg.noGraphs": [
+    "표시할 Property Graph가 없습니다.",
+    "No Property Graphs to display.",
+    "没有可显示的 Property Graph。",
+    "表示する Property Graph はありません。"
+  ],
+  "ontology.mg.listedGraphs": [
+    "그래프 {0}개 확인",
+    "Found {0} graphs",
+    "找到 {0} 个图",
+    "グラフ {0} 件を確認"
+  ],
+  "ontology.mg.graphListLimit": [
+    "이름순 처음 100개만 표시합니다.",
+    "Showing the first 100 names only.",
+    "仅显示按名称排序的前 100 个。",
+    "名前順の最初の 100 件のみ表示します。"
+  ],
+  "ontology.mg.metadataCandidate": [
+    "메타데이터 그래프 후보",
+    "Possible metadata graph",
+    "可能的元数据图",
+    "メタデータグラフ候補"
+  ],
+  "ontology.mg.otherGraph": [
+    "기타 그래프",
+    "Other graph",
+    "其他图",
+    "その他のグラフ"
+  ],
+  "ontology.mg.queryGraph": [
+    "조회",
+    "Query",
+    "查询",
+    "照会"
+  ],
+  "ontology.mg.queryingGraph": [
+    "{0} 조회 중…",
+    "Querying {0}…",
+    "正在查询 {0}…",
+    "{0} を照会中…"
+  ],
+  "ontology.mg.queriedGraph": [
+    "결과 {0}행",
+    "{0} rows returned",
+    "返回 {0} 行",
+    "結果 {0} 行"
+  ],
+  "ontology.mg.noGraphRows": [
+    "조회 결과가 없습니다.",
+    "No rows returned.",
+    "没有查询结果。",
+    "照会結果はありません。"
+  ],
+  "ontology.mg.queryLimit": [
+    "최대 100행을 표시합니다. 조회 결과는 업무 관계의 정확성 검증이 아닙니다.",
+    "Shows at most 100 rows; query results do not validate business relationships.",
+    "最多显示 100 行；查询结果不验证业务关系正确性。",
+    "最大 100 行を表示します。照会結果は業務関係の正確性を検証しません。"
+  ],
+  "ontology.mg.metadataResult": [
+    "메타데이터 관계 조회",
+    "Metadata relationship query",
+    "元数据关系查询",
+    "メタデータ関係照会"
+  ],
+  "ontology.mg.genericResult": [
+    "그래프 ID 조회 · 업무행 그래프는 원본 행을 참조할 수 있습니다.",
+    "Graph ID query; business graphs may reference source rows.",
+    "图 ID 查询；业务图可能引用源数据行。",
+    "グラフ ID 照会。業務グラフは元データ行を参照する場合があります。"
+  ],
+  "ontology.mg.notQueryable": [
+    "이 그래프는 메타데이터 조회 조건을 충족하지 않습니다.",
+    "This graph does not meet metadata query conditions.",
+    "此图不符合元数据查询条件。",
+    "このグラフはメタデータ照会条件を満たしません。"
+  ],
+  "ontology.mg.technicalDetails": [
+    "내부 객체 정보",
+    "Technical details",
+    "Technical details",
+    "Technical details"
+  ],
+  "ontology.mg.queryComplete": [
+    "그래프 조회 완료",
+    "Graph loaded",
+    "Graph loaded",
+    "Graph loaded"
+  ],
+  "ontology.mg.browser.relations": [
+    "테이블 관계",
+    "Table relationships",
+    "Table relationships",
+    "Table relationships"
+  ],
+  "ontology.mg.browser.mappings": [
+    "컬럼 매핑",
+    "Column mappings",
+    "Column mappings",
+    "Column mappings"
+  ],
+  "ontology.mg.browser.columns": [
+    "컬럼 구성",
+    "Column membership",
+    "Column membership",
+    "Column membership"
+  ],
+  "ontology.mg.browser.count": [
+    "전체 {1}건 중 {0}건 표시",
+    "Showing {0} of {1}",
+    "Showing {0} of {1}",
+    "Showing {0} of {1}"
+  ],
+  "ontology.mg.browser.noRelations": [
+    "테이블 간 관계가 없습니다. 컬럼 소속 정보만으로 조인 경로를 알 수 없습니다. 저장한 관계 정의와 그래프 생성 시 포함한 관계를 확인하세요.",
+    "No table relationships. Column membership does not define joins. Review saved definitions and relationships included when creating the graph.",
+    "No table relationships. Column membership does not define joins. Review saved definitions and relationships included when creating the graph.",
+    "No table relationships. Column membership does not define joins. Review saved definitions and relationships included when creating the graph."
+  ],
+  "ontology.mg.browser.empty": [
+    "이 유형의 항목이 없습니다.",
+    "No entries in this category.",
+    "No entries in this category.",
+    "No entries in this category."
+  ],
+  "ontology.mg.browser.unlabeled": [
+    "의미 라벨 미정의",
+    "Relationship label not defined",
+    "Relationship label not defined",
+    "Relationship label not defined"
+  ],
+  "ontology.mg.browser.mappingDetails": [
+    "매핑 · 조건 상세",
+    "Mapping and condition details",
+    "Mapping and condition details",
+    "Mapping and condition details"
+  ],
+  "ontology.mg.browser.limited": [
+    "이 유형의 앞 100건만 표시합니다.",
+    "Only the first 100 entries in this category are shown.",
+    "Only the first 100 entries in this category are shown.",
+    "Only the first 100 entries in this category are shown."
+  ],
+  "ontology.mg.browser.SOURCE_OBJECT": [
+    "테이블",
+    "Table",
+    "Table",
+    "Table"
+  ],
+  "ontology.mg.browser.TARGET_COLUMN": [
+    "대상 컬럼",
+    "Target column",
+    "Target column",
+    "Target column"
+  ],
+  "ontology.mg.browser.SOURCE_COLUMN": [
+    "출발 컬럼",
+    "Source column",
+    "Source column",
+    "Source column"
+  ],
+  "ontology.mg.browser.CONDITION_TEXT": [
+    "조건",
+    "Condition",
+    "Condition",
+    "Condition"
+  ],
+  "ontology.mg.browser.RELATION_ID": [
+    "관계 ID",
+    "Relationship ID",
+    "Relationship ID",
+    "Relationship ID"
+  ],
+  "ontology.mg.browser.MAPPING_POSITION": [
+    "매핑 순서",
+    "Position",
+    "Position",
+    "Position"
+  ],
+  "ontology.mg.browser.MAPPING_COUNT": [
+    "매핑 수",
+    "Mapping count",
+    "Mapping count",
+    "Mapping count"
+  ],
+  "ontology.mg.browser.review": [
+    "검토 · 제외",
+    "Review / exclude",
+    "审核 / 排除",
+    "レビュー・除外"
+  ],
+  "ontology.mg.browser.ORIGIN": [
+    "제안 출처",
+    "Origin",
+    "来源",
+    "出典"
+  ],
+  "ontology.mg.browser.RELATION_STATE": [
+    "검토 상태",
+    "Review state",
+    "审核状态",
+    "レビュー状態"
+  ]
 }

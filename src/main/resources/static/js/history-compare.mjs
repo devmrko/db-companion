@@ -1,4 +1,5 @@
 import {t} from './i18n.mjs';
+import {changeHistorySummary} from './change-history-summary.mjs';
 export function sameHistoryItem(a, b) {
   return ['schema', 'table', 'column', 'kind', 'annotationName'].every(key => (a[key] ?? null) === (b[key] ?? null));
 }
@@ -122,7 +123,8 @@ export function mountHistoryComparison(entries) {
         option.value = value; return option;
       }));
       view.select.value = phase;
-      view.metadata.textContent = t('ui.fe9b3082f3de', "이력 기록: {0} · {1}", row.changedAt, row.changedBy);
+      view.metadata.textContent = changeHistorySummary({actor:row.changedBy,at:row.changedAt,content:itemLabel(row)});
+      view.metadata.classList.add('app-change-history-summary');
       view.text.replaceChildren();
       view.presence.textContent = !snapshot.valid ? t('ui.9070bdcbed63', "JSON 형식을 확인해 주세요.") : !snapshot.exists ? t('ui.f6a454f6c46d', "항목 없음")
         : snapshot.value === null ? t('ui.b127908bee20', "값 없음 (NULL)") : snapshot.value === '' ? t('ui.a747ef5ec74d', "빈 문자열") : t('ui.4bbf8f68f323', "값 있음");

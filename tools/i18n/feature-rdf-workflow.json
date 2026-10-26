@@ -1,0 +1,158 @@
+{
+  "ontology.query.rdfFlow.title": [
+    "조회 근거와 SQL 생성",
+    "Query evidence and SQL generation",
+    "查询依据与 SQL 生成",
+    "照会根拠と SQL 生成"
+  ],
+  "ontology.query.rdfFlow.policy": [
+    "원천·규칙을 확인하고 SQL을 생성합니다. 초안 설명은 검색 참고이며 승인된 업무 규칙이 아닙니다. SQL에는 선택한 메타데이터·사전 규칙·승인 정의와 검증된 관계만 전달합니다.",
+    "Review sources and rules before generating SQL. Draft descriptions are discovery context, not approved rules. SQL receives selected metadata, dictionary rules, approved definitions and verified relationships only.",
+    "生成 SQL 前检查来源与规则。草稿仅供搜索参考。SQL 仅使用选定元数据、词典规则、已批准定义和已验证关系。",
+    "SQL 生成前にソースと規則を確認します。下書きは検索参考です。選択したメタデータ・辞書規則・承認定義・検証済み関係のみを使用します。"
+  ],
+  "ontology.query.rdfFlow.dictionarySource": [
+    "사전에 명시된 원천",
+    "Source named in dictionary",
+    "词典指定来源",
+    "辞書に明記されたソース"
+  ],
+  "ontology.query.rdfFlow.rdfSource": [
+    "RDF 검색 근거",
+    "RDF search evidence",
+    "RDF 搜索依据",
+    "RDF 検索根拠"
+  ],
+  "ontology.query.rdfFlow.columns": [
+    "컬럼·자료형·설명",
+    "Columns, types and descriptions",
+    "列、类型与说明",
+    "列・型・説明"
+  ],
+  "ontology.query.rdfFlow.rules": [
+    "업무 규칙 · 용어사전 근거",
+    "Business rules · Dictionary evidence",
+    "业务规则 · 词典依据",
+    "業務規則・辞書の根拠"
+  ],
+  "ontology.query.rdfFlow.criteria": [
+    "사전의 SQL 기준",
+    "Dictionary SQL criteria",
+    "词典 SQL 条件",
+    "辞書の SQL 基準"
+  ],
+  "ontology.query.rdfFlow.relations": [
+    "원천 간 관계",
+    "Relationships between sources",
+    "来源之间的关系",
+    "ソース間の関係"
+  ],
+  "ontology.query.rdfFlow.noRelations": [
+    "확인된 연결이 없어도 각 원천을 독립적으로 조회·집계할 수 있습니다.",
+    "Sources can be queried or aggregated independently without a verified connection.",
+    "即使没有已验证连接，也可独立查询或聚合来源。",
+    "検証済み接続がなくても各ソースを独立して照会・集計できます。"
+  ],
+  "ontology.query.rdfFlow.usable": [
+    "조인 근거로 선택 가능",
+    "Selectable join evidence",
+    "可选择为连接依据",
+    "結合根拠として選択可能"
+  ],
+  "ontology.query.rdfFlow.referenceOnly": [
+    "참고만 · SQL 조인 사용 불가",
+    "Reference only · Not allowed for SQL joins",
+    "仅供参考 · 不可用于 SQL 连接",
+    "参考のみ・SQL 結合不可"
+  ],
+  "ontology.query.rdfFlow.mode": [
+    "조회 방식",
+    "Query mode",
+    "查询方式",
+    "照会方式"
+  ],
+  "ontology.query.rdfFlow.INDEPENDENT": [
+    "원천별 독립 조회·집계 (복수 결과는 UNION ALL)",
+    "Independent sources (UNION ALL for multiple results)",
+    "独立来源（多个结果使用 UNION ALL）",
+    "ソース別の独立照会・集計（複数結果は UNION ALL）"
+  ],
+  "ontology.query.rdfFlow.JOIN": [
+    "선택한 검증 관계로 조인",
+    "Join using selected verified relationships",
+    "使用选定的已验证关系连接",
+    "選択した検証済み関係で結合"
+  ],
+  "ontology.query.rdfFlow.generate": [
+    "선택 근거로 SQL 생성",
+    "Generate SQL from selected evidence",
+    "根据选定依据生成 SQL",
+    "選択した根拠から SQL を生成"
+  ],
+  "ontology.query.rdfFlow.terms": [
+    "용어",
+    "Terms",
+    "术语",
+    "用語"
+  ],
+  "ontology.query.rdfFlow.noTerms": [
+    "일치하는 사전 용어가 없습니다.",
+    "No matching dictionary terms.",
+    "无匹配词典术语。",
+    "一致する辞書用語はありません。"
+  ],
+  "ontology.query.rdfFlow.relationship": [
+    "이번 조회의 관계",
+    "Relationship for this query",
+    "本次查询的关系",
+    "今回の照会の関係"
+  ],
+  "ontology.query.rdfFlow.evidence": [
+    "근거 보기",
+    "View evidence",
+    "查看依据",
+    "根拠を見る"
+  ],
+  "ontology.query.rdfFlow.sources": [
+    "원천·컬럼 확인 및 선택",
+    "Review and select sources and columns",
+    "查看并选择来源与列",
+    "ソース・列の確認と選択"
+  ],
+  "ontology.query.rdfFlow.otherRelations": [
+    "기타 검색 관계 후보",
+    "Other retrieved relationship candidates",
+    "其他检索关系候选",
+    "その他の検索関係候補"
+  ],
+  "ontology.query.rdfFlow.chooseSources": [
+    "조회할 원천을 선택하세요.",
+    "Select a source.",
+    "请选择来源。",
+    "ソースを選択してください。"
+  ],
+  "ontology.query.rdfFlow.independentSummary": [
+    "선택한 원천을 각각 조회·집계한 뒤 결과를 UNION ALL로 합칩니다. 원천 상세행은 조인하지 않습니다.",
+    "Query or aggregate each selected source separately, then combine results with UNION ALL. Detail rows are not joined.",
+    "分别查询或聚合选定来源，再以 UNION ALL 合并结果。不连接明细行。",
+    "選択したソースを個別に照会・集計し、UNION ALL で結果をまとめます。明細行は結合しません。"
+  ],
+  "ontology.query.rdfFlow.singleSummary": [
+    "선택한 원천을 조회합니다. 다른 원천과의 조인은 사용하지 않습니다.",
+    "Query the selected source without joining another source.",
+    "查询选定来源，不连接其他来源。",
+    "選択したソースを照会します。他のソースとの結合はありません。"
+  ],
+  "ontology.query.rdfFlow.joinSummary": [
+    "선택한 검증 관계를 SQL 조인 근거로 사용합니다.",
+    "Use the selected verified relationships as SQL join evidence.",
+    "使用选定的已验证关系作为 SQL 连接依据。",
+    "選択した検証済み関係を SQL 結合の根拠に使います。"
+  ],
+  "ontology.query.rdfFlow.chooseRelations": [
+    "근거에서 원천과 검증된 조인 관계를 선택하세요.",
+    "Select sources and verified join relationships in the evidence section.",
+    "在依据中选择来源与已验证连接关系。",
+    "根拠からソースと検証済み結合関係を選択してください。"
+  ]
+}

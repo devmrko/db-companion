@@ -15,6 +15,22 @@ import static com.dbcompanion.common.db.BusinessGlossarySql.*;
 public class BusinessGlossaryRepository {
     private final JdbcTemplate jdbc;
     private final JsonMapper json;
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    private BusinessGlossaryHistoryRepository history;
+    private Term enrich(String owner,Term term){return history==null?term:history.enrich(owner,term);}
+    private List<Term> enrich(String owner,List<Term> terms){return history==null?terms:history.enrich(owner,terms);}
+    public void validateRdf(String owner,com.dbcompanion.model.GlossaryRdf.Definition rdf){
+        if(rdf==null)return;
+        for(var mapping:rdf.mappings()){
+            if(!owner.equals(mapping.schema()))throw BusinessGlossary.failure(400,"RDF 매핑은 로그인 소유 스키마의 원천만 지정할 수 있습니다.");
+            var types=jdbc.queryForList("SELECT OBJECT_TYPE FROM SYS.ALL_OBJECTS WHERE OWNER=? AND OBJECT_NAME=? AND STATUS='VALID' AND SUBOBJECT_NAME IS NULL",String.class,owner,mapping.table());
+            if(types.size()!=1||!List.of("TABLE","VIEW").contains(types.getFirst())
+                    ||mapping.table().startsWith("DR$")||mapping.table().startsWith("VECTOR$")||mapping.table().contains("#RDF")||mapping.table().contains("#SEM")||mapping.table().contains("$VECTAB")
+                    ||jdbc.queryForObject("SELECT COUNT(*) FROM SYS.ALL_EXTERNAL_TABLES WHERE OWNER=? AND TABLE_NAME=?",Integer.class,owner,mapping.table())!=0
+                    ||jdbc.queryForObject("SELECT COUNT(*) FROM SYS.ALL_TAB_COLUMNS WHERE OWNER=? AND TABLE_NAME=? AND COLUMN_NAME=?",Integer.class,owner,mapping.table(),mapping.column())!=1)
+                throw BusinessGlossary.failure(400,"RDF 매핑의 원천·컬럼을 확인해 주세요. 로컬 테이블·뷰 메타데이터만 참조합니다.");
+        }
+    }
     public BusinessGlossaryRepository(JdbcTemplate jdbc,JsonMapper json){this.jdbc=new JdbcTemplate(Objects.requireNonNull(jdbc.getDataSource()));this.jdbc.setQueryTimeout(30);this.json=json;}
     public String tableStatus(String owner){
         var objects=jdbc.queryForList("SELECT OBJECT_TYPE FROM SYS.ALL_OBJECTS WHERE OWNER=? AND OBJECT_NAME=? AND SUBOBJECT_NAME IS NULL",String.class,owner,TABLE);
@@ -33,6 +49,16 @@ public class BusinessGlossaryRepository {
         return "READY";
     }
     public void requireTable(String owner){if(!tableStatus(owner).equals("READY"))throw BusinessGlossary.failure(409,"업무 용어 사전이 없거나 구조가 다릅니다. 관리 화면에서 상태를 확인해 주세요.");}
+    /** Read-only preflight; never attempts a grant or creates a partial Text configuration. */
+    public void requireTextSetupPrivilege(){
+        int allowed=jdbc.queryForObject("""
+            SELECT COUNT(*) FROM ALL_TAB_PRIVS
+            WHERE TABLE_SCHEMA='CTXSYS' AND TABLE_NAME='CTX_DDL' AND PRIVILEGE='EXECUTE'
+              AND (GRANTEE IN (USER,'PUBLIC') OR GRANTEE IN (SELECT ROLE FROM SESSION_ROLES))
+            """,Integer.class);
+        if(allowed==0)throw BusinessGlossary.failure(403,
+                "Oracle Text 설정 권한이 없습니다. DB 관리자에게 CTXSYS.CTX_DDL 실행 권한을 요청해 주세요. 설정 SQL은 실행하지 않았습니다.");
+    }
     public String textStatus(String owner){
         var lexer=jdbc.queryForList("SELECT PRE_OBJECT FROM CTXSYS.CTX_USER_PREFERENCES WHERE PRE_NAME=? AND PRE_CLASS='LEXER'",String.class,LEXER);
         var policy=jdbc.queryForList("SELECT IDX_NAME FROM CTXSYS.CTX_USER_INDEXES WHERE IDX_NAME=?",String.class,POLICY);
@@ -53,6 +79,7 @@ public class BusinessGlossaryRepository {
             if(!tableStatus(owner).equals("MISSING"))throw BusinessGlossary.stale();jdbc.execute(create(owner));requireTable(owner);
         }else if(operation.equals("TEXT")){
             requireTable(owner);if(!textStatus(owner).equals("MISSING"))throw BusinessGlossary.stale();
+            requireTextSetupPrivilege();
             for(String sql:textSetup(owner))jdbc.execute(sql);
             if(!textStatus(owner).equals("READY"))throw BusinessGlossary.failure(409,"Oracle Text 설정 확인이 필요합니다. 자동 재설치하거나 기존 객체를 삭제하지 않습니다.");
         }else throw BusinessGlossary.invalid();
@@ -72,9 +99,27 @@ public class BusinessGlossaryRepository {
     public Page page(String owner,String filter,int offset){
         String pattern="%"+filter.toUpperCase(Locale.ROOT).replace("!","!!").replace("%","!%").replace("_","!_")+"%";
         var rows=jdbc.query("SELECT * FROM "+table(owner)+" WHERE UPPER(TERM_TEXT) LIKE ? ESCAPE '!' ORDER BY TERM_TEXT,TERM_ID OFFSET ? ROWS FETCH NEXT 21 ROWS ONLY",(r,n)->term(r),pattern,offset);
-        return new Page(rows.stream().limit(20).toList(),rows.size()>20,offset);
+        return new Page(enrich(owner,rows.stream().limit(20).toList()),rows.size()>20,offset);
     }
-    public Term find(String owner,String id){var rows=jdbc.query("SELECT * FROM "+table(owner)+" WHERE TERM_ID=?",(r,n)->term(r),BusinessGlossary.id(id));if(rows.size()!=1)throw BusinessGlossary.stale();return rows.getFirst();}
+    public List<Term> transferTerms(String owner) {
+        var rows=jdbc.query("SELECT * FROM "+table(owner)+" ORDER BY TERM_TEXT,TERM_ID FETCH FIRST 2001 ROWS ONLY",(r,n)->term(r));
+        if(rows.size()>BusinessGlossary.MAX_TERMS)throw BusinessGlossary.failure(413,"사전 내보내기·가져오기 검토 한도는 2,000개입니다. 일부만 처리하지 않습니다.");
+        return enrich(owner,rows);
+    }
+    /** Batch release capture avoids repeating history-store introspection per term. */
+    public List<Term> releaseTerms(String owner){
+        var rows=jdbc.query("SELECT * FROM "+table(owner)+" WHERE ENABLED_YN='Y' ORDER BY TERM_TEXT,TERM_ID FETCH FIRST 2001 ROWS ONLY",(r,n)->term(r));
+        if(rows.size()>BusinessGlossary.MAX_TERMS)throw BusinessGlossary.failure(413,"활성 용어가 배포 버전 한도 2,000개를 초과합니다.");return enrich(owner,rows);
+    }
+    /** Serialize import name checks against concurrent INSERT/UPDATE transactions; no DDL/commit. */
+    public void lockTransfer(String owner) {
+        jdbc.execute("LOCK TABLE "+table(owner)+" IN SHARE ROW EXCLUSIVE MODE WAIT 5");
+    }
+    public Term find(String owner,String id){var rows=jdbc.query("SELECT * FROM "+table(owner)+" WHERE TERM_ID=?",(r,n)->term(r),BusinessGlossary.id(id));if(rows.size()!=1)throw BusinessGlossary.stale();return enrich(owner,rows.getFirst());}
+    public Term revision(String owner,String id,long revision){
+        var current=find(owner,id);if(current.revision()==revision)return current;
+        if(history==null)throw BusinessGlossary.stale();return history.revision(owner,id,revision);
+    }
     public Term save(String owner,String id,long revision,Draft d){
         String aliases=json.writeValueAsString(d.aliases()),search=d.term()+"\n"+String.join("\n",d.aliases())+"\n"+d.definition();
         boolean insert=id==null||id.isBlank();String termId=insert?UUID.randomUUID().toString():BusinessGlossary.id(id);

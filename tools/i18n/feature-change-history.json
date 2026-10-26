@@ -1,0 +1,12 @@
+{
+  "changeHistory.actor":["변경자","Changed by","修改人","変更者"],
+  "changeHistory.at":["변경 시각","Changed at","修改时间","変更日時"],
+  "changeHistory.content":["변경 내용","Change details","修改内容","変更内容"],
+  "changeHistory.recorder":["기록자","Recorded by","记录人","記録者"],
+  "changeHistory.recordedAt":["기록 시각","Recorded at","记录时间","記録日時"],
+  "changeHistory.recordedContent":["기록 내용","Recorded details","记录内容","記録内容"],
+  "changeHistory.requester":["요청자","Requested by","请求人","依頼者"],
+  "changeHistory.requestedAt":["요청 시각","Requested at","请求时间","依頼日時"],
+  "changeHistory.requestedContent":["요청 내용","Request details","请求内容","依頼内容"],
+  "changeHistory.unknown":["미확인","Unknown","未确认","未確認"]
+}

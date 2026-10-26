@@ -3,6 +3,8 @@ package com.dbcompanion.service;
 import com.dbcompanion.common.db.*;
 import com.dbcompanion.model.Ontology;
 import com.dbcompanion.model.OntologyValues;
+import com.dbcompanion.model.OntologyStatistics;
+import com.dbcompanion.model.OntologyWizard;
 import com.dbcompanion.repository.*;
 import java.time.Instant;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -25,6 +27,19 @@ public class OntologyValuesService {
             if(entry==null)throw new Ontology.Failure(404,"notFound");
             var columns=OntologyValues.columns(entry,input);
             return OntologyValues.preview(OntologyValues.type(columns.getFirst().dataType()),rows.sample(entry.document().source(),columns,OntologyValues.ROWS),Instant.now().toString());
+        });}finally{source.clear();}
+    }}
+    public OntologyStatistics.Report statistics(PoolSession session,OntologyStatistics.Request input){synchronized(session){
+        Ontology.name(input.schema());Ontology.name(input.table());Ontology.name(input.column());
+        if(!input.schema().equals(session.metadata().selectedSchema()))throw new Ontology.Failure(409,"stale");
+        if(!input.confirmed())throw new Ontology.Failure(400,"confirmRequired");
+        String login=session.metadata().info().username();source.bind(session.pool(),login);
+        try{return read.execute(status->{
+            catalog.require(input.schema(),login);var entry=catalog.entry(input.schema(),input.table(),0);
+            if(entry==null)throw new Ontology.Failure(404,"notFound");
+            if(entry.revision()!=input.revision())throw new Ontology.Failure(409,"stale");
+            var columns=OntologyWizard.select(entry,java.util.List.of(input.column()),true,10);
+            return OntologyStatistics.summarize(columns,rows.profileRows(entry.document().source(),columns),Instant.now().toString());
         });}finally{source.clear();}
     }}
 }

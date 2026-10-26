@@ -10,7 +10,7 @@
       <p class="app-filter-message" role="status" data-on-message></p>
       <p class="app-filter-message" th:text="#{ontology.cacheHint}"></p>
       <div class="app-ontology-viewbar" data-on-views hidden>
-        <div class="app-dds-tabs"><button type="button" data-on-view="list" aria-pressed="true" th:text="#{ontology.erd.list}"></button><button type="button" data-on-view="erd" aria-pressed="false">ERD</button><button type="button" data-on-view="relationships" aria-pressed="false" th:text="#{ontology.relationships.title}"></button></div>
+        <div class="app-dds-tabs"><button type="button" data-on-view="list" aria-pressed="true" th:text="#{ontology.erd.list}"></button><button type="button" data-on-view="erd" aria-pressed="false">ERD</button><button type="button" data-on-view="relationships" aria-pressed="false" th:text="#{ontology.relationships.title}"></button><button type="button" data-on-view="property-graphs" aria-pressed="false" th:text="#{ontology.mg.tab}">Property Graph</button></div>
         <button type="button" class="btn app-btn app-btn-primary" data-on-analyze aria-controls="ontology-relationships" th:text="#{ontology.relationships.analyze}"></button>
         <button type="button" class="btn app-btn app-btn-secondary" data-on-native th:text="#{ontology.native.title}"></button>
       </div>
@@ -24,6 +24,18 @@
       <div class="app-preview-header"><h2 id="ontology-native-title" th:text="#{ontology.native.title}"></h2><button type="button" class="btn app-btn app-btn-quiet" data-sql-help-for="ontology-native">SQL ?</button><button type="button" class="btn app-btn app-btn-quiet" data-native-close th:text="#{ontology.close}"></button></div>
       <p th:text="#{ontology.native.help}"></p><p data-native-storage></p>
       <p role="status" aria-live="polite" data-native-status></p><progress data-native-progress hidden th:aria-label="#{ontology.native.working}"></progress>
+      <section class="app-ontology-section" data-native-runtime>
+        <h3 th:text="#{ontology.native.javaTitle}"></h3><p data-native-java-state></p>
+        <button type="button" class="btn app-btn app-btn-secondary" data-native-refresh th:text="#{ontology.native.refresh}"></button>
+        <button type="button" class="btn app-btn app-btn-secondary" data-native-diagnose th:text="#{ontology.native.diagnose}"></button>
+        <div data-native-java-setup hidden>
+          <p class="app-alert" th:text="#{ontology.native.javaWarning}"></p>
+          <details><summary th:text="#{ontology.native.javaSql}"></summary><pre class="app-preview-source" data-native-java-sql></pre></details>
+          <label class="app-ontology-consent"><input type="checkbox" data-native-java-consent><span th:text="#{ontology.native.javaConsent}"></span></label>
+          <button type="button" class="btn app-btn app-btn-primary" data-native-java-enable disabled th:text="#{ontology.native.javaEnable}"></button>
+        </div>
+        <a href="https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/autonomous-oracle-java.html" target="_blank" rel="noopener noreferrer" th:text="#{ontology.native.javaDocs}"></a>
+      </section>
       <button type="button" class="btn app-btn app-btn-secondary" data-native-install hidden th:text="#{ontology.native.install}"></button>
       <h3 th:text="#{ontology.native.objects}"></h3><p class="app-filter-message" th:text="#{ontology.native.scopeHelp}"></p>
       <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-quiet" data-native-all th:text="#{ontology.native.all}"></button><button type="button" class="btn app-btn app-btn-quiet" data-native-none th:text="#{ontology.native.none}"></button><span data-native-count></span></div>
@@ -31,6 +43,7 @@
       <label class="app-ontology-consent"><input type="checkbox" data-native-consent><span th:text="#{ontology.native.captureConsent}"></span></label>
       <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-secondary" data-native-capture th:text="#{ontology.native.capture}"></button><button type="button" class="btn app-btn app-btn-primary" data-native-preview th:text="#{ontology.native.preview}"></button></div>
       <details data-native-column-details><summary th:text="#{ontology.native.columns}"></summary><pre class="app-preview-source" data-native-columns></pre></details>
+      <details data-native-diagnostic-details><summary th:text="#{ontology.native.diagnosticRows}"></summary><pre class="app-preview-source" data-native-diagnostics></pre></details>
       <section data-native-result hidden><h3 th:text="#{ontology.native.candidates}"></h3><p th:text="#{ontology.native.candidateHelp}"></p><p data-native-candidate-count></p>
         <div class="app-ontology-actions"><button type="button" class="btn app-btn app-btn-quiet" data-native-choose-all th:text="#{ontology.native.all}"></button><button type="button" class="btn app-btn app-btn-quiet" data-native-choose-none th:text="#{ontology.native.none}"></button></div>
         <div class="app-native-list" data-native-candidates></div>
@@ -40,6 +53,7 @@
     </dialog>
     <section th:replace="~{fragments/ontology-erd :: erd}"></section>
     <section th:replace="~{fragments/ontology-relationships :: relationships}"></section>
+    <section class="app-card" data-on-property-graphs hidden th:aria-label="#{ontology.mg.tab}"></section>
     <dialog class="app-preview-dialog app-ontology-dialog" data-on-pipeline-dialog aria-labelledby="ontology-pipeline-title">
       <div class="app-preview-header"><h2 id="ontology-pipeline-title" data-pipeline-title></h2><button type="button" class="btn app-btn app-btn-quiet" data-pipeline-close th:text="#{ontology.close}"></button></div>
       <p role="status" aria-live="polite" data-pipeline-status></p>

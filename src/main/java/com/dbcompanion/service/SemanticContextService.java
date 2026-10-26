@@ -65,11 +65,11 @@ public class SemanticContextService {
             try {
                 repository.create(capability.owner(), input);
                 if (repository.matches(capability.owner(), input, expected))
-                    return new Result(true, UiMessages.text("semantic.created", "Semantic Source created and verified."));
+                    return new Result(true, UiMessages.text("semanticContext.created", "Semantic Source created and verified."));
             } catch (RuntimeException ex) {
                 org.slf4j.LoggerFactory.getLogger(getClass()).warn("Semantic source creation/readback could not be verified");
             }
-            return new Result(false, UiMessages.text("semantic.uncertain", "Check the current DB state before retrying."));
+            return new Result(false, UiMessages.text("semanticContext.uncertain", "Check the current DB state before retrying."));
         });
     }
 }

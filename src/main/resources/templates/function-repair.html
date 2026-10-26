@@ -1,0 +1,12 @@
+<!DOCTYPE html><html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/common :: head(#{functionRepair.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside><div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content" data-function-repair>
+<h1 th:text="#{functionRepair.title}"></h1><p><strong th:text="${info.database}"></strong> · <strong th:text="${info.username}"></strong></p><p class="app-alert" th:text="#{functionRepair.help}"></p>
+<input type="hidden" data-fr-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+<section class="app-card app-module-card">
+<label class="app-field"><span th:text="#{functionRepair.name}"></span><input class="form-control" data-fr-name maxlength="125" autocomplete="off"></label><button class="btn app-btn app-btn-secondary" type="button" data-fr-load th:text="#{functionRepair.load}"></button>
+<label class="app-field"><span th:text="#{functionRepair.source}"></span><textarea class="form-control app-editor-value" data-fr-source rows="16" maxlength="60000" spellcheck="false" disabled></textarea></label>
+<div class="app-editor-actions"><button type="button" class="btn app-btn app-btn-secondary" data-fr-preview disabled th:text="#{functionRepair.preview}"></button><button type="button" class="btn app-btn app-btn-quiet" data-fr-restore disabled th:text="#{functionRepair.restore}"></button></div>
+<section data-fr-review hidden><h2 th:text="#{functionRepair.before}"></h2><pre class="app-preview-source" data-code-language="sql" data-fr-before></pre><h2 th:text="#{functionRepair.after}"></h2><pre class="app-preview-source" data-code-language="sql" data-fr-sql></pre><label class="app-check-field"><input type="checkbox" data-fr-consent><span th:text="#{functionRepair.consent}"></span></label><button type="button" class="btn app-btn app-btn-primary" data-fr-apply disabled th:text="#{functionRepair.apply}"></button></section>
+<p role="status" aria-live="polite" data-fr-message></p><pre class="app-preview-source" data-code-language="json" data-fr-result></pre>
+<a th:href="@{/db/admin-help}" th:text="#{adminHelp.title}"></a> · <a th:href="@{/db/functions}" th:text="#{functions.title}"></a>
+</section></main></div><script type="module" th:src="@{/js/function-repair.mjs}"></script></body></html>

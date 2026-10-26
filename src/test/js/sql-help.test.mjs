@@ -11,7 +11,7 @@ test('global generic help is removed and unknown features/operations do not inve
   assert.equal(featureForPath('/'),null);assert.equal(helpFor('profiles','ko','nonexistent'),null);
   for(const ops of Object.values(helpRegistry))for(const op of ops)assert.doesNotMatch(op.sql,/대응 SQL이 없습니다|No user-run equivalent|GET \/ontology|POST \/ontology/);
 });
-test('all recipes have actual SQL, a real source, localized titles, effects and official references',()=>{
+test('all recipes have SQL, source, localized effects and a specific official or project reference',()=>{
   assert.ok(Object.keys(helpRegistry).length>=18);
   for(const [feature,ops]of Object.entries(helpRegistry)){
     assert.equal(new Set(ops.map(op=>op.id)).size,ops.length,feature);
@@ -21,11 +21,75 @@ test('all recipes have actual SQL, a real source, localized titles, effects and 
       for(const lang of ['ko','en','ja','zh-CN','fr']){
         const help=helpFor(feature,lang,op.id);
         for(const key of ['title','purpose','variables','permission','effects','result','source'])assert.ok(help[key],feature+':'+key);
-        assert.match(help.doc,/^https:\/\/docs\.oracle\.com\//);
+        if(help.docKind==='oracle')assert.match(help.doc,/^https:\/\/docs\.oracle\.com\/.+\.html(?:#.*)?$/);
+        else {
+          assert.equal(help.docKind,'project');
+          const [path,anchor]=help.doc.split('#');
+          assert.equal(path,'/help/sql-reference.html');
+          assert.ok(read('src/main/resources/static'+path).includes(`id="${anchor}"`),help.doc);
+          assert.match(help.labels.doc,/DB Companion/);
+        }
         assert.equal(help.sql,op.sql);assert.equal(help.labels[op.risk]!==undefined,true);
       }
     }
   }
+});
+test('audit fixes retain default operations and make reference labels change with selection',()=>{
+  for(const feature of ['ords','agents'])assert.equal(operationsFor(feature)[0].id,'list');
+  const h=harness();h.open('tables','list');
+  assert.match(h.node('[data-sql-help-doc]').href,/ALL_TAB_COLUMNS.html$/);
+  h.change('history-delegated');
+  assert.equal(h.node('[data-sql-help-doc]').href,'/help/sql-reference.html#metadata-history');
+  h.change('list');assert.match(h.node('[data-sql-help-doc]').href,/ALL_TAB_COLUMNS.html$/);
+  for(const locale of ['ko','en','ja','zh-CN']){
+    assert.match(helpFor('tables',locale,'history').labels.doc,/DB Companion/);
+    assert.match(helpFor('tables',locale,'list').labels.doc,/Oracle/);
+  }
+});
+test('task definition help reads definitions instead of team execution history',()=>{
+  const help=helpFor('agents','ko','task-definition');
+  assert.match(help.sql,/USER_AI_AGENT_TASKS WHERE TASK_NAME/);
+  assert.match(help.sql,/USER_AI_AGENT_TASK_ATTRIBUTES/);assert.match(help.sql,/USER_AI_AGENT_TOOLS/);
+  assert.doesNotMatch(help.sql,/HISTORY|RUN_TEAM/);assert.match(help.result,/Team/);
+  assert.match(read('src/main/resources/templates/ai-agent-task.html'),/sqlHelp\('agents', 'task-definition'\)/);
+});
+test('delegated history documents installer, session authorization and one-based lookahead paging',()=>{
+  const help=helpFor('tables','ko','history-delegated');
+  assert.match(help.sql,/<AUDIT_OWNER>"\."DBC_METADATA_ACCESS"\.inspect\(/);
+  assert.match(help.sql,/\.entries\('<TARGET_SCHEMA>', '<TABLE_OR_VIEW>', 1\)/);
+  assert.match(help.result,/SESSION_USER/);assert.match(help.result,/10건/);
+  assert.match(help.permission,/직접 SELECT 권한은 이 경로의 필수 조건이 아닙니다/);
+  assert.doesNotMatch(help.sql,/GRANT|CREATE|set_enabled\(|FROM.*DBC_METADATA_HISTORY/);
+  const source=read('src/main/resources/db/history/access-body.sql');
+  assert.match(source,/FUNCTION entries\(p_schema VARCHAR2, p_table VARCHAR2, p_page NUMBER\)/);
+  assert.match(source,/\(p_page-1\)\*10/);assert.match(source,/FETCH NEXT 11 ROWS ONLY/);
+});
+test('executed result review uses a prepared prompt and does not claim numerical validation',()=>{
+  const help=helpFor('ai-test','ko','result-review');
+  assert.match(help.sql,/prompt => :prepared_review_prompt/);assert.match(help.sql,/:prepared_review_prompt IS NULL/);
+  assert.match(help.sql,/action => 'chat'/);assert.match(help.sql,/"conversation":false/);
+  assert.equal(help.risk,'ai');assert.match(help.result,/결과 셀 값은 보내지 않습니다/);
+  assert.match(help.result,/SQL 해시/);assert.match(help.result,/실제 수치 정답/);
+  assert.doesNotMatch(help.sql,/runsql|EXECUTE IMMEDIATE|SELECT .*FROM/);
+  assert.match(read('src/main/resources/templates/ai-test.html'),/sqlHelp\('ai-test', 'result-review'\)/);
+});
+test('discovery help distinguishes persisted plans, receipts, candidates and approval',()=>{
+  const help=helpFor('ontology','ko','discovery-history');
+  for(const type of ['ONTOLOGY_DISCOVERY_PLAN','ONTOLOGY_DISCOVERY_CALL'])assert.ok(help.sql.includes(type));
+  assert.match(help.sql,/\$\.runId/);assert.match(help.sql,/\$\.index' RETURNING NUMBER\) \+ 1/);
+  assert.match(help.result,/계획 저장 성공/);assert.match(help.result,/CANDIDATE/);assert.match(help.result,/자동 재시도하지 않습니다/);
+  assert.equal(help.risk,'read');assert.doesNotMatch(help.sql,/\b(INSERT|UPDATE|DELETE|GENERATE|CREATE)\b/);
+  assert.match(read('src/main/resources/templates/fragments/ontology-relationships.html'),/sqlHelp\('ontology', 'discovery-history'\)/);
+});
+test('ORDS publication and populated-module path changes preserve descendants',()=>{
+  const publish=helpFor('ords','en','publish'),path=helpFor('ords','en','module-path');
+  assert.match(publish.sql,/PUBLISH_MODULE\(p_module_name => '<MODULE>', p_status/);
+  assert.match(path.sql,/RENAME_MODULE\(p_module_name => '<MODULE>', p_new_base_path/);
+  assert.match(path.sql,/PUBLISH_MODULE/);
+  for(const help of [publish,path]){assert.match(help.sql,/COMMIT;/);assert.equal(help.risk,'write');assert.doesNotMatch(help.sql,/DEFINE_MODULE|DELETE_|DROP_/);}
+  const source=read('src/main/java/com/dbcompanion/service/OrdsManagementService.java');
+  assert.match(source,/"PUBLISH_MODULE","p_module_name => \?, p_status => \?"/);
+  assert.match(source,/"RENAME_MODULE","p_module_name => \?, p_new_base_path => \?"/);
 });
 test('profile creation and edits mirror source API and modify only a selected attribute',()=>{
   const create=helpFor('profiles','ko','create'),model=helpFor('profiles','ko','model');

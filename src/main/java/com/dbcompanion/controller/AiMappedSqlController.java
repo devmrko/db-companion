@@ -40,6 +40,12 @@ public class AiMappedSqlController {
             model.addAttribute("readGrantExample", AiMappedSql.readGrantExample(session.metadata().info().username()));
             // Do not show a schema selector on a source without an owner column.
             model.addAttribute("sqlId", sqlId); model.addAttribute("question", question);
+            var capability = AiSqlHistoryAccessAdvice.selected(model, "mapping");
+            if (!capability.available()) {
+                model.addAttribute("sqlAccess", Access.failure(capability.code()));
+                model.addAttribute("sqlSourceBlocked", true);
+                return "ai-mapped-sql";
+            }
             try {
                 var query = Query.parse(sqlId, question, page);
                 model.addAttribute("sqlId", query.sqlId()); model.addAttribute("question", query.question());

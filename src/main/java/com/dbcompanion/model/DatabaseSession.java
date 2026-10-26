@@ -22,10 +22,14 @@ public final class DatabaseSession {
     public SelectAiTest.State aiTest() { return aiTest; }
     private final BusinessGlossary.State businessGlossary = new BusinessGlossary.State();
     public BusinessGlossary.State businessGlossary(){return businessGlossary;}
+    private final SemanticRelease.State semanticRelease=new SemanticRelease.State();
+    public SemanticRelease.State semanticRelease(){return semanticRelease;}
     private final SelectAiComparison.State aiComparison = new SelectAiComparison.State();
     public SelectAiComparison.State aiComparison(){return aiComparison;}
     private final SelectAiBatch.State aiBatch = new SelectAiBatch.State();
     public SelectAiBatch.State aiBatch(){return aiBatch;}
+    private final ProblemEvaluation.State problemEvaluation=new ProblemEvaluation.State();
+    public ProblemEvaluation.State problemEvaluation(){return problemEvaluation;}
     private final ExternalSources.State externalSources = new ExternalSources.State();
     public ExternalSources.State externalSources() { return externalSources; }
     private final Scheduler.State scheduler = new Scheduler.State();
@@ -93,6 +97,7 @@ public final class DatabaseSession {
         if(!functions.containsKey(schema))functions.put(schema,List.copyOf(loader.get()));
         return functions.get(schema);
     }
+    public synchronized void invalidateFunctions(String schema){functions.remove(schema);functionDetails.keySet().removeIf(key->key.schema().equals(schema));}
     public synchronized List<FunctionCatalog.Detail> functionDetails(String schema,List<String> reference,
             java.util.function.Supplier<List<FunctionCatalog.Detail>> loader) {
         var key=new FunctionKey(schema,reference);

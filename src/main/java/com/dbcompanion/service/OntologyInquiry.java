@@ -62,16 +62,28 @@ public final class OntologyInquiry {
     public record Rows(String searchId,String sql,String hash,String actor,String executedAt,List<String> columns,List<List<Cell>> rows,boolean truncated){public Rows{columns=List.copyOf(columns);rows=rows.stream().map(List::copyOf).toList();}}
     public static final class State {
         private Dataset data;private Search search;private Prepared prepared;private Execution execution;private String activeToken;
+        private OntologyQuestionGrounding.Result grounding;
+        private OntologyQueryService.GroundedSearch grounded;
+        private List<OntologyRelations.Relation> reviewedCandidates=List.of();
+        public synchronized void grounded(OntologyQueryService.GroundedSearch value){grounded=value;}
+        public synchronized OntologyQueryService.GroundedSearch grounded(){return grounded;}
+        public synchronized void reviewedCandidates(List<OntologyRelations.Relation> value){reviewedCandidates=List.copyOf(value);}
+        public synchronized List<OntologyRelations.Relation> reviewedCandidates(){return reviewedCandidates;}
+        private OntologyQueryService.AiStep aiStep;
+        public synchronized void aiStep(OntologyQueryService.AiStep value){aiStep=value;}
+        public synchronized OntologyQueryService.AiStep aiStep(String token){if(aiStep==null||!aiStep.token().equals(token))throw new Failure(409,"query.stale");return aiStep;}
+        public synchronized void grounding(OntologyQuestionGrounding.Result value){grounding=value;}
+        public synchronized OntologyQuestionGrounding.Result grounding(){return grounding;}
         private Outcome archivedOutcome;private String outcomeRoute;
         public synchronized Dataset dataset(String schema,boolean refresh,Supplier<Dataset> loader){
             if(refresh||data!=null&&!data.schema().equals(schema))clear();
             if(data==null)data=Objects.requireNonNull(loader.get());return data;
         }
-        public synchronized void clear(){data=null;search=null;invalidate();}
-        public synchronized void invalidate(){prepared=null;execution=null;activeToken=null;archivedOutcome=null;outcomeRoute=null;}
+        public synchronized void clear(){data=null;search=null;grounding=null;grounded=null;reviewedCandidates=List.of();invalidate();}
+        public synchronized void invalidate(){prepared=null;execution=null;activeToken=null;archivedOutcome=null;outcomeRoute=null;aiStep=null;}
         public synchronized void outcome(String route,Outcome value){outcomeRoute=route;archivedOutcome=value;}
         public synchronized Outcome outcome(String route){return Objects.equals(route,outcomeRoute)?archivedOutcome:null;}
-        public synchronized void remember(Search value){search=value;invalidate();}
+        public synchronized void remember(Search value){search=value;grounding=null;grounded=null;reviewedCandidates=List.of();invalidate();}
         public synchronized Search search(String id,String schema){if(search==null||!search.id().equals(id)||!search.schema().equals(schema))throw new Failure(409,"query.stale");return search;}
         public synchronized Dataset data(){if(data==null)throw new Failure(409,"query.stale");return data;}
         public synchronized void prepare(Prepared value){search(value.search().id(),value.search().schema());invalidate();prepared=value;activeToken=value.token();}
@@ -187,8 +199,8 @@ public final class OntologyInquiry {
             +COLUMN_GUIDANCE
             +"Supported grammar: SELECT [DISTINCT] explicit alias.column expressions, optional AS output_alias, FROM schema.table alias, INNER JOIN or LEFT JOIN table alias ON alias.column=alias.column [AND ...], WHERE, GROUP BY, HAVING, ORDER BY, FETCH FIRST n ROWS ONLY. "
             +"Every column must be alias-qualified, including ORDER BY. Every JOIN must exactly match one selected evidence mapping including all composite columns. "
-            +"Allowed functions: COUNT, SUM, AVG, MIN, MAX, ROUND, TRUNC, COALESCE, NVL, NULLIF, UPPER, LOWER, LENGTH, ABS. COUNT(*) is allowed. "
-            +"No SELECT *, subqueries, WITH, UNION, CASE, window functions, arbitrary functions, DB links, comments, hints, locks, binds, DDL, DML or PL/SQL. "
+            +"Allowed functions: COUNT, SUM, AVG, MIN, MAX, ROUND, TRUNC, COALESCE, NVL, NULLIF, UPPER, LOWER, LENGTH, ABS, TRIM. COUNT(*) is allowed. For independent metrics, use separate SELECT aggregates combined with UNION ALL, with a literal metric label and matching output columns. Do not join detail populations. "
+            +"No SELECT *, subqueries, WITH, UNION DISTINCT, CASE, window functions, arbitrary functions, DB links, comments, hints, locks, binds, DDL, DML or PL/SQL. "
             +"If impossible within these rules, return a brief plain-text refusal, not SQL. No invented filters or constants. The app will separately validate and ask the user before execution. "
             +"\nBEGIN QUESTION AND EVIDENCE\n"+draft.preview().source()+"\nEND QUESTION AND EVIDENCE";
     }

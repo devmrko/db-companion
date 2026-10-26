@@ -91,6 +91,21 @@ class AiSqlHistoryServiceTest {
             assertThat(repository.calls).isZero();
         }
     }
+    @Test void candidateLookupRequiresAnOpaqueSelectionOwnedByThisLoginSession() {
+        var repository=new StubRepository();var service=new AiSqlHistoryService(source,repository);
+        try(var first=session();var second=session()) {
+            String id=java.util.UUID.randomUUID().toString();
+            var item=new AiSqlHistory.Item(id,"time","abc123def4567","APP","GENERATE","1","call",List.of());
+            repository.result=new AiSqlHistory.Page(List.of(item),1,false,Instant.EPOCH,null);
+            service.page(first,cacheQuery(),false);
+            assertThat(service.candidates(second,id)).isNull();assertThat(repository.candidateCalls).isZero();
+            assertThatThrownBy(()->service.candidates(first,"abc123def4567")).isInstanceOf(IllegalArgumentException.class);
+            assertThat(repository.candidateCalls).isZero();
+            assertThat(service.candidates(first,id).items()).isEmpty();assertThat(repository.candidateCalls).isEqualTo(1);
+            first.metadata().sqlHistory().refresh(AiSqlHistory.Source.cache);
+            assertThat(service.candidates(first,id)).isNull();assertThat(repository.candidateCalls).isEqualTo(1);
+        }
+    }
 
     private void assertCacheFailureCode(int code) {
         var repository = new StubRepository();
@@ -107,11 +122,16 @@ class AiSqlHistoryServiceTest {
 
     private static final class StubRepository extends AiSqlHistoryRepository {
         private int calls;
+        private int candidateCalls;
         private AiSqlHistory.Query query;
         private AiSqlHistory.Page result;
         private RuntimeException failure;
 
         private StubRepository() { super(new JdbcTemplate(new SessionDataSource())); }
+        @Override public AiSqlHistory.Candidates candidates(AiSqlHistory.Selection selected) {
+            candidateCalls++;
+            return new AiSqlHistory.Candidates("time","APP","NOT_CHECKED",List.of(),false,0);
+        }
 
         @Override public AiSqlHistory.Page page(AiSqlHistory.Query query) {
             calls++;

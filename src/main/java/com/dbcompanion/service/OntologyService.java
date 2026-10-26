@@ -25,7 +25,7 @@ public class OntologyService {
     }
     private String login(PoolSession s){return s.metadata().info().username();}
     private void scope(PoolSession s,String schema){Ontology.name(schema);if(!schema.equals(s.metadata().selectedSchema()))throw new Failure(409,"stale");}
-    private <T>T query(PoolSession s,TransactionTemplate tx,Supplier<T> action){source.bind(s.pool(),login(s));try{return tx.execute(status->tx==read?JdbcNetworkTimeout.execute(source,40_000,action):action.get());}finally{source.clear();}}
+    private <T>T query(PoolSession s,TransactionTemplate tx,Supplier<T> action){source.bind(s.pool(),login(s),s.metadata().assistant());try{return tx.execute(status->tx==read?JdbcNetworkTimeout.execute(source,40_000,action):action.get());}finally{source.clear();}}
     public Catalog catalog(PoolSession s,String schema,boolean refresh){synchronized(s){scope(s,schema);var state=s.metadata().ontology();return state.catalog(schema,refresh,()->query(s,read,()->repository.catalog(schema,login(s),()->state.tables(schema,()->repository.tables(schema)))));}}
     public GraphData graph(PoolSession s,String schema,boolean refresh){synchronized(s){scope(s,schema);return s.metadata().ontology().graph(schema,refresh,()->query(s,read,()->repository.graph(s.metadata().info().database(),schema,login(s))));}}
     public OntologyRelations.Analysis relationships(PoolSession s,String schema){synchronized(s){scope(s,schema);return s.metadata().ontology().pipeline().augment(s.metadata().ontology().relationships(schema,()->query(s,read,()->analyze(s,schema))));}}

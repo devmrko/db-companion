@@ -1,13 +1,17 @@
 import {t} from './i18n.mjs';
+import {confirmAction} from './confirm-action.mjs';
+import {changeHistoryFields} from './change-history-summary.mjs';
 import {editGuard} from './edit-guard.mjs';
 import {assistantApi,assistantPost} from './ai-assistant.mjs';
 import {pageOf} from './table-list.mjs';
+import {internalObject} from './internal-objects.mjs';
 import {rdfViewer,meaningChanges} from './ontology-rdf.mjs';
 import {metadataImporter} from './ontology-import.mjs';
 import {ontologyNative} from './ontology-native.mjs';
 import {ontologyErd} from './ontology-erd.mjs';
 import {ontologyRelationships} from './ontology-relationships.mjs';
 import {ontologyPipeline} from './ontology-pipeline.mjs';
+import {propertyGraphManager} from './property-graph-manager.mjs';
 import {ontologyWizard,definitionEditor} from './ontology-wizard.mjs';
 import {valuesEditor} from './ontology-values.mjs';
 import {contextSummary,reviewContext,reviewRows,selectedEdits,evidenceView,responseDiagnostic,prettyPayload} from './ontology-context.mjs';
@@ -25,15 +29,21 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology]').fo
   let catalog=null,entry=null,meaning=null,page=1,tab='definition',latest=0,busy=false,dirty=false,historyBefore='',historyStack=[],preview=null,proposal=null,aiRunning=false,aiSpent=false,rdfData=null;
   let view='list';
   let contextRows=[];
+  const sourceFilter=el('label',undefined,'app-ontology-consent'),sourceAll=el('input');sourceAll.type='checkbox';
+  sourceFilter.append(sourceAll,el('span',t('auditFixes.internal.show','내부 관리 객체도 표시')));get('source').after(sourceFilter);
+  function sourceOptions(){const options=captureChoices(catalog?.tables??[],catalog?.entries??[]).filter(item=>sourceAll.checked||!internalObject(item.name));get('source').replaceChildren(new Option(label('sourceTable'),''),...options.map(i=>new Option(i.name,i.name)));lock(busy);}
+  sourceAll.addEventListener('change',sourceOptions);
   const erd=ontologyErd(get('erd'),{schema,base:root.dataset.base});
   const relationships=ontologyRelationships(get('relationships'),{schema,base:root.dataset.base,post:(path,data)=>post(path,data),run:fn=>{if(dirty){message(label('import.saveFirst'),true);return;}return work(fn);},
     coverage:()=>({saved:catalog?.entries.length||0,total:catalog?.tables.length||0}),
     saved:async table=>{erd.invalidate();relationships.invalidate();await load();if(entry?.document.source.table===table)await open(table);applyView();},
     openDefinition:table=>work(async()=>{if(!leave())return;view='list';await open(table);applyView();})});
   editGuard.register(()=>dirty||relationships.dirty());
-  const pipeline=ontologyPipeline(get('pipeline-dialog'),{schema,post:(path,data)=>post(path,data),profiles:()=>assistantApi(get('erd').dataset.profilesUrl+'?'+new URLSearchParams({schema})),canOpen:()=>{if(busy||dirty||relationships.dirty()){message(label('import.saveFirst'),true);return false;}return true;},updated:()=>work(async()=>{relationships.invalidate();await relationships.show();})});
-  root.querySelector('[data-rel-discover]').addEventListener('click',()=>pipeline.discover());root.querySelector('[data-rel-graph]').addEventListener('click',()=>pipeline.graph());
-  function applyView(){const ready=catalog?.status==='READY';get('views').hidden=!ready;get('ready').hidden=!ready||view!=='list';get('erd').hidden=!ready||view!=='erd';get('relationships').hidden=!ready||view!=='relationships';get('detail').hidden=view!=='list'||!entry;root.querySelectorAll('[data-on-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.onView===view)));}
+  let graphManager;
+  const pipeline=ontologyPipeline(get('pipeline-dialog'),{schema,post:(path,data)=>post(path,data),profiles:()=>assistantApi(get('erd').dataset.profilesUrl+'?'+new URLSearchParams({schema})),canOpen:()=>{if(busy||dirty||relationships.dirty()){message(label('import.saveFirst'),true);return false;}return true;},updated:()=>work(async()=>{relationships.invalidate();await relationships.show();}),graphCreated:()=>graphManager.refresh()});
+  graphManager=propertyGraphManager(get('property-graphs'),{schema,post:(path,data)=>post(path,data),create:()=>pipeline.graph(),review:row=>work(async()=>{if(!leave())return;view='relationships';applyView();relationships.invalidate();await relationships.reviewGraphRow(row);}),canCreate:()=>catalog?.status==='READY'});
+  root.querySelector('[data-rel-discover]').addEventListener('click',()=>pipeline.discover());root.querySelector('[data-rel-graph]').addEventListener('click',()=>work(async()=>{view='property-graphs';applyView();await graphManager.show();}));
+  function applyView(){const ready=catalog?.status==='READY';get('views').hidden=false;get('analyze').hidden=!ready;get('native').hidden=!ready;get('ready').hidden=!ready||view!=='list';get('erd').hidden=!ready||view!=='erd';get('relationships').hidden=!ready||view!=='relationships';get('property-graphs').hidden=view!=='property-graphs';get('detail').hidden=view!=='list'||!entry;root.querySelectorAll('[data-on-view]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.onView===view));b.disabled=busy||!ready&&b.dataset.onView!=='property-graphs';});}
   const loading=()=>t('ui.8bf609c884ca','불러오는 중…');
   function message(text,error=false){get('message').textContent=text;get('message').className=error?'app-alert is-error':'app-filter-message';}
   function aiMessage(text,error=false){get('ai-message').textContent=text;get('ai-message').className=error?'app-alert is-error':'app-filter-message';}
@@ -43,10 +53,10 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology]').fo
   const native=ontologyNative(get('native-dialog'),{schema,base:root.dataset.base,post,entries:()=>catalog?.entries||[],canOpen:()=>{if(busy||dirty||relationships.dirty()){message(label('import.saveFirst'),true);return false;}return true;},saved:reloadSaved});
   get('native').addEventListener('click',()=>native.open());
   function lock(value){busy=value;root.querySelectorAll('button,input,textarea,select').forEach(e=>{if(!dialog.contains(e)&&!get('import-dialog').contains(e)&&!get('wizard-dialog').contains(e)&&!get('pipeline-dialog').contains(e)&&!get('native-dialog').contains(e))e.disabled=value||e.dataset.boundDisabled==='true';});get('prev').disabled=value||page<=1;get('next').disabled=value||page>=entriesPage(catalog?.entries??[],get('filter').value,page).pages;get('capture').disabled=value||!get('source').value;const edit=editable(entry,latest);['save','approve','ai','wizard'].forEach(k=>get(k).disabled=value||!edit);get('ai').disabled=value||!edit||dirty;get('wizard').disabled=value||!edit||dirty;if(!value){if(entry&&readOnlyPanel(entry,latest,tab))get('panel').querySelectorAll('input,textarea,select').forEach(e=>e.disabled=true);}}
-  async function work(fn){if(busy)return;lock(true);message(loading());try{await fn();message('');}catch(ex){message(ex.message,true);}finally{lock(false);}}
+  async function work(fn){if(busy)return;lock(true);message(loading());try{await fn();message('');}catch(ex){message(ex.message,true);}finally{lock(false);applyView();}}
   function leave(){return !dirty&&!relationships.dirty()||window.confirm(label('discard'));}
   function list(){const result=entriesPage(catalog?.entries??[],get('filter').value,page);page=result.page;get('list').replaceChildren(grid(['table','version','state','actor','recordedAt'].map(label),result.items.map(e=>[button(e.name,()=>{if(leave())work(()=>open(e.name));}),String(e.revision),label(e.state),e.actor,e.recordedAt])));get('count').textContent=t('ui.f32c9f13d498','{0}–{1} / {2}개',result.from,result.to,result.total);get('page').textContent=`${result.pages?page:0} / ${result.pages}`;lock(busy);}
-  async function load(refresh=false){if(refresh){erd.invalidate();relationships.invalidate();}get('install').hidden=true;catalog=null;applyView();const data=await assistantApi(url('/catalog',{refresh}));catalog=data;get('status').textContent=label(data.status);get('install').hidden=!data.canInstall;get('checked').textContent=data.checkedAt?new Date(data.checkedAt).toLocaleString(document.documentElement.lang):'';const options=captureChoices(data.tables,data.entries);get('source').replaceChildren(new Option(label('sourceTable'),''),...options.map(i=>new Option(i.name,i.name)));list();applyView();}
+  async function load(refresh=false){if(refresh){erd.invalidate();relationships.invalidate();}get('install').hidden=true;catalog=null;applyView();const data=await assistantApi(url('/catalog',{refresh}));catalog=data;get('status').textContent=label(data.status);get('install').hidden=!data.canInstall;get('checked').textContent=data.checkedAt?new Date(data.checkedAt).toLocaleString(document.documentElement.lang):'';sourceOptions();list();applyView();}
   async function open(table,revision=0){const data=await assistantApi(url('/detail',{table,revision}));entry=data;rdfData=null;if(!revision)latest=data.revision;meaning=structuredClone(data.document.meaning);dirty=false;historyBefore='';historyStack=[];get('detail').hidden=view!=='list';get('target').textContent=schema+'.'+table;get('version').textContent=`v${data.revision} · ${label(data.state)} · ${data.actor} · ${data.recordedAt}`;await render();}
   function input(value,change,large=false){const e=el(large?'textarea':'input',undefined,'form-control');e.value=value??'';if(large)e.rows=2;e.maxLength=large?8000:256;e.disabled=!editable(entry,latest);e.addEventListener('input',()=>{change(e.value);dirty=true;get('ai').disabled=true;get('wizard').disabled=true;});return e;}
   function field(host,title,control){const group=el('label',undefined,'app-ontology-field');group.append(el('span',title),control);host.append(group);}
@@ -65,7 +75,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology]').fo
       host.append(grid(['key','type','sourceColumns','target','state','description'].map(label),source.keys.map(k=>[k.name,k.type,k.columns.join(' + '),[k.targetOwner,k.targetTable].filter(Boolean).join('.')+(k.targetColumns.length?' ('+k.targetColumns.join(' + ')+')':''),[k.status,k.validated].join(' / '),k.type==='R'?input(meaning.relations[k.name],v=>meaning.relations[k.name]=v,true):'—'])));
       if(!source.keys.length)host.append(el('p',label('empty'),'app-empty'));
     }else if(tab==='values'){
-      valuesEditor(host,{entry,meaning,editable:editable(entry,latest),lookup:value=>post('/values/lookup',value),run:work,changed:()=>{dirty=true;get('ai').disabled=true;get('wizard').disabled=true;}});
+      valuesEditor(host,{entry,meaning,editable:editable(entry,latest),lookup:value=>post('/values/lookup',value),statistics:value=>post('/values/statistics',value),run:work,changed:()=>{dirty=true;get('ai').disabled=true;get('wizard').disabled=true;}});
     }else if(tab==='drift'){
       const drift=await assistantApi(url('/drift',{table:source.table}));host.append(el('p',`${drift.status} · ${drift.limitation||''}`,'app-filter-message'));
       host.append(grid(['kind','name','baseline','current','status'],drift.differences.map(d=>[d.kind,d.name,d.baseline,d.current,d.status])));
@@ -73,15 +83,19 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology]').fo
     }else if(tab==='rdf'){
       rdfData??=await assistantApi(url('/rdf',{table:source.table,revision:entry.revision}));host.append(rdfViewer(rdfData,dirty));
     }else{
-      const data=await assistantApi(url('/history',{table:source.table,before:historyBefore}));host.append(grid(['version','state','actor','recordedAt'].map(label),data.items.map(v=>[button('v'+v.revision,()=>{if(leave())work(async()=>{tab='definition';await open(source.table,v.revision);});}),label(v.state),v.actor,v.recordedAt])));
+      const data=await assistantApi(url('/history',{table:source.table,before:historyBefore}));
+      host.append(grid(changeHistoryFields({}).map(field=>field.label),data.items.map(v=>{
+        const fields=changeHistoryFields({actor:v.actor,at:v.recordedAt});
+        return [fields[0].value,fields[1].value,button(`v${v.revision} · ${label(v.state)}`,()=>{if(leave())work(async()=>{tab='definition';await open(source.table,v.revision);});})];
+      })));
       const controls=el('div',undefined,'app-dds-pages'),prev=button(t('ui.da7e61c67cc5','이전'),()=>work(async()=>{historyBefore=historyStack.pop()??'';await render();}),'btn app-btn app-btn-quiet'),next=button(t('ui.aef613c6612d','다음'),()=>work(async()=>{historyStack.push(historyBefore);historyBefore=data.next;await render();}),'btn app-btn app-btn-quiet');prev.disabled=!historyStack.length;next.disabled=!data.next;prev.dataset.boundDisabled=String(prev.disabled);next.dataset.boundDisabled=String(next.disabled);controls.append(prev,next);host.append(controls);
     }
   }
   async function refresh(){if(!leave())return;const selected=entry?.document.source.table;entry=null;get('detail').hidden=true;await load(true);if(selected&&catalog.entries.some(e=>e.name===selected))await open(selected);if(view==='erd'&&catalog.status==='READY')await erd.show();if(view==='relationships'&&catalog.status==='READY')await relationships.show();}
-  root.querySelectorAll('[data-on-view]').forEach(button=>button.addEventListener('click',()=>work(async()=>{view=button.dataset.onView;applyView();if(view==='erd')await erd.show();if(view==='relationships')await relationships.show();})));
+  root.querySelectorAll('[data-on-view]').forEach(button=>button.addEventListener('click',()=>work(async()=>{view=button.dataset.onView;applyView();if(view==='erd')await erd.show();if(view==='relationships')await relationships.show();if(view==='property-graphs')await graphManager.show();})));
   get('analyze').addEventListener('click',()=>work(async()=>{view='relationships';applyView();await relationships.all();}));
   async function reloadSaved(){erd.invalidate();relationships.invalidate();await load();}
-  get('install').addEventListener('click',()=>{if(window.confirm(label('installConfirm')+'\n'+schema+'.DBC_ONTOLOGY_CATALOG'))work(async()=>{await post('/install',{schema,confirmed:true});await reloadSaved();});});
+  get('install').addEventListener('click',async()=>{if(await confirmAction(label('installConfirm')+'\n'+schema+'.DBC_ONTOLOGY_CATALOG'))work(async()=>{await post('/install',{schema,confirmed:true});await reloadSaved();});});
   const importer=metadataImporter(get('import-dialog'),{schema,post,completed:reloadSaved,profiles:profile=>assistantApi(get('erd').dataset.profilesUrl+'?'+new URLSearchParams(profile===undefined?{schema}:{schema,profile}))});
   const wizard=ontologyWizard(get('wizard-dialog'),{schema,post,getOptions:value=>assistantApi(url('/wizard/options',{table:value.document.source.table,revision:value.revision})),saved:async table=>{await reloadSaved();await open(table);}});
   get('wizard').addEventListener('click',()=>{if(!busy&&!dirty&&editable(entry,latest))wizard.open(entry);});
@@ -90,7 +104,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ontology]').fo
     work(async()=>{
       await load(true);
       if(catalog.status!=='READY')throw new Error(label('notReady'));
-      const pending=captureChoices(catalog.tables,catalog.entries),names=pending.filter(i=>table===null||i.name===table).map(i=>i.name);
+      const pending=captureChoices(catalog.tables,catalog.entries),names=pending.filter(i=>(sourceAll.checked||!internalObject(i.name))&&(table===null||i.name===table)).map(i=>i.name);
       await importer.open(names,catalog.tables.length,catalog.entries,catalog.importExclusions??{},table===null);
     });
   }

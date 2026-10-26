@@ -15,8 +15,10 @@ class NativeMetadataServiceTest {
     List<Snapshot> snapshots=List.of(new Snapshot("urn:dbc:capture:"+"a".repeat(32),"A","VIEW","now","APP"),new Snapshot("urn:dbc:capture:"+"b".repeat(32),"B","VIEW","now","APP"));
     int appends,sqlReads;
     final NativeMetadataRepository rdf=new NativeMetadataRepository(db.jdbc,db.json){
+        @Override public String javaState(){return "READY";}
         @Override public String storage(){return "READY";}
         @Override public List<Snapshot> snapshots(){return snapshots;}
+        @Override public Map<String,Object> diagnostics(String owner){assertThat(owner).isEqualTo("APP");sqlReads++;return Map.of("storedTriples",List.of(Map.of("SUBJECT","urn:dbc:metadata")));}
         @Override public List<Match> candidates(List<Snapshot> selected){sqlReads++;return List.of(new Match("A","B","ENTITY_ID","ENTITY_ID","VARCHAR2",snapshots.get(0).iri(),snapshots.get(1).iri()));}
     };
     final OntologyRepository catalog=new OntologyRepository(db.jdbc,db.json,new DatabaseRepository(db.jdbc),new TableStructureRepository(db.jdbc)){
@@ -29,6 +31,11 @@ class NativeMetadataServiceTest {
     };
     final NativeMetadataService service=new NativeMetadataService(db.source,rdf,catalog);
     NativeMetadataServiceTest(){for(String name:List.of("A","B"))entries.put(name,f.entry(name,List.of(f.col("ENTITY_ID","VARCHAR2(100 CHAR)")),List.of(),Map.of()));}
+    @Test void storageDiagnosticsAreReadOnlyAndCannotInspectAnotherSchema(){try(var s=db.session()){
+        assertThatThrownBy(()->service.diagnostics(s,"OTHER")).isInstanceOf(Ontology.Failure.class);
+        assertThat(sqlReads).isZero();assertThat(service.diagnostics(s,"APP")).hasSize(1);
+        assertThat(sqlReads).isEqualTo(1);assertThat(appends).isZero();
+    }}
     @Test void saveAppendsUnapprovedCandidateOnceAndNextPreviewSkipsDuplicate(){try(var s=db.session()){
         var before=entries.get("A");var preview=service.preview(s,"APP",List.of("B","A"));assertThat(sqlReads).isEqualTo(1);assertThat(appends).isZero();assertThat(preview.candidates()).hasSize(1);
         var ids=List.of(preview.candidates().getFirst().id());

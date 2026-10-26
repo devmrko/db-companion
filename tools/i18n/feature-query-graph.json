@@ -1,0 +1,278 @@
+{
+  "ontology.query.graph.title": [
+    "질문 근거 그래프",
+    "Question evidence graph",
+    "问题依据图",
+    "質問の根拠グラフ"
+  ],
+  "ontology.query.graph.hint": [
+    "이번 질문의 용어·선택 원천·관계를 표시합니다. 클릭하면 근거만 확인하며 선택·승인·SQL 실행은 변경하지 않습니다.",
+    "Shows terms, selected sources and relationships for this question. Click to inspect evidence only; selection, approval and SQL execution are unchanged.",
+    "显示本次问题的术语、选定来源与关系。点击仅查看依据，不改变选择、批准或执行 SQL。",
+    "今回の用語・選択ソース・関係を表示します。クリックは根拠の確認のみで、選択・承認・SQL 実行は変更しません。"
+  ],
+  "ontology.query.graph.legend": [
+    "보라 점선: 사전의 원천 참조 · 초록 점선: 사전 기준 · 파랑 실선: 선택한 조인 · 금색 파선: 참고 관계 · 회색: 결과 비교 흐름. 비교 흐름은 RDF 조인 관계가 아닙니다.",
+    "Purple dotted: dictionary source reference · Green dotted: dictionary criteria · Blue solid: selected join · Gold dashed: reference relationship · Gray: result comparison flow, not an RDF join.",
+    "紫色点线：词典来源引用 · 绿色点线：词典规则 · 蓝色实线：选定连接 · 金色虚线：参考关系 · 灰色：结果比较流程，非 RDF 连接。",
+    "紫点線：辞書のソース参照・緑点線：辞書基準・青実線：選択結合・金破線：参考関係・灰色：結果比較の流れ（RDF 結合ではありません）。"
+  ],
+  "ontology.query.graph.fit": [
+    "화면 맞춤",
+    "Fit",
+    "适应屏幕",
+    "全体表示"
+  ],
+  "ontology.query.graph.zoomIn": [
+    "확대",
+    "Zoom in",
+    "放大",
+    "拡大"
+  ],
+  "ontology.query.graph.zoomOut": [
+    "축소",
+    "Zoom out",
+    "缩小",
+    "縮小"
+  ],
+  "ontology.query.graph.references": [
+    "참고 관계 보기",
+    "Show reference relationships",
+    "显示参考关系",
+    "参考関係を表示"
+  ],
+  "ontology.query.graph.hideReferences": [
+    "참고 관계 숨기기",
+    "Hide reference relationships",
+    "隐藏参考关系",
+    "参考関係を非表示"
+  ],
+  "ontology.query.graph.nodes": [
+    "노드",
+    "Nodes",
+    "节点",
+    "ノード"
+  ],
+  "ontology.query.graph.edges": [
+    "연결",
+    "Connections",
+    "连接",
+    "接続"
+  ],
+  "ontology.query.graph.omitted": [
+    "숨긴 참고 관계",
+    "Hidden reference relationships",
+    "隐藏的参考关系",
+    "非表示の参考関係"
+  ],
+  "ontology.query.graph.inspect": [
+    "근거 선택 · 키보드로도 확인 가능",
+    "Choose evidence · Also available by keyboard",
+    "选择依据 · 支持键盘",
+    "根拠の選択・キーボード操作可"
+  ],
+  "ontology.query.graph.choose": [
+    "노드나 연결을 선택하면 여기에 근거가 표시됩니다.",
+    "Select a node or connection to inspect its evidence here.",
+    "选择节点或连接以查看依据。",
+    "ノードや接続を選ぶと根拠を表示します。"
+  ],
+  "ontology.query.graph.detail": [
+    "선택한 항목의 근거",
+    "Evidence for the selected item",
+    "选定项目的依据",
+    "選択項目の根拠"
+  ],
+  "ontology.query.graph.dictionaryMapping": [
+    "원천 참조",
+    "Source reference",
+    "来源引用",
+    "ソース参照"
+  ],
+  "ontology.query.graph.mappingHelp": [
+    "사전 SQL 기준에서 참조한 원천입니다. RDF에 저장된 조인이나 승인된 관계라는 뜻은 아닙니다.",
+    "This source is referenced by dictionary SQL criteria. This is not a stored RDF join or an approved relationship.",
+    "此来源由词典 SQL 引用，不代表已存储的 RDF 连接或已批准关系。",
+    "辞書 SQL 基準が参照するソースです。保存済み RDF の結合や承認関係ではありません。"
+  ],
+  "ontology.query.graph.unmapped": [
+    "선택한 원천과 연결할 수 있는 사전 SQL 참조를 확인하지 못했습니다. 연결을 추측하지 않습니다.",
+    "No dictionary SQL reference to a selected source was verified. No connection is inferred.",
+    "未确认到选定来源的词典 SQL 引用，不推测连接。",
+    "選択ソースへの辞書 SQL 参照を確認できません。接続は推測しません。"
+  ],
+  "ontology.query.graph.combine": [
+    "각각 집계 → 결과 합치기\nUNION ALL",
+    "Separate aggregates → combine\nUNION ALL",
+    "分别聚合 → 合并结果\nUNION ALL",
+    "個別集計 → 結果を結合\nUNION ALL"
+  ],
+  "ontology.query.graph.single": [
+    "단일 원천 조회",
+    "Single-source query",
+    "单一来源查询",
+    "単一ソース照会"
+  ],
+  "ontology.query.graph.separate": [
+    "독립 조회·집계",
+    "Independent query / aggregate",
+    "独立查询・聚合",
+    "独立照会・集計"
+  ],
+  "ontology.query.graph.operationHelp": [
+    "이번 조회의 처리 방식입니다. 저장된 RDF 관계나 상세행 조인 관계가 아닙니다.",
+    "This is the operation for this query, not a stored RDF relationship or a detail-row join.",
+    "这是本次查询的处理方式，不是已存储的 RDF 关系或明细行连接。",
+    "今回の照会処理です。保存済み RDF 関係や明細行の結合ではありません。"
+  ],
+  "ontology.query.graph.relation": [
+    "원천 관계",
+    "Source relationship",
+    "来源关系",
+    "ソースの関係"
+  ],
+  "ontology.query.graph.selectedJoin": [
+    "이번 SQL의 선택한 조인 근거",
+    "Selected join evidence for this SQL",
+    "本次 SQL 的选定连接依据",
+    "今回の SQL で選択した結合根拠"
+  ],
+  "ontology.query.graph.notSelected": [
+    "선택 가능 · 이번 SQL에는 미선택",
+    "Selectable · Not selected for this SQL",
+    "可选择 · 未用于本次 SQL",
+    "選択可能・今回の SQL では未選択"
+  ],
+  "ontology.query.graph.source": [
+    "원천",
+    "Source",
+    "来源",
+    "ソース"
+  ],
+  "ontology.query.graph.state": [
+    "상태·버전",
+    "State / version",
+    "状态・版本",
+    "状態・版"
+  ],
+  "ontology.query.graph.description": [
+    "설명",
+    "Description",
+    "说明",
+    "説明"
+  ],
+  "ontology.query.graph.rdf": [
+    "RDF 근거 식별자",
+    "RDF evidence identifier",
+    "RDF 依据标识",
+    "RDF 根拠識別子"
+  ],
+  "ontology.query.graph.dictionary": [
+    "업무 용어 사전",
+    "Business dictionary",
+    "业务词典",
+    "業務辞書"
+  ],
+  "ontology.query.graph.version": [
+    "버전",
+    "Version",
+    "版本",
+    "版"
+  ],
+  "ontology.query.graph.definition": [
+    "정의",
+    "Definition",
+    "定义",
+    "定義"
+  ],
+  "ontology.query.graph.id": [
+    "근거 ID",
+    "Evidence ID",
+    "依据 ID",
+    "根拠 ID"
+  ],
+  "ontology.query.graph.pair": [
+    "컬럼 쌍",
+    "Column pair",
+    "列对",
+    "列の組"
+  ],
+  "ontology.query.graph.condition": [
+    "조건",
+    "Condition",
+    "条件",
+    "条件"
+  ],
+  "ontology.query.graph.origin": [
+    "출처",
+    "Origin",
+    "出处",
+    "出典"
+  ],
+  "ontology.query.graph.evidence": [
+    "근거",
+    "Evidence",
+    "依据",
+    "根拠"
+  ],
+  "ontology.query.graph.fallback": [
+    "그래프를 표시하지 못했습니다. 근거 선택 목록과 기존 근거 보기는 계속 사용할 수 있습니다.",
+    "The graph is unavailable. The evidence selector and existing evidence view remain available.",
+    "无法显示图。仍可使用依据选择列表与现有依据视图。",
+    "グラフを表示できません。根拠の選択リストと既存の根拠表示は利用できます。"
+  ],
+  "ontology.query.graph.readingHint": [
+    "용어 → 원천 → 사전 기준 → 결과 비교. 항목을 클릭하면 전체 규칙과 출처를 확인할 수 있습니다.",
+    "Term → source → dictionary criteria → result comparison. Select an item for full rules and provenance.",
+    "术语 → 来源 → 词典规则 → 结果比较。选择项目查看完整规则与来源。",
+    "用語 → ソース → 辞書基準 → 結果比較。項目を選ぶと規則全文と出典を確認できます。"
+  ],
+  "ontology.query.graph.compare": [
+    "원천별 결과 비교\n상세행 조인 없음",
+    "Compare source results\nNo detail-row join",
+    "比较各来源结果\n不连接明细行",
+    "ソース別結果の比較\n明細行の結合なし"
+  ],
+  "ontology.query.graph.ruleBasis": [
+    "사전 기준",
+    "Dictionary criteria",
+    "词典规则",
+    "辞書基準"
+  ],
+  "ontology.query.graph.ruleHelp": [
+    "사전 정의의 일부를 그래프에 표시했습니다. 아래 원문과 SQL 기준을 확인하세요. SQL에 실제 반영되었는지는 SQL 검토 단계에서 확인합니다.",
+    "The graph shows an excerpt of the dictionary definition. Inspect the full definition and SQL criteria; verify their application when reviewing generated SQL.",
+    "图中显示词典定义摘录。请核对完整定义与 SQL 规则，并在 SQL 审查时确认实际应用情况。",
+    "グラフは辞書定義の抜粋です。原文と SQL 基準を確認し、生成 SQL のレビューで適用状況を確認してください。"
+  ],
+  "ontology.query.graph.guide": [
+    "범례·근거 목록",
+    "Legend and evidence list",
+    "图例与依据列表",
+    "凡例・根拠一覧"
+  ],
+  "ontology.query.graph.closeDetail": [
+    "근거 닫기",
+    "Close evidence",
+    "关闭依据",
+    "根拠を閉じる"
+  ],
+  "ontology.query.graph.technical": [
+    "RDF 식별자",
+    "RDF identifier",
+    "RDF 标识",
+    "RDF 識別子"
+  ],
+  "ontology.query.graph.sqlMethod": [
+    "SQL 처리 방식",
+    "SQL operation",
+    "SQL 处理方式",
+    "SQL 処理方式"
+  ],
+  "ontology.query.graph.businessSummary": [
+    "각 원천의 지표를 따로 조회·집계해 비교합니다. 상세행끼리는 조인하지 않습니다.",
+    "Query or aggregate each source separately to compare its results. Detail rows are not joined.",
+    "分别查询或聚合各来源以比较结果，不连接明细行。",
+    "各ソースを個別に照会・集計して結果を比較します。明細行同士は結合しません。"
+  ]
+}

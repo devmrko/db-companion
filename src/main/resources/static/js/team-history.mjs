@@ -1,4 +1,5 @@
 import {t} from './i18n.mjs';
+import {changeHistorySummary} from './change-history-summary.mjs';
 import {valueChange,compactRows} from './profile-diff.mjs';
 const node=(tag,text='',className)=>{const el=document.createElement(tag);el.textContent=text;if(className)el.className=className;return el;};
 export const outcomeLabel=outcome=>({VERIFIED:t('ui.5d9c284e2909', "저장 확인"),UNCERTAIN:t('ui.0f0ec196d600', "결과 확인 필요"),BEFORE_SAVED:t('ui.6ecd5601b0ca', "변경 전 보관 · 저장 결과 미확인")})[outcome]??outcome;
@@ -86,7 +87,7 @@ export function mountHistory(dialog,{objectMode=false}={}) {
     for(const entry of data.entries) {
       const article=node('article','','app-history-entry'),heading=node('div','','app-history-entry-heading'),button=node('button',selected===entry.seq?t('ui.3622ad893c69', "선택됨"):t('ui.d8291eb080d2', "변경 내용"),'btn app-btn app-btn-quiet');
       button.type='button';button.dataset.seq=entry.seq;button.setAttribute('aria-pressed',String(selected===entry.seq));button.setAttribute('aria-label',t('ui.5ccfb8a9e4c0', "#{0} 변경 내용", entry.seq));button.addEventListener('click',()=>choose(entry.seq));
-      heading.append(node('h3',`#${entry.seq} · ${entry.eventAt} · ${entry.actor}`),button);article.append(heading,node('p',`${entry.attribute} · ${outcomeLabel(entry.outcome)}`,'app-muted'));entries.append(article);
+      heading.append(node('h3',`#${entry.seq}`),button);article.append(heading,node('p',changeHistorySummary({actor:entry.actor,at:entry.eventAt,content:`${entry.attribute} · ${outcomeLabel(entry.outcome)}`}), 'app-change-history-summary'));entries.append(article);
     }
     find('page').textContent=t('ui.25be58ceeac8', "{0} 페이지", page);
   }

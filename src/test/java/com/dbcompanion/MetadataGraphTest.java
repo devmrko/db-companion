@@ -31,7 +31,16 @@ class MetadataGraphTest {
         assertThat(p.edgesSql()).contains("c.SEQ=13 AND l.id=", "a.pos=b.pos", "mapping_count", "condition_text");
         assertThat(p.query()).contains("RELATION_ID","MAPPING_POSITION","MAPPING_COUNT","CONDITION_TEXT");
     }
-    @Test void rejectedCandidatesAndStaleApprovalsAreNeverPublished(){
+    @Test void explicitSelectionCannotPromoteCandidatesOrStaleIds(){
+        var rows=approved();var analysis=analyze(rows);var all=MetadataGraph.build("APP","META",rows,analysis);
+        assertThat(all.available()).hasSize(1);assertThat(all.selected()).containsExactly(all.available().getFirst().id());
+        var containment=MetadataGraph.build("APP","META",rows,analysis,List.of());
+        assertThat(containment.relations()).isZero();assertThat(containment.mappings()).isZero();
+        assertThat(containment.edgesSql()).contains("l.status='APPROVED' AND (1=0)");
+        assertThatThrownBy(()->MetadataGraph.build("APP","META",rows,analysis,List.of("candidate-id"))).isInstanceOf(Failure.class);
+        assertThatThrownBy(()->MetadataGraph.build("APP","META",rows,analysis,List.of(all.available().getFirst().id(),all.available().getFirst().id()))).isInstanceOf(Failure.class);
+    }
+    @Test void candidatesAreIncludedWithoutApprovalButStaleAndRejectedAreExcluded(){
         var rows=approved();var a=rows.getFirst();var doc=a.document();var m=doc.meaning();
         var changed=new Document(1,doc.source(),new Meaning("changed",m.description(),m.columns(),m.relations()),doc.origin(),doc.profile(),doc.analysis(),doc.links());
         var stale=List.of(new Entry("14",3,a.documentId(),"DRAFT","APP","now",changed),rows.getLast());
@@ -39,7 +48,19 @@ class MetadataGraphTest {
         var candidate=new Link(doc.links().getFirst().id(),rows.getLast().documentId(),2,1,"APP","B_VIEW",List.of("ID","AT_DAY"),List.of("ID","AT_DAY"),"candidate","","CANDIDATE","RDF",List.of(),"APP","now");
         var candidateDoc=new Document(1,doc.source(),doc.meaning(),doc.origin(),null,null,List.of(candidate));
         var unreviewed=List.of(new Entry("15",2,a.documentId(),"DRAFT","APP","now",candidateDoc),rows.getLast());
-        assertThat(MetadataGraph.build("APP","META",unreviewed,analyze(unreviewed)).relations()).isZero();
+        var draft=MetadataGraph.build("APP","META",unreviewed,analyze(unreviewed));
+        assertThat(draft.relations()).isEqualTo(1);assertThat(draft.mappings()).isEqualTo(2);
+        assertThat(draft.edgesSql()).contains("'CANDIDATE'","FROM DUAL");
+        assertThat(draft.available().getFirst().status()).isEqualTo("CANDIDATE");
+        assertThat(candidateDoc.links().getFirst().status()).isEqualTo("CANDIDATE");
+        var staleProposal=new Analysis("APP",analyze(unreviewed).tables(),analyze(unreviewed).relations().stream().map(r->new Relation(r.id(),r.source(),r.targetSchema(),r.target(),r.sourceColumns(),r.targetColumns(),"STALE",r.origin(),r.label(),r.condition(),r.evidence(),r.key(),r.review())).toList(),"now");
+        var staleDraft=MetadataGraph.build("APP","META",unreviewed,staleProposal);
+        assertThat(staleDraft.relations()).isEqualTo(1);
+        assertThat(staleDraft.edgesSql()).contains("'STALE'");
+        var rejected=new Link(candidate.id(),candidate.targetDocumentId(),2,1,"APP","B_VIEW",candidate.sourceColumns(),candidate.targetColumns(),"candidate","","REJECTED","RDF",List.of(),"APP","now");
+        var rejectedDoc=new Document(1,doc.source(),doc.meaning(),doc.origin(),null,null,List.of(rejected));
+        var excluded=List.of(new Entry("16",2,a.documentId(),"DRAFT","APP","now",rejectedDoc),rows.getLast());
+        assertThat(MetadataGraph.build("APP","META",excluded,analyze(excluded)).relations()).isZero();
     }
     @Test void sequenceNamesAndCrossSchemaInputsCannotInjectDdl(){
         var rows=entries();var a=rows.getFirst();

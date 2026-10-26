@@ -18,7 +18,10 @@ public final class ProblemQuestion {
     public record Summary(String seq,String id,String question,Status status,boolean retained,String recordedAt,String updatedAt,int attempts) {}
     public record Page(List<Summary> rows,String next){public Page{rows=List.copyOf(rows);}}
     public record Detail(Parent parent,List<Attempt> attempts) {public Detail{attempts=List.copyOf(attempts);}}
-    public record DeletePreview(List<String> ids,int records,int attempts,String fingerprint){public DeletePreview{ids=List.copyOf(ids);}}
+    public record DeletePreview(List<String> ids,int records,int attempts,int evaluations,String fingerprint){
+        public DeletePreview(List<String> ids,int records,int attempts,String fingerprint){this(ids,records,attempts,0,fingerprint);}
+        public DeletePreview{ids=List.copyOf(ids);}
+    }
     public static String text(String value,int maximum,String key){if(value==null||value.isBlank()||value.length()>maximum||value.indexOf('\0')>=0)throw new AiAssistant.Failure(400,key,"입력값을 확인해 주세요.");return mask(value);}
     public static String optional(String value,int maximum,String key){if(value==null)return "";if(value.length()>maximum||value.indexOf('\0')>=0)throw new AiAssistant.Failure(400,key,"입력값을 확인해 주세요.");return mask(value);}
     /**

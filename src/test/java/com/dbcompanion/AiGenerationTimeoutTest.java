@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.*;
 /** Exercises real repository bindings without a provider call. */
 class AiGenerationTimeoutTest {
     private int timeout,executions,clobFrees,closed;
-    private String sql,profile;
+    private String sql,profile,attributes;
     private boolean fail;
     private final Clob clob=(Clob)Proxy.newProxyInstance(Clob.class.getClassLoader(),new Class[]{Clob.class},(p,m,a)->switch(m.getName()){
         case "length"->18L;
@@ -27,7 +27,7 @@ class AiGenerationTimeoutTest {
         case "setQueryTimeout"->{timeout=(int)a[0];yield null;}
         case "registerOutParameter"->{assertThat(a[0]).isEqualTo(1);assertThat(a[1]).isEqualTo(java.sql.Types.CLOB);yield null;}
         case "setCharacterStream"->{assertThat(a[0]).isEqualTo(2);yield null;}
-        case "setString"->{assertThat(a[0]).isEqualTo(3);profile=(String)a[1];yield null;}
+        case "setString"->{if((int)a[0]==4)attributes=(String)a[1];else {assertThat(a[0]).isEqualTo(3);profile=(String)a[1];}yield null;}
         case "execute"->{executions++;if(fail)throw new SQLException("ORA-18730: Socket read timed out","08006",18730);yield false;}
         case "getClob"->clob;
         case "close"->{closed++;yield null;}
@@ -54,6 +54,19 @@ class AiGenerationTimeoutTest {
     @Test void otherScreensKeepExistingDefaultBudget(){
         repository.generate("CLOUD","PROFILE","question",Action.SQL);
         assertThat(timeout).isEqualTo(90);
+    }
+    @Test void sessionOverrideIsBoundJsonAndDoesNotAlterTheDatabaseProfile(){
+        var source=new com.dbcompanion.common.db.SessionDataSource(){@Override public Connection getConnection(){return connection;}};
+        var state=new com.dbcompanion.model.AiAssistant.State();state.select(new com.dbcompanion.model.AiAssistant.Selection("APP","PROFILE"));state.maxTokens(8192);
+        source.bind(source,"APP",state);
+        try{
+            var scoped=new AiAssistantRepository(new JdbcTemplate(source));
+            scoped.generate("CLOUD","PROFILE","question",Action.CHAT);
+            assertThat(sql).contains("attributes => ?").doesNotContain("SET_ATTRIBUTE");
+            assertThat(attributes).isEqualTo("{\"conversation\":false,\"max_tokens\":8192}");
+            attributes=null;scoped.generate("CLOUD","OTHER","question",Action.CHAT);
+            assertThat(attributes).isNull();assertThat(sql).contains("attributes => '{\"conversation\":false}'");
+        }finally{source.clear();}
     }
     @Test void explainUsesConfiguredBudget(){
         repository.explain("CLOUD","PROFILE","question",300);
