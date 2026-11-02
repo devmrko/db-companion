@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Validation" xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"><description>Intentional unused variable for report preservation verification.</description><rule ref="category/java/bestpractices.xml/UnusedLocalVariable"/></ruleset>
