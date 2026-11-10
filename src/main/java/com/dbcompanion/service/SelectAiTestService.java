@@ -56,6 +56,7 @@ public class SelectAiTestService {
     private final BusinessGlossaryService glossary;
     private final QuestionAnalysisService questionAnalysis;
     private final SelectAiExecutionSettings executionSettings;
+    private final SelectAiConversationRepository conversations;
     public SelectAiTestService(SessionDataSource source,AiAssistantRepository ai,DatabaseRepository database,ProfileHistoryRepository packages,OntologyQueryRepository rows,OntologyRepository ontology,SelectAiInspectionService inspections,JsonMapper json){
         this(source,ai,database,packages,rows,ontology,inspections,json,null);
     }
@@ -65,15 +66,19 @@ public class SelectAiTestService {
     public SelectAiTestService(SessionDataSource source,AiAssistantRepository ai,DatabaseRepository database,ProfileHistoryRepository packages,OntologyQueryRepository rows,OntologyRepository ontology,SelectAiInspectionService inspections,JsonMapper json,BusinessGlossaryService glossary,SelectAiExecutionSettings executionSettings){
         this(source,ai,database,packages,rows,ontology,inspections,json,glossary,executionSettings,null);
     }
-    @org.springframework.beans.factory.annotation.Autowired
     public SelectAiTestService(SessionDataSource source,AiAssistantRepository ai,DatabaseRepository database,ProfileHistoryRepository packages,OntologyQueryRepository rows,OntologyRepository ontology,SelectAiInspectionService inspections,JsonMapper json,BusinessGlossaryService glossary,SelectAiExecutionSettings executionSettings,QuestionAnalysisService questionAnalysis){
+        this(source,ai,database,packages,rows,ontology,inspections,json,glossary,executionSettings,questionAnalysis,null);
+    }
+    @org.springframework.beans.factory.annotation.Autowired
+    public SelectAiTestService(SessionDataSource source,AiAssistantRepository ai,DatabaseRepository database,ProfileHistoryRepository packages,OntologyQueryRepository rows,OntologyRepository ontology,SelectAiInspectionService inspections,JsonMapper json,BusinessGlossaryService glossary,SelectAiExecutionSettings executionSettings,QuestionAnalysisService questionAnalysis,SelectAiConversationRepository conversations){
+        this.conversations=conversations;
         this.source=source;this.ai=ai;this.database=database;this.packages=packages;
         this.questionAnalysis=questionAnalysis;
         this.executionSettings=Objects.requireNonNull(executionSettings);
         this.rows=rows;this.ontology=ontology;this.inspections=inspections;this.json=json;this.glossary=glossary;
         var manager=new DataSourceTransactionManager(source);
         read=new TransactionTemplate(manager);read.setReadOnly(true);read.setTimeout(10);
-        generate=new TransactionTemplate(manager);generate.setReadOnly(true);generate.setTimeout(executionSettings.generateTransactionTimeoutSeconds());
+        generate=new TransactionTemplate(manager);generate.setTimeout(executionSettings.generateTransactionTimeoutSeconds());
         var strict=new DataSourceTransactionManager(source);strict.setEnforceReadOnly(true);
         // Includes profile/evidence freshness checks and transaction cleanup.
         execute=new TransactionTemplate(strict);execute.setReadOnly(true);execute.setTimeout(executionSettings.transactionTimeoutSeconds());
@@ -358,8 +363,22 @@ public class SelectAiTestService {
         var trace=state.progress().begin(operationId,prepared.action().name());trace.step(Stage.DEFINITIONS);
         var before=prepared.preview().profile();var started=Instant.now();long nanos=System.nanoTime();
         String id=UUID.randomUUID().toString();boolean[] called={false};Outcome outcome=null;
+        String[] conversation={null},store={null},memoryOwner={null};
         try{
             if(prepared.glossary()!=null)Objects.requireNonNull(glossary).verify(session,prepared.glossary());
+            if(conversations!=null&&prepared.action()!=Action.PROMPT){
+                query(session,true,()->{
+                    if(!before.equals(ai.profile(before.selection())))throw AiAssistant.stale();
+                    var settings=conversations.settings(before.selection().name());
+                    if("true".equalsIgnoreCase(settings.get("conversation"))){
+                        if(session.metadata().semanticRelease().selected()!=null)throw BusinessGlossary.failure(409,"대화 저장은 현재 프로필 설정 모드에서 실행하세요. 고정 버전 실행과 함께 사용할 수 없습니다.");
+                        memoryOwner[0]=packages.packageOwner(before.selection().owner());
+                        store[0]=settings.get("memory_store_name");
+                        conversation[0]=conversations.create(memoryOwner[0]);
+                    }
+                    return null;
+                });
+            }
             trace.step(Stage.CONNECTION);
             String text=query(session,true,()->{
                 trace.step(Stage.PROFILE);
@@ -374,7 +393,8 @@ public class SelectAiTestService {
                     String attributes=json.writeValueAsString(Map.of("conversation",false,"comments",false,"annotations",false,"enforce_object_list",true,"object_list",entries.stream().map(e->Map.of("owner",e.document().source().schema(),"name",e.document().source().table())).toList()));
                     return ai.generate(owner,before.selection().name(),prepared.preview().source(),prepared.action(),executionSettings.generateTimeoutSeconds(),attributes);
                 }
-                return ai.generate(owner,before.selection().name(),prepared.preview().source(),prepared.action(),executionSettings.generateTimeoutSeconds());
+                if(conversation[0]==null)return ai.generate(owner,before.selection().name(),prepared.preview().source(),prepared.action(),executionSettings.generateTimeoutSeconds());
+                return ai.generate(owner,before.selection().name(),prepared.preview().source(),prepared.action(),executionSettings.generateTimeoutSeconds(),null,conversation[0]);
             });
             trace.step(Stage.RESPONSE);
             boolean rejected=prepared.action()==Action.SQL&&!SelectAiReview.sqlResponse(text);
@@ -389,7 +409,19 @@ public class SelectAiTestService {
             String stage=called[0] ? "AI request" : "profile preflight";
             outcome=new Outcome(id,prepared.action(),before,prepared.question(),started,elapsed(nanos),null,error(message,stage,ex),
                     code(ex),called[0]?"generate":"preflight",prepared.evidence(),prepared.confirmation(),prepared.glossary());
-        }finally{state.finish(outcome);trace.finish(outcome!=null&&outcome.error()==null);}
+        }finally{
+            if(outcome!=null&&conversation[0]!=null){
+                boolean recorded=false;
+                try{recorded=query(session,false,()->conversations.recorded(before.selection().name(),conversation[0]));}catch(RuntimeException ignored){/* Report uncertainty; never repeat generation. */}
+                String memoryStatus=recorded?"대화 저장 확인":"대화 기록 미확인 · 자동 재시도하지 않았습니다.";
+                if(outcome.error()==null&&recorded&&store[0]!=null&&!store[0].isBlank()){
+                    try{query(session,true,()->{conversations.extract(memoryOwner[0],store[0],conversation[0]);return null;});memoryStatus="대화 저장·메모리 추출 호출 완료 · 추출 항목은 내용에 따라 없을 수 있습니다.";}
+                    catch(RuntimeException ex){memoryStatus="대화 저장 완료 · 메모리 추출 실패 또는 결과 미확인 ("+code(ex)+") · 자동 재시도하지 않았습니다.";}
+                }
+                outcome=outcome.withMemory(new MemoryExecution(conversation[0],store[0],memoryStatus));
+            }
+            state.finish(outcome);trace.finish(outcome!=null&&outcome.error()==null);
+        }
         return outcome;
     }
     /** Keep the persistence-facing code contract short; diagnostics stay in the user-visible error body. */

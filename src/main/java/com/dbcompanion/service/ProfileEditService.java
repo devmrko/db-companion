@@ -59,6 +59,24 @@ public class ProfileEditService {
             }); } finally { source.clear(); }
         }
     }
+    public record EmbeddingOptions(java.util.List<String> databaseModels, String modelError, Map<String,String> settings) {}
+    public EmbeddingOptions embeddingOptions(PoolSession session, Target target) {
+        synchronized (session) {
+            ProfileEditPolicy.scope(session.metadata().info().username(), session.metadata().selectedSchema(), target);
+            source.bind(session.pool(), target.schema());
+            try { return read.execute(s -> {
+                var snapshot = archive.currentSnapshot(target.schema(), target.profile(), true);
+                var attributes = (Map<?,?>) snapshot.get("attributes");
+                var settings = new java.util.LinkedHashMap<String,String>();
+                for (String key : java.util.List.of("provider", "region", "credential_name", "oci_compartment_id"))
+                    settings.put(key, java.util.Objects.toString(attributes.get(key), ""));
+                java.util.List<String> models = java.util.List.of(); String error = "";
+                try { models = repository.embeddingModels(); }
+                catch (RuntimeException ex) { error = "DB 내부 임베딩 모델 목록을 조회하지 못했습니다. 조회 권한을 확인하세요."; }
+                return new EmbeddingOptions(models, error, settings);
+            }); } finally { source.clear(); }
+        }
+    }
     private void requireCredential(Target target, String value) {
         repository.requireSemanticSources(target, value);
         if ("credential_name".equals(target.attribute()) && !repository.credentialAvailable(value))

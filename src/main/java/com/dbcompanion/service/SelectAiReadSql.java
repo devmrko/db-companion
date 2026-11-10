@@ -9,7 +9,8 @@ public final class SelectAiReadSql {
     public record Checked(String sql) {}
     private static final String SPACE="(?:\\s+|--[^\\r\\n]*(?:\\R|\\z)|/\\*.*?\\*/)";
     private static final Pattern QUERY=Pattern.compile("(?is)^"+SPACE+"*(?:SELECT|WITH)\\b");
-    private static final Pattern AI_COMMAND=Pattern.compile("(?is)^"+SPACE+"*SELECT"+SPACE+"+AI\\b");
+    // AI followed by a qualifier dot is a table alias, not a SELECT AI command.
+    private static final Pattern AI_COMMAND=Pattern.compile("(?is)^"+SPACE+"*SELECT"+SPACE+"+AI\\b(?!"+SPACE+"*\\.)");
     private static final Pattern FENCE=Pattern.compile("(?is)^```(?:sql)?[ \\t]*\\R(.*)\\R```$");
     private static String body(String value){
         String sql=value.strip();var fence=FENCE.matcher(sql);

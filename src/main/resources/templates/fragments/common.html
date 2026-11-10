@@ -6,6 +6,7 @@
   <title th:text="${title} + ' · DB Companion'">DB Companion</title>
   <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
   <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/configuration.css}">
   <script th:src="@{/i18n/messages.js}"></script>
   <script type="module" th:src="@{/js/common.js}"></script>
 </head>
@@ -36,6 +37,8 @@
     <a class="app-nav-item" th:classappend="${activePage == 'ai-problems'} ? 'is-active'" th:href="@{/ai-test/problems}" th:attr="aria-current=${activePage == 'ai-problems' ? 'page' : null}" th:aria-label="#{problemQuestion.title}" th:title="#{problemQuestion.title}"><svg th:replace="~{fragments/common :: icon('history')}"></svg><span class="app-nav-text" th:text="#{problemQuestion.title}">문제 질문</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'feedback'} ? 'is-active'" th:href="@{/ai-feedback}" th:attr="aria-current=${activePage == 'feedback' ? 'page' : null}" aria-label="Select AI Feedback" title="Select AI Feedback"><svg th:replace="~{fragments/common :: icon('table')}"></svg><span class="app-nav-text">Select AI Feedback</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'agents'} ? 'is-active'" th:href="@{/ai-agents}" th:attr="aria-current=${activePage == 'agents' ? 'page' : null}" aria-label="Select AI Agent" title="Select AI Agent"><svg th:replace="~{fragments/common :: icon('layers')}"></svg><span class="app-nav-text">Select AI Agent</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'memory'} ? 'is-active'" th:href="@{/ai-memory}" th:attr="aria-current=${activePage == 'memory' ? 'page' : null}"><svg th:replace="~{fragments/common :: icon('layers')}"></svg><span class="app-nav-text">Agent Memory</span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'engine'} ? 'is-active'" th:href="@{/ai-agent-engine}" th:attr="aria-current=${activePage == 'engine' ? 'page' : null}"><svg th:replace="~{fragments/common :: icon('layers')}"></svg><span class="app-nav-text">Agent Engine</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'executions'} ? 'is-active'" th:href="@{/ai-executions}" th:attr="aria-current=${activePage == 'executions' ? 'page' : null}" th:aria-label="#{ui.cf835c698541}" th:title="#{ui.cf835c698541}"><svg th:replace="~{fragments/common :: icon('history')}"></svg><span class="app-nav-text" th:text="#{ui.cf835c698541}">AI 실행 이력</span></a>
   </nav>
   <p class="app-nav-label app-nav-group" th:text="#{functions.nav}">DB 관리</p>

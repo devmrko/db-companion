@@ -32,7 +32,9 @@ public final class OciEmbeddingModels {
     public record Result(Page page,boolean cached) {}
     public static Page parse(String json,JsonMapper mapper) {
         var root=mapper.readTree(json);
-        if(!root.path("items").isArray() || root.path("items").size()>100)
+        // Some SDK deployments return the complete catalogue despite limit=100.
+        // The repository separately bounds the response CLOB to 1 MB.
+        if(!root.path("items").isArray() || root.path("items").size()>2000)
             throw new Failure(502,UiMessages.text("vector.oci.responseInvalid","OCI 모델 목록 응답 형식을 확인할 수 없습니다."));
         var items=new ArrayList<Model>();
         for(var row:root.path("items")) {

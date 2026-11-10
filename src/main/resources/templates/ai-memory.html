@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Agent Memory')}"></head>
+<body class="app-shell">
+<aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content app-config" data-memory-browser th:attr="data-schema=${selectedSchema}">
+<h1>Agent Memory</h1>
+<p>저장된 기억을 조회하고 검색합니다. 조회는 메모리 추출이나 모델 호출을 수행하지 않습니다.</p>
+    <section class="app-config-disclosure" data-mp-browser>
+      <h3>저장된 메모리 조회</h3>
+      <form class="app-config-form" data-mb-form>
+        <label>저장소<select class="form-select" data-mb-store required></select></label>
+        <label>메모리 형태<select class="form-select" data-mb-kind><option value="all">전체</option><option value="memory">장기 기억</option><option value="conversation">단기 문맥 · Select AI 대화</option><option value="message">단기 문맥 · 메시지</option><option value="summary">대화 요약</option><option value="actor">사용자·에이전트 정보</option></select></label>
+        <p class="app-muted">Select AI 대화는 현재 이 저장소에 연결된 프로필의 원본 질문·응답입니다. 저장소에 추출된 장기 기억과 다르며, 연결 변경 이전의 사용 관계를 증명하지는 않습니다.</p>
+        <details><summary>메모리 형태란? · ?</summary><p>장기 기억은 대화에서 추출한 사실·선호 등 재사용할 정보입니다. 메시지는 대화의 개별 발화이며 단기 문맥의 원본입니다. 요약은 대화 내용을 압축한 기록, 사용자·에이전트 정보는 참여자의 설명입니다. 단기·장기는 역할 구분이며 실제 보관 기간을 보장하지 않습니다. Select AI 원본 대화는 별도 대화 저장소에서 관리되어 메시지 목록이 비어 있을 수 있습니다.</p></details>
+        <label>내용 또는 레코드 ID<input class="form-control" data-mb-query maxlength="500" placeholder="검색어를 비우면 전체 목록"></label>
+        <button class="btn app-btn" type="submit">조회·검색</button>
+      </form>
+      <p class="app-config-notice" data-mb-status role="status"></p>
+      <details><summary>ID의 의미 · ?</summary><dl class="app-config-summary"><div><dt>Store ID</dt><dd>여러 대화의 기억을 담는 저장소 식별자입니다.</dd></div><div><dt>Record ID</dt><dd>메시지·기억·요약 한 건의 식별자입니다. 참여자 정보는 Actor ID를 표시합니다.</dd></div><div><dt>Thread ID</dt><dd>기록이 속한 대화 묶음입니다. Select AI에서 추출한 기억은 원본 Conversation ID와 연결됩니다.</dd></div><div><dt>User / Agent ID</dt><dd>기억이 연결된 사용자와 에이전트 식별자입니다. 앱 로그인 이름과 같다고 가정하지 않습니다.</dd></div><div><dt>Space ID</dt><dd>기억의 공간·범위를 구분하는 식별자입니다. 없는 값은 미지정으로 표시합니다.</dd></div></dl></details>
+      <div data-mb-rows></div>
+      <div class="app-config-actions"><button type="button" class="btn app-btn" data-mb-prev disabled>이전</button><span data-mb-page></span><button type="button" class="btn app-btn" data-mb-next disabled>다음</button></div>
+      <dialog class="app-preview-dialog app-memory-dialog" aria-labelledby="memory-detail-title" data-mb-dialog>
+        <div class="app-memory-dialog-header"><h2 id="memory-detail-title">메모리·대화 상세</h2><button type="button" class="btn app-btn" data-mb-close autofocus>닫기</button></div>
+        <div class="app-memory-dialog-body" data-mb-detail></div>
+      </dialog>
+    </section>
+</main></div>
+<script type="module" th:src="@{/js/memory-browser.mjs}"></script>
+</body></html>

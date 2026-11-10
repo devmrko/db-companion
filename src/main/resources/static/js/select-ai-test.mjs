@@ -107,6 +107,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ai-test]').for
     get('request-id').textContent=outcome.id;get('request-question').textContent=outcome.question;
     renderEvidence(get('request-evidence'),outcome.evidence);
     const host=get('result-content');host.replaceChildren();
+    if(outcome.memory){const note=document.createElement('p');note.className='app-alert';note.textContent=`${outcome.memory.status} · 대화 ID: ${outcome.memory.conversationId}${outcome.memory.store?' · Memory Store: '+outcome.memory.store:''}`;host.append(note);}
     if(outcome.confirmation){const details=document.createElement('details'),summary=document.createElement('summary'),text=document.createElement('pre');summary.textContent=t('aitest.condition.confirmed','사용자 확정 조건');text.className='app-preview-value';text.textContent=JSON.stringify(outcome.confirmation,null,2);details.append(summary,text);host.append(details);}
     renderGlossarySnapshot(host,outcome.glossary);
     if(outcome.error){const error=document.createElement('p');error.className='app-alert is-error';error.textContent=[outcome.error,outcome.code,outcome.phase].filter(Boolean).join(' · ');host.append(error);}
@@ -161,7 +162,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ai-test]').for
       const p=prepared.preview.profile;
       get('preview-meta').textContent=`${p.selection.owner}.${p.selection.name} · ${p.provider} / ${p.model||'—'} · ${modeLabel(action)}`;
       get('transmission').textContent=action==='PROMPT'?t('aitest.promptTransmission','현재 조건으로 SHOWPROMPT를 구성합니다. SQL은 실행하지 않습니다. Feedback·RAG 준비 과정에서 외부 호출과 비용이 발생할 수 있습니다.'):
-        t('aitest.transmission','아래 프롬프트와 프로필 설정에 따른 메타데이터·Feedback·RAG 문맥이 제공자에게 전달될 수 있습니다. 이번 호출: conversation=false.');
+        t('aitest.transmission','아래 프롬프트와 프로필 설정에 따른 메타데이터·Feedback·RAG 문맥이 제공자에게 전달될 수 있습니다. 대화 저장은 프로필의 conversation 설정을 따릅니다.');
       get('prompt').textContent=prepared.preview.source;get('consent').checked=false;dialog.showModal();
     }catch(ex){prepared=null;message(ex.message,true);}finally{busy=false;controls();}
   }

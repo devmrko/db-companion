@@ -25,6 +25,10 @@ public class ProfileEditController {
     public ResponseEntity<?> save(@RequestBody SaveRequest body,HttpServletRequest request) {
         return invoke(request, () -> service.save(session(request),body));
     }
+    @GetMapping("/ai-profiles/attribute/embedding-options")
+    public ResponseEntity<?> embeddingOptions(@RequestParam String schema, @RequestParam String profile, HttpServletRequest request) {
+        return invoke(request, () -> service.embeddingOptions(session(request), new Target(schema,profile,"embedding_model")));
+    }
     @GetMapping("/ai-profiles/attribute/objects")
     public ResponseEntity<?> objects(@RequestParam String schema, @RequestParam String profile,
             @RequestParam String owner, @RequestParam(defaultValue="") String filter, HttpServletRequest request) {

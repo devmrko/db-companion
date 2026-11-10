@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.*;
 /** Exercises real repository bindings without a provider call. */
 class AiGenerationTimeoutTest {
     private int timeout,executions,clobFrees,closed;
-    private String sql,profile,attributes;
+    private String sql,profile,attributes,params;
     private boolean fail;
     private final Clob clob=(Clob)Proxy.newProxyInstance(Clob.class.getClassLoader(),new Class[]{Clob.class},(p,m,a)->switch(m.getName()){
         case "length"->18L;
@@ -27,7 +27,7 @@ class AiGenerationTimeoutTest {
         case "setQueryTimeout"->{timeout=(int)a[0];yield null;}
         case "registerOutParameter"->{assertThat(a[0]).isEqualTo(1);assertThat(a[1]).isEqualTo(java.sql.Types.CLOB);yield null;}
         case "setCharacterStream"->{assertThat(a[0]).isEqualTo(2);yield null;}
-        case "setString"->{if((int)a[0]==4)attributes=(String)a[1];else {assertThat(a[0]).isEqualTo(3);profile=(String)a[1];}yield null;}
+        case "setString"->{if((int)a[0]==5)params=(String)a[1];else if((int)a[0]==4)attributes=(String)a[1];else {assertThat(a[0]).isEqualTo(3);profile=(String)a[1];}yield null;}
         case "execute"->{executions++;if(fail)throw new SQLException("ORA-18730: Socket read timed out","08006",18730);yield false;}
         case "getClob"->clob;
         case "close"->{closed++;yield null;}
@@ -72,6 +72,14 @@ class AiGenerationTimeoutTest {
         repository.explain("CLOUD","PROFILE","question",300);
         assertThat(timeout).isEqualTo(300);
         assertThat(sql).isEqualTo(AiAssistantRepository.generateSql("CLOUD",Action.CHAT));
+    }
+    @Test void persistentConversationIsBoundWithoutChangingPooledSessionOrDisablingHistory(){
+        repository.generate("CLOUD","PROFILE","question",Action.CHAT,90,null,"synthetic-conversation");
+        assertThat(sql).contains("params => ?", "GET_CONVERSATION_ID IS NOT NULL")
+                .doesNotContain("SET_CONVERSATION_ID", "synthetic-conversation", "\"conversation\":false");
+        assertThat(attributes).isEqualTo("{}");
+        assertThat(params).isEqualTo("{\"conversation_id\":\"synthetic-conversation\"}");
+        assertThat(executions).isEqualTo(1);
     }
     @Test void invalidBudgetNeverExecutes(){
         assertThatThrownBy(()->repository.generate("CLOUD","PROFILE","question",Action.SQL,0)).isInstanceOf(IllegalArgumentException.class);

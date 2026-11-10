@@ -23,14 +23,29 @@ public class ProfileEditRepository {
     }
     public void requireSemanticSources(Target target, String value) {
         if ("semantic_source".equals(target.attribute())) new SemanticContextRepository(jdbc).requireSources(value);
+        if (com.dbcompanion.model.AiMemoryPolicy.LINKS.contains(target.attribute()))
+            new AiMemoryPolicyRepository(jdbc).requireLink(target.attribute(), value);
     }
     public void requireSemanticSupport(Target target) {
         if ("semantic_source".equals(target.attribute())) new SemanticContextRepository(jdbc).require();
+        if (com.dbcompanion.model.AiMemoryPolicy.LINKS.contains(target.attribute()))
+            new AiMemoryPolicyRepository(jdbc).require(target.attribute().equals("memory_store_name") ? "memory" : "guardrail");
     }
     public List<String> credentials() {
-        return jdbc.queryForList("SELECT CREDENTIAL_NAME FROM SYS.USER_CREDENTIALS WHERE ENABLED = 'TRUE' ORDER BY CREDENTIAL_NAME", String.class);
+        return jdbc.queryForList("""
+                SELECT CREDENTIAL_NAME FROM SYS.USER_CREDENTIALS WHERE ENABLED = 'TRUE'
+                UNION
+                SELECT CREDENTIAL_NAME FROM SYS.ALL_CREDENTIALS
+                WHERE ENABLED = 'TRUE' AND CREDENTIAL_NAME = 'OCI$RESOURCE_PRINCIPAL'
+                ORDER BY CREDENTIAL_NAME
+                """, String.class);
     }
     public boolean credentialAvailable(String name) {
+        if ("OCI$RESOURCE_PRINCIPAL".equals(name)) {
+            // ADB exposes the enabled resource principal through ALL_CREDENTIALS,
+            // including when no credential is owned by the current user.
+            return !jdbc.queryForList("SELECT CREDENTIAL_NAME FROM SYS.ALL_CREDENTIALS WHERE ENABLED = 'TRUE' AND CREDENTIAL_NAME = ?", String.class, name).isEmpty();
+        }
         return !jdbc.queryForList("SELECT CREDENTIAL_NAME FROM SYS.USER_CREDENTIALS WHERE ENABLED = 'TRUE' AND CREDENTIAL_NAME = ?", String.class, name).isEmpty();
     }
     public List<String> suggestions(String attribute, String provider) {
@@ -53,5 +68,8 @@ public class ProfileEditRepository {
                 ORDER BY OBJECT_NAME, OBJECT_TYPE FETCH FIRST 101 ROWS ONLY
                 """, (row, index) -> new ObjectChoice(row.getString(1), row.getString(2)), owner, filter, filter);
         return new ObjectChoices(List.copyOf(rows.subList(0, Math.min(100, rows.size()))), rows.size() > 100);
+    }
+    public List<String> embeddingModels() {
+        return jdbc.queryForList("SELECT OWNER||'.'||MODEL_NAME FROM SYS.ALL_MINING_MODELS WHERE MINING_FUNCTION='EMBEDDING' AND ALGORITHM='ONNX' ORDER BY OWNER,MODEL_NAME", String.class);
     }
 }

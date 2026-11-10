@@ -55,6 +55,11 @@ class OciEmbeddingModelsTest {
         state.ociModels(new Request(new Query(query.credential(),query.region(),"ocid1.compartment.oc1..other"),"",false),loader);
         session().ociModels(first,loader);assertThat(calls).hasValue(5);
     }
+    @Test void acceptsBoundedCatalogueWhenSdkIgnoresRequestedPageSize(){
+        String item="{\"name\":\"cohere.embed-v4.0\",\"state\":\"ACTIVE\",\"type\":\"BASE\",\"capabilities\":[\"TEXT_EMBEDDINGS\"]}";
+        assertThat(OciEmbeddingModels.parse("{\"items\":["+String.join(",",Collections.nCopies(152,item))+"],\"nextPage\":null}",new JsonMapper()).items()).hasSize(152);
+        assertThatThrownBy(()->OciEmbeddingModels.parse("{\"items\":["+String.join(",",Collections.nCopies(2001,item))+"]}",new JsonMapper())).isInstanceOf(VectorSearch.Failure.class);
+    }
     @Test void continuationMustHaveBeenReturnedAndRefreshInvalidatesAllPages(){
         var state=session();var second=new Request(query,"p2",false);
         assertThatThrownBy(()->state.ociModels(second,()->{throw new AssertionError("Must not call OCI");})).isInstanceOf(VectorSearch.Failure.class);

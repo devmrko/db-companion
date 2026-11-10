@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="panel" class="app-card app-config app-config-panel" data-memory-policy th:attr="data-schema=${selectedSchema},data-profile=${profileName}">
+  <div class="app-card-heading"><h2>Memory · Guardrail</h2><button class="btn app-btn app-btn-secondary" type="button" data-mp-refresh>새로고침</button></div>
+  <p>이 프로필에서 사용할 메모리 저장소와 OCI Guardrail을 구성합니다. 생성한 뒤 프로필에 연결하세요.</p>
+  <p class="app-config-notice" data-mp-status role="status"></p>
+  <p class="app-muted">앱 검증 기준: 23.26.4.1.0. 실제 API·조회 지원을 기능별로 확인합니다. Oracle 최초 지원 버전을 뜻하지 않습니다.</p>
+  <input type="hidden" data-mp-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+  <dl class="app-config-summary"><div><dt>연결된 Memory Store</dt><dd data-mp-memory-current></dd></div><div><dt>연결된 Guardrail</dt><dd data-mp-guard-current></dd></div><div><dt>대화 저장 · conversation</dt><dd data-mp-conversation></dd></div></dl>
+  <div class="app-config-grid">
+  <div class="app-config-card" data-mp-memory hidden>
+    <h3>Memory Store</h3>
+    <p>대화에서 추출한 정보를 이후 요청에서 재사용합니다. 같은 저장소를 사용하는 앱 사용자별 격리는 별도로 확인해야 합니다.</p>
+    <ul class="app-config-list" data-mp-stores></ul>
+    <div data-mp-store-details></div>
+    <a class="btn app-btn" data-mp-browse-link href="/ai-memory">Agent Memory에서 내용 조회·검색</a>
+    <div class="app-config-actions"><button type="button" class="btn app-btn" data-edit-profile-attribute="memory_store_name">저장소 연결 변경</button>
+    <button type="button" class="btn app-btn" data-edit-profile-attribute="embedding_model">임베딩 모델 설정</button>
+    <button type="button" class="btn app-btn" data-edit-profile-attribute="conversation">대화 저장 설정</button></div>
+    <details class="app-config-disclosure"><summary>대화에서 새 메모리 추출 · 별도 작업</summary>
+      <p>대화 ID는 원본 대화를 식별합니다. Memory Store ID는 여러 대화에서 재사용할 저장소를 식별하며, 두 ID는 다릅니다.</p>
+      <button type="button" class="btn app-btn" data-mp-conversations>이 프로필의 대화 조회</button>
+      <p>최근 50개 대화입니다. 추출은 저장 내용을 읽는 작업이 아니라 LLM으로 기억을 만드는 작업이며 비용이 발생할 수 있습니다.</p>
+      <form class="app-config-form" data-mp-extract>
+        <label>원본 대화<select name="conversationId" class="form-select" data-mp-conversation-list required></select></label>
+        <p>현재 프로필에 연결된 저장소로 추출합니다. 다른 프로필이 섞인 대화는 추출하지 않습니다.</p>
+        <label><input name="confirmed" type="checkbox" required> 선택한 대화의 외부 모델 전달·유료 추출을 승인합니다.</label>
+        <button type="submit" class="btn app-btn">메모리 추출</button>
+      </form>
+    </details>
+    <details class="app-config-disclosure"><summary>Memory Store 생성</summary>
+      <form data-mp-form="memory" class="app-config-form">
+        <label>저장소 이름<input name="name" class="form-control" required pattern="[A-Za-z][A-Za-z0-9_$#]{0,124}" maxlength="125" placeholder="예: AGENT_MEMORY" title="영문자로 시작하고 영문·숫자·_·$·#만 사용하세요. 소문자는 대문자로 저장됩니다."></label>
+        <p class="app-muted">영문자로 시작하는 125자 이내 이름입니다. 영문·숫자·_·$·#을 사용할 수 있으며, 소문자는 대문자로 저장됩니다. 예: agentmemory → AGENTMEMORY</p>
+        <label>추출·임베딩에 사용할 프로필<select name="profile" class="form-select" data-mp-profiles required></select></label>
+        <p class="app-muted">선택한 프로필의 LLM과 embedding_model을 사용합니다. 다른 프로필의 설정을 복사하지 않습니다.</p>
+        <p class="app-config-notice" data-mp-prerequisite role="status">프로필의 필수 설정을 확인 중입니다.</p>
+        <div class="app-config-actions"><button type="button" class="btn app-btn" data-mp-embedding-edit data-edit-profile-attribute="embedding_model">임베딩 모델 설정</button><a class="btn app-btn" data-mp-profile-link hidden>선택한 프로필 설정 열기</a></div>
+        <label>설명<input name="description" class="form-control" maxlength="1000"></label>
+        <label>match_limit<input name="matchLimit" class="form-control" type="number" min="1" max="99" value="5" required></label>
+        <label>refresh_rate (선택)<input name="refreshRate" class="form-control" type="number" min="1" max="999"></label>
+        <p>생성 시 자동 추출 파이프라인이 시작될 수 있으며 LLM 비용이 발생할 수 있습니다.</p>
+        <label><input name="confirmed" type="checkbox" required> 위 설정으로 DB 저장소 생성과 자동 추출을 승인합니다.</label>
+        <p class="app-config-notice" data-mp-create-message role="alert"></p>
+        <button type="submit" class="btn app-btn app-btn-primary">저장소 생성</button>
+      </form>
+    </details>
+  </div>
+  <div class="app-config-card" data-mp-guardrail hidden>
+    <h3>OCI Guardrail</h3>
+    <ul class="app-config-list" data-mp-guards></ul>
+    <button type="button" class="btn app-btn" data-edit-profile-attribute="guardrail">정책 연결 변경</button>
+    <p>detect는 탐지하면서 응답을 반환할 수 있고, enforce는 정책 위반을 차단합니다. BLOCK 상태와 SQL 성공 여부만으로 실제 차단을 판단하지 않습니다.</p>
+    <button type="button" class="btn app-btn" data-mp-observe>최근 검사 결과 조회</button>
+    <p class="app-muted">이 프로필에 기록된 최근 20건입니다. 질문·응답은 앞 2,000자만 표시합니다. 현재 정책 설정이 과거 실행 시점의 모드와 같다고 가정하지 않습니다. 기록이 없다고 검사를 수행하지 않았다는 뜻은 아닙니다.</p>
+    <div data-mp-observations></div>
+    <details class="app-config-disclosure"><summary>Guardrail 생성</summary>
+      <form data-mp-form="guardrail" class="app-config-form">
+        <label>정책 이름<input name="name" class="form-control" required pattern="[A-Za-z][A-Za-z0-9_$#]{0,124}" maxlength="125" placeholder="예: PII_GUARDRAIL" title="영문자로 시작하고 영문·숫자·_·$·#만 사용하세요. 소문자는 대문자로 저장됩니다."></label>
+        <p class="app-muted">영문자로 시작하는 125자 이내 이름입니다. 소문자는 대문자로 저장됩니다.</p>
+        <label>OCI 연결 프로필<select name="profile" class="form-select" data-mp-profiles required></select></label>
+        <p class="app-muted">provider·credential_name·region·oci_compartment_id만 참조합니다. 실제 비밀키는 복사하지 않습니다.</p>
+        <label>설명<input name="description" class="form-control" maxlength="1000"></label>
+        <label>모드<select name="mode" class="form-select"><option value="detect">detect · 탐지</option><option value="enforce">enforce · 차단</option></select></label>
+        <label><input name="pii" type="checkbox" checked> PII</label>
+        <label><input name="injection" type="checkbox"> Prompt Injection</label>
+        <label><input name="moderation" type="checkbox"> Content Moderation</label>
+        <label><input name="confirmed" type="checkbox" required> 위 설정으로 DB 정책 생성을 승인합니다. 연결 후 요청·응답이 OCI 검사 대상이 됩니다.</label>
+        <p class="app-config-notice" data-mp-create-message role="alert"></p>
+        <button type="submit" class="btn app-btn app-btn-primary">정책 생성</button>
+      </form>
+    </details>
+  </div>
+  </div>
+  <p class="app-config-notice" data-mp-message role="status" aria-live="polite"></p>
+  <script type="module" th:src="@{/js/memory-policy.mjs}"></script>
+</section>
+</body></html>

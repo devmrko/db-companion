@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Agent Engine')}"></head>
+<body class="app-shell">
+<aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content app-config" data-engine th:attr="data-schema=${selectedSchema}">
+  <div class="app-page-heading"><h1>Agent Engine</h1><span class="app-badge">AgentSpec · Flow</span></div>
+  <p class="app-muted">등록된 Agent를 조회하거나 워크플로우 JSON을 불러와 입력값을 설정하고, DB 실행 결과와 trace를 확인합니다.</p>
+  <p class="app-config-notice" data-engine-status role="status">DB 실행 API 확인 중…</p>
+  <input type="hidden" data-engine-csrf th:value="${_csrf.token}" th:attr="data-header=${_csrf.headerName}">
+  <section class="app-config-card">
+    <div class="app-config-actions"><h2>DB에 등록된 Agent</h2><button class="btn app-btn app-btn-secondary" type="button" data-engine-refresh disabled>목록 새로고침</button></div>
+    <p class="app-muted">현재 로그인 소유자의 등록 목록입니다. 선택하면 입출력·생성일을 조회하며, 실행 버튼을 누르기 전에는 실행하지 않습니다.</p>
+    <label class="app-config-field">등록된 Agent 선택<select class="form-select" data-engine-agents disabled><option value="">목록 확인 중…</option></select></label>
+    <p class="app-config-notice" data-engine-catalog-status role="status"></p>
+    <details class="app-config-disclosure" data-engine-detail-panel hidden><summary>DB 상세 응답 JSON</summary><pre class="app-config-output" data-engine-detail></pre></details>
+  </section>
+  <section class="app-config-card"><h2>처리 흐름</h2><div data-engine-diagram><p class="app-muted">등록된 Agent를 선택하거나 AgentSpec을 불러오면 입력 → 처리 → 출력 흐름을 표시합니다.</p></div></section>
+  <div class="app-config-grid">
+    <section class="app-config-card">
+      <h2>1. 정의와 입출력 확인</h2>
+      <label class="app-config-field">AgentSpec JSON 파일<input type="file" accept=".json,application/json" data-engine-file></label>
+      <details class="app-config-disclosure"><summary>AgentSpec JSON 편집</summary>
+        <label class="app-config-field">Flow 정의<textarea rows="14" class="form-control app-config-code" data-engine-spec spellcheck="false" placeholder='{"component_type":"Flow", ...}'></textarea></label>
+        <button class="btn app-btn app-btn-secondary" type="button" data-engine-load>설정 읽기</button>
+      </details>
+      <div data-engine-preview></div>
+    </section>
+    <section class="app-config-card">
+      <h2>2. 입력값과 실행</h2>
+      <form data-engine-form class="app-config-form">
+        <div data-engine-inputs class="app-config-form"><p class="app-muted">먼저 AgentSpec을 불러오세요.</p></div>
+        <p class="app-config-notice">로그인한 DB 계정 권한으로 실행합니다. 연결된 도구에 따라 데이터 변경·외부 호출·모델 비용이 발생할 수 있습니다.</p>
+        <label class="app-config-check"><input type="checkbox" data-engine-confirm required> 선택한 Agent 또는 JSON의 실행 범위를 확인했으며 이 입력으로 실행하는 데 동의합니다.</label>
+        <button type="submit" class="btn app-btn app-btn-primary" data-engine-run disabled>워크플로우 실행</button>
+      </form>
+    </section>
+  </div>
+  <p data-engine-message class="app-config-notice" role="status" aria-live="polite"></p>
+  <section class="app-config-card" data-engine-results hidden>
+    <h2>3. 실행 결과</h2><pre class="app-config-output" data-engine-output></pre>
+    <h3>실행 경로 · Trace</h3><p class="app-muted">DB가 반환한 노드 실행 기록입니다. ParallelFlow 표시는 실제 동시 실행 시간이나 성능 측정값을 의미하지 않습니다.</p>
+    <div data-engine-trace-diagram></div>
+    <details class="app-config-disclosure"><summary>노드별 상세 이벤트</summary><div data-engine-trace></div></details>
+    <details class="app-config-disclosure"><summary>Trace JSON 원문</summary><pre class="app-config-output" data-engine-raw></pre></details>
+  </section>
+</main></div><script type="module" th:src="@{/js/agent-engine.mjs}"></script>
+</body></html>

@@ -5,7 +5,8 @@ public record AiProfileAttribute(String name, String value) {
             "provider", "model", "credential_name", "object_list", "comments", "annotations",
             "constraints", "enforce_object_list", "conversation", "max_tokens", "temperature",
             "additional_instructions", "region", "oci_compartment_id", "oci_endpoint_id",
-            "azure_resource_name", "azure_deployment_name", "provider_endpoint");
+            "azure_resource_name", "azure_deployment_name", "provider_endpoint",
+            "embedding_model", "memory_store_name", "guardrail");
     /** Missing settings are UI rows only; never copy defaults from another profile. */
     public static java.util.List<AiProfileAttribute> withConfiguration(java.util.List<AiProfileAttribute> attributes) {
         var result = new java.util.ArrayList<>(attributes);

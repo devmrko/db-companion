@@ -7,6 +7,11 @@ import static org.assertj.core.api.Assertions.*;
 
 /** Source contracts, not simulated Oracle query results. */
 class ProfileEditChoicesTest {
+    @Test void sharedCredentialsAreLimitedToTheEnabledResourcePrincipal() throws Exception {
+        String repository=Files.readString(Path.of("src/main/java/com/dbcompanion/repository/ProfileEditRepository.java"));
+        assertThat(repository).contains("WHERE ENABLED = 'TRUE' AND CREDENTIAL_NAME = 'OCI$RESOURCE_PRINCIPAL'",
+                "if (\"OCI$RESOURCE_PRINCIPAL\".equals(name))", "SELECT CREDENTIAL_NAME FROM SYS.ALL_CREDENTIALS WHERE ENABLED = 'TRUE' AND CREDENTIAL_NAME = ?");
+    }
     @Test void credentialsAreOwnerScopedEnabledNamesOnlyAndBoundAtSave() throws Exception {
         String repository=Files.readString(Path.of("src/main/java/com/dbcompanion/repository/ProfileEditRepository.java"));
         assertThat(repository).contains("SELECT CREDENTIAL_NAME FROM SYS.USER_CREDENTIALS WHERE ENABLED = 'TRUE'", "AND CREDENTIAL_NAME = ?")

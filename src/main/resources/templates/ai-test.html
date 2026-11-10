@@ -124,6 +124,7 @@
     <div class="app-preview-header"><h2 id="test-preview-title" th:text="#{aitest.preview}">전송 확인</h2><button type="button" class="btn app-btn app-btn-quiet" data-test-close th:text="#{aitest.close}">닫기</button></div>
     <div class="app-preview-body"><p data-test-preview-meta></p><p data-test-transmission th:text="#{aitest.transmission}"></p>
       <pre class="app-preview-value app-test-prompt" data-test-prompt></pre>
+      <p class="app-alert">프로필의 conversation=true이면 실행별 대화 ID로 질문·응답을 DB에 7일간 저장합니다. Memory Store가 연결되어 있으면 응답 후 메모리 추출도 호출하며 추가 모델 비용이 발생할 수 있습니다. SHOWPROMPT는 제외합니다.</p>
       <label class="app-assistant-consent"><input type="checkbox" data-test-consent><span th:text="#{aitest.consent}"></span></label>
       <div class="app-editor-actions"><button type="button" class="btn app-btn app-btn-primary" data-test-run disabled th:text="#{aitest.send}">전송</button></div>
     </div>

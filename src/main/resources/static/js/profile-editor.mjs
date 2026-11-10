@@ -3,8 +3,11 @@ import {profileField,booleanValue,validateTypedValue,credentialChoices,attachPro
 import {objectPicker} from './profile-objects.mjs';
 import {validSources} from './semantic-context.mjs';
 import {semanticPicker} from './semantic-picker.mjs';
+import {linkChoices} from './memory-policy.mjs';
+import {embeddingPicker} from './embedding-picker.mjs';
 export const profileBytes = value => new TextEncoder().encode(value).length;
 export function validateProfileValue(attribute,value,maxBytes=32767) {
+  if(['memory_store_name','guardrail'].includes(attribute)&&value==='')return '';
   if (!value || !value.trim()) return t('ui.db6144584361', "값을 입력해 주세요. 빈 값 저장이나 속성 삭제는 지원하지 않습니다.");
   if (!value.isWellFormed() || value.includes('\0')) return t('ui.276b201421c0', "올바르지 않은 문자가 있습니다.");
   if (profileBytes(value)>maxBytes) return t('ui.2c41f4ca8f42', "내용은 UTF-8 기준 32,767바이트 이내로 입력해 주세요. 입력은 자르지 않습니다.");
@@ -23,10 +26,11 @@ function mount(dialog) {
   const find=name=>dialog.querySelector(`[data-pe-${name}]`);
   const fields=find('fields'), value=find('value'), save=find('save'), close=find('close'), message=find('message');
   let state=null, original=null, savedVersion=null, initial='', pending=null, generation=0, saving=false, locked=false, reload=false, control=value, cleanup=()=>{};
+  let returnToMemory=false;
   const show=(text,error=false)=>{message.textContent=text; message.hidden=!text; message.className=error?'app-alert is-error':'app-alert';};
   const currentValue=()=>control.type==='checkbox'?String(control.checked):control.value;
   const dirty=()=>state && currentValue()!==initial;
-  const count=()=>{find('bytes').textContent=profileBytes(currentValue()); save.disabled=!state||saving||locked||!dirty();};
+  const count=()=>{find('bytes').textContent=profileBytes(currentValue()); save.disabled=!state||saving||locked||(!dirty()&&state.target.attribute!=='embedding_model');};
   const element=(tag,text,className)=>{const node=document.createElement(tag);if(text)node.textContent=text;if(className)node.className=className;return node;};
   function prepare(data) {
     cleanup();cleanup=()=>{};find('raw').append(value);find('raw').querySelector('details')?.remove();find('control').replaceChildren();
@@ -34,6 +38,7 @@ function mount(dialog) {
     const help=dialog.querySelector('[data-sql-help-for="profiles"]');
     if(help)help.dataset.sqlHelpOperation=attr==='model'?'model':attr==='object_list'?'objects':'options';
     let type=spec.type;
+    if(['memory_store_name','guardrail'].includes(attr))type='select';
     // Keep unfamiliar existing representations intact instead of silently converting them.
     if(type==='boolean'&&booleanValue(data.value)===null){
       if(data.value==null){type='select';spec.choices=['true','false'];}else type='multiline';
@@ -42,7 +47,28 @@ function mount(dialog) {
     value.value=data.value??(type==='objects'?'[]':'');control=value;find('raw').hidden=!['multiline','objects'].includes(type);
     find('counter').hidden=!['multiline','objects'].includes(type);
     dialog.classList.toggle('app-profile-editor-compact',!['multiline','objects'].includes(type));
-    if(attr==='semantic_source') {
+    if(attr==='embedding_model') {
+      cleanup=embeddingPicker(host,value,data,read,count,find('csrf'));
+    }else if(['memory_store_name','guardrail'].includes(attr)) {
+      control=element('select',null,'form-select');host.append(control);
+      const pendingOption=element('option','목록을 불러오는 중…');pendingOption.value=data.value??'';control.append(pendingOption);
+      const select=control;select.disabled=true;
+      let active=true;cleanup=()=>{active=false;};
+      read('/ai-profiles/memory-policy?'+new URLSearchParams({schema:data.target.schema,profile:data.target.profile})).then(status=>{
+        if(!active)return;select.replaceChildren();
+        const empty=element('option','연결 해제 (미연결)');empty.value='';select.append(empty);
+        const names=linkChoices(attr,status);
+        if(attr==='memory_store_name'&&!names.length){
+          host.append(element('p','생성된 Memory Store가 없습니다. 임베딩 모델 저장만으로는 저장소가 생성되지 않습니다. 아래 버튼에서 저장소를 만든 뒤 이 프로필에 연결하세요.','app-config-notice'));
+          const create=element('button','Memory Store 생성으로 이동','btn app-btn app-btn-primary');create.type='button';
+          create.addEventListener('click',()=>{reload=false;dialog.close();document.dispatchEvent(new CustomEvent('memory-store-create-requested'));});host.append(create);
+        }
+        if(data.value&&!names.includes(data.value)){const old=element('option',data.value+' (연결 불가)');old.value=data.value;old.disabled=true;select.append(old);}
+        for(const name of names){const option=element('option',name);option.value=name;select.append(option);}
+        select.value=data.value??'';select.disabled=false;count();
+      }).catch(error=>{if(active)show(error.message,true);});
+      select.addEventListener('change',count);
+    }else if(attr==='semantic_source') {
       cleanup=semanticPicker(host,value,data,read,count);
       const details=element('details'),summary=element('summary',t('ui.7e7265068560','JSON 직접 편집'));details.append(summary);
       find('raw').append(details);details.append(value);
@@ -87,9 +113,10 @@ function mount(dialog) {
     return data;
   }
   document.querySelectorAll('[data-edit-profile-attribute]').forEach(button=>button.addEventListener('click',async()=>{
+    returnToMemory=button.dataset.editProfileAttribute==='embedding_model'&&!!button.closest('[data-memory-policy]');
     pending?.abort(); pending=new AbortController(); const id=++generation;
     cleanup();cleanup=()=>{};find('raw').append(value);find('raw').querySelector('details')?.remove();find('control').replaceChildren();find('help').replaceChildren();
-    control=value;state=null;original=null;savedVersion=null;find('restore').hidden=true; locked=false; reload=false; fields.disabled=true; value.value=''; initial=''; count();
+    control=value;state=null;original=null;savedVersion=null;find('restore').hidden=true; locked=false; reload=false; fields.disabled=true; value.value=''; initial=''; save.textContent=t('ui.5fb926229090','저장');count();
     find('raw').hidden=true;find('counter').hidden=true;
     find('object').textContent=`${dialog.dataset.schema}.${dialog.dataset.profile}`;
     find('label').textContent=button.dataset.editProfileAttribute; find('hint').textContent='';
@@ -111,11 +138,20 @@ function mount(dialog) {
     try {
       const result=await read(dialog.dataset.url,{method:'POST',headers:{'Content-Type':'application/json',[csrf.dataset.csrfHeader]:csrf.value},
         body:JSON.stringify({...state.target,value:submitted,version:state.version})});
-      locked=true; reload=result.verified; if(result.verified)initial=submitted; show(result.message,!result.verified);
+      locked=true; reload=result.verified; if(result.verified)initial=submitted; show(result.verified&&state.target.attribute==='embedding_model'?`저장 확인 완료 · embedding_model = ${submitted}\n${result.message}`:result.message,!result.verified);
+      if(result.verified&&state.target.attribute==='embedding_model')save.textContent='저장 확인 완료';
       if(result.verified){
         const url=new URL(dialog.dataset.url,location.origin);for(const [key,item] of Object.entries(state.target))url.searchParams.set(key,item);
         const latest=await read(url);savedVersion=latest.value===submitted?latest.version:null;
         find('restore').hidden=!profileRestoreAllowed(original,latest,savedVersion)||latest.value===original.value;
+        if(returnToMemory&&savedVersion){
+          reload=false;
+          for(const button of document.querySelectorAll('[data-edit-profile-attribute="embedding_model"]')){
+            const cell=button.closest('tr')?.cells[1];if(cell)cell.textContent=latest.value;
+          }
+          document.dispatchEvent(new CustomEvent('profile-attribute-saved',{detail:{...latest.target,value:latest.value}}));
+          dialog.close();
+        }
       }
     } catch(error){locked=!profileRetryAllowed(error.status);show(error.message,true);}
     finally{saving=false;close.disabled=false;fields.disabled=false;count();}

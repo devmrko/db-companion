@@ -37,6 +37,7 @@ public final class ProfileEditPolicy {
                 && !name.matches(".*(?:^|_)(?:password|secret|private_key|api_key|token|access_token|refresh_token|access_key|auth_token)(?:_|$).*");
     }
     public static void input(Target target, String value, JsonMapper json) {
+        if (com.dbcompanion.model.AiMemoryPolicy.LINKS.contains(target.attribute()) && "".equals(value)) return;
         if (value == null || value.isBlank()) throw invalid(UiMessages.text("ui.db6144584361", "값을 입력해 주세요. 빈 값 저장이나 속성 삭제는 지원하지 않습니다."));
         unicode(value);
         if (value.indexOf('\0') >= 0) throw invalid(UiMessages.text("ui.8c2eea79f90f", "내용에 NUL 문자를 사용할 수 없습니다."));
@@ -98,6 +99,7 @@ public final class ProfileEditPolicy {
             throw new MetadataEditException(409, "Profile changed", UiMessages.text("ui.72fcb9606fa7", "편집 중 프로필이 변경되었습니다. 입력을 복사한 뒤 최신 값을 다시 불러와 주세요."));
     }
     public static boolean equivalent(String attribute, String desired, String actual, JsonMapper json) {
+        if (com.dbcompanion.model.AiMemoryPolicy.LINKS.contains(attribute) && "".equals(desired) && actual == null) return true;
         if (Objects.equals(desired,actual)) return true;
         if (desired==null || actual==null) return false;
         try {

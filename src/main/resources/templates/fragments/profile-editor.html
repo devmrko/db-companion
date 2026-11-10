@@ -7,13 +7,13 @@
     <form class="app-editor-form" data-pe-form>
       <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-pe-csrf>
       <p class="app-muted" data-pe-object></p>
-      <p class="app-alert" role="status" aria-live="polite" data-pe-message hidden></p>
       <fieldset data-pe-fields disabled>
         <div class="app-profile-field-label"><label for="profile-attribute-value" data-pe-label th:text="#{ui.b19ddf94b4c9}">값</label><span data-pe-help></span></div>
         <div data-pe-control></div>
         <div data-pe-raw><textarea class="form-control app-editor-value app-profile-editor-value" id="profile-attribute-value" rows="14" spellcheck="false" data-pe-value></textarea></div>
         <p class="app-muted app-editor-note" data-pe-counter><span data-pe-bytes>0</span> <th:block th:text="#{ui.a86e5c687c71}">/ 32,767바이트 (UTF-8)</th:block></p>
         <p class="app-muted app-editor-note" data-pe-hint></p>
+        <p class="app-alert" role="status" aria-live="polite" data-pe-message hidden></p>
         <div class="app-editor-actions"><button class="btn app-btn app-btn-primary" type="submit" data-pe-save disabled th:text="#{ui.5fb926229090}">저장</button><button class="btn app-btn app-btn-quiet" type="button" data-pe-restore hidden th:text="#{profileRestore.prepare}">이 창의 변경 전 값으로 복구 준비</button></div>
       </fieldset>
     </form>
