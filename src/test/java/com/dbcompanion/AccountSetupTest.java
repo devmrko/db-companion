@@ -57,6 +57,7 @@ class AccountSetupTest {
     @Test void existingAccountGrantsAreFixedAndOneShot(){
         assertThat(AccountSetupService.privilegeSql("APP_TEST","RDF")).containsExactly("GRANT CREATE TABLE, CREATE VIEW, CREATE PROCEDURE, CREATE SEQUENCE, CREATE TRIGGER, CREATE TYPE TO \"APP_TEST\"");
         assertThat(AccountSetupService.privilegeSql("APP_TEST","TEXT")).containsExactly("GRANT EXECUTE ON CTXSYS.CTX_DDL TO \"APP_TEST\"");
+        assertThat(AccountSetupService.privilegeSql("APP_TEST","SQL_CACHE")).containsExactly("GRANT SELECT ON SYS.V_$SQL TO \"APP_TEST\"");
         for(String operation:List.of("DBA","ANY","TEXT; DROP USER X"))assertThatThrownBy(()->AccountSetupService.privilegeSql("APP_TEST",operation)).isInstanceOf(AiAssistant.Failure.class);
         int[] writes={0};
         var service=new AccountSetupService(){

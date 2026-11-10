@@ -1,6 +1,6 @@
 CREATE FUNCTION {{CONTEXT}}(p_context CLOB)
   RETURN CLOB AUTHID CURRENT_USER AS
-  -- DB Companion semantic glossary callback v1. JSON types escape all text.
+  -- DB Companion semantic glossary callback v2. Normalize Oracle repair envelopes.
   context_obj JSON_OBJECT_T;
   response_obj JSON_OBJECT_T;
   glossary_obj JSON_OBJECT_T;
@@ -10,6 +10,10 @@ CREATE FUNCTION {{CONTEXT}}(p_context CLOB)
   item_obj JSON_OBJECT_T;
   value_element JSON_ELEMENT_T;
   question CLOB;
+  original_question CLOB;
+  repair_start PLS_INTEGER;
+  error_start PLS_INTEGER;
+  correction_start PLS_INTEGER;
   evidence CLOB;
   definition_text CLOB;
   criteria_text CLOB;
@@ -27,6 +31,16 @@ BEGIN
       RAISE invalid_input;
     END IF;
     question := context_obj.get_clob('user_prompt');
+    -- A SQL validation repair appends generated SQL and Oracle errors. These are
+    -- not business search terms. Only recognize the complete ordered envelope.
+    repair_start := DBMS_LOB.INSTR(question,CHR(10)||CHR(10)||'The previous Oracle SQL generated was:'||CHR(10));
+    error_start := DBMS_LOB.INSTR(question,CHR(10)||CHR(10)||'It failed with the following error:'||CHR(10));
+    correction_start := DBMS_LOB.INSTR(question,'Correct the SQL to address the error and respond with a valid Oracle SQL statement only.');
+    IF repair_start>1 AND error_start>repair_start AND correction_start>error_start THEN
+      DBMS_LOB.CREATETEMPORARY(original_question,TRUE);
+      DBMS_LOB.COPY(original_question,question,repair_start-1,1,1);
+      question := original_question;
+    END IF;
     IF question IS NULL OR DBMS_LOB.GETLENGTH(question)>8000
       OR TRIM(DBMS_LOB.SUBSTR(question,8000,1)) IS NULL THEN
       RAISE invalid_input;

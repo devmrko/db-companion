@@ -1,0 +1,14 @@
+{
+  "adminHelp.sqlCacheTitle": [
+    "공유 SQL 캐시 조회",
+    "Shared SQL cache access",
+    "共享SQL缓存查询",
+    "共有SQLキャッシュの参照"
+  ],
+  "adminHelp.sqlCacheSteps": [
+    "SQL 이력의 공유 캐시 조회에는 SYS.V_$SQL SELECT 권한이 필요합니다. ADMIN은 계정 설정에서 대상 계정을 확인하고 공유 SQL 캐시 조회를 선택하여 SQL 미리보기 후 적용하세요. 다른 사용자의 SQL이 포함될 수 있으므로 필요한 계정에만 부여하세요. 캐시는 영구 이력이 아니며 AWR·감사 이력 권한은 포함하지 않습니다. 적용 후 재로그인하고 조회 가능 출처를 다시 확인하세요.",
+    "SQL history's shared cache requires SELECT on SYS.V_$SQL. In account setup, ADMIN verifies the target account, selects shared SQL cache access, previews the SQL and applies it. Grant only to accounts that need it: other users' SQL may be visible. The cache is not permanent history and this grant does not cover AWR or audit history. Sign in again and refresh available sources.",
+    "SQL历史的共享缓存查询需要SYS.V_$SQL的SELECT权限。ADMIN在账户设置中确认目标账户，选择共享SQL缓存查询，预览SQL后应用。可能包含其他用户的SQL，请仅向必要账户授权。缓存不是永久历史，本授权不含AWR或审计历史。重新登录并刷新可用来源。",
+    "SQL履歴の共有キャッシュにはSYS.V_$SQLへのSELECT権限が必要です。ADMINはアカウント設定で対象を確認し、共有SQLキャッシュを選び、SQLをプレビューして適用します。他ユーザーのSQLが含まれる場合があるため必要なアカウントだけに付与してください。キャッシュは永続履歴ではなく、AWR・監査履歴の権限は含みません。再ログインして参照可能なソースを確認してください。"
+  ]
+}

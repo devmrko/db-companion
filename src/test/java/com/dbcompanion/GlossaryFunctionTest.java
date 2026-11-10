@@ -102,6 +102,9 @@ class GlossaryFunctionTest {
         }
     }
     @Test void exactLegacyAndPartialModulesHaveAnExplicitMigrationPathButConflictsDoNot(){
+        assertThat(GlossaryFunctionRepository.moduleState(List.of("READY","READY","READY","LEGACY"))).isEqualTo("LEGACY");
+        assertThat(GlossaryFunctionSql.legacyContext("APP")).contains("callback v1").doesNotContain("repair_start");
+        assertThat(GlossaryFunctionSql.statements("APP").get(3)).contains("error_start>repair_start AND correction_start>error_start","DBMS_LOB.GETLENGTH(question)>8000");
         assertThat(GlossaryFunctionRepository.moduleState(List.of("READY","READY","READY","MISSING"))).isEqualTo("INCOMPLETE");
         assertThat(GlossaryFunctionRepository.moduleState(List.of("READY","READY","READY","CONFLICT"))).isEqualTo("CONFLICT");
         assertThat(GlossaryFunctionRepository.moduleState(List.of("MISSING","MISSING","MISSING"))).isEqualTo("MISSING");

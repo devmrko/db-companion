@@ -2,7 +2,12 @@
 
 ## Unreleased
 
-No additional changes recorded.
+- Keep glossary lookup focused on the original question when Select AI appends
+  a SQL repair prompt. Preserve existing question and search-token limits.
+- Recognize the exact shipped v1 callback for an explicit, fingerprint-checked
+  upgrade; leave modified callbacks protected from replacement.
+- Add an ADMIN-reviewed SYS.V_$SQL SELECT grant and multilingual guidance for
+  shared SQL cache history. This does not grant AWR or audit history access.
 
 ## 0.1.0-alpha.19
 
