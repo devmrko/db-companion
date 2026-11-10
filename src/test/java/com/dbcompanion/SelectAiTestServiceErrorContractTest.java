@@ -109,6 +109,16 @@ class SelectAiTestServiceErrorContractTest {
             assertThat(progress.steps().getLast().stage()).isEqualTo(SelectAiProgress.Stage.AI);
         }
     }
+    @Test void glossaryTokenFailureExplainsLookupLimitWithoutRetry() {
+        failure=new DataAccessResourceFailureException("private",new SQLException("ORA-20000: Semantic source callback failed\nORA-20061: Token limit exceeded","42000",20000));
+        try(var session=session()){
+            var prepared=service.preview(session,Action.SQL,"question",false,null,java.util.Locale.KOREAN);
+            var result=service.run(session,prepared.preview().token(),true);
+            assertThat(result.error()).startsWith("업무 용어 검색의 토큰 한도를 초과했습니다.")
+                .contains("max_tokens","별개","ORA-20061").doesNotContain("private");
+            assertThat(generationCalls).isEqualTo(1);
+        }
+    }
     @Test void reviewFailureKeepsShortCodeAndSafeExplainedError() {
         try (var session = session()) {
             session.metadata().aiTest().finish(new SelectAiTest.Outcome("prompt", Action.PROMPT, profile, "question", Instant.now(), 1, "prompt", null, null, "complete"));

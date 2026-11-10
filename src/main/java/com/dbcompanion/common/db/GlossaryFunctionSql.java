@@ -23,6 +23,14 @@ public final class GlossaryFunctionSql {
                 .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT)));
     }
     public static String script(String owner){return String.join("\n/\n\n",statements(owner))+"\n/\n";}
+    public static String legacyContext(String owner){
+        return CallableAiSql.resource("glossary-context-v1.sql").replace("{{API}}",ProfileHistorySql.object(owner,API))
+            .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT));
+    }
+    public static String legacyContextV2(String owner){
+        return CallableAiSql.resource("glossary-context-v2.sql").replace("{{API}}",ProfileHistorySql.object(owner,API))
+            .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT));
+    }
     /** Exact v1 fingerprint recognition only; never displayed as the new source. */
     public static String legacyCreate(String owner){
         return """

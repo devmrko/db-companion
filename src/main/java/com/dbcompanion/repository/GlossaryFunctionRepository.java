@@ -45,6 +45,8 @@ public class GlossaryFunctionRepository {
                 if(objects.stream().noneMatch(o->o.startsWith(type+":")))state="MISSING";
                 else if(normalize(actual).equals(normalize(expected)))state=objects.contains(type+":VALID")?"READY":"INVALID";
                 else if(i==2&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyCreate(owner)))))state="LEGACY";
+                else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContext(owner)))))state="LEGACY";
+                else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContextV2(owner)))))state="LEGACY";
             }
             states.add(state);
             snapshots.add(name+":"+type+":"+objects+":"+actual);
@@ -68,7 +70,7 @@ public class GlossaryFunctionRepository {
         if(states.contains("INVALID"))return "INVALID";
         if(states.stream().allMatch(s->s.equals("READY")))return "READY";
         if(states.stream().allMatch(s->s.equals("MISSING")))return "MISSING";
-        return states.get(2).equals("LEGACY")?"LEGACY":"INCOMPLETE";
+        return states.contains("LEGACY")?"LEGACY":"INCOMPLETE";
     }
     public static String storedSource(String owner,String name,String sql){
         return sql.replaceFirst("^CREATE (?:OR REPLACE )?","")
