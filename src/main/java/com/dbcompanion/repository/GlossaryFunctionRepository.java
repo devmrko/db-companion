@@ -46,6 +46,7 @@ public class GlossaryFunctionRepository {
                 else if(normalize(actual).equals(normalize(expected)))state=objects.contains(type+":VALID")?"READY":"INVALID";
                 else if(i==2&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyCreate(owner)))))state="LEGACY";
                 else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContext(owner)))))state="LEGACY";
+                else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContextV2(owner)))))state="LEGACY";
             }
             states.add(state);
             snapshots.add(name+":"+type+":"+objects+":"+actual);

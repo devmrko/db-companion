@@ -395,6 +395,9 @@ public class SelectAiTestService {
     /** Keep the persistence-facing code contract short; diagnostics stay in the user-visible error body. */
     private static String code(Throwable error){return CredentialCatalogRepository.error(error);}
     private static String error(String message,String stage,Throwable failure){
+        String original=OracleErrorDetails.forDisplay(failure);
+        if(original.contains("ORA-20061")&&original.contains("Token limit exceeded"))
+            message="업무 용어 검색의 토큰 한도를 초과했습니다. 모델의 출력 토큰(max_tokens) 한도와는 별개입니다. 첨부된 정의·SQL까지 검색 입력에 포함되는지 업무 용어 콜백을 확인해 주세요. 자동 재시도하지 않았습니다.";
         String detail=AiErrorExplanation.explain(stage,failure).display();
         return detail.isBlank()?message:message+"\n"+detail;
     }

@@ -1,6 +1,6 @@
 CREATE FUNCTION {{CONTEXT}}(p_context CLOB)
   RETURN CLOB AUTHID CURRENT_USER AS
-  -- DB Companion semantic glossary callback v2. Normalize Oracle repair envelopes.
+  -- DB Companion semantic glossary callback v3. Search the original question, not attached evidence.
   context_obj JSON_OBJECT_T;
   response_obj JSON_OBJECT_T;
   glossary_obj JSON_OBJECT_T;
@@ -14,6 +14,10 @@ CREATE FUNCTION {{CONTEXT}}(p_context CLOB)
   repair_start PLS_INTEGER;
   error_start PLS_INTEGER;
   correction_start PLS_INTEGER;
+  dictionary_start PLS_INTEGER;
+  dictionary_end PLS_INTEGER;
+  dictionary_json CLOB;
+  dictionary_obj JSON_OBJECT_T;
   evidence CLOB;
   definition_text CLOB;
   criteria_text CLOB;
@@ -40,6 +44,23 @@ BEGIN
       DBMS_LOB.CREATETEMPORARY(original_question,TRUE);
       DBMS_LOB.COPY(original_question,question,repair_start-1,1,1);
       question := original_question;
+    END IF;
+    -- Companion appends a complete terminal JSON evidence envelope. Its terms
+    -- and SQL criteria belong to the LLM context, not the tokenized lookup.
+    dictionary_start := DBMS_LOB.INSTR(question,CHR(10)||'BEGIN BUSINESS DICTIONARY JSON'||CHR(10));
+    dictionary_end := DBMS_LOB.INSTR(question,CHR(10)||'END BUSINESS DICTIONARY JSON');
+    IF dictionary_start>0 AND dictionary_end>dictionary_start
+      AND dictionary_end+LENGTH(CHR(10)||'END BUSINESS DICTIONARY JSON')-1=DBMS_LOB.GETLENGTH(question)
+      AND DBMS_LOB.GETLENGTH(question)<=64000
+      AND DBMS_LOB.INSTR(question,CHR(10)||'BUSINESS DICTIONARY EVIDENCE: ')>0 THEN
+      dictionary_start := dictionary_start+LENGTH(CHR(10)||'BEGIN BUSINESS DICTIONARY JSON'||CHR(10));
+      DBMS_LOB.CREATETEMPORARY(dictionary_json,TRUE);
+      DBMS_LOB.COPY(dictionary_json,question,dictionary_end-dictionary_start,1,dictionary_start);
+      dictionary_obj := JSON_OBJECT_T.parse(dictionary_json);
+      dictionary_obj.on_error(1);
+      value_element := dictionary_obj.get('originalQuestion');
+      IF value_element IS NULL OR NOT value_element.is_string() THEN RAISE invalid_input; END IF;
+      question := dictionary_obj.get_clob('originalQuestion');
     END IF;
     IF question IS NULL OR DBMS_LOB.GETLENGTH(question)>8000
       OR TRIM(DBMS_LOB.SUBSTR(question,8000,1)) IS NULL THEN
