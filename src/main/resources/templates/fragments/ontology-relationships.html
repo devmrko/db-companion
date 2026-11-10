@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"><body>
 <section th:fragment="relationships" id="ontology-relationships" class="app-card app-relationships" data-on-relationships hidden tabindex="-1" aria-labelledby="ontology-relationships-title">
+  <link rel="stylesheet" th:href="@{/vendor/ontology-flow/ontology-flow.css}">
   <div class="app-dds-toolbar">
     <h2 id="ontology-relationships-title" th:text="#{ontology.relationships.title}"></h2>
     <button type="button" class="btn app-btn app-btn-secondary" data-rel-manual th:text="#{ontology.relationships.manual}"></button>
@@ -19,9 +20,14 @@
   <p data-rel-message role="status" aria-live="polite" class="app-filter-message"></p>
   <p data-rel-coverage class="app-filter-message"></p>
   <details class="app-relationship-isolated"><summary data-rel-isolated-title></summary><p data-rel-isolated></p></details>
-  <div class="app-erd-workspace">
-    <div><div class="app-erd-canvas" data-rel-canvas role="img" th:aria-label="#{ontology.relationships.canvas}"></div></div>
-    <aside class="app-erd-inspector" data-rel-detail></aside>
+  <div class="app-flow-options">
+    <label><input type="checkbox" data-rel-candidates><span th:text="#{ontology.flow.candidates}"></span></label>
+    <span class="app-flow-legend" th:text="#{ontology.flow.legend}"></span>
+    <button type="button" class="btn app-btn app-btn-quiet" data-rel-panel aria-expanded="false" aria-controls="ontology-relation-detail" th:text="#{ontology.flow.details}"></button>
+  </div>
+  <div class="app-erd-workspace is-collapsed" data-rel-workspace>
+    <div><div class="app-erd-canvas" data-rel-canvas role="group" th:aria-label="#{ontology.relationships.canvas}"></div></div>
+    <aside class="app-erd-inspector" data-rel-detail id="ontology-relation-detail"></aside>
   </div>
   <div class="app-dds-toolbar app-relationship-filters">
     <input type="search" class="form-control" data-rel-query th:placeholder="#{ontology.relationships.search}" th:aria-label="#{ontology.relationships.search}">

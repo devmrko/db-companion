@@ -40,32 +40,31 @@ export async function revealAnalysis({show,resetFilters,focus,announce,hasData})
 export function ontologyRelationships(root,{schema,base,post,run,saved,openDefinition,coverage=()=>({saved:0,total:0})}){
   const get=key=>root.querySelector(`[data-rel-${key}]`);
   let data=null,cy=null,epoch=0,page=1,dirty=false,active=null;
+  const panel=open=>{get('workspace').classList.toggle('is-collapsed',!open);get('panel').setAttribute('aria-expanded',String(open));};
   const status=(value,error=false)=>{get('message').textContent=value;get('message').className=error?'app-alert is-error':'app-filter-message';};
   const button=(text,fn)=>{const e=el('button',text,'btn app-btn app-btn-quiet');e.type='button';e.addEventListener('click',fn);return e;};
   const safeLeave=()=>!dirty||window.confirm(t('ontology.discard','Discard unsaved changes?'));
   function field(host,title,input){const row=el('label',undefined,'app-ontology-field');row.append(el('span',title),input);host.append(row);return input;}
   function input(value,max,area=false){const e=el(area?'textarea':'input',undefined,'form-control');e.value=value??'';e.maxLength=max;if(area)e.rows=2;e.addEventListener('input',()=>dirty=true);return e;}
   function selector(host,title,items,value,change){const e=el('select',undefined,'form-select app-select');e.setAttribute('aria-label',title);e.append(...items.map(v=>new Option(v.label??v.name,v.name)));e.value=value;e.addEventListener('change',()=>{dirty=true;change(e.value);});field(host,title,e);return e;}
-  function draw(){
+  async function draw(){
     cy?.destroy();cy=null;get('canvas').classList.add('app-graph-canvas');get('canvas').replaceChildren();if(!data.tables.length){status(label('empty'));return;}
-    if(typeof globalThis.cytoscape!=='function')throw new Error(t('ontology.erd.libraryError','Diagram library unavailable'));
-    const theme=getComputedStyle(root),color=(key,fallback)=>theme.getPropertyValue(key).trim()||fallback;
-    cy=globalThis.cytoscape({container:get('canvas'),elements:relationElements(data),minZoom:.08,maxZoom:2.5,userZoomingEnabled:false,
-      layout:{name:'grid'},style:[
-        {selector:'node',style:{shape:'roundrectangle',width:250,height:90,label:'data(label)','text-wrap':'wrap','text-max-width':225,'font-size':13,'text-valign':'center',color:color('--app-text','#302c28'),'background-color':color('--app-surface','#fff'),'border-width':1.5,'border-color':color('--app-border','#bbb')}},
-        {selector:'node.boundary',style:{'border-style':'dashed'}},
-        {selector:'edge',style:{width:1.5,'curve-style':'bezier','target-arrow-shape':'triangle',label:'','font-size':12,'text-background-opacity':.9,'text-background-color':color('--app-surface','#fff'),'text-wrap':'ellipsis','text-max-width':180,'line-color':color('--app-muted','#888'),'target-arrow-color':color('--app-muted','#888')}},
-        {selector:'edge:selected, edge:active',style:{label:'data(label)','z-index':10}},
-        {selector:'edge.candidate, edge.stale, edge.unchecked',style:{'line-style':'dashed','line-color':'#af752f','target-arrow-color':'#af752f'}},
-        {selector:'edge.approved',style:{width:2.5,'line-color':'#497867','target-arrow-color':'#497867'}},
-        {selector:':selected',style:{'border-width':3,'border-color':color('--app-accent','#845e4d'),'overlay-opacity':.12}}
-      ]});
-    cy.on('tap','edge',event=>{if(data&&safeLeave())inspect(data.relations.find(r=>r.id===event.target.id()));});
-    cy.on('tap','node',event=>{if(data&&safeLeave())inspectTable(event.target.id());});
-    cy.on('zoom',()=>get('zoom').textContent=Math.round(cy.zoom()*100)+'%');layout();
+    const version=epoch;
+    const {mountGraph}=await import('../vendor/ontology-flow/ontology-flow.js');
+    if(version!==epoch||!data)return;
+    const graph=mountGraph(get('canvas'),data,{
+      node:id=>{if(data&&safeLeave())inspectTable(id);},
+      edge:id=>{if(data&&safeLeave())inspect(data.relations.find(r=>r.id===id));},
+      zoom:value=>{get('zoom').textContent=Math.round(value*100)+'%';},
+      error:ex=>status(ex.message,true)
+    });
+    cy=graph;
+    await graph.ready;
+    if(version!==epoch)return;
+    get('candidates').checked=false;panel(false);
   }
-  function focus(){if(cy){cy.resize();cy.zoom(1);cy.center(cy.$(':selected').length?cy.$(':selected'):cy.nodes().sort((a,b)=>b.degree()-a.degree()).first());}}
-  function layout(){if(cy&&data){cy.resize();cy.layout({name:'grid',animate:false,padding:30,avoidOverlap:true,spacingFactor:1.4}).run();cy.fit(undefined,35);get('zoom').textContent=Math.round(cy.zoom()*100)+'%';}}
+  function focus(){cy?.focus();}
+  function layout(){cy?.layout().catch(ex=>status(ex.message,true));}
   function counts(){status(label('counts',data.tables.length,...['FK','CANDIDATE','APPROVED','REJECTED','STALE'].map(s=>data.relations.filter(r=>r.status===s).length)));
     const scope=coverage();get('coverage').textContent=t('ontology.discovery.coverage','Saved {0} / {1}',scope.saved,scope.total);
     const isolated=unconnectedTables(data,schema);
@@ -92,12 +91,12 @@ export function ontologyRelationships(root,{schema,base,post,run,saved,openDefin
     const pairs=el('ol',undefined,'app-erd-mapping');r.sourceColumns.forEach((name,i)=>{const pair=el('li');pair.append(el('p',columnInfo(data.tables.find(t=>t.name===r.source),name)),el('p','→ '+columnInfo(r.targetSchema===schema?data.tables.find(t=>t.name===r.target):null,r.targetColumns[i]??'—')));pairs.append(pair);});host.append(pairs);
   }
   function inspectTable(id){
-    dirty=false;active=null;const host=get('detail');host.replaceChildren();cy?.elements().unselect();cy?.getElementById(id).select();
+    dirty=false;active=null;panel(true);const host=get('detail');host.replaceChildren();cy?.select(id);
     const table=data.tables.find(t=>tableId(schema,t.name)===id);if(table){host.append(el('h3',table.concept||table.name),el('code',schema+'.'+table.name),el('p',table.description||'—'),button(label('definition'),()=>openDefinition(table.name)));}
     for(const r of data.relations.filter(r=>tableId(schema,r.source)===id||tableId(r.targetSchema,r.target)===id))host.append(button(`${label(r.status)} · ${r.source} → ${r.target}`,()=>inspect(r)));
   }
   function inspect(r){
-    if(!r)return;dirty=false;active=r;cy?.elements().unselect();cy?.getElementById(r.id).select();const host=get('detail');host.replaceChildren(el('h3',label(r.status)));
+    if(!r)return;dirty=false;active=r;panel(true);cy?.select(r.id);const host=get('detail');host.replaceChildren(el('h3',label(r.status)));
     context(host,r);host.append(el('h3',label('evidence')),el('p',r.evidence.filter(value=>!value.startsWith('SOURCE_DEFINITION:')&&!value.startsWith('TARGET_DEFINITION:')).map(value=>value.startsWith('AI_')?t('ontology.discovery.evidence.'+value.split(':')[0],value.split(':')[0])+(value.includes(':')?' · '+value.slice(value.indexOf(':')+1):''):label('evidence.'+value)).join(' · ')));
     if(r.review)host.append(el('p',`${r.review.actor} · ${r.review.reviewedAt}`),el('p',label('versions',r.review.sourceRevision,r.review.targetRevision)),el('p',label(r.review.status)));
     if(r.status==='STALE')host.append(el('p',label('stale'),'app-alert'));
@@ -121,7 +120,7 @@ export function ontologyRelationships(root,{schema,base,post,run,saved,openDefin
     });
   }
   function manual(){
-    if(!data?.tables.length||!safeLeave())return;dirty=false;active=null;const host=get('detail');host.replaceChildren(el('h3',label('manual')));
+    if(!data?.tables.length||!safeLeave())return;dirty=false;active=null;panel(true);const host=get('detail');host.replaceChildren(el('h3',label('manual')));
     const draft={id:'',source:data.tables[0].name,targetSchema:schema,target:data.tables[Math.min(1,data.tables.length-1)].name,sourceColumns:[],targetColumns:[]};
     const pairs=el('div',undefined,'app-relationship-pairs');
     const options=data.tables.map(t=>({name:t.name,label:t.name+(t.concept?' · '+t.concept:'')}));
@@ -141,13 +140,15 @@ export function ontologyRelationships(root,{schema,base,post,run,saved,openDefin
   function invalidate(){epoch++;data=null;active=null;dirty=false;cy?.destroy();cy=null;get('canvas').replaceChildren();get('rows').replaceChildren();get('detail').replaceChildren();get('zoom').textContent='—';get('page').textContent='';get('manual').disabled=true;get('result').hidden=true;get('result').textContent='';}
   async function show(){
     if(data){cy?.resize();return;}const version=epoch;status(label('loading'));
-    try{const result=await assistantApi(base+'/relationships?'+new URLSearchParams({schema}));if(version!==epoch)return;data=result;counts();draw();list();get('manual').disabled=!data.tables.length;get('detail').replaceChildren(el('p',label('choose')));}
+    try{const result=await assistantApi(base+'/relationships?'+new URLSearchParams({schema}));if(version!==epoch)return;data=result;counts();await draw();if(version!==epoch)return;list();get('manual').disabled=!data.tables.length;get('detail').replaceChildren(el('p',label('choose')));}
     catch(ex){if(version===epoch){invalidate();status(ex.message,true);}throw ex;}
   }
   get('query').addEventListener('input',()=>{if(data){page=1;list();}});get('state').addEventListener('change',()=>{if(data){page=1;list();}});
   get('prev').addEventListener('click',()=>{if(data){page--;list();}});get('next').addEventListener('click',()=>{if(data){page++;list();}});
-  get('manual').addEventListener('click',manual);get('fit').addEventListener('click',()=>cy?.fit(undefined,35));get('focus').addEventListener('click',focus);get('layout').addEventListener('click',layout);
-  const zoomBy=factor=>{if(cy)cy.zoom({level:cy.zoom()*factor,renderedPosition:{x:cy.width()/2,y:cy.height()/2}});};
+  get('manual').addEventListener('click',manual);get('fit').addEventListener('click',()=>cy?.fit());get('focus').addEventListener('click',focus);get('layout').addEventListener('click',layout);
+  get('panel').addEventListener('click',()=>panel(get('workspace').classList.contains('is-collapsed')));
+  get('candidates').addEventListener('change',()=>cy?.candidates(get('candidates').checked).catch(ex=>status(ex.message,true)));
+  const zoomBy=factor=>cy?.zoomBy(factor);
   get('in').addEventListener('click',()=>zoomBy(1.2));get('out').addEventListener('click',()=>zoomBy(1/1.2));
   new ResizeObserver(()=>{if(!root.hidden)cy?.resize();}).observe(get('canvas'));
   async function all(){

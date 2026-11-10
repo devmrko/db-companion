@@ -1,0 +1,5 @@
+{
+  "ontology.flow.candidates": ["후보·미검증 관계 표시", "Show candidate and unverified relations", "显示候选和未验证关系", "候補・未検証の関係を表示"],
+  "ontology.flow.legend": ["실선: 확인된 관계 · 점선: 검토 필요", "Solid: confirmed · Dashed: review needed", "实线：已确认 · 虚线：待审核", "実線：確認済み · 破線：要確認"],
+  "ontology.flow.details": ["상세 패널", "Details panel", "详细面板", "詳細パネル"]
+}

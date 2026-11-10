@@ -67,5 +67,7 @@ test('action is separate from navigation and explicit results do not re-fetch or
   const action=code.slice(code.indexOf('async function all()'));
   assert.ok(action.includes('scrollIntoView'));assert.ok(action.includes('root.focus({preventScroll:true})'));assert.ok(action.includes('data.checkedAt'));
   assert.ok(!/fetch\(|post\(|invalidate\(|dirty=false|draw\(/.test(action));
-  assert.ok(code.includes('userZoomingEnabled:false'));assert.ok(code.includes("get('in').addEventListener"));assert.ok(code.includes("get('out').addEventListener"));
+  const flow=readFileSync('frontend/ontology-flow.jsx','utf8');
+  assert.ok(flow.includes('zoomOnScroll={true}'));assert.ok(flow.includes('zoomOnDoubleClick={true}'));
+  assert.ok(code.includes("get('in').addEventListener"));assert.ok(code.includes("get('out').addEventListener"));
 });

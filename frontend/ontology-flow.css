@@ -1,0 +1,19 @@
+.app-relationships .app-erd-canvas { background: #f8faf9; }
+.app-relationships .react-flow { --xy-node-border-radius: 10px; --xy-edge-stroke: #738a86; }
+.dbc-flow-card { width: 238px; height: 100%; background: #fff; border: 1px solid #d7dfda; border-radius: 10px; box-shadow: 0 3px 12px #18362a0a; color: #293e35; overflow: hidden; }
+.dbc-flow-card.is-boundary { border-style: dashed; }
+.react-flow__node.selected .dbc-flow-card { border-color: #397c69; box-shadow: 0 0 0 2px #397c6926; }
+.dbc-flow-card-heading { display: flex; gap: 10px; padding: 14px; min-height: 72px; align-items: center; border-bottom: 1px solid #edf1ee; }
+.dbc-flow-symbol { color: #568674; background: #edf5f0; border-radius: 6px; padding: 4px 8px; }
+.dbc-flow-card-heading > div { min-width: 0; }
+.dbc-flow-card strong,.dbc-flow-card small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dbc-flow-card strong { font-size: 14px; font-weight: 600; }
+.dbc-flow-card small { color: #7d8982; font-size: 10px; margin-top: 4px; }
+.dbc-flow-column { padding: 2px 14px; font: 11px/18px ui-monospace,monospace; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.app-relationships .react-flow__handle { width: 6px; height: 6px; background: #8ba99c; border: 2px solid #fff; }
+.app-relationships .app-erd-workspace.is-collapsed { grid-template-columns: minmax(0,1fr); }
+.app-relationships .app-erd-workspace.is-collapsed .app-erd-inspector { display: none; }
+.app-relationships .app-erd-workspace > div { min-width: 0; }
+.app-flow-options { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 8px 0 12px; font-size: 13px; }
+.app-flow-options label { display: inline-flex; align-items: center; gap: 6px; }
+.app-flow-legend { color: var(--app-muted); }

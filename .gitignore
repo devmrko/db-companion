@@ -18,4 +18,5 @@ Wallet*/
 *.keystore
 credentials.json
 secrets/
+node_modules/
 *.zip
