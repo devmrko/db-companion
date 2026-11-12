@@ -12,8 +12,27 @@ import org.springframework.stereotype.Repository;
 public class AgentEngineRepository {
     private final JdbcTemplate jdbc;
     public AgentEngineRepository(JdbcTemplate jdbc) { this.jdbc = jdbc; }
+    public record ToolArgument(String name, String type, String direction) {}
+    public record ToolChoice(String owner, String packageName, String name, java.util.List<ToolArgument> arguments) {}
+    public java.util.List<ToolChoice> tools() {
+        var rows = jdbc.queryForList("SELECT USER OWNER,PACKAGE_NAME,OBJECT_NAME,ARGUMENT_NAME,DATA_TYPE,IN_OUT,POSITION,SUBPROGRAM_ID,OVERLOAD FROM USER_ARGUMENTS WHERE DATA_LEVEL=0 ORDER BY PACKAGE_NAME,OBJECT_NAME,SUBPROGRAM_ID,POSITION");
+        var groups = new java.util.LinkedHashMap<String,java.util.List<java.util.Map<String,Object>>>();
+        for (var row : rows) groups.computeIfAbsent(row.get("PACKAGE_NAME")+":"+row.get("OBJECT_NAME"), k -> new java.util.ArrayList<>()).add(row);
+        var result = new java.util.ArrayList<ToolChoice>();
+        var types = java.util.Map.of("VARCHAR2","string","CHAR","string","CLOB","string","NUMBER","number","BINARY_INTEGER","integer","PLS_INTEGER","integer","BOOLEAN","boolean");
+        for (var group : groups.values()) {
+            if (group.stream().anyMatch(r -> r.get("OVERLOAD") != null || ((Number)r.get("POSITION")).intValue()==0 || !types.containsKey(String.valueOf(r.get("DATA_TYPE"))))) continue;
+            var first = group.getFirst();
+            var args = group.stream().map(r -> new ToolArgument((String)r.get("ARGUMENT_NAME"),types.get(String.valueOf(r.get("DATA_TYPE"))),(String)r.get("IN_OUT"))).toList();
+            result.add(new ToolChoice((String)first.get("OWNER"),(String)first.get("PACKAGE_NAME"),(String)first.get("OBJECT_NAME"),args));
+        }
+        return java.util.List.copyOf(result);
+    }
     public boolean supported() {
         return signature("EXECUTE_IMMEDIATE", java.util.List.of("0:null:CLOB:OUT", "1:AGENT_SPEC:CLOB:IN", "2:INPUTS:CLOB:IN", "3:TRACES:CLOB:OUT"));
+    }
+    public String databaseIdentity() {
+        return jdbc.queryForObject("SELECT SYS_CONTEXT('USERENV','DB_UNIQUE_NAME') || ':' || SYS_CONTEXT('USERENV','CON_NAME') FROM SYS.DUAL", String.class);
     }
     public boolean catalogSupported() {
         return signature("LIST_AGENTS", java.util.List.of("1:AGENTS:CLOB:OUT"))

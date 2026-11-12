@@ -30,6 +30,8 @@ export function mountEngine(root) {
   const get=n=>root.querySelector(`[data-engine-${n}]`);
   const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
   let spec=null, loaded='', supported=false, busy=false, stored=null, catalogSupported=false, storedSupported=false;
+  let editorSpec=null;
+  function editorSource(value){editorSpec=value;get('editor').dispatchEvent(new CustomEvent('engine-source',{detail:value}));}
   const message=text=>{get('message').textContent=text;};
   const controls=()=>{get('run').disabled=busy||!(stored?storedSupported:supported)||!spec||(!stored&&loaded!==get('spec').value);get('file').disabled=busy;get('load').disabled=busy;get('spec').disabled=busy;get('agents').disabled=busy||!catalogSupported;get('refresh').disabled=busy||!catalogSupported;};
   async function api(path,options={}) {
@@ -38,6 +40,7 @@ export function mountEngine(root) {
     if(!response.headers.get('content-type')?.includes('application/json'))throw new Error('서버 응답을 확인하지 못했습니다.');
     const data=await response.json();if(!response.ok)throw new Error(data.error||'처리 실패');return data;
   }
+import('../vendor/ontology-flow/engine-workbench.js').then(({mountWorkbench})=>mountWorkbench(get('editor'),{read:()=>editorSpec,subscribe:handler=>{const listener=e=>handler(e.detail);get('editor').addEventListener('engine-source',listener);return ()=>get('editor').removeEventListener('engine-source',listener);},apply:value=>{get('spec').value=JSON.stringify(value,null,2);load();},busy:()=>busy,tools:()=>api('/tools?'+new URLSearchParams({schema:root.dataset.schema}))})).catch(e=>{get('editor').textContent='편집기를 불러오지 못했습니다: '+e.message;});
   function load() {
     spec=null;stored=null;get('agents').value='';get('detail-panel').hidden=true;get('confirm').checked=false;get('results').hidden=true;
     get('inputs').replaceChildren();get('preview').replaceChildren();
@@ -66,6 +69,7 @@ export function mountEngine(root) {
       connections.append(edges);get('preview').append(connections);
       renderInputs(spec.inputs);
       renderOutputs(spec.outputs||[]);
+      editorSource(spec);
       message('정의를 읽었습니다. 입력값과 호출 도구를 확인하세요.');
     }catch(error){spec=null;get('diagram').replaceChildren();message(error.message);}controls();
   }
@@ -87,6 +91,7 @@ export function mountEngine(root) {
     get('preview').append(el('h3','출력 규격'),list);
   }
   function clearSelection() {
+    editorSource(null);
     spec=null;stored=null;loaded='';get('spec').value='';get('confirm').checked=false;
     get('results').hidden=true;get('detail-panel').hidden=true;get('inputs').replaceChildren();get('preview').replaceChildren();get('diagram').replaceChildren();
   }
@@ -109,15 +114,34 @@ export function mountEngine(root) {
       renderFlow(get('diagram'),storedGraph(detail));
       get('detail').textContent=JSON.stringify(detail,null,2);get('detail-panel').hidden=false;
       get('preview').append(el('h3',detail.name),el('p',`생성일: ${detail.create_time||'미제공'}`,'app-muted'),el('p',detail.description||'등록된 설명이 없습니다.'));
-      get('preview').append(el('p','DB 상세 API는 입출력 규격만 제공합니다. 전체 워크플로우·도구 정의는 원본 AgentSpec 파일을 불러와 확인하세요.','app-config-notice'));
       renderOutputs(detail.outputs||[]);
       // Validate supported input types without presenting a fabricated stored Flow definition.
       parseFlow(JSON.stringify({component_type:'Flow',agentspec_version:'input-contract',inputs:detail.inputs}));
       stored=detail;spec={inputs:detail.inputs};renderInputs(detail.inputs);
       message(`${detail.name} 조회 완료 · DB에 등록된 이름으로 실행합니다.`);
+      try {
+        const original=await api('/definition?'+new URLSearchParams({schema:root.dataset.schema,name}));
+        editorSource(parseFlow(JSON.stringify(original.spec)));
+        renderFlow(get('diagram'),flowGraph(original.spec));
+        message(`${detail.name} · 보관된 등록 원본을 캔버스에 로드했습니다. DB 등록 정보 일치 확인. 편집은 실행에 적용하기 전까지 초안입니다.`);
+      }catch(error){message(`${detail.name} · ${error.message}`);}
     }catch(error){stored=null;spec=null;message(error.message);}finally{busy=false;controls();}
   });
   get('load').addEventListener('click',load);
+  get('original').addEventListener('change',async event=>{
+    const file=event.target.files?.[0],name=get('agents').value;
+    if(!file)return;
+    try{
+      if(!name||busy)throw Error('먼저 등록된 Agent를 선택하세요.');
+      if(file.size>2000000)throw Error('원본 파일은 2MB 이하만 지원합니다.');
+      const text=await file.text();parseFlow(text);
+      busy=true;controls();
+      await api('/definition',{method:'POST',headers:{'Content-Type':'application/json',[get('csrf').dataset.header]:get('csrf').value},body:JSON.stringify({schema:root.dataset.schema,name,spec:text,confirmed:true})});
+      const original=await api('/definition?'+new URLSearchParams({schema:root.dataset.schema,name}));
+      editorSource(original.spec);renderFlow(get('diagram'),flowGraph(original.spec));
+      message(`${name} · 등록 원본을 보관하고 캔버스에 로드했습니다. DB 정의는 변경하지 않았습니다.`);
+    }catch(error){message(error.message);}finally{busy=false;controls();event.target.value='';}
+  });
   get('spec').addEventListener('input',()=>{get('diagram').replaceChildren();if(stored){stored=null;spec=null;get('agents').value='';get('inputs').replaceChildren();get('preview').replaceChildren();get('detail-panel').hidden=true;}get('confirm').checked=false;controls();});
   get('file').addEventListener('change',async()=>{try{const file=get('file').files[0];if(!file)return;if(file.size>2000000)throw new Error('파일 크기를 확인하세요.');get('spec').value=await file.text();load();}catch(error){message(error.message);}});
   get('inputs').addEventListener('input',()=>{get('confirm').checked=false;});

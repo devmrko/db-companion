@@ -25,6 +25,9 @@ public class AgentEngineService {
     public boolean supported(PoolSession session, String schema) {
         return bound(session, schema, repository::supported);
     }
+    public java.util.List<AgentEngineRepository.ToolChoice> tools(PoolSession session, String schema) {
+        return bound(session, schema, repository::tools);
+    }
     public java.util.Map<String, Boolean> capability(PoolSession session, String schema) {
         return bound(session, schema, () -> java.util.Map.of("supported", repository.supported(),
                 "catalog", repository.catalogSupported(), "stored", repository.storedSupported()));
@@ -45,6 +48,39 @@ public class AgentEngineService {
     }
     private void requireCatalog() {
         if (!repository.catalogSupported()) throw AgentEngine.error(409, "등록 목록·상세 조회 API 지원을 확인하지 못했습니다.");
+    }
+    @org.springframework.beans.factory.annotation.Value("${app.agent-engine.originals-directory:.run/agent-originals}")
+    private String originalsDirectory = ".run/agent-originals";
+    public tools.jackson.databind.JsonNode definition(PoolSession session, String schema, String name) {
+        AgentEngine.name(name);
+        return bound(session, schema, () -> {
+            requireCatalog();
+            var contract = AgentEngine.description(repository.describe(name));
+            final tools.jackson.databind.JsonNode saved;
+            try { saved = com.dbcompanion.common.AgentDefinitionStore.read(originalsDirectory, repository.databaseIdentity(), schema, name); }
+            catch (Exception ex) { throw AgentEngine.error(503, "보관된 등록 원본을 읽지 못했습니다."); }
+            if (saved == null) throw AgentEngine.error(404, "이 Agent에 연결된 등록 원본이 없습니다. 원본 JSON을 연결하세요.");
+            if (!contract.equals(saved.path("contract"))) throw AgentEngine.error(409, "DB 등록 정보가 보관 당시와 달라 원본을 자동 로드하지 않았습니다. 원본 연결을 다시 확인하세요.");
+            return saved;
+        });
+    }
+    public record OriginalInput(String schema, String name, String spec, boolean confirmed) {}
+    public Object saveOriginal(PoolSession session, OriginalInput input) {
+        if (input == null || !input.confirmed()) throw AgentEngine.error(400, "등록 원본 연결을 확인하세요.");
+        AgentEngine.name(input.name());
+        if (input.spec() == null || input.spec().length() > 500_000) throw AgentEngine.error(400, "원본 크기를 확인하세요.");
+        var spec = new tools.jackson.databind.json.JsonMapper().readTree(input.spec());
+        if (spec == null || !"Flow".equals(spec.path("component_type").asText()) || !spec.path("nodes").isArray())
+            throw AgentEngine.error(400, "노드 정의가 포함된 Flow 원본이 필요합니다.");
+        return bound(session, input.schema(), () -> {
+            requireCatalog();
+            var contract = AgentEngine.description(repository.describe(input.name()));
+            if (!contract.path("inputs").equals(spec.path("inputs")) || !contract.path("outputs").equals(spec.path("outputs")))
+                throw AgentEngine.error(409, "원본의 입출력이 DB 등록 Agent와 다릅니다.");
+            try { com.dbcompanion.common.AgentDefinitionStore.save(originalsDirectory, repository.databaseIdentity(), input.schema(), input.name(), contract, spec); }
+            catch (Exception ex) { throw AgentEngine.error(503, "등록 원본을 보관하지 못했습니다."); }
+            return java.util.Map.of("saved", true, "source", "application-archive");
+        });
     }
     public AgentEngine.Result runStored(PoolSession session, AgentEngine.StoredRun input) {
         if (input == null || !input.confirmed()) throw AgentEngine.error(400, "등록된 Agent의 실행 범위를 확인하고 동의하세요.");

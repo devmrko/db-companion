@@ -4,8 +4,8 @@ import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const out = path.resolve(here, '../src/main/resources/static/vendor/ontology-flow');
-const result = await build({absWorkingDir: here, entryPoints: ['ontology-flow.jsx'], bundle: true,
-  outfile: path.join(out, 'ontology-flow.js'), format: 'esm', target: 'es2022', minify: true,
+const result = await build({absWorkingDir: here, entryPoints: ['ontology-flow.jsx','engine-workbench.jsx'], bundle: true,
+  outdir: out, format: 'esm', target: 'es2022', minify: true,
   define: {'process.env.NODE_ENV': '"production"'}, legalComments: 'eof', write: false, metafile: true});
 const modules = new Set();
 for (const input of Object.keys(result.metafile.inputs)) {

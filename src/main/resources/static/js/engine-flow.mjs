@@ -50,7 +50,7 @@ export function layoutFlow(graph) {
   const nodes=graph.nodes.map(node=>{const rank=ranks.get(node.id),row=counts.get(rank)||0;counts.set(rank,row+1);return {...node,x:24+rank*328,y:24+row*(height+48),width:260,height};});
   return {nodes,edges,width:Math.max(300,...nodes.map(n=>n.x+n.width+24)),height:Math.max(200,...nodes.map(n=>n.y+n.height+30))};
 }
-export function renderFlow(host,graph) {
+export function renderFlow(host,graph,onSelect) {
   host.replaceChildren();if(!graph.nodes.length){host.textContent='표시할 처리 단계가 없습니다.';return;}
   const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
   host.append(el('p',graph.source,'app-muted'));
@@ -70,6 +70,7 @@ export function renderFlow(host,graph) {
     const card=el('section',undefined,'app-engine-flow-node');card.style.left=node.x+'px';card.style.top=node.y+'px';card.style.width=node.width+'px';card.style.height=node.height+'px';
     card.append(el('span',node.type,'app-badge'),el('h3',node.title));
     const list=el('ul');for(const row of node.rows)list.append(el('li',row));card.append(list);canvas.append(card);
+    if(onSelect){const edit=el('button','노드 편집','btn app-btn');edit.type='button';edit.addEventListener('click',()=>onSelect(node.id));card.append(edit);}
   }
   viewport.append(canvas);host.append(viewport);
 }

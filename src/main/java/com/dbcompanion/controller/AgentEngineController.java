@@ -41,6 +41,10 @@ public class AgentEngineController {
     public ResponseEntity<?> agents(@RequestParam String schema, HttpServletRequest request) {
         return invoke(request, s -> service.list(s, schema));
     }
+    @GetMapping("/tools") @ResponseBody
+    public ResponseEntity<?> tools(@RequestParam String schema, HttpServletRequest request) {
+        return invoke(request, s -> service.tools(s, schema));
+    }
     @GetMapping("/agent") @ResponseBody
     public ResponseEntity<?> agent(@RequestParam String schema, @RequestParam String name, HttpServletRequest request) {
         return invoke(request, s -> service.describe(s, schema, name));
@@ -48,6 +52,14 @@ public class AgentEngineController {
     @PostMapping("/run-stored") @ResponseBody
     public ResponseEntity<?> runStored(@RequestBody AgentEngine.StoredRun input, HttpServletRequest request) {
         return invoke(request, s -> service.runStored(s, input));
+    }
+    @GetMapping("/definition") @ResponseBody
+    public ResponseEntity<?> definition(@RequestParam String schema, @RequestParam String name, HttpServletRequest request) {
+        return invoke(request, s -> service.definition(s, schema, name));
+    }
+    @PostMapping("/definition") @ResponseBody
+    public ResponseEntity<?> saveDefinition(@RequestBody AgentEngineService.OriginalInput input, HttpServletRequest request) {
+        return invoke(request, s -> service.saveOriginal(s, input));
     }
     @PostMapping("/run") @ResponseBody
     public ResponseEntity<?> run(@RequestBody AgentEngine.Run input, HttpServletRequest request) {
