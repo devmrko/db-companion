@@ -6,10 +6,10 @@
     "DDS の作成・変更"
   ],
   "ddsManage.scope": [
-    "Role 값·OCI 그룹 매핑·Data Grant 조건과 대상 Role을 관리합니다. Python·Java 접속, OCI Domain 인증 및 그룹 멤버 관리는 외부에서 수행합니다.",
-    "Manage role values, OCI group mappings and data grant conditions/roles. Python/Java connections, OCI Domain authentication and group membership are managed externally.",
-    "管理角色属性、OCI 组映射及数据授权条件和角色。Python/Java 连接、OCI Domain 认证和组成员管理在外部进行。",
-    "ロール値・OCI グループ連携・Data Grant 条件とロールを管理します。接続・OCI Domain 認証・グループメンバー管理は外部で行います。"
+    "Role 값·OCI 그룹 매핑·Data Grant 조건과 대상 Role을 관리합니다. 로컬 최종 사용자와 직접 접속 시험은 아래에서 관리합니다. IAM 인증·그룹 멤버 관리는 외부에서 수행합니다.",
+    "Manage role values, OCI group mappings and data grant conditions/roles. Manage local end users and direct-logon checks below. IAM authentication and group membership are managed externally.",
+    "管理角色属性、OCI 组映射及数据授权条件和角色。在下方管理本地最终用户及直接登录测试。IAM 认证和组成员管理在外部进行。",
+    "ロール値・OCI グループ連携・Data Grant 条件とロールを管理します。ローカルエンドユーザーと直接接続テストは下で管理します。IAM 認証とグループ所属は外部で管理します。"
   ],
   "ddsManage.adminHelp": [
     "ADMIN 조치: 계정 생성·권한 설정 → DDS → 대상 계정 → 권한 미리보기 → 선택 권한 추가. CREATE DATA GRANT와 SYS.DBA_DATA_ROLES 조회 권한을 부여합니다. 로컬 역할은 CREATE DATA ROLE 권한이 있는 ADMIN이 이 화면에서 생성합니다. 뷰·SQL 미지원은 권한 추가로 해결되지 않습니다. ADMIN이 계정 생성·권한 설정 → DDS · 자기 스키마 Data Grant 관리 → 선택 권한 추가를 실행해야 합니다. 필요한 권한: ADMINISTER ANY DATA GRANT ON SCHEMA (로그인 계정). 다른 스키마 권한은 필요하지 않습니다.",

@@ -37,7 +37,7 @@ public final class DdsManagement {
         if(d.kind().equals("ROLE")){
             require(r.keySet().equals(Set.of("DATA_ROLE","MAPPED_TO","ENABLED_BY_DEFAULT")),"unsupported");
             String mapped=Objects.toString(r.get("MAPPED_TO"),"");
-            if(blank(mapped))require(Set.of("TRUE","FALSE","1","0").contains(Objects.toString(r.get("ENABLED_BY_DEFAULT"),"").toUpperCase(Locale.ROOT)),"unsupported");else mapping(mapped);
+            if(blank(mapped))require(Set.of("TRUE","FALSE","1","0").contains(Objects.toString(r.get("ENABLED_BY_DEFAULT"),"").toUpperCase(Locale.ROOT)),"unsupported");else mapped=mapping(mapped);
             return new Draft(d.schema(),"ROLE","UPDATE",d.name(),"","","","","",truth(r.get("ENABLED_BY_DEFAULT")),mapped);
         }
         var expected=new HashSet<>(Set.of("OWNER","GRANT_NAME","PRIVILEGE","COLUMN_NAME","GRANTED_WITH_ALL_COLUMNS_EXCEPT","OBJECT_OWNER","OBJECT_NAME","OBJECT_TYPE","PREDICATE","GRANTEE","GRANTEE_TYPE","USE_DATA_GRANTS_ONLY","START_TIME","END_TIME","INVALID_COLUMN_NAME"));
@@ -56,11 +56,13 @@ public final class DdsManagement {
     public static String mapping(String value){
         if(blank(value))return "";
         require(value.length()<=500&&value.codePoints().noneMatch(Character::isISOControl),"mappingInvalid");
-        require(value.startsWith("IAM_OAUTH_GROUP=")||value.startsWith("IAM_GROUP_NAME="),"mappingInvalid");
-        String group=value.substring(value.indexOf('=')+1);
+        int separator=value.indexOf('=');require(separator>0,"mappingInvalid");
+        String mode=value.substring(0,separator).toUpperCase(Locale.ROOT);
+        require(Set.of("IAM_OAUTH_GROUP","IAM_GROUP_NAME").contains(mode),"mappingInvalid");
+        String group=value.substring(separator+1);
         require(!group.isBlank()&&group.equals(group.strip()),"mappingInvalid");
-        if(value.startsWith("IAM_OAUTH_GROUP="))require(!group.contains("/"),"mappingInvalid");
-        return value;
+        if(mode.equals("IAM_OAUTH_GROUP"))require(!group.contains("/"),"mappingInvalid");
+        return mode+"="+group;
     }
     public static String sql(Draft d,State state,String username){
         require(d!=null&&Objects.equals(d.schema(),username),"ownSchema");id(d.schema());id(d.name());
@@ -84,6 +86,6 @@ public final class DdsManagement {
     }
     public static void verify(Draft d,State after){
         Draft actual=previous(d,after);
-        require(d.kind().equals("ROLE")?(blank(d.mapping())?blank(actual.mapping())&&actual.enabled()==d.enabled():Objects.equals(actual.mapping(),d.mapping())):Objects.equals(actual.table(),d.table())&&Objects.equals(actual.role(),d.role())&&predicate(actual).equals(predicate(d)),"verifyFailed");
+        require(d.kind().equals("ROLE")?(blank(d.mapping())?blank(actual.mapping())&&actual.enabled()==d.enabled():Objects.equals(mapping(actual.mapping()),mapping(d.mapping()))):Objects.equals(actual.table(),d.table())&&Objects.equals(actual.role(),d.role())&&predicate(actual).equals(predicate(d)),"verifyFailed");
     }
 }

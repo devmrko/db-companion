@@ -4,6 +4,7 @@ import com.dbcompanion.common.db.PoolSession;
 import com.dbcompanion.common.i18n.UiMessages;
 import com.dbcompanion.model.DdsManagement.*;
 import com.dbcompanion.model.OrdsManagement;
+import com.dbcompanion.model.DdsIdentity;
 import com.dbcompanion.repository.OrdsManagementRepository;
 import com.dbcompanion.service.DdsManagementService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,10 +18,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/db/security/manage")
 public class DdsManagementController {
     private final DdsManagementService service;
+    private com.dbcompanion.service.DdsIdentityProbeService probe;
+    @org.springframework.beans.factory.annotation.Autowired
+    public void setProbe(com.dbcompanion.service.DdsIdentityProbeService probe){this.probe=probe;}
     public DdsManagementController(DdsManagementService service){this.service=service;}
     @GetMapping("/state") @ResponseBody public ResponseEntity<?> state(HttpServletRequest r){return call(r,s->{var state=service.state(s);return Map.of("state",state,"revision",OrdsManagement.digest(state));});}
     @PostMapping("/preview") @ResponseBody public ResponseEntity<?> preview(@RequestBody PreviewRequest d,HttpServletRequest r){return call(r,s->service.preview(s,d));}
     @PostMapping("/apply") @ResponseBody public ResponseEntity<?> apply(@RequestBody Apply a,HttpServletRequest r){return call(r,s->service.apply(s,a));}
+    @GetMapping("/identities") @ResponseBody public ResponseEntity<?> identities(HttpServletRequest r){return call(r,s->{var state=service.identities(s);return Map.of("state",state,"revision",OrdsManagement.digest(state));});}
+    @PostMapping("/identity-preview") @ResponseBody public ResponseEntity<?> identityPreview(@RequestBody DdsIdentity.Request d,HttpServletRequest r){return call(r,s->service.identityPreview(s,d));}
+    @PostMapping("/identity-apply") @ResponseBody public ResponseEntity<?> identityApply(@RequestBody DdsIdentity.Apply a,HttpServletRequest r){return call(r,s->service.identityApply(s,a));}
+    @PostMapping("/identity-probe") @ResponseBody public ResponseEntity<?> identityProbe(@RequestBody com.dbcompanion.service.DdsIdentityProbeService.Request a,HttpServletRequest r){return call(r,s->probe.probe(s,a));}
     private ResponseEntity<?> call(HttpServletRequest r,Function<PoolSession,Object> action){
         var http=r.getSession(false);var session=http==null?null:(PoolSession)http.getAttribute(PoolSession.ATTRIBUTE);
         if(session==null)return error(401,"expired");

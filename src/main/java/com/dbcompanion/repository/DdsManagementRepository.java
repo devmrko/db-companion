@@ -25,4 +25,11 @@ public class DdsManagementRepository {
         return new State(roles,grants,columns,privileges);
     }
     public void execute(String sql){jdbc.execute((ConnectionCallback<Void>)c->{try(var statement=c.createStatement()){statement.setQueryTimeout(30);statement.execute(sql);}return null;});}
+    public com.dbcompanion.model.DdsIdentity.State identities(){
+        return new com.dbcompanion.model.DdsIdentity.State(
+                rows("SELECT USERNAME,ACCOUNT_STATUS,AUTHENTICATION_TYPE,SCHEMA,START_TIME,END_TIME FROM SYS.DBA_END_USERS ORDER BY USERNAME FETCH FIRST 5001 ROWS ONLY"),
+                rows("SELECT DATA_ROLE,MAPPED_TO,ENABLED_BY_DEFAULT FROM SYS.DBA_DATA_ROLES ORDER BY DATA_ROLE FETCH FIRST 5001 ROWS ONLY"),
+                rows("SELECT DATA_ROLE,ROLE_TYPE,GRANTEE,GRANTEE_TYPE,START_TIME,END_TIME FROM SYS.DBA_DATA_ROLE_GRANTS ORDER BY GRANTEE,DATA_ROLE FETCH FIRST 5001 ROWS ONLY"),
+                new TreeSet<>(jdbc.queryForList("SELECT PRIVILEGE FROM SESSION_PRIVS",String.class)));
+    }
 }

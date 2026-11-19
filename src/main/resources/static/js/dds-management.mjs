@@ -2,7 +2,7 @@ import {assistantApi,assistantPost} from './ai-assistant.mjs';
 import {t} from './i18n.mjs';
 const label=k=>t('ddsManage.'+k,k);
 export const canApply=(plan,confirmation,consent,busy)=>!!plan&&confirmation===plan.confirmation&&consent&&!busy;
-export function roleMapping(value){if(!value)return {mode:'LOCAL',group:''};const at=value.indexOf('=');const mode=value.slice(0,at);if(!['IAM_OAUTH_GROUP','IAM_GROUP_NAME'].includes(mode))throw new Error(label('mappingInvalid'));return {mode,group:value.slice(at+1)};}
+export function roleMapping(value){if(!value)return {mode:'LOCAL',group:''};const at=value.indexOf('=');const mode=value.slice(0,at).toUpperCase();if(!['IAM_OAUTH_GROUP','IAM_GROUP_NAME'].includes(mode))throw new Error(label('mappingInvalid'));return {mode,group:value.slice(at+1)};}
 export function grantDraft(row,schema){
   const match=/^\s*"?([A-Z][A-Z0-9_]{0,127})"?\s*=\s*(-?[0-9]+(?:\.[0-9]+)?|'(?:[^']|'')*')\s*$/.exec(row.PREDICATE??'');
   if(!match)throw new Error(label('unsupported'));

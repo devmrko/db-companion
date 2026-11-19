@@ -6,6 +6,7 @@ test('OCI mapping parser preserves named domains and rejects unknown types',()=>
   assert.deepEqual(roleMapping('IAM_GROUP_NAME=Domain/한글'),{mode:'IAM_GROUP_NAME',group:'Domain/한글'});
   assert.deepEqual(roleMapping('IAM_OAUTH_GROUP=Group'),{mode:'IAM_OAUTH_GROUP',group:'Group'});
   assert.deepEqual(roleMapping(null),{mode:'LOCAL',group:''});
+  assert.deepEqual(roleMapping('iam_oauth_group=MixedCaseGroup'),{mode:'IAM_OAUTH_GROUP',group:'MixedCaseGroup'});
   assert.throws(()=>roleMapping('OTHER=Group'));
 });
 test('DDS apply requires current preview exact confirmation and consent',()=>{

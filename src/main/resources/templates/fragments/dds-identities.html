@@ -1,0 +1,42 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="identities" class="app-card" data-ddsi>
+  <h2 th:text="#{ddsIdentity.title}"></h2>
+  <p th:text="#{ddsIdentity.scope}"></p>
+  <input type="hidden" data-di-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+  <button type="button" class="btn app-btn" data-di-load th:text="#{ddsManage.refresh}"></button>
+  <p role="status" data-di-message></p>
+  <div data-di-content hidden>
+    <label class="app-field"><span th:text="#{ddsIdentity.user}"></span><select class="form-select" data-di-user></select></label>
+    <p data-di-detail></p><ul data-di-assignments></ul>
+    <details class="app-config-disclosure"><summary th:text="#{ddsIdentity.edit}"></summary>
+      <form data-di-form class="app-config-form">
+        <label><span th:text="#{ddsManage.action}"></span><select class="form-select" data-di-action><option value="CREATE" th:text="#{ddsIdentity.create}"></option><option value="GRANT" th:text="#{ddsIdentity.grant}"></option><option value="REVOKE" th:text="#{ddsIdentity.revoke}"></option></select></label>
+        <label data-di-name-field><span th:text="#{ddsManage.name}"></span><input class="form-control" data-di-name maxlength="128" pattern="[A-Z][A-Z0-9_]{0,127}"></label>
+        <label data-di-auth-field><span th:text="#{ddsIdentity.passwordAuth}"></span><input type="checkbox" data-di-auth checked></label>
+        <label data-di-role-field hidden><span th:text="#{ddsManage.role}"></span><select class="form-select" data-di-role></select></label>
+        <p th:text="#{ddsIdentity.mapping}"></p>
+        <button class="btn app-btn" type="submit" th:text="#{ddsManage.preview}"></button>
+      </form>
+      <section data-di-review hidden>
+        <p class="app-alert" th:text="#{ddsManage.warning}"></p>
+        <pre data-di-sql></pre>
+        <label class="app-field" data-di-password-field hidden><span th:text="#{ddsIdentity.newPassword}"></span><input class="form-control" type="password" data-di-password autocomplete="new-password" maxlength="128"></label>
+        <label class="app-field"><span data-di-confirm-label></span><input class="form-control" data-di-confirm autocomplete="off"></label>
+        <label><input type="checkbox" data-di-consent><span th:text="#{ddsManage.consent}"></span></label>
+        <button class="btn app-btn" type="button" data-di-apply disabled th:text="#{ddsManage.apply}"></button>
+      </section>
+    </details>
+    <details class="app-config-disclosure"><summary th:text="#{ddsIdentity.probe}"></summary>
+      <p th:text="#{ddsIdentity.probeHelp}"></p>
+      <p th:text="#{ddsIdentity.loginHelp}"></p>
+      <form class="app-config-form" data-di-probe-form>
+        <label><span th:text="#{ddsIdentity.currentPassword}"></span><input class="form-control" type="password" data-di-probe-password autocomplete="off" maxlength="128" required></label>
+        <label><span th:text="#{ddsManage.table}"></span><select class="form-select" data-di-table required></select></label>
+        <label><input type="checkbox" data-di-probe-consent required><span th:text="#{ddsIdentity.probeConsent}"></span></label>
+        <button class="btn app-btn" type="submit" th:text="#{ddsIdentity.runProbe}"></button>
+      </form>
+      <p role="status" data-di-probe-result></p>
+    </details>
+  </div>
+</section>
+</body></html>

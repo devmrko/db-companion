@@ -49,6 +49,7 @@
       <button class="btn app-btn" type="button" data-dm-apply disabled th:text="#{ddsManage.apply}"></button>
     </section>
   </details>
+  <section th:replace="~{fragments/dds-identities :: identities}"></section>
   <section data-dds th:attr="data-schema=${selectedSchema},data-base=@{/db/security}">
     <nav class="app-dds-tabs" th:aria-label="#{dds.sections}">
       <button type="button" data-dds-tab="roles" aria-pressed="true" th:text="#{dds.roles}">역할</button>
@@ -69,4 +70,4 @@
     </div>
     <section class="app-card app-dds-detail" data-dds-detail aria-live="polite" hidden></section>
   </section>
-</main></div><script type="module" th:src="@{/js/deep-data-security.mjs}"></script><script type="module" th:src="@{/js/dds-management.mjs}"></script></body></html>
+</main></div><script type="module" th:src="@{/js/deep-data-security.mjs}"></script><script type="module" th:src="@{/js/dds-management.mjs}"></script><script type="module" th:src="@{/js/dds-identities.mjs}"></script></body></html>

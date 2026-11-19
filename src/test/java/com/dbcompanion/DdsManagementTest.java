@@ -80,6 +80,14 @@ class DdsManagementTest {
         assertThatThrownBy(()->DdsManagement.sql(duplicate,mapped,"ADMIN")).hasMessage("mappingExists");
         for(String value:List.of("IAM_OAUTH_GROUP=", "IAM_OAUTH_GROUP=D/G", "IAM_GROUP_NAME=\nX", "OTHER=G"))assertThatThrownBy(()->DdsManagement.mapping(value)).hasMessage("mappingInvalid");
     }
+    @Test void nativeLowercaseMappingPrefixPreservesGroupCaseAndVerifies(){
+        var state=new State(List.of(row("DATA_ROLE","R","MAPPED_TO","iam_oauth_group=MixedCaseGroup","ENABLED_BY_DEFAULT","true")),List.of(),List.of(),Set.of("CREATE DATA ROLE"));
+        var d=new Draft("ADMIN","ROLE","UPDATE","R","","","","","",false,"IAM_OAUTH_GROUP=MixedCaseGroup");
+        DdsManagement.verify(d,state);assertThat(DdsManagement.previous(d,state).mapping()).isEqualTo("IAM_OAUTH_GROUP=MixedCaseGroup");
+        assertThat(DdsManagement.mapping("iam_group_name=Domain/MixedCaseGroup")).isEqualTo("IAM_GROUP_NAME=Domain/MixedCaseGroup");
+        var wrong=new Draft("ADMIN","ROLE","UPDATE","R","","","","","",false,"IAM_OAUTH_GROUP=mixedcasegroup");
+        assertThatThrownBy(()->DdsManagement.verify(wrong,state)).hasMessage("verifyFailed");
+    }
     static final class Fixture implements AutoCloseable {
         State current=state(List.of());int writes;boolean fail;
         final SessionDataSource source=new SessionDataSource();

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add ADMIN-managed local DDS end-user creation, role grants/revocations and a
+  password-authenticated, read-only access check. Confirm the actual end-user
+  identity before counting visible rows, with no fallback to ADMIN. Keep IAM
+  membership and token propagation separate from stored group mappings.
+- Accept Oracle's lowercase IAM mapping prefix during readback and editing while
+  preserving the group identifier. See [DDS end-user setup](docs/dds-end-users.md).
 - Extend the AI setup assistant to enable table/column comments and constraints,
   one confirmed setting at a time, through the existing profile editor. Check
   prerequisites again immediately before applying and disclose future prompt effects.

@@ -1,5 +1,51 @@
 # Release validation
 
+## DDS end-user management
+
+Checked on 2026-11-19 on the isolated application with disposable local DDS
+users, local data roles, a connection role and a three-row synthetic table.
+
+- The new API created two password-authenticated end users, verified dictionary
+  state, granted/revoked local data roles and rejected reused apply tickets.
+  Probe requests without consent and direct assignment of an IAM-mapped role
+  were rejected. Passwords were supplied only during apply/authentication and
+  were absent from preview payloads.
+- Direct authentication established the requested end-user identity and showed
+  its active data roles. User A counted one visible row and user B counted two,
+  matching their configured SELECT grant predicates. Revoking A's data role
+  removed it from the active roles and the table query failed with ORA-00942.
+  Re-granting restored A's one-row count. This test checked counts against known
+  synthetic grants, not arbitrary row contents or all DDS policy types.
+- An IAM group mapping was created and read back. Oracle returned its prefix in
+  lowercase; the existing editor initially rejected that value. Prefix-only
+  normalization was fixed and checked in Java, JavaScript and the real DB.
+  The group identifier itself is preserved. No IAM token or real membership
+  authentication was tested.
+- The end-user identity check initially rejected JDBC's JSON-valued result.
+  Explicit scalar extraction fixed the comparison; the subsequent real A/B
+  checks passed. Identity mismatch still stops table access and never falls
+  back to ADMIN. Probe regression tests check read-only ordering, rejected reads,
+  unavailable role metadata, rollback and connection closure.
+- Java reports total 1,520 passing tests (full suite, followed by affected suites
+  after fixes). JavaScript: 727 passed, one optional skip; affected mapping tests
+  reran after the final mapping fix. Package, PMD, publication and whitespace
+  checks passed. Initial lifecycle tests hit a sandbox process-inspection denial
+  and passed after rerunning through the supported approval path.
+- All temporary end users, data roles, the connection role and table were
+  confirmed absent after cleanup. Setup DDL and local authentication made no AI
+  calls. This does not verify end-user switching on a shared application pool,
+  IAM token propagation or end-user isolation of Memory extraction/recall.
+- Chrome on the isolated application rendered the management state and updated
+  the assigned-role list when selecting another end user. The direct-grant
+  selector excluded IAM-mapped roles. A creation preview showed a password
+  placeholder; apply remained disabled without a password, and editing the
+  draft removed the preview. The access-check form blocked submission with a
+  missing password. No user creation, role change or authenticated access probe
+  was submitted through the browser; those write/access paths were checked via
+  the API and real DB above.
+
+See [DDS end-user setup and boundaries](dds-end-users.md).
+
 ## Memory recall and access boundaries
 
 Checked on 2026-11-19 using two independent web sessions authenticated as the
