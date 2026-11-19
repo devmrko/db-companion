@@ -28,9 +28,16 @@ Checked on 2026-11-19 using isolated local application and disposable profiles.
   hid the Oracle error code; safe-code reporting was added and covered by a
   synthetic exception test. The original live failure's cause remains unknown,
   and the uncertain creation was not retried automatically.
-- Existing Memory store type filters, detail identity and empty searches passed
-  read-only API checks. All profiles, stores and conversations created for this
-  follow-up were confirmed absent after cleanup.
+- Existing Memory store type filters and empty searches passed read-only API
+  checks. Every type returned zero rows, so record detail lookup was not exercised.
+  All profiles, stores and conversations created for this follow-up were confirmed
+  absent after cleanup.
+- Chrome confirmed the new setup action catalogue in transmission preview,
+  disabled analysis before consent and invalidation after editing the question.
+  No model call or DB setting change was made during this browser check. Memory's
+  empty-state screen was also confirmed. Agent Engine's registered workflow
+  selection loaded its matching archived original into the canvas; browser
+  execution was not repeated.
 - Automated checks: Java 1,507 passed; JavaScript 724 passed with one optional
   skip. Full suites ran before the final safe-error change; the affected Java
   tests and setup-assistant JavaScript flow were rerun afterward. Package, PMD,
