@@ -30,6 +30,14 @@ public class AiAssistantService {
         source.bind(session.pool(),session.metadata().info().username(),session.metadata().assistant());
         try{return (generating?generate:read).execute(status->work.get());}finally{source.clear();}
     }
+    public String profileVersion(PoolSession session,String name){
+        synchronized(session){
+            String owner=session.metadata().info().username();
+            if(!owner.equals(session.metadata().selectedSchema())||name==null||name.isBlank()||name.length()>128)
+                throw new IllegalArgumentException("Profile version requires owner schema and profile");
+            return query(session,false,()->repository.profileVersion(new Selection(owner,name)));
+        }
+    }
     public Options options(PoolSession session,boolean refresh){
         synchronized(session){var metadata=session.metadata();var state=metadata.assistant();
             var choices=state.profiles(refresh,()->query(session,false,repository::profiles));

@@ -33,9 +33,14 @@ public class AiAssistantRepository {
                 """,(r,n)->new Choice(r.getString(1),r.getString(2),r.getString(3)));
     }
     public Profile profile(Selection selected){
+        return profile(selected,true);
+    }
+    /** Same request fingerprint; disabled profiles remain readable for comparison. */
+    public String profileVersion(Selection selected){return profile(selected,false).version();}
+    private Profile profile(Selection selected,boolean requireEnabled){
         var rows=jdbc.query("SELECT PROFILE_ID, STATUS FROM USER_CLOUD_AI_PROFILES WHERE PROFILE_NAME=?",
                 (r,n)->r.getString(1)+":"+r.getString(2),selected.name());
-        if(rows.size()!=1||!rows.getFirst().endsWith(":ENABLED"))throw AiAssistant.stale();
+        if(rows.size()!=1||requireEnabled&&!rows.getFirst().endsWith(":ENABLED"))throw AiAssistant.stale();
         final MessageDigest digest;
         try{digest=MessageDigest.getInstance("SHA-256");}catch(java.security.NoSuchAlgorithmException ex){throw new IllegalStateException(ex);}
         hash(digest,rows.getFirst());
@@ -47,7 +52,7 @@ public class AiAssistantRepository {
             if(attribute.getKey().equals("provider"))provider=attribute.getValue();
             if(attribute.getKey().equals("model"))model=attribute.getValue();
         }
-        if(provider==null||provider.isBlank())throw AiAssistant.stale();
+        if(requireEnabled&&(provider==null||provider.isBlank()))throw AiAssistant.stale();
         return new Profile(selected,provider,model,HexFormat.of().formatHex(digest.digest()));
     }
     private static void hash(MessageDigest digest,String value){

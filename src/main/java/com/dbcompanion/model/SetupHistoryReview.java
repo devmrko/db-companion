@@ -11,14 +11,29 @@ public final class SetupHistoryReview {
     private static final Set<String> KEYS = Set.of("object_list", "object_list_mode", "comments", "annotations",
             "constraints", "enforce_object_list", "feedback", "feedback_enabled");
     public record Saved(String id, String parentId, String at, String kind, String model,
-                        boolean errorRecorded, String snapshot) {}
+                        boolean errorRecorded, String snapshot, String profileVersion) {
+        public Saved(String id,String parentId,String at,String kind,String model,boolean errorRecorded,String snapshot){
+            this(id,parentId,at,kind,model,errorRecorded,snapshot,null);
+        }
+    }
     public record Recovery(String id, String retestId) {}
     public record Review(String id, String at, String comparison, List<String> compared, List<String> changed,
-                         boolean errorRecorded, Recovery recovery) {
+                         boolean errorRecorded, Recovery recovery, String versionState) {
         public Review { compared=List.copyOf(compared); changed=List.copyOf(changed); }
+        public Review(String id,String at,String comparison,List<String> compared,List<String> changed,boolean errorRecorded,Recovery recovery){
+            this(id,at,comparison,compared,changed,errorRecorded,recovery,"UNAVAILABLE");
+        }
     }
     public record Result(String state, List<Review> items) {
         public Result { items=List.copyOf(items); }
+    }
+    public static Review withVersion(Review review,Saved saved,String owner,String profile,String current){
+        String state="UNAVAILABLE";
+        if("USER_SELECTED".equals(saved.kind())&&saved.profileVersion()!=null){
+            try{state=JSON.readValue(saved.profileVersion(),SetupProfileVersion.class).compare(owner,profile,current);}
+            catch(RuntimeException ex){state="UNAVAILABLE";}
+        }
+        return new Review(review.id(),review.at(),review.comparison(),review.compared(),review.changed(),review.errorRecorded(),review.recovery(),state);
     }
     public static Review compare(Saved saved, List<AiProfileAttribute> current, Recovery recovery) {
         if (!"USER_SELECTED".equals(saved.kind())) return unknown(saved,"MANUAL",recovery);

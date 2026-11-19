@@ -10,8 +10,13 @@ import org.springframework.stereotype.Service;
 public class AiSetupEvidenceService {
     private final AiExecutionHistoryService conversations;
     private final ProblemQuestionService problems;
+    private final AiAssistantService assistant;
     public AiSetupEvidenceService(AiExecutionHistoryService conversations, ProblemQuestionService problems) {
-        this.conversations = conversations; this.problems = problems;
+        this(conversations,problems,null);
+    }
+    @org.springframework.beans.factory.annotation.Autowired
+    public AiSetupEvidenceService(AiExecutionHistoryService conversations,ProblemQuestionService problems,AiAssistantService assistant){
+        this.conversations=conversations;this.problems=problems;this.assistant=assistant;
     }
     public List<SetupEvidence.Group> read(PoolSession session, String profile) {
         if (!session.metadata().info().username().equals(session.metadata().selectedSchema()))
@@ -33,7 +38,9 @@ public class AiSetupEvidenceService {
         if(!session.metadata().info().username().equals(session.metadata().selectedSchema()))
             throw new IllegalArgumentException("Saved evidence requires owner schema");
         try {
-            var rows=problems.setupHistory(session,profile,attributes);
+            String version=null;
+            try{if(assistant!=null)version=assistant.profileVersion(session,profile);}catch(RuntimeException ex){version=null;}
+            var rows=problems.setupHistory(session,profile,attributes,version);
             return new com.dbcompanion.model.SetupHistoryReview.Result(rows.isEmpty()?"EMPTY":"RECORDED",rows);
         }catch(RuntimeException ex){return new com.dbcompanion.model.SetupHistoryReview.Result("UNKNOWN",List.of());}
     }

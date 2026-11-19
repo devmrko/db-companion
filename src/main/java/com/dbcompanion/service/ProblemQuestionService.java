@@ -33,9 +33,13 @@ public class ProblemQuestionService {
         return tx(s,read,()->records.recentProblemMetadata(schema(s),profile));
     }
     public List<SetupHistoryReview.Review> setupHistory(PoolSession s,String profile,List<AiProfileAttribute> current){
+        return setupHistory(s,profile,current,null);
+    }
+    public List<SetupHistoryReview.Review> setupHistory(PoolSession s,String profile,List<AiProfileAttribute> current,String version){
         if(profile==null||profile.isBlank()||profile.length()>128)throw new IllegalArgumentException("Invalid profile");
         return tx(s,read,()->records.recentSetupHistory(schema(s),profile).stream()
-                .map(saved->SetupHistoryReview.compare(saved,current,records.setupRecovery(schema(s),saved.parentId(),saved.id()))).toList());
+                .map(saved->SetupHistoryReview.withVersion(SetupHistoryReview.compare(saved,current,records.setupRecovery(schema(s),saved.parentId(),saved.id())),
+                        saved,schema(s),profile,version)).toList());
     }
     public String save(PoolSession s,ProblemQuestion.Create request){var value=ProblemQuestion.create(request);return tx(s,write,()->{String schema=schema(s),id=UUID.randomUUID().toString();var parent=new ProblemQuestion.Parent(1,id,value.question(),value.description(),value.expected(),value.expectedSql(),value.status(),false,Instant.now(),Instant.now());saveRecord(schema,id,ProblemQuestion.TYPE,parent);return id;});}
     /** Captures a user-confirmed current test result; this is persistence only, never another provider call. */
@@ -53,6 +57,7 @@ public class ProblemQuestionService {
     private String saveCapturedAttempt(String schema,String parentId,Capture capture){var outcome=capture.outcome();var profile=outcome.profile();var options=capture.options();var prompt=capture.prompt();var metadata=capture.metadata();var feedback=capture.feedback();String diagnostic=ProblemQuestion.optional(outcome.error(),8_000,"problemQuestion.error");if(outcome.code()!=null&&!outcome.code().isBlank())diagnostic+=(diagnostic.isBlank()?"":"\n")+"code="+ProblemQuestion.optional(outcome.code(),128,"problemQuestion.code");if(outcome.phase()!=null&&!outcome.phase().isBlank())diagnostic+=(diagnostic.isBlank()?"":"\n")+"phase="+ProblemQuestion.optional(outcome.phase(),128,"problemQuestion.phase");boolean failed=outcome.error()!=null&&!outcome.error().isBlank();String conditions=capturedConditions(outcome);var attempt=new ProblemQuestion.Attempt(1,UUID.randomUUID().toString(),parentId,ProblemQuestion.optional(outcome.question(),ProblemQuestion.MAX_TEXT,"problemQuestion.question"),conditions,ProblemQuestion.optional(outcome.text(),ProblemQuestion.MAX_DESCRIPTION,"problemQuestion.response"),outcome.action()==SelectAiTest.Action.SQL&&!failed?ProblemQuestion.optional(outcome.text(),ProblemQuestion.MAX_DESCRIPTION,"problemQuestion.sql"):"",diagnostic,ProblemQuestion.optional(profile.selection().owner()+"."+profile.selection().name(),512,"problemQuestion.profile"),ProblemQuestion.optional(profile.model(),512,"problemQuestion.model"),"","","","","USER_SELECTED","INDIVIDUAL_SNAPSHOTS",outcome.requestedAt(),outcome.elapsedMillis(),options,prompt,metadata,feedback);if(json.writeValueAsString(attempt).length()>ProblemQuestion.MAX_PAYLOAD)throw new AiAssistant.Failure(413,"problemQuestion.limit","선택한 저장 자료가 보관 한도를 초과합니다.");saveRecord(schema,attempt.id(),ProblemQuestion.ATTEMPT_TYPE,attempt);return parentId;}
     private String capturedConditions(SelectAiTest.Outcome outcome){
         var data=new LinkedHashMap<String,Object>();
+        data.put("profileVersion",SetupProfileVersion.captured(outcome.profile()));
         if(outcome.confirmation()!=null){data.put("confirmationQuestion",outcome.confirmation().question());data.put("confirmationAnswer",outcome.confirmation().answer());data.put("conditions",outcome.confirmation().conditions());}
         if(outcome.glossary()!=null)data.put("businessGlossary",outcome.glossary());
         return data.isEmpty()?"":ProblemQuestion.optional(json.writeValueAsString(data),ProblemQuestion.MAX_DESCRIPTION,"problemQuestion.conditions");

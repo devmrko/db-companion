@@ -74,7 +74,7 @@ class AiSetupTest {
                     new com.dbcompanion.model.SetupEvidence.Group("problem","UNKNOWN",List.of())));
             context.setVariable("historyReview",new com.dbcompanion.model.SetupHistoryReview.Result("RECORDED",List.of(
                     new com.dbcompanion.model.SetupHistoryReview.Review("safe-id","2026-11-19","DIFFERENT",List.of("comments"),List.of("comments"),true,
-                            new com.dbcompanion.model.SetupHistoryReview.Recovery("note","retest")))));
+                            new com.dbcompanion.model.SetupHistoryReview.Recovery("note","retest"),"MATCH"))));
             context.setVariable("historyChecks",List.of("records","conversation","conversationView","profileStore","profileAudit","profileCollect","auditSource","auditStore","auditCollector","auditSchedule","objectHistory").stream()
                     .map(key->new com.dbcompanion.service.AiSetupHistoryService.Check(key,AiSetupService.State.UNKNOWN,"/ai-profiles","synthetic")).toList());
             assertThat(engine.process("ai-setup",context)).contains("app-setup-CONFIGURED","app-setup-UNKNOWN",

@@ -77,7 +77,8 @@ public class AppRecordRepository {
         return jdbc.query("SELECT RECORD_ID,JSON_VALUE(PAYLOAD,'$.parentId'),JSON_VALUE(PAYLOAD,'$.capturedAt'),"
                 +"JSON_VALUE(PAYLOAD,'$.snapshotKind'),JSON_VALUE(PAYLOAD,'$.model'),"
                 +"CASE WHEN JSON_EXISTS(PAYLOAD,'$.error?(@ != null && @ != \"\")') THEN 1 ELSE 0 END,"
-                +"JSON_QUERY(PAYLOAD,'$.optionSnapshot' RETURNING CLOB) FROM "+AppRecordSql.table(schema)
+                +"JSON_QUERY(PAYLOAD,'$.optionSnapshot' RETURNING CLOB),"
+                +"JSON_QUERY(JSON_VALUE(PAYLOAD,'$.conditions' RETURNING CLOB),'$.profileVersion') FROM "+AppRecordSql.table(schema)
                 +" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED' AND JSON_VALUE(PAYLOAD,'$.profile')=?"
                 +" AND NVL(JSON_VALUE(PAYLOAD,'$.snapshotKind'),'UNKNOWN')<>'MANUAL_RECOVERY'"
                 +" ORDER BY RECORDED_AT DESC,SEQ DESC FETCH FIRST 10 ROWS ONLY",
@@ -85,7 +86,7 @@ public class AppRecordRepository {
                     var clob=row.getClob(7);
                     try {
                         String snapshot=clob==null||clob.length()>ProblemQuestion.MAX_PAYLOAD?null:clob.getSubString(1,(int)clob.length());
-                        return new SetupHistoryReview.Saved(row.getString(1),row.getString(2),row.getString(3),row.getString(4),row.getString(5),row.getInt(6)==1,snapshot);
+                        return new SetupHistoryReview.Saved(row.getString(1),row.getString(2),row.getString(3),row.getString(4),row.getString(5),row.getInt(6)==1,snapshot,row.getString(8));
                     }finally{if(clob!=null)clob.free();}
                 },ProblemQuestion.ATTEMPT_TYPE,schema+"."+profile);
     }

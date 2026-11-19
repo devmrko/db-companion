@@ -84,10 +84,13 @@
     <details class="app-config-disclosure">
       <summary th:text="#{setup.review.title}"></summary>
       <p th:text="#{setup.review.help}"></p>
+      <p th:text="#{setup.version.help}"></p>
       <p th:if="${historyReview.state != 'RECORDED'}" th:text="${#messages.msg('setup.saved.help.' + historyReview.state)}"></p>
       <details class="app-config-disclosure" th:each="item : ${historyReview.items}">
-        <summary><span th:text="${#messages.msg('setup.review.' + item.comparison)}"></span> · <code th:text="${item.id}"></code></summary>
+        <summary><span th:text="${#messages.msg(item.versionState == 'UNAVAILABLE' ? 'setup.review.' + item.comparison : 'setup.version.' + item.versionState)}"></span> · <code th:text="${item.id}"></code></summary>
         <p th:text="${item.at}"></p>
+        <p th:text="${#messages.msg('setup.version.' + item.versionState)}"></p>
+        <p th:if="${item.versionState != 'UNAVAILABLE'}" th:text="${#messages.msg('setup.review.' + item.comparison)}"></p>
         <p th:text="${#messages.msg(item.errorRecorded ? 'setup.review.error' : 'setup.review.noError')}"></p>
         <p th:if="${!#lists.isEmpty(item.compared)}"><span th:text="#{setup.review.compared}"></span> <span th:text="${#strings.listJoin(item.compared, ', ')}"></span></p>
         <p th:if="${!#lists.isEmpty(item.changed)}"><span th:text="#{setup.review.changed}"></span> <span th:text="${#strings.listJoin(item.changed, ', ')}"></span></p>

@@ -17,6 +17,17 @@ import static org.assertj.core.api.Assertions.*;
 
 /** Captures synthetic observations without executing SQL, AI or database writes. */
 class ProblemQuestionCaptureTest {
+    @Test void savingWithoutOptionalSnapshotsKeepsTheRequestVersionNotALaterRead(){try(var s=session()){
+        var capturedProfile=new AiAssistant.Profile(profile.selection(),"oci","model","a".repeat(64));
+        s.metadata().aiTest().finish(new SelectAiTest.Outcome("version-result",SelectAiTest.Action.SQL,capturedProfile,"synthetic",time,1,"SELECT 1 FROM DUAL",null,null,"complete"));
+        service.saveLatest(s,new ProblemQuestion.Create("synthetic","problem","expected","",null),false);
+        var version=json.readTree(savedAttempt.path("conditions").asString()).path("profileVersion");
+        assertThat(version.path("scheme").asString()).isEqualTo(SetupProfileVersion.SCHEME);
+        assertThat(version.path("owner").asString()).isEqualTo("APP");
+        assertThat(version.path("profile").asString()).isEqualTo("P");
+        assertThat(version.path("value").asString()).isEqualTo("a".repeat(64));
+        assertThat(savedAttempt.path("optionSnapshot").path("availability").asString()).isEqualTo("NOT_REQUESTED");
+    }}
     final JsonMapper json = new JsonMapper(); JsonNode savedAttempt;
     final SessionDataSource source = new SessionDataSource() {@Override public Connection getConnection() {return proxy(Connection.class,(p,m,a)->switch(m.getName()){case "getAutoCommit"->true;case "getTransactionIsolation"->Connection.TRANSACTION_READ_COMMITTED;case "equals"->p==a[0];case "hashCode"->System.identityHashCode(p);default->empty(m.getReturnType());});}};
     final AppRecordRepository records = new AppRecordRepository(new JdbcTemplate(source), json) {@Override public String status(String schema,String login){return "READY";} @Override public void begin(String schema,String id,String type,JsonNode payload){if(ProblemQuestion.ATTEMPT_TYPE.equals(type))savedAttempt=payload;} @Override public boolean finish(String schema,String id,String state,JsonNode payload){return true;}};
