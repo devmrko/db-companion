@@ -30,7 +30,7 @@ class AiMemoryPolicyTest {
         @Override public Capability capability() { return new Capability("23.26.4.1.0", "API_OWNER", supported, supported, "USER_AI_GUARDRAILS", ""); }
         @Override public List<Resource> stores(Capability c) { return List.of(); }
         @Override public String attributes(Create input) { return "{\"match_limit\":5}"; }
-        @Override public void create(Capability c, Create input, String attributes) { writes++; if (fails) throw new IllegalStateException("uncertain"); }
+        @Override public void create(Capability c, Create input, String attributes) { writes++; if (fails) throw new IllegalStateException("uncertain",new java.sql.SQLException("private-provider-response", "", 20000)); }
         @Override public boolean matches(Capability c, Create input, String attributes) { return matches; }
         @Override public void validateExtraction(Extract input) {
             if (!supported) throw AiMemoryPolicy.error(409, "unsupported");
@@ -75,6 +75,15 @@ class AiMemoryPolicyTest {
     }
     @Test void verifiedResultRequiresReadback() {
         try (var s = session()) { assertThat(service.create(s, input("APP", true, 5)).verified()).isTrue(); }
+    }
+    @Test void uncertainCreationReportsOnlySafeOracleCodeWithoutRetrying() {
+        try(var s=session()) {
+            fails=true;
+            var result=service.create(s,input("APP",true,5));
+            assertThat(result.verified()).isFalse();
+            assertThat(result.message()).contains("ORA-20000").doesNotContain("private-provider-response","uncertain");
+            assertThat(writes).isEqualTo(1);
+        }
     }
     @Test void extractionRequiresConsentAndOwnerBeforeCallingProvider() {
         try (var s = session()) {

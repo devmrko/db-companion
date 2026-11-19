@@ -80,8 +80,10 @@ public class AiMemoryPolicyService {
                     return new Result(true, "생성과 저장 설정을 확인했습니다. 프로필 연결은 별도로 저장하세요.");
                 return new Result(false, "생성 호출이 완료되었습니다. 목록을 새로고침하고 DB 설정을 확인하세요. 프로필 연결은 별도로 저장해야 합니다.");
             } catch (RuntimeException ex) {
-                org.slf4j.LoggerFactory.getLogger(getClass()).warn("Memory/guardrail creation outcome requires readback");
-                return new Result(false, "생성 결과를 확정하지 못했습니다. 자동 재시도하지 말고 DB의 현재 저장소·정책을 먼저 확인하세요.");
+                String code=com.dbcompanion.repository.CredentialCatalogRepository.error(ex);
+                org.slf4j.LoggerFactory.getLogger(getClass()).warn("Memory/guardrail creation outcome requires readback; code={}",code);
+                return new Result(false, "생성 결과를 확정하지 못했습니다. 자동 재시도하지 말고 DB의 현재 저장소·정책을 먼저 확인하세요."
+                        +(code.isEmpty()?"":" ("+code+")"));
             }
         });
     }

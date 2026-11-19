@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Extend the AI setup assistant to enable table/column comments and constraints,
+  one confirmed setting at a time, through the existing profile editor. Check
+  prerequisites again immediately before applying and disclose future prompt effects.
+- Include only a safe Oracle error code when memory-store creation is uncertain;
+  do not expose provider messages or retry automatically.
+- Expand live validation to three native-knowledge on/off aggregate comparisons
+  and three read-only Agent Engine branches. Memory creation remains unverified;
+  see [follow-up validation](docs/validation.md#follow-up-after-alpha20).
+
 ## 0.1.0-alpha.20
 
 Prepared on 2026-11-19. See [validation and remaining scope](docs/validation.md#010-alpha20).

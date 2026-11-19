@@ -34,4 +34,20 @@ class AiSetupAssistantTest {
                 "{\"explanation\":\"x\",\"enableConversation\":true,\"sql\":\"DROP TABLE X\"}"))
             assertThatThrownBy(()->AiSetupAssistantService.parse(response,mapper)).isInstanceOf(IllegalArgumentException.class);
     }
+    @Test void onlyFixedSingleActionsCanReachTheExistingEditor() {
+        var mapper=new JsonMapper();
+        for(String id:List.of("enable-conversation","enable-comments","enable-constraints")) {
+            var parsed=AiSetupAssistantService.parse("{\"explanation\":\"Review first\",\"action\":\""+id+"\"}",mapper);
+            assertThat(parsed.action()).isEqualTo(id);
+            var action=AiSetupCatalog.action(id);
+            assertThat(action.attribute()).isEqualTo(id.substring(7));
+            assertThat(action.value()).isEqualTo("true");
+            assertThat(action.confirmationRequired()).isTrue();
+            assertThat(action.apply()).isEqualTo("ProfileEditService.save");
+            assertThat(AiSetupCatalog.eligible(id,List.of(),List.of())).isFalse();
+        }
+        for(String action:List.of("set-credential","enable_custom_source_uri","execute-sql","enable-comments,enable-constraints"))
+            assertThatThrownBy(()->AiSetupAssistantService.parse("{\"explanation\":\"x\",\"action\":\""+action+"\"}",mapper)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(AiSetupAssistantService.parse("{\"explanation\":\"No change\",\"action\":\"\"}",mapper).action()).isEmpty();
+    }
 }

@@ -20,10 +20,10 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-setup-assistan
   }));
   get('analyze').addEventListener('click',()=>perform(async()=>{
     const token=preview.token;preview=null;const result=await post('analyze',{token,consent:get('consent').checked});
-    get('explanation').textContent=result.explanation;get('result').hidden=false;get('change').hidden=!result.enableConversation;get('preview-panel').hidden=true;
+    get('explanation').textContent=result.explanation;get('result').hidden=false;get('change').hidden=!(result.action||result.enableConversation);get('preview-panel').hidden=true;
   }));
   get('change').addEventListener('click',()=>perform(async()=>{
-    change=await post('change-preview',{});get('change-value').textContent=`${change.profile} · conversation: ${change.before||'—'} → ${change.after}`;
+    change=await post('change-preview',{});get('change-value').textContent=`${change.profile} · ${change.attribute||'conversation'}: ${change.before||'—'} → ${change.after}`;
     get('apply-consent').checked=false;get('change-panel').hidden=false;
   }));
   get('apply').addEventListener('click',()=>perform(async()=>{

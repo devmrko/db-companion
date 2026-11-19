@@ -1,5 +1,41 @@
 # Release validation
 
+## Follow-up after alpha.20
+
+Checked on 2026-11-19 using isolated local application and disposable profiles.
+
+- AI setup: actual model recommendations for `comments=true` and `constraints=true`
+  each passed preview, consent, existing-editor application and DB readback.
+  Missing consent and reused apply tickets were rejected; the temporary profile
+  was removed. This verifies supported configuration changes, not answer quality.
+- Business checks: three aggregate questions (issue, severity and a bounded month)
+  were generated once per native Semantic Source condition. Separate temporary
+  profiles had no memory link or app-added glossary evidence. SHOWPROMPT confirmed
+  the selected glossary definition was absent/present in the off/on conditions.
+  All six manually reviewed SELECT statements matched independent aggregates in
+  both directions in a read-only transaction (8, 4 and 1 result groups). Both
+  conditions succeeded; these examples do not demonstrate an accuracy improvement
+  or generalize to joins, complex business rules or other datasets. Profiles removed.
+- Agent Engine: the live demo tool body matched the reviewed read-only source.
+  Actual execution passed stock-use, procurement and budget-review branches with
+  expected outputs and execution traces; unconfirmed execution was rejected.
+  This did not invoke an LLM or verify arbitrary tools, external writes or every
+  workflow type. API execution is not reported as browser-driven execution.
+- Agent Memory: an initial test request missing required boolean fields was
+  rejected before creation. With the request corrected, store creation returned
+  an uncertain result; extraction and recall were not attempted. Temporary store,
+  profile and associated conversations were cleaned up. The service previously
+  hid the Oracle error code; safe-code reporting was added and covered by a
+  synthetic exception test. The original live failure's cause remains unknown,
+  and the uncertain creation was not retried automatically.
+- Existing Memory store type filters, detail identity and empty searches passed
+  read-only API checks. All profiles, stores and conversations created for this
+  follow-up were confirmed absent after cleanup.
+- Automated checks: Java 1,507 passed; JavaScript 724 passed with one optional
+  skip. Full suites ran before the final safe-error change; the affected Java
+  tests and setup-assistant JavaScript flow were rerun afterward. Package, PMD,
+  publication and whitespace checks passed.
+
 ## 0.1.0-alpha.20
 
 Prepared on 2026-11-19. This release helps users diagnose setup gaps, review

@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "goals": [
     {
       "id": "nl2sql",
@@ -13,7 +13,7 @@
         "execution"
       ],
       "actions": [
-        "enable-conversation"
+        "enable-conversation", "enable-comments", "enable-constraints"
       ]
     },
     {
@@ -30,7 +30,7 @@
         "execution"
       ],
       "actions": [
-        "enable-conversation"
+        "enable-conversation", "enable-comments", "enable-constraints"
       ]
     },
     {
@@ -47,7 +47,7 @@
         "execution"
       ],
       "actions": [
-        "enable-conversation"
+        "enable-conversation", "enable-comments", "enable-constraints"
       ]
     }
   ],
@@ -222,6 +222,20 @@
     }
   ],
   "actions": [
+    {
+      "id": "enable-comments", "actor": "USER", "attribute": "comments", "value": "true",
+      "requires": ["configuration.profile", "history.profileStore"],
+      "preview": "ProfileEditService.edit", "apply": "ProfileEditService.save",
+      "verification": "Existing editor readback and before/after archive; future model prompts may include table and column descriptions; quality is not verified",
+      "confirmationRequired": true
+    },
+    {
+      "id": "enable-constraints", "actor": "USER", "attribute": "constraints", "value": "true",
+      "requires": ["configuration.profile", "history.profileStore"],
+      "preview": "ProfileEditService.edit", "apply": "ProfileEditService.save",
+      "verification": "Existing editor readback and before/after archive; future model prompts may include constraints; quality is not verified",
+      "confirmationRequired": true
+    },
     {
       "id": "enable-conversation",
       "actor": "USER",

@@ -20,6 +20,10 @@ test('editing or failing to refresh a preview hides stale data and clears consen
   globalThis.fetch=async(url,options)=>{
     requests.push({url,body:JSON.parse(options.body)});
     if(fail)throw new Error('Preview unavailable');
+    const response=url.endsWith('/analyze')?{explanation:'Use comments',action:'enable-comments',enableConversation:false}
+      :url.endsWith('/change-preview')?{token:'change-token',profile:'TEST_PROFILE',attribute:'comments',before:'false',after:'true'}
+      :url.endsWith('/apply')?{verified:true,message:'Readback verified'}:null;
+    if(response)return {ok:true,status:200,headers:new Headers({'content-type':'application/json'}),json:async()=>response};
     return {ok:true,status:200,headers:new Headers({'content-type':'application/json'}),json:async()=>({token:'preview-token',source:'Synthetic diagnosis',profile:{selection:{name:'TEST_MODEL'},provider:'test',model:'test-model'}})};
   };
   try{
@@ -48,6 +52,19 @@ test('editing or failing to refresh a preview hides stale data and clears consen
     assert.equal(get('status').textContent,'');
     assert.ok(requests.every(request=>request.url==='/ai-setup/assistant/preview'));
     assert.equal(requests[0].body.question,'Explain readiness');
+    await get('preview').events.click();
+    get('consent').checked=true;get('consent').events.change();
+    await get('analyze').events.click();
+    assert.equal(get('change').hidden,false,'a non-conversation action must remain reviewable');
+    await get('change').events.click();
+    assert.equal(get('change-value').textContent,'TEST_PROFILE · comments: false → true');
+    assert.equal(get('apply').disabled,true);
+    get('apply-consent').checked=true;get('apply-consent').events.change();
+    assert.equal(get('apply').disabled,false);
+    await get('apply').events.click();
+    assert.deepEqual(requests.at(-1).body,{token:'change-token',consent:true});
+    assert.equal(get('change-panel').hidden,true);
+    assert.equal(get('apply').disabled,true);
   }finally{
     if(originalDocument===undefined)delete globalThis.document;else globalThis.document=originalDocument;
     globalThis.fetch=originalFetch;
