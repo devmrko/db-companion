@@ -11,6 +11,7 @@ function side(result,name){
   const profile=sql?.profile||inspection?.profile;
   const rows={
     profile:observation(profile||null,profile?'OBSERVED':'NOT_OBSERVED',sql?.requestedAt||inspection?.checkedAt,Boolean(profile)),
+    glossary:observation(sql?.glossary??null,sql?(sql.glossary?'ATTACHED_SNAPSHOT':'NO_EXTRA_ATTACHMENT'):'NOT_OBSERVED',sql?.glossary?.capturedAt??sql?.requestedAt,Boolean(sql)),
     sql:observation(sql?.text??null,sql?.error?'ERROR':sql?.text?'GENERATED_NOT_EXECUTED':'NOT_OBSERVED',sql?.requestedAt,Boolean(sql?.text)&&!sql?.error),
     error:observation(sql?{message:sql.error||null,code:sql.code||null,phase:sql.phase||null}:null,sql?'OBSERVED':'NOT_OBSERVED',sql?.requestedAt,Boolean(sql)),
     time:observation(sql?.elapsedMillis??null,sql?'OBSERVED_MS':'NOT_OBSERVED',sql?.requestedAt,Boolean(sql)),
@@ -50,7 +51,7 @@ export function renderComparisonRows(host,result,differencesOnly=false){
   for(const row of rows){
     const section=document.createElement('section'),title=document.createElement('h3'),grid=document.createElement('div');
     section.className=`app-comparison-field ${row.same?'is-equal':'is-different'}`;
-    title.textContent=`${labels()[row.key]} · ${row.same?t('aitest.comparison.same','조회값 같음'):t('aitest.comparison.different','차이 또는 미확인')}`;
+    title.textContent=`${row.key==='glossary'?t('followup.glossarySnapshot','첨부 용어·버전·참조 SQL'):labels()[row.key]} · ${row.same?t('aitest.comparison.same','조회값 같음'):t('aitest.comparison.different','차이 또는 미확인')}`;
     grid.className='app-comparison-grid';
     for(const [name,value] of [['A',row.left],['B',row.right]]){
       const cell=document.createElement('div'),heading=document.createElement('h4'),status=document.createElement('p'),body=document.createElement('pre');

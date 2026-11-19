@@ -72,6 +72,22 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ai-test]').for
     if(get('comparison-left')){get('comparison-preview').disabled=pending||!selected||!validQuestion(get('question').value);get('comparison-left-inspection').disabled=pending||!comparison;get('comparison-right-inspection').disabled=pending||!comparison;get('comparison-left-run').disabled=pending||!comparison||!get('comparison-consent').checked;get('comparison-right-run').disabled=pending||!comparison||!get('comparison-consent').checked;get('comparison-showprompt-preview').disabled=pending||!comparison;get('comparison-showprompt-left-run').disabled=pending||!comparisonShowPrompt||!get('comparison-showprompt-consent').checked;get('comparison-showprompt-right-run').disabled=pending||!comparisonShowPrompt||!get('comparison-showprompt-consent').checked;get('comparison-ai-run').disabled=pending||!comparisonAi||!get('comparison-ai-consent').checked;}
   }
   const comparisonDialog=get('comparison-dialog');
+  const glossaryCompare=document.createElement('button');
+  glossaryCompare.type='button';glossaryCompare.className='btn app-btn app-btn-secondary';
+  glossaryCompare.textContent=t('followup.glossaryCompare','선택 용어 첨부 전후 비교');
+  get('comparison-preview').before(glossaryCompare);
+  glossaryCompare.addEventListener('click',async()=>{
+    if(busy||remoteRunning)return;
+    if(!glossary.enabled()||!glossary.ready()){message(t('followup.chooseTerms','업무 용어 참고를 켜고 검색할 용어를 선택하세요.'),true);return;}
+    if(evidence.request().useOntology){message(t('aitest.comparison.evidenceUnsupported','온톨로지 근거 비교는 A/B에서 아직 지원하지 않습니다.'),true);return;}
+    busy=true;comparison=null;observedComparison=null;get('comparison-result').replaceChildren();controls();glossaryCompare.disabled=true;
+    try{
+      comparison=await post('comparison/glossary-preview',{profile:selected,question:get('question').value,...glossary.request()});
+      get('comparison-plan').textContent=t('followup.comparisonScope','A: 선택 용어 미첨부 · B: 정의·참조 SQL 첨부. 같은 프로필로 SQL 생성 2회. 기존 Semantic Source·Feedback는 양쪽에 유지됩니다. 기대 정답은 전송하지 않습니다.');
+      get('comparison-source').textContent=`A: ${comparison.left.source}\n\nB: ${comparison.right.source}`;
+      get('comparison-consent').checked=false;comparisonDialog.showModal();
+    }catch(ex){message(ex.message,true);}finally{busy=false;glossaryCompare.disabled=false;controls();}
+  });
   const comparisonAiDialog=get('comparison-ai-dialog');
   const comparisonShowPromptDialog=get('comparison-showprompt-dialog');
   get('comparison-preview').addEventListener('click',async()=>{if(glossary.enabled()){message(t('businessGlossary.comparisonUnsupported','업무 용어 참고는 단일 테스트에서 사용해 주세요. A/B 비교는 아직 지원하지 않습니다.'),true);return;}const context=evidence.request();if(context.useOntology){message(t('aitest.comparison.evidenceUnsupported','온톨로지 근거 비교는 A/B에서 아직 지원하지 않습니다. 근거 사용을 해제하거나 단일 테스트를 사용해 주세요.'),true);return;}busy=true;controls();try{comparison=await post('comparison/preview',{left:get('comparison-left').value,right:get('comparison-right').value,question:get('question').value});get('comparison-plan').textContent=t('aitest.comparison.plan','기본 SQL 생성 {0}회 · SHOWPROMPT {1}회 · AI 비교 {2}회',comparison.baseCalls,comparison.showPromptCalls,comparison.aiComparisonCalls);get('comparison-source').textContent=`A: ${comparison.left.source}\n\nB: ${comparison.right.source}`;get('comparison-consent').checked=false;comparisonDialog.showModal();}catch(ex){message(ex.message,true);}finally{busy=false;controls();}});

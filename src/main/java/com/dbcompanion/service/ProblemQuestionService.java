@@ -54,6 +54,20 @@ public class ProblemQuestionService {
     private void saveRecord(String schema,String id,String type,Object payload){var tree=json.valueToTree(payload);records.begin(schema,id,type,tree);if(!records.finish(schema,id,"SUCCEEDED",tree))throw new AiAssistant.Failure(409,"problemQuestion.stale","저장 상태가 변경되었습니다.");}
     public ProblemQuestion.Page page(PoolSession s,String before){return tx(s,read,()->records.problemPage(schema(s),before));}
     public ProblemQuestion.Detail detail(PoolSession s,String id){return tx(s,read,()->records.problemDetail(schema(s),ProblemQuestion.id(id)));}
+    public String saveRecovery(PoolSession s,String parentId,Instant expectedUpdatedAt,ProblemQuestion.Recovery request){
+        if(expectedUpdatedAt==null)throw AiAssistant.stale();
+        return tx(s,write,()->{
+            String schema=schema(s);var parent=records.lockProblem(schema,ProblemQuestion.id(parentId));
+            if(!parent.updatedAt().equals(expectedUpdatedAt))throw AiAssistant.stale();
+            var detail=records.problemDetail(schema,parent.id());
+            var note=ProblemQuestion.recovery(request,detail.attempts());
+            String id=UUID.randomUUID().toString();
+            var attempt=new ProblemQuestion.Attempt(1,id,parent.id(),parent.question(),
+                    json.writeValueAsString(Map.of("recovery",note)),note.assessment(),"","","","","","","","",
+                    "MANUAL_RECOVERY","USER_REPORTED_NOT_VERIFIED",Instant.now(),0,null,null,null,null);
+            saveRecord(schema,id,ProblemQuestion.ATTEMPT_TYPE,attempt);return id;
+        });
+    }
     public ProblemQuestion.Parent update(PoolSession s,String id,ProblemQuestion.Update request,Instant expectedUpdatedAt){if(request==null||request.status()==null||expectedUpdatedAt==null)throw new AiAssistant.Failure(400,"problemQuestion.invalid","문제 질문 정보를 확인해 주세요.");return tx(s,write,()->{String schema=schema(s);var current=records.lockProblem(schema,ProblemQuestion.id(id));if(!current.updatedAt().equals(expectedUpdatedAt))throw new AiAssistant.Failure(409,"problemQuestion.stale","문제 질문이 변경되었습니다. 다시 불러와 주세요.");var next=new ProblemQuestion.Parent(current.version(),current.id(),current.question(),current.description(),current.expected(),current.expectedSql(),request.status(),request.retained(),current.createdAt(),Instant.now());records.updateProblem(schema,next,expectedUpdatedAt);return next;});}
     /** Compares two immutable saved observations only; it never reconstructs or calls AI. */
     public Map<String,Object> compare(PoolSession s,String parentId,String leftId,String rightId){return tx(s,read,()->{var detail=records.problemDetail(schema(s),ProblemQuestion.id(parentId));var left=detail.attempts().stream().filter(a->a.id().equals(ProblemQuestion.id(leftId))).findFirst().orElseThrow(()->new AiAssistant.Failure(404,"problemQuestion.missing","실행 기록을 찾을 수 없습니다."));var right=detail.attempts().stream().filter(a->a.id().equals(ProblemQuestion.id(rightId))).findFirst().orElseThrow(()->new AiAssistant.Failure(404,"problemQuestion.missing","실행 기록을 찾을 수 없습니다."));var differences=new LinkedHashMap<String,Map<String,String>>();compare(differences,"conditions",left.conditions(),right.conditions());compare(differences,"response",left.response(),right.response());compare(differences,"sql",left.sql(),right.sql());compare(differences,"error",left.error(),right.error());compare(differences,"profile",left.profile(),right.profile());compare(differences,"model",left.model(),right.model());compareSnapshot(differences,"options",left.optionSnapshot(),left.options(),right.optionSnapshot(),right.options());compareSnapshot(differences,"prompt",left.promptSnapshot(),left.prompt(),right.promptSnapshot(),right.prompt());compareSnapshot(differences,"metadata",left.metadataSnapshot(),left.metadata(),right.metadataSnapshot(),right.metadata());compareSnapshot(differences,"feedback",left.feedbackSnapshot(),left.feedback(),right.feedbackSnapshot(),right.feedback());return Map.of("left",left.id(),"right",right.id(),"differences",differences,"comparisonKind","SAVED_SNAPSHOTS_ONLY");});}

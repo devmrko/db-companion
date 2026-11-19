@@ -15,6 +15,17 @@ public final class ProblemQuestion {
     public record Snapshot(String value,String availability,Instant checkedAt) {}
     public record Attempt(int version,String id,String parentId,String input,String conditions,String response,String sql,String error,String profile,String model,String options,String prompt,String metadata,String feedback,String snapshotKind,String availability,Instant capturedAt,long elapsedMillis,Snapshot optionSnapshot,Snapshot promptSnapshot,Snapshot metadataSnapshot,Snapshot feedbackSnapshot) {}
     public record Update(Status status,boolean retained) {}
+    /** Human-authored recovery notes link saved observations; they are not an executed test. */
+    public record Recovery(String beforeId,String retestId,String cause,String action,String assessment) {}
+    public static Recovery recovery(Recovery value,List<Attempt> attempts){
+        if(value==null)throw AiAssistant.stale();
+        String before=id(value.beforeId());
+        String retest=value.retestId()==null||value.retestId().isBlank()?"":id(value.retestId());
+        var available=attempts.stream().filter(a->!"MANUAL_RECOVERY".equals(a.snapshotKind())).map(Attempt::id).toList();
+        if(!available.contains(before)||!retest.isEmpty()&&(!available.contains(retest)||before.equals(retest)))throw AiAssistant.stale();
+        return new Recovery(before,retest,optional(value.cause(),4000,"assistant.invalid"),
+                text(value.action(),4000,"assistant.invalid"),text(value.assessment(),4000,"assistant.invalid"));
+    }
     public record Summary(String seq,String id,String question,Status status,boolean retained,String recordedAt,String updatedAt,int attempts) {}
     public record Page(List<Summary> rows,String next){public Page{rows=List.copyOf(rows);}}
     public record Detail(Parent parent,List<Attempt> attempts) {public Detail{attempts=List.copyOf(attempts);}}

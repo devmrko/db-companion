@@ -1,4 +1,8 @@
 /* Shared configuration surfaces: Memory, Guardrail and Agent Engine. */
+.app-setup-state { display:inline-block; padding:3px 9px; margin-right:8px; border-radius:5px; font-size:12px; font-weight:600; }
+.app-setup-CONFIGURED { background:#e5f3ec; color:#155a38; }
+.app-setup-ACTION { background:#fff0d9; color:#784900; }
+.app-setup-UNKNOWN { background:#eaf0f8; color:#304b6c; }
 .app-memory-dialog { width:min(960px,calc(100vw - 32px)); max-height:85vh; padding:0; }
 .app-memory-dialog-header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 24px; border-bottom:1px solid var(--app-border); }
 .app-memory-dialog-header h2 { margin:0; font-size:18px; }

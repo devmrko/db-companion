@@ -1,0 +1,247 @@
+{
+  "version": 1,
+  "goals": [
+    {
+      "id": "nl2sql",
+      "requires": [
+        "profile",
+        "provider",
+        "model",
+        "objects",
+        "credential",
+        "external",
+        "execution"
+      ],
+      "actions": [
+        "enable-conversation"
+      ]
+    },
+    {
+      "id": "glossary",
+      "requires": [
+        "profile",
+        "provider",
+        "model",
+        "objects",
+        "credential",
+        "semantic",
+        "glossary",
+        "external",
+        "execution"
+      ],
+      "actions": [
+        "enable-conversation"
+      ]
+    },
+    {
+      "id": "mcp",
+      "requires": [
+        "profile",
+        "provider",
+        "model",
+        "objects",
+        "credential",
+        "semantic",
+        "mcp",
+        "external",
+        "execution"
+      ],
+      "actions": [
+        "enable-conversation"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "profile",
+      "scope": "configuration",
+      "actor": "USER",
+      "link": "/ai-profiles",
+      "condition": "Enabled owner profile",
+      "probe": "DatabaseService.profiles"
+    },
+    {
+      "id": "provider",
+      "scope": "configuration",
+      "actor": "USER",
+      "link": "/ai-profiles",
+      "condition": "Model provider configured",
+      "probe": "DatabaseService.profiles"
+    },
+    {
+      "id": "model",
+      "scope": "configuration",
+      "actor": "USER",
+      "link": "/ai-profiles",
+      "condition": "Model identifier configured",
+      "probe": "DatabaseService.profiles"
+    },
+    {
+      "id": "objects",
+      "scope": "configuration",
+      "actor": "USER",
+      "link": "/ai-profiles",
+      "condition": "Valid object_list entries; object privileges require separate verification",
+      "probe": "DatabaseService.profiles"
+    },
+    {
+      "id": "credential",
+      "scope": "configuration",
+      "actor": "DB_ADMIN",
+      "link": "/db/credentials",
+      "condition": "Available credential or resource principal; external IAM separately verified",
+      "probe": "ProfileEditRepository.credentials"
+    },
+    {
+      "id": "semantic",
+      "scope": "configuration",
+      "actor": "USER",
+      "link": "/ai-profiles",
+      "condition": "Supported Semantic Context API and active linked sources",
+      "probe": "SemanticContextService.status"
+    },
+    {
+      "id": "glossary",
+      "scope": "configuration",
+      "actor": "USER",
+      "link": "/business-glossary",
+      "condition": "Definitions and reference SQL match the intended business meaning",
+      "probe": "MANUAL"
+    },
+    {
+      "id": "mcp",
+      "scope": "configuration",
+      "actor": "USER",
+      "link": "/ai-profiles",
+      "condition": "MCP tool mapping and remote response verified",
+      "probe": "MANUAL"
+    },
+    {
+      "id": "external",
+      "scope": "configuration",
+      "actor": "OCI_ADMIN",
+      "link": "/db/admin-help",
+      "condition": "External network, IAM and model access verified",
+      "probe": "MANUAL"
+    },
+    {
+      "id": "execution",
+      "scope": "configuration",
+      "actor": "USER",
+      "link": "/ai-test",
+      "condition": "Generated SQL executed and independently compared to a business baseline",
+      "probe": "MANUAL"
+    },
+    {
+      "id": "records",
+      "scope": "history",
+      "actor": "USER",
+      "link": "/ai-test/problems",
+      "condition": "Shared app record store compatible",
+      "probe": "ProblemQuestionService.status"
+    },
+    {
+      "id": "conversation",
+      "scope": "history",
+      "actor": "USER",
+      "link": "/ai-profiles",
+      "condition": "conversation enabled; caller must provide conversation ID",
+      "probe": "DatabaseService.profiles"
+    },
+    {
+      "id": "conversationView",
+      "scope": "history",
+      "actor": "DB_ADMIN",
+      "link": "/ai-executions",
+      "condition": "Required conversation view columns readable",
+      "probe": "AiExecutionHistoryRepository.readable"
+    },
+    {
+      "id": "profileStore",
+      "scope": "history",
+      "actor": "DB_ADMIN",
+      "link": "/ai-profiles",
+      "condition": "Profile archive compatible",
+      "probe": "ProfileHistoryService.state"
+    },
+    {
+      "id": "profileAudit",
+      "scope": "history",
+      "actor": "DB_ADMIN",
+      "link": "/ai-profiles",
+      "condition": "Profile audit policy enabled",
+      "probe": "ProfileHistoryService.state"
+    },
+    {
+      "id": "profileCollect",
+      "scope": "history",
+      "actor": "DB_ADMIN",
+      "link": "/ai-profiles",
+      "condition": "Profile collection prerequisites ready; actual collection separately verified",
+      "probe": "ProfileHistoryService.state"
+    },
+    {
+      "id": "auditSource",
+      "scope": "history",
+      "actor": "DB_ADMIN",
+      "link": "/db/audit",
+      "condition": "Audit source readable",
+      "probe": "AuditHistoryService.status"
+    },
+    {
+      "id": "auditStore",
+      "scope": "history",
+      "actor": "DB_ADMIN",
+      "link": "/db/audit",
+      "condition": "Audit archive and settings tables compatible",
+      "probe": "AuditHistoryService.status"
+    },
+    {
+      "id": "auditCollector",
+      "scope": "history",
+      "actor": "DB_ADMIN",
+      "link": "/db/audit",
+      "condition": "Audit collector package compatible and valid",
+      "probe": "AuditHistoryService.status"
+    },
+    {
+      "id": "auditSchedule",
+      "scope": "history",
+      "actor": "DB_ADMIN",
+      "link": "/db/audit",
+      "condition": "Collector scheduled and enabled; interval and retention configured",
+      "probe": "AuditHistoryService.status"
+    },
+    {
+      "id": "objectHistory",
+      "scope": "history",
+      "actor": "USER",
+      "link": "/tables",
+      "condition": "Object-specific metadata and row history settings checked",
+      "probe": "MANUAL"
+    }
+  ],
+  "actions": [
+    {
+      "id": "enable-conversation",
+      "actor": "USER",
+      "attribute": "conversation",
+      "value": "true",
+      "requires": [
+        "configuration.profile",
+        "history.profileStore"
+      ],
+      "preview": "ProfileEditService.edit",
+      "apply": "ProfileEditService.save",
+      "verification": "Existing editor readback and before/after archive; subsequent request must supply conversation ID",
+      "confirmationRequired": true
+    }
+  ],
+  "evidenceRules": [
+    "UNKNOWN is not MISSING or DISABLED",
+    "CONFIGURED does not prove a successful request or business correctness",
+    "Metadata and assistant text do not grant permissions",
+    "Changes use only registered service actions, never model-generated SQL",
+    "Check supported API and view capabilities; do not assume support from a version string alone"
+  ]
+}

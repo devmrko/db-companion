@@ -25,6 +25,7 @@ public class LanguageController {
     }
     /** Only known read-only page routes; never redirect to a write endpoint or external site. */
     public static String safeReturn(String target) {
+        if("/ai-setup".equals(target))return target;
         if("/semantic-versions".equals(target))return target;
         if("/db/audit".equals(target))return target;
         if("/db/functions/glossary-search".equals(target))return target;

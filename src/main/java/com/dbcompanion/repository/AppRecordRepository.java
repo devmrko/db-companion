@@ -75,7 +75,7 @@ public class AppRecordRepository {
     public ProblemQuestion.Page problemPage(String schema,String before){
         Ontology.cursor(before);var args=new ArrayList<Object>(List.of(ProblemQuestion.TYPE));if(!before.isEmpty())args.add(new BigDecimal(before));
         var rows=jdbc.query("SELECT SEQ,RECORD_ID,RECORDED_AT,UPDATED_AT,PAYLOAD FROM "+AppRecordSql.table(schema)+" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED'"+(before.isEmpty()?"":" AND SEQ<?")+" ORDER BY SEQ DESC FETCH FIRST 21 ROWS ONLY",(r,n)->{
-            var parent=parent(r.getClob(5));int attempts=jdbc.queryForObject("SELECT COUNT(*) FROM "+AppRecordSql.table(schema)+" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED' AND JSON_VALUE(PAYLOAD,'$.parentId')=?",Integer.class,ProblemQuestion.ATTEMPT_TYPE,parent.id());
+            var parent=parent(r.getClob(5));int attempts=jdbc.queryForObject("SELECT COUNT(*) FROM "+AppRecordSql.table(schema)+" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED' AND JSON_VALUE(PAYLOAD,'$.parentId')=? AND NVL(JSON_VALUE(PAYLOAD,'$.snapshotKind'),'UNKNOWN')<>'MANUAL_RECOVERY'",Integer.class,ProblemQuestion.ATTEMPT_TYPE,parent.id());
             return new ProblemQuestion.Summary(r.getString(1),r.getString(2),parent.question(),parent.status(),parent.retained(),r.getString(3),r.getString(4),attempts);
         },args.toArray());
         var page=rows.stream().limit(20).toList();return new ProblemQuestion.Page(page,rows.size()>20?page.getLast().seq():"");

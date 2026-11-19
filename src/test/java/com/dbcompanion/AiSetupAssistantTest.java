@@ -1,0 +1,37 @@
+package com.dbcompanion;
+
+import com.dbcompanion.service.*;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import tools.jackson.databind.json.JsonMapper;
+import static org.assertj.core.api.Assertions.*;
+
+class AiSetupAssistantTest {
+    @Test void catalogueCoversEveryPurposeAndFailsClosedForUnobservedChecks() {
+        for(var purpose:AiSetupCatalog.purposes()) {
+            var expected=AiSetupCatalog.goal(purpose).requires();
+            var actual=AiSetupCatalog.configuration(purpose,List.of());
+            assertThat(actual).extracting(AiSetupService.Check::key).containsExactlyElementsOf(expected);
+            assertThat(actual).allMatch(c->c.state()==AiSetupService.State.UNKNOWN);
+        }
+        assertThat(AiSetupCatalog.history(List.of())).hasSize(11).allMatch(c->c.state()==AiSetupService.State.UNKNOWN);
+        assertThatThrownBy(()->AiSetupCatalog.goal("invented")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(()->AiSetupCatalog.action("execute-sql")).isInstanceOf(IllegalArgumentException.class);
+    }
+    @Test void catalogueActionRequiresConfirmedPrerequisitesAndExistingEditor() {
+        var action=AiSetupCatalog.action("enable-conversation");
+        assertThat(action.attribute()).isEqualTo("conversation");assertThat(action.value()).isEqualTo("true");
+        assertThat(action.apply()).isEqualTo("ProfileEditService.save");assertThat(action.confirmationRequired()).isTrue();
+        var checks=List.of(new AiSetupService.Check("profile",AiSetupService.State.CONFIGURED,"/ai-profiles"));
+        assertThat(AiSetupCatalog.eligible(action.id(),checks,List.of())).isFalse();
+        assertThat(AiSetupCatalog.eligible(action.id(),checks,List.of(new AiSetupHistoryService.Check("profileStore",AiSetupService.State.UNKNOWN,"/ai-profiles","")))).isFalse();
+        assertThat(AiSetupCatalog.eligible(action.id(),checks,List.of(new AiSetupHistoryService.Check("profileStore",AiSetupService.State.CONFIGURED,"/ai-profiles","")))).isTrue();
+    }
+    @Test void modelCannotSupplySqlOrArbitraryActionFields() {
+        var mapper=new JsonMapper();
+        assertThat(AiSetupAssistantService.parse("{\"explanation\":\"설정 안내\",\"enableConversation\":true}",mapper).enableConversation()).isTrue();
+        for(String response:List.of("null","{}","{\"explanation\":\"x\",\"enableConversation\":\"true\"}",
+                "{\"explanation\":\"x\",\"enableConversation\":true,\"sql\":\"DROP TABLE X\"}"))
+            assertThatThrownBy(()->AiSetupAssistantService.parse(response,mapper)).isInstanceOf(IllegalArgumentException.class);
+    }
+}

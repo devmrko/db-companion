@@ -7,7 +7,9 @@ import java.util.*;
 public final class SelectAiComparison {
     private static final int MAX_SAVE_LEDGER=64;
     private SelectAiComparison() {}
-    public record Preview(String token,AiAssistant.Profile profile,String source,Instant expires) {}
+    public record Preview(String token,AiAssistant.Profile profile,String source,Instant expires,BusinessGlossary.Snapshot glossary) {
+        public Preview(String token,AiAssistant.Profile profile,String source,Instant expires){this(token,profile,source,expires,null);}
+    }
     public record Plan(String generation,Preview left,Preview right,String question,int baseCalls,int showPromptCalls,int aiComparisonCalls) {}
     public record ShowPromptPlan(String generation,Preview left,Preview right,int additionalCalls) {}
     public record InspectionRequest(String generation,String side,AiAssistant.Profile profile,String question,SelectAiInspection.Snapshot snapshot) {}
@@ -29,6 +31,20 @@ public final class SelectAiComparison {
             String generation=UUID.randomUUID().toString();plan=new Plan(generation,new Preview(UUID.randomUUID().toString(),a,SelectAiTest.prompt(SelectAiTest.Action.SQL,question,language),now.plusSeconds(600)),new Preview(UUID.randomUUID().toString(),b,SelectAiTest.prompt(SelectAiTest.Action.SQL,question,language),now.plusSeconds(600)),question,2,0,0);
             left=null;right=null;leftPrompt=null;rightPrompt=null;leftInspection=null;rightInspection=null;showPrompt=null;ai=null;aiResult=null;return plan;
         }
+        /** Only the explicitly selected glossary attachment differs; native profile context is unchanged. */
+        public synchronized Plan prepareGlossary(AiAssistant.Profile profile,String question,String language,
+                                                BusinessGlossary.Snapshot glossary,Instant now){
+            SelectAiTest.question(question);busy();
+            if(profile==null||glossary==null||glossary.selected().isEmpty()
+                    ||!profile.selection().owner().equals(glossary.owner())
+                    ||!profile.selection().name().equals(glossary.profile())||!question.equals(glossary.question()))
+                throw BusinessGlossary.stale();
+            String before=SelectAiTest.prompt(SelectAiTest.Action.SQL,question,language);
+            plan=new Plan(UUID.randomUUID().toString(),new Preview(UUID.randomUUID().toString(),profile,before,now.plusSeconds(600)),
+                    new Preview(UUID.randomUUID().toString(),profile,BusinessGlossary.append(before,glossary),now.plusSeconds(600),glossary),question,2,0,0);
+            left=null;right=null;leftPrompt=null;rightPrompt=null;leftInspection=null;rightInspection=null;showPrompt=null;ai=null;aiResult=null;
+            return plan;
+        }
         private void busy(){if(leftRunning||rightRunning||leftInspectionRunning||rightInspectionRunning||leftPromptRunning||rightPromptRunning||aiRunning||saves.values().stream().anyMatch(SaveSlot::saving))throw new AiAssistant.Failure(409,"testComparison.busy","비교 요청 처리 중입니다.");}
         public synchronized Preview consume(String token,boolean consent,Instant now){
             if(!consent)throw new AiAssistant.Failure(400,"aitest.consentRequired","외부 전송·사용량 확인이 필요합니다.");if(plan==null||!now.isBefore(plan.left().expires()))throw AiAssistant.stale();
@@ -49,7 +65,11 @@ public final class SelectAiComparison {
             if("left".equals(side))leftInspectionRunning=false;else if("right".equals(side))rightInspectionRunning=false;
         }
         public synchronized ShowPromptPlan prepareShowPrompt(String language,Instant now){
-            busy();if(plan==null)throw AiAssistant.stale();showPrompt=new ShowPromptPlan(plan.generation(),new Preview(UUID.randomUUID().toString(),plan.left().profile(),SelectAiTest.prompt(SelectAiTest.Action.PROMPT,plan.question(),language),now.plusSeconds(600)),new Preview(UUID.randomUUID().toString(),plan.right().profile(),SelectAiTest.prompt(SelectAiTest.Action.PROMPT,plan.question(),language),now.plusSeconds(600)),2);leftPrompt=null;rightPrompt=null;return showPrompt;
+            busy();if(plan==null)throw AiAssistant.stale();showPrompt=new ShowPromptPlan(plan.generation(),promptPreview(plan.left(),language,now),promptPreview(plan.right(),language,now),2);leftPrompt=null;rightPrompt=null;return showPrompt;
+        }
+        private Preview promptPreview(Preview side,String language,Instant now){
+            return new Preview(UUID.randomUUID().toString(),side.profile(),BusinessGlossary.append(
+                    SelectAiTest.prompt(SelectAiTest.Action.PROMPT,plan.question(),language),side.glossary()),now.plusSeconds(600),side.glossary());
         }
         public synchronized Preview consumePrompt(String token,boolean consent,Instant now){
             if(!consent)throw new AiAssistant.Failure(400,"aitest.consentRequired","외부 전송·사용량 확인이 필요합니다.");if(showPrompt==null||!now.isBefore(showPrompt.left().expires()))throw AiAssistant.stale();Preview value=showPrompt.left().token().equals(token)?showPrompt.left():showPrompt.right().token().equals(token)?showPrompt.right():null;if(value==null)throw AiAssistant.stale();if(value==showPrompt.left()){if(leftPromptRunning||leftPrompt!=null)throw AiAssistant.stale();leftPromptRunning=true;}else{if(rightPromptRunning||rightPrompt!=null)throw AiAssistant.stale();rightPromptRunning=true;}return value;

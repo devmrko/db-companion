@@ -78,6 +78,8 @@ public class SelectAiTestController {
     @PostMapping("/ai-test/generate") @ResponseBody
     public ResponseEntity<?> generate(@RequestBody Run v,HttpServletRequest r){return respond(r,()->service.run(session(r),v.token(),v.consent(),r.getHeader("X-AI-Progress-Id")));}
     public record ComparisonPrepare(String left,String right,String question) {}
+    public record GlossaryComparisonPrepare(String profile,String question,com.dbcompanion.model.BusinessGlossary.Selection glossary) {}
+    @PostMapping("/ai-test/comparison/glossary-preview") @ResponseBody public ResponseEntity<?> glossaryComparisonPreview(@RequestBody GlossaryComparisonPrepare v,Locale locale,HttpServletRequest r){return respond(r,()->service.glossaryComparisonPreview(session(r),v.profile(),v.question(),v.glossary(),locale));}
     @PostMapping("/ai-test/comparison/preview") @ResponseBody public ResponseEntity<?> comparisonPreview(@RequestBody ComparisonPrepare v,Locale locale,HttpServletRequest r){return respond(r,()->service.comparisonPreview(session(r),v.left(),v.right(),v.question(),locale));}
     @PostMapping("/ai-test/comparison/generate") @ResponseBody public ResponseEntity<?> comparisonGenerate(@RequestBody Run v,HttpServletRequest r){return respond(r,()->service.comparisonGenerate(session(r),v.token(),v.consent()));}
     @PostMapping("/ai-test/comparison/showprompt/preview") @ResponseBody public ResponseEntity<?> comparisonShowPromptPreview(Locale locale,HttpServletRequest r){return respond(r,()->service.comparisonShowPromptPreview(session(r),locale));}

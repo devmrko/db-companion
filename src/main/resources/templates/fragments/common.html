@@ -21,6 +21,7 @@
   <a th:replace="~{fragments/common :: brand}"></a>
   <p class="app-nav-label" th:text="#{nav.workspace}">Workspace</p>
   <nav th:aria-label="#{ui.72fbacf096bf}">
+    <a class="app-nav-item" th:classappend="${activePage == 'ai-setup'} ? 'is-active'" th:href="@{/ai-setup}" th:attr="aria-current=${activePage == 'ai-setup' ? 'page' : null}"><svg th:replace="~{fragments/common :: icon('grid')}"></svg><span class="app-nav-text" th:text="#{setup.title}">시작·준비 진단</span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'overview'} ? 'is-active'" th:href="@{/}" th:attr="aria-current=${activePage == 'overview' ? 'page' : null}" th:aria-label="#{ui.6c9c3023153d}" th:title="#{ui.6c9c3023153d}"><svg th:replace="~{fragments/common :: icon('grid')}"></svg><span class="app-nav-text" th:text="#{ui.6c9c3023153d}">접속 정보</span></a>
   </nav>
   <p class="app-nav-label app-nav-group" th:text="#{ui.e307b2f42689}">AI 데이터 관리</p>

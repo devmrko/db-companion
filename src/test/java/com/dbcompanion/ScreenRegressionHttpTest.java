@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /** Real embedded HTTP and repository assets; no database substitution or fake authentication. */
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT,properties={"app.oracle.wallet-path=","app.oracle.wallet-paths="})
 class ScreenRegressionHttpTest {
-    static final List<String> MENUS=List.of("/","/business-glossary","/ontology","/ontology-query","/ai-assistant","/vector-search",
+    static final List<String> MENUS=List.of("/","/ai-setup","/business-glossary","/ontology","/ontology-query","/ai-assistant","/vector-search",
             "/tables","/ai-profiles","/ai-test","/ai-test/problems","/ai-feedback","/ai-agents","/ai-executions","/db/scheduler",
             "/db/external-sources","/db/credentials","/db/security","/db/functions","/db/ords");
     @LocalServerPort int port;

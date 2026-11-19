@@ -24,6 +24,10 @@ public class AiExecutionHistoryRepository {
     }
 
     public record Statement(String sql, List<Object> args) {}
+    public boolean readable() {
+        jdbc.queryForList("SELECT CONVERSATION_PROMPT_ID, CONVERSATION_ID, PROFILE_NAME, CREATED, PROMPT_ACTION FROM " + VIEW + " WHERE 1=0");
+        return true;
+    }
 
     /** The view and columns are fixed; filters and pagination are bound values. */
     public static Statement listStatement(Query query) {
