@@ -51,6 +51,7 @@ public class AiSetupController {
                     model.addAttribute("checks", setup.diagnose(session, profile, purpose));
                     if(history!=null)model.addAttribute("historyChecks",history.diagnose(session,database.profiles(session,profile).attributes()));
                     if(evidence!=null)model.addAttribute("savedEvidence",evidence.read(session,profile));
+                    if(evidence!=null)model.addAttribute("historyReview",evidence.review(session,profile,database.profiles(session,profile).attributes()));
                     var state=session.metadata().aiTest();var comparison=session.metadata().aiComparison().result();
                     model.addAttribute("observations", AiSetupService.observations(session.metadata().info().username(),profile,
                             java.util.Arrays.asList(state.latest(),state.prompt(),comparison.left(),comparison.right(),

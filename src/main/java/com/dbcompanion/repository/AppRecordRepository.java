@@ -73,6 +73,32 @@ public class AppRecordRepository {
         return new OntologyScope.Page(rows.stream().limit(20).toList(),rows.size()>20?sequences.get(19):"");
     }
     /** STATE is the persistence result, never an AI/SQL success verdict. */
+    public List<SetupHistoryReview.Saved> recentSetupHistory(String schema,String profile){
+        return jdbc.query("SELECT RECORD_ID,JSON_VALUE(PAYLOAD,'$.parentId'),JSON_VALUE(PAYLOAD,'$.capturedAt'),"
+                +"JSON_VALUE(PAYLOAD,'$.snapshotKind'),JSON_VALUE(PAYLOAD,'$.model'),"
+                +"CASE WHEN JSON_EXISTS(PAYLOAD,'$.error?(@ != null && @ != \"\")') THEN 1 ELSE 0 END,"
+                +"JSON_QUERY(PAYLOAD,'$.optionSnapshot' RETURNING CLOB) FROM "+AppRecordSql.table(schema)
+                +" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED' AND JSON_VALUE(PAYLOAD,'$.profile')=?"
+                +" AND NVL(JSON_VALUE(PAYLOAD,'$.snapshotKind'),'UNKNOWN')<>'MANUAL_RECOVERY'"
+                +" ORDER BY RECORDED_AT DESC,SEQ DESC FETCH FIRST 10 ROWS ONLY",
+                (row,index)->{
+                    var clob=row.getClob(7);
+                    try {
+                        String snapshot=clob==null||clob.length()>ProblemQuestion.MAX_PAYLOAD?null:clob.getSubString(1,(int)clob.length());
+                        return new SetupHistoryReview.Saved(row.getString(1),row.getString(2),row.getString(3),row.getString(4),row.getString(5),row.getInt(6)==1,snapshot);
+                    }finally{if(clob!=null)clob.free();}
+                },ProblemQuestion.ATTEMPT_TYPE,schema+"."+profile);
+    }
+    public SetupHistoryReview.Recovery setupRecovery(String schema,String parentId,String beforeId){
+        String note="JSON_VALUE(PAYLOAD,'$.conditions' RETURNING CLOB)";
+        var rows=jdbc.query("SELECT RECORD_ID,JSON_VALUE("+note+",'$.recovery.retestId') FROM "+AppRecordSql.table(schema)
+                +" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED' AND JSON_VALUE(PAYLOAD,'$.parentId')=?"
+                +" AND JSON_VALUE(PAYLOAD,'$.snapshotKind')='MANUAL_RECOVERY'"
+                +" AND JSON_VALUE("+note+",'$.recovery.beforeId')=? ORDER BY SEQ DESC FETCH FIRST 1 ROW ONLY",
+                (row,index)->new SetupHistoryReview.Recovery(row.getString(1),Objects.toString(row.getString(2),"")),
+                ProblemQuestion.ATTEMPT_TYPE,parentId,beforeId);
+        return rows.isEmpty()?null:rows.getFirst();
+    }
     public List<SetupEvidence.Item> recentProblemMetadata(String schema,String profile){
         return jdbc.query("SELECT RECORD_ID, JSON_VALUE(PAYLOAD,'$.capturedAt'), JSON_VALUE(PAYLOAD,'$.snapshotKind') FROM "
                 +AppRecordSql.table(schema)+" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED'"

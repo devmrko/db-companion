@@ -80,6 +80,28 @@
       <a class="app-btn" th:href="${group.source == 'conversation' ? '/ai-executions?profile=' + #uris.escapeQueryParam(profile) : '/ai-test/problems'}" th:text="#{setup.openAction}"></a>
     </details>
   </section>
+  <section class="app-config-card" th:if="${historyReview != null}" data-history-review>
+    <details class="app-config-disclosure">
+      <summary th:text="#{setup.review.title}"></summary>
+      <p th:text="#{setup.review.help}"></p>
+      <p th:if="${historyReview.state != 'RECORDED'}" th:text="${#messages.msg('setup.saved.help.' + historyReview.state)}"></p>
+      <details class="app-config-disclosure" th:each="item : ${historyReview.items}">
+        <summary><span th:text="${#messages.msg('setup.review.' + item.comparison)}"></span> · <code th:text="${item.id}"></code></summary>
+        <p th:text="${item.at}"></p>
+        <p th:text="${#messages.msg(item.errorRecorded ? 'setup.review.error' : 'setup.review.noError')}"></p>
+        <p th:if="${!#lists.isEmpty(item.compared)}"><span th:text="#{setup.review.compared}"></span> <span th:text="${#strings.listJoin(item.compared, ', ')}"></span></p>
+        <p th:if="${!#lists.isEmpty(item.changed)}"><span th:text="#{setup.review.changed}"></span> <span th:text="${#strings.listJoin(item.changed, ', ')}"></span></p>
+        <p th:if="${item.recovery == null}" th:text="#{setup.review.noRecovery}"></p>
+        <div th:if="${item.recovery != null}">
+          <p><span th:text="#{setup.review.recovery}"></span> <code th:text="${item.recovery.id}"></code></p>
+          <p th:if="${item.recovery.retestId != ''}"><span th:text="#{setup.review.retest}"></span> <code th:text="${item.recovery.retestId}"></code></p>
+          <p th:if="${item.recovery.retestId == ''}" th:text="#{setup.review.noRetest}"></p>
+        </div>
+        <a class="app-btn" th:href="@{/ai-test/problems}" th:text="#{followup.recovery}"></a>
+        <a class="app-btn" th:href="@{/ai-test}" th:text="#{setup.runTest}"></a>
+      </details>
+    </details>
+  </section>
   <section class="app-config-card" th:if="${!#lists.isEmpty(checks)}" data-setup-assistant th:attr="data-purpose=${purpose},data-profile=${profile}">
     <h2 th:text="#{setup.ai.title}"></h2>
     <p th:text="#{setup.ai.help}"></p>

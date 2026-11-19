@@ -28,4 +28,13 @@ public class AiSetupEvidenceService {
             return new SetupEvidence.Group(name, "UNKNOWN", List.of());
         }
     }
+    public com.dbcompanion.model.SetupHistoryReview.Result review(PoolSession session,String profile,
+            List<com.dbcompanion.model.AiProfileAttribute> attributes){
+        if(!session.metadata().info().username().equals(session.metadata().selectedSchema()))
+            throw new IllegalArgumentException("Saved evidence requires owner schema");
+        try {
+            var rows=problems.setupHistory(session,profile,attributes);
+            return new com.dbcompanion.model.SetupHistoryReview.Result(rows.isEmpty()?"EMPTY":"RECORDED",rows);
+        }catch(RuntimeException ex){return new com.dbcompanion.model.SetupHistoryReview.Result("UNKNOWN",List.of());}
+    }
 }
