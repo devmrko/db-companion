@@ -38,6 +38,8 @@ public final class AiMemoryPolicy {
         if (!Set.of("memory", "guardrail").contains(java.util.Objects.toString(value.kind(), "")))
             throw error(400, "생성 유형을 확인해 주세요.");
         name(value.name()); name(value.profile());
+        if (value.kind().equals("memory") && !value.name().matches("[A-Z][A-Z0-9_]{0,15}"))
+            throw error(400, "메모리 저장소 이름은 영문으로 시작하는 16자 이내의 영문·숫자·밑줄만 사용할 수 있습니다.");
         if (value.description() == null || value.description().length() > 1000 || value.description().indexOf('\0') >= 0)
             throw error(400, "설명은 1,000자 이내로 입력해 주세요.");
         if (value.kind().equals("memory")) {

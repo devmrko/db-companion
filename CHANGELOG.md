@@ -8,8 +8,12 @@
 - Include only a safe Oracle error code when memory-store creation is uncertain;
   do not expose provider messages or retry automatically.
 - Expand live validation to three native-knowledge on/off aggregate comparisons
-  and three read-only Agent Engine branches. Memory creation remains unverified;
+  and three read-only Agent Engine branches. Verify disposable Memory creation,
+  extraction, record lookup and recall in a separate conversation;
   see [follow-up validation](docs/validation.md#follow-up-after-alpha20).
+- Validate Memory store names before creation (letter first, up to 16 letters,
+  digits or underscores) and recognize the same owner-qualified profile during
+  creation readback without accepting a different owner.
 
 ## 0.1.0-alpha.20
 

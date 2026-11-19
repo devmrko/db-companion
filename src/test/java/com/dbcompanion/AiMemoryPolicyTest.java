@@ -15,6 +15,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import static org.assertj.core.api.Assertions.*;
 
 class AiMemoryPolicyTest {
+    @Test void creationReadbackAcceptsTheSameQualifiedProfileButNeverADifferentOwner() {
+        assertThat(AiMemoryPolicyRepository.profileMatches("PROFILE","APP","PROFILE")).isTrue();
+        assertThat(AiMemoryPolicyRepository.profileMatches("\"APP\".\"PROFILE\"","APP","PROFILE")).isTrue();
+        assertThat(AiMemoryPolicyRepository.profileMatches("\"OTHER\".\"PROFILE\"","APP","PROFILE")).isFalse();
+        assertThat(AiMemoryPolicyRepository.profileMatches("\"APP\".\"OTHER\"","APP","PROFILE")).isFalse();
+        assertThat(AiMemoryPolicyRepository.profileMatches(null,"APP","PROFILE")).isFalse();
+    }
     @Test void nativeMemoryCreationAcceptsBothObservedProfileParameterNames() {
         for (String name : List.of("PROFILE_NAME", "MEMORY_PROFILE_NAME")) {
             assertThat(AiMemoryPolicyRepository.memoryCreateSignature(List.of("MEMORY_STORE_NAME:VARCHAR2:IN", name + ":VARCHAR2:IN", "DESCRIPTION:CLOB:IN", "ATTRIBUTES:CLOB:IN"))).isTrue();
@@ -52,6 +59,18 @@ class AiMemoryPolicyTest {
             assertThatThrownBy(() -> service.create(s, input("APP", true, 100))).isInstanceOf(RuntimeException.class);
             assertThatThrownBy(() -> AiMemoryPolicy.name("STORE';END;")).isInstanceOf(RuntimeException.class);
             assertThat(writes).isZero();
+        }
+    }
+    @Test void memoryStoreNameLimitIsCheckedBeforeDatabaseWritesWithoutRestrictingProfilesOrGuardrails() {
+        try(var s=session()) {
+            for(String invalid:List.of("A".repeat(17),"STORE$NAME","STORE#NAME")) {
+                var value=new Create("APP","memory",invalid,"PROFILE".repeat(3),"",5,null,null,false,false,false,true);
+                assertThatThrownBy(()->service.create(s,value)).isInstanceOfSatisfying(com.dbcompanion.common.exception.MetadataEditException.class,
+                        ex->assertThat(ex.userMessage()).contains("16"));
+            }
+            assertThat(writes).isZero();
+            assertThatCode(()->AiMemoryPolicy.validate(new Create("APP","memory","A".repeat(16),"PROFILE".repeat(3),"",5,null,null,false,false,false,true))).doesNotThrowAnyException();
+            assertThatCode(()->AiMemoryPolicy.validate(new Create("APP","guardrail","A".repeat(30),"PROFILE","",null,null,"detect",true,false,false,true))).doesNotThrowAnyException();
         }
     }
     @Test void unsupportedAndForeignSchemaCannotWrite() {

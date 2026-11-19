@@ -26,12 +26,22 @@ Checked on 2026-11-19 using isolated local application and disposable profiles.
   an uncertain result; extraction and recall were not attempted. Temporary store,
   profile and associated conversations were cleaned up. The service previously
   hid the Oracle error code; safe-code reporting was added and covered by a
-  synthetic exception test. The original live failure's cause remains unknown,
-  and the uncertain creation was not retried automatically.
+  synthetic exception test. At that stage the cause was unknown and the uncertain
+  creation was not retried automatically. Subsequent diagnosis identified the
+  native 16-character store-name restriction. After correcting the name, creation
+  succeeded but readback rejected the owner-qualified profile name. Both cases
+  are now handled explicitly; other owners are still rejected.
 - Existing Memory store type filters and empty searches passed read-only API
   checks. Every type returned zero rows, so record detail lookup was not exercised.
   All profiles, stores and conversations created for this follow-up were confirmed
   absent after cleanup.
+- After those fixes, a disposable store passed creation readback and profile
+  linking. A synthetic report-title preference was extracted from a real chat,
+  found through search and record detail, and recalled in a separate conversation
+  without repeating the title in its question. Temporary profiles, stores,
+  conversations and store tables were confirmed absent after cleanup. This is one
+  preference example, not a general recall-quality benchmark. These are API/DB
+  checks, not browser-driven creation or recall.
 - Chrome confirmed the new setup action catalogue in transmission preview,
   disabled analysis before consent and invalidation after editing the question.
   No model call or DB setting change was made during this browser check. Memory's
@@ -42,6 +52,9 @@ Checked on 2026-11-19 using isolated local application and disposable profiles.
   skip. Full suites ran before the final safe-error change; the affected Java
   tests and setup-assistant JavaScript flow were rerun afterward. Package, PMD,
   publication and whitespace checks passed.
+- Memory fixes: Java report totals are 1,509 passing tests after the affected
+  suite was rerun; unaffected full-suite results were retained. Package and PMD
+  passed. The relevant Memory-policy/profile-editor JavaScript tests passed (10).
 
 ## 0.1.0-alpha.20
 

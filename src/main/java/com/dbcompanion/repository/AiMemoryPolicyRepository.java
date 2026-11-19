@@ -192,7 +192,7 @@ public class AiMemoryPolicyRepository {
         if (rows.size() != 1) return false;
         var row = rows.getFirst();
         if (!Objects.toString(row.description(), "").equals(input.description())
-                || memory && !row.profile().equals(input.profile()) || !memory && !"ENABLED".equalsIgnoreCase(row.status())) return false;
+                || memory && !profileMatches(row.profile(),input.schema(),input.profile()) || !memory && !"ENABLED".equalsIgnoreCase(row.status())) return false;
         String view = memory ? "USER_AI_MEMORY_STORE_ATTRIBUTES" : "USER_AI_GUARDRAIL_ATTRIBUTES";
         String column = memory ? "MEMORY_STORE_NAME" : "GUARDRAIL_NAME";
         Map<String,String> actual = new java.util.HashMap<>();
@@ -207,5 +207,8 @@ public class AiMemoryPolicyRepository {
                     : entry.getValue().equals(JSON.readTree(value)))) return false;
         }
         return true;
+    }
+    public static boolean profileMatches(String actual,String owner,String profile) {
+        return Objects.equals(actual,profile)||Objects.equals(actual,object(owner,profile));
     }
 }
