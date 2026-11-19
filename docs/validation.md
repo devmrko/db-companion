@@ -1,5 +1,44 @@
 # Release validation
 
+## 0.1.0-alpha.20
+
+Prepared on 2026-11-19. This release helps users diagnose setup gaps, review
+consented changes and revisit stored test evidence. It is not production certification.
+
+- Java: 1,505 passed, no failures/errors/skips. JavaScript: 724 passed, one optional
+  case skipped. Executable JAR, PMD, publication and whitespace checks passed.
+- Signed-in browser checks covered purpose/profile selection, setup assistant
+  preview and consent behavior, saved evidence and recovery links, and profile
+  version match/change/unverified displays. Misleading comparison titles and
+  diagnostic-stage wording were corrected and checked again in Chrome.
+- An approved disposable profile was analyzed once by AI; conversation history
+  was enabled through the existing editing service, read back and diagnosed.
+  Reusing the apply ticket was rejected. The profile was removed after verification.
+- Selected-glossary A/B SQL for one aggregate question matched an independent
+  read-only aggregation: ten groups, no differences. Existing native knowledge
+  remained in both arms; this does not establish general accuracy improvement.
+- Recovery record API storage/link isolation and browser memo/retest selection
+  were checked. Stored-setting comparison used synthetic snapshots in the real DB.
+  Profile-version checks passed synthetic outcomes through the actual save service,
+  then verified attribute/status changes, disabled-profile execution rejection,
+  and manual-record uncertainty. These tests made no additional AI calls and their
+  synthetic SQL text was not executed. Temporary records/profiles were removed.
+- A simulated lookup failure was rendered through the real template; an actual
+  DB privilege failure was not induced. The deployed setup pages were checked
+  through read-only login/API requests for all three purposes.
+
+Profile-version equality covers the profile ID, status and stored attributes.
+It does not compare Credential secrets, linked knowledge/Feedback contents, table
+data or per-call overrides; changing and reverting settings can yield the same
+version. Equality and linked recovery notes do not establish execution success.
+
+Remaining work: broader business-answer comparisons, a complete native knowledge
+on/off comparison, more supported AI configuration changes, and user outcome
+measurements. The web update notification/install flow is deferred. Agent Memory,
+Agent Engine and ontology changes included from earlier commits passed automated
+checks, but this release's setup verification does not certify all their live write
+or external execution paths. Unrelated uncommitted workspace changes are excluded.
+
 ## 0.1.0-alpha.19
 
 - Java: 1,456 tests passed; no failures, errors or skips. Maven quality verify,

@@ -1,6 +1,23 @@
 # Changelog
 
-## Unreleased
+## 0.1.0-alpha.20
+
+Prepared on 2026-11-19. See [validation and remaining scope](docs/validation.md#010-alpha20).
+
+- Add purpose-based readiness checks and links to existing configuration screens,
+  using a shared capability catalog. Separate missing settings, unreadable state
+  and execution that has not been verified; diagnosis makes no model calls.
+- Add an AI setup assistant with transmission preview, separate AI/apply consent,
+  one-use tickets and stale-profile checks. The supported write is enabling
+  conversation history through the existing profile editor, followed by readback.
+- Add history-storage readiness, recent session results, saved profile evidence,
+  and comparisons of recorded settings and request-time profile versions with
+  current settings. Manual/legacy records remain unverified where evidence is absent.
+- Add selected-glossary A/B comparison and recovery notes linked to the same problem
+  question and an explicitly selected retest. Neither proves general answer accuracy.
+- Include committed Agent Memory browsing/policy controls, Agent Engine workflow
+  editing and original-definition loading, and the ontology graph layout/zoom UI.
+  These components have separate live-verification limits in the validation notes.
 
 - Keep glossary lookup focused on the original question when Select AI appends
   a SQL repair prompt. Preserve existing question and search-token limits.
