@@ -55,6 +55,10 @@ Checked on 2026-11-19 using isolated local application and disposable profiles.
 - Memory fixes: Java report totals are 1,509 passing tests after the affected
   suite was rerun; unaffected full-suite results were retained. Package and PMD
   passed. The relevant Memory-policy/profile-editor JavaScript tests passed (10).
+- Chrome confirmed the updated Memory-name help and browser validity: 17 letters
+  and a dollar-sign name were invalid; 16 letters were valid. Inputs were cleared
+  without submitting creation or changing the existing profile. The fix was
+  deployed to the local 8080 application after backing up its previous JAR.
 
 ## 0.1.0-alpha.20
 
