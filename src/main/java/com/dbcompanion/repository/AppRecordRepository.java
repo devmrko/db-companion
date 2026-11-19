@@ -72,6 +72,16 @@ public class AppRecordRepository {
         },args.toArray());
         return new OntologyScope.Page(rows.stream().limit(20).toList(),rows.size()>20?sequences.get(19):"");
     }
+    /** STATE is the persistence result, never an AI/SQL success verdict. */
+    public List<SetupEvidence.Item> recentProblemMetadata(String schema,String profile){
+        return jdbc.query("SELECT RECORD_ID, JSON_VALUE(PAYLOAD,'$.capturedAt'), JSON_VALUE(PAYLOAD,'$.snapshotKind') FROM "
+                +AppRecordSql.table(schema)+" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED'"
+                +" AND JSON_VALUE(PAYLOAD,'$.profile')=?"
+                +" AND NVL(JSON_VALUE(PAYLOAD,'$.snapshotKind'),'UNKNOWN')<>'MANUAL_RECOVERY'"
+                +" ORDER BY RECORDED_AT DESC, SEQ DESC FETCH FIRST 10 ROWS ONLY",
+                (row,index)->new SetupEvidence.Item(row.getString(1),row.getString(2),row.getString(3)),
+                ProblemQuestion.ATTEMPT_TYPE,schema+"."+profile);
+    }
     public ProblemQuestion.Page problemPage(String schema,String before){
         Ontology.cursor(before);var args=new ArrayList<Object>(List.of(ProblemQuestion.TYPE));if(!before.isEmpty())args.add(new BigDecimal(before));
         var rows=jdbc.query("SELECT SEQ,RECORD_ID,RECORDED_AT,UPDATED_AT,PAYLOAD FROM "+AppRecordSql.table(schema)+" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED'"+(before.isEmpty()?"":" AND SEQ<?")+" ORDER BY SEQ DESC FETCH FIRST 21 ROWS ONLY",(r,n)->{

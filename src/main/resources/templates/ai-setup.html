@@ -68,6 +68,18 @@
       <p th:if="${item.code != null}" th:text="${item.code}"></p>
     </details>
   </section>
+  <section class="app-config-card" th:if="${savedEvidence != null and !#lists.isEmpty(savedEvidence)}" data-saved-evidence>
+    <h2 th:text="#{setup.saved.title}"></h2>
+    <p th:text="#{setup.saved.help}"></p>
+    <details class="app-config-disclosure" th:each="group : ${savedEvidence}">
+      <summary><span th:text="${#messages.msg('setup.saved.' + group.source)}"></span> · <span th:text="${#messages.msg('setup.saved.' + group.state)}"></span></summary>
+      <p th:text="${#messages.msg('setup.saved.help.' + group.state)}"></p>
+      <ul th:if="${!#lists.isEmpty(group.items)}">
+        <li th:each="item : ${group.items}"><code th:text="${item.id}"></code> · <span th:text="${item.at}"></span> · <span th:text="${item.kind}"></span></li>
+      </ul>
+      <a class="app-btn" th:href="${group.source == 'conversation' ? '/ai-executions?profile=' + #uris.escapeQueryParam(profile) : '/ai-test/problems'}" th:text="#{setup.openAction}"></a>
+    </details>
+  </section>
   <section class="app-config-card" th:if="${!#lists.isEmpty(checks)}" data-setup-assistant th:attr="data-purpose=${purpose},data-profile=${profile}">
     <h2 th:text="#{setup.ai.title}"></h2>
     <p th:text="#{setup.ai.help}"></p>

@@ -69,11 +69,15 @@ class AiSetupTest {
             context.setVariable("checks",List.of(new AiSetupService.Check("model",AiSetupService.State.CONFIGURED,"/ai-profiles"),
                     new AiSetupService.Check("execution",AiSetupService.State.UNKNOWN,"/ai-test")));
             context.setVariable("observations",List.of(new AiSetupService.Observation("SQL","r1",java.time.Instant.EPOCH,"RETURNED",null)));
+            context.setVariable("savedEvidence",List.of(new com.dbcompanion.model.SetupEvidence.Group("conversation","RECORDED",
+                    List.of(new com.dbcompanion.model.SetupEvidence.Item("<script>unsafe</script>","2026-11-19","showsql"))),
+                    new com.dbcompanion.model.SetupEvidence.Group("problem","UNKNOWN",List.of())));
             context.setVariable("historyChecks",List.of("records","conversation","conversationView","profileStore","profileAudit","profileCollect","auditSource","auditStore","auditCollector","auditSchedule","objectHistory").stream()
                     .map(key->new com.dbcompanion.service.AiSetupHistoryService.Check(key,AiSetupService.State.UNKNOWN,"/ai-profiles","synthetic")).toList());
             assertThat(engine.process("ai-setup",context)).contains("app-setup-CONFIGURED","app-setup-UNKNOWN",
                     "/ai-profiles/detail?profile=P%26%3Ctest%3E", "P&amp;&lt;test&gt;")
-                    .doesNotContain("??", "th:", "<test>");
+                    .contains("data-saved-evidence", "&lt;script&gt;unsafe&lt;/script&gt;")
+                    .doesNotContain("??", "th:", "<test>", "<script>unsafe</script>");
         }
     }
     @Test void placeholderRowsAndDisabledProfileAreNotReady() {

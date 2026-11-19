@@ -24,6 +24,13 @@ public class AiExecutionHistoryRepository {
     }
 
     public record Statement(String sql, List<Object> args) {}
+    /** Exact profile, bounded metadata; never reads prompt or response content. */
+    public List<com.dbcompanion.model.SetupEvidence.Item> recentMetadata(String profile) {
+        return jdbc.query("SELECT CONVERSATION_PROMPT_ID, TO_CHAR(CREATED, '" + DATE_FORMAT
+                + "'), PROMPT_ACTION FROM " + VIEW + " WHERE PROFILE_NAME = ?"
+                + " ORDER BY CREATED DESC, CONVERSATION_PROMPT_ID DESC FETCH FIRST 10 ROWS ONLY",
+                (row, index) -> new com.dbcompanion.model.SetupEvidence.Item(row.getString(1), row.getString(2), row.getString(3)), profile);
+    }
     public boolean readable() {
         jdbc.queryForList("SELECT CONVERSATION_PROMPT_ID, CONVERSATION_ID, PROFILE_NAME, CREATED, PROMPT_ACTION FROM " + VIEW + " WHERE 1=0");
         return true;

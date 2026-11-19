@@ -24,6 +24,10 @@ public class AiExecutionHistoryService {
     public Page page(PoolSession session, String schema, Query query) {
         return query(session, schema, () -> repository.page(query));
     }
+    public java.util.List<com.dbcompanion.model.SetupEvidence.Item> recentMetadata(PoolSession session, String profile) {
+        if (profile == null || profile.isBlank() || profile.length() > 128) throw new IllegalArgumentException("Invalid profile");
+        return query(session, session.metadata().selectedSchema(), () -> repository.recentMetadata(profile));
+    }
     public Detail detail(PoolSession session, String schema, String id) {
         AiExecutionHistory.requireId(id);
         return query(session, schema, () -> repository.detail(id));

@@ -17,6 +17,8 @@ public class AiSetupController {
     private final AiSetupService setup;
     @org.springframework.beans.factory.annotation.Autowired(required=false)
     private com.dbcompanion.service.AiSetupHistoryService history;
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    private com.dbcompanion.service.AiSetupEvidenceService evidence;
     public AiSetupController(DatabaseService database, AiSetupService setup) { this.database = database; this.setup = setup; }
     @GetMapping("/ai-setup")
     public String page(@RequestParam(defaultValue="") String purpose, @RequestParam(defaultValue="") String profile,
@@ -35,6 +37,7 @@ public class AiSetupController {
         model.addAttribute("checks", List.of());
         model.addAttribute("observations", List.of());
         model.addAttribute("historyChecks", List.of());
+        model.addAttribute("savedEvidence", List.of());
         if (!com.dbcompanion.service.AiSetupCatalog.purposes().contains(purpose)) return "ai-setup";
         synchronized (session) {
             if (!session.metadata().info().username().equals(session.metadata().selectedSchema())) {
@@ -47,6 +50,7 @@ public class AiSetupController {
                 if (!profile.isBlank()) {
                     model.addAttribute("checks", setup.diagnose(session, profile, purpose));
                     if(history!=null)model.addAttribute("historyChecks",history.diagnose(session,database.profiles(session,profile).attributes()));
+                    if(evidence!=null)model.addAttribute("savedEvidence",evidence.read(session,profile));
                     var state=session.metadata().aiTest();var comparison=session.metadata().aiComparison().result();
                     model.addAttribute("observations", AiSetupService.observations(session.metadata().info().username(),profile,
                             java.util.Arrays.asList(state.latest(),state.prompt(),comparison.left(),comparison.right(),

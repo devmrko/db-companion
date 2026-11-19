@@ -28,6 +28,10 @@ public class ProblemQuestionService {
         }
     }
     public String status(PoolSession s){return tx(s,read,false,()->records.status(schema(s),s.metadata().info().username()));}
+    public List<SetupEvidence.Item> recentMetadata(PoolSession s,String profile){
+        if(profile==null||profile.isBlank()||profile.length()>128)throw new IllegalArgumentException("Invalid profile");
+        return tx(s,read,()->records.recentProblemMetadata(schema(s),profile));
+    }
     public String save(PoolSession s,ProblemQuestion.Create request){var value=ProblemQuestion.create(request);return tx(s,write,()->{String schema=schema(s),id=UUID.randomUUID().toString();var parent=new ProblemQuestion.Parent(1,id,value.question(),value.description(),value.expected(),value.expectedSql(),value.status(),false,Instant.now(),Instant.now());saveRecord(schema,id,ProblemQuestion.TYPE,parent);return id;});}
     /** Captures a user-confirmed current test result; this is persistence only, never another provider call. */
     public String saveLatest(PoolSession s,ProblemQuestion.Create request,boolean includeSnapshots){return saveCaptured(s,request,capture(s,includeSnapshots));}
