@@ -82,6 +82,17 @@ class AiMemoryPolicyTest {
             assertThat(writes).isZero();
         }
     }
+    @Test void memoryListAndDetailRejectForeignOwnerAndStaleSchemaBeforeReadingRecords() {
+        try (var s = session()) {
+            assertThatThrownBy(() -> service.browse(s,"OTHER","STORE","memory","",0))
+                    .isInstanceOfSatisfying(com.dbcompanion.common.exception.MetadataEditException.class,ex -> assertThat(ex.status()).isEqualTo(409));
+            s.metadata().selectSchema("OTHER");
+            assertThatThrownBy(() -> service.browse(s,"OTHER","STORE","memory","",0))
+                    .isInstanceOfSatisfying(com.dbcompanion.common.exception.MetadataEditException.class,ex -> assertThat(ex.status()).isEqualTo(403));
+            assertThatThrownBy(() -> service.record(s,"OTHER","STORE","memory","record-id"))
+                    .isInstanceOfSatisfying(com.dbcompanion.common.exception.MetadataEditException.class,ex -> assertThat(ex.status()).isEqualTo(403));
+        }
+    }
     @Test void committedButUnverifiedCallIsNotRetried() {
         try (var s = session()) {
             matches = false;

@@ -1,5 +1,33 @@
 # Release validation
 
+## Memory recall and access boundaries
+
+Checked on 2026-11-19 using two independent web sessions authenticated as the
+same DB account, two disposable profiles/stores and synthetic preferences.
+
+- One seed chat extracted three preferences. Three paraphrased questions in fresh
+  conversations recalled their exact values. An unrecorded preference returned
+  `UNKNOWN`. The second session recalled a preference from the shared store;
+  the separate store returned `UNKNOWN` without any of the seeded values.
+  Seven chat requests used seven different conversation IDs; no generation was
+  retried. Each successful chat also followed the normal memory-extraction path.
+- The second session could browse and read details from the first session's
+  store. A record ID from that store returned 404 when requested through the
+  other store. Store scoping prevents that cross-store ID lookup; it does not
+  prevent a person sharing the DB account from selecting the original store.
+- The application currently authorizes by DB owner, not a separately authenticated
+  human identity. Different web sessions using one DB account are not isolated
+  users. These checks do not prove isolation between different DB accounts or
+  provide a general recall-quality benchmark. Multi-user authentication/access
+  policy remains a separate design decision.
+- A regression test checks stale-schema rejection (409) and foreign-owner list
+  and detail rejection (403) before repository reads. The affected Java suite
+  passed 13 tests; package, PMD, publication and whitespace checks passed. These
+  synthetic owner tests are not a live second-account test.
+- Temporary profiles, stores, conversations and store tables were confirmed
+  absent after cleanup. A preliminary overlength test name was rejected before
+  creation and corrected; no model generation occurred in that attempt.
+
 ## Follow-up after alpha.20
 
 Checked on 2026-11-19 using isolated local application and disposable profiles.
