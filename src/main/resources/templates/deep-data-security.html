@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head('Deep Data Security')}"></head>
+<head th:replace="~{fragments/common :: head(#{menu.item.security})}"></head>
 <body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
 <main class="app-content">
-  <div class="app-page-heading"><h1>Deep Data Security</h1><button th:replace="~{fragments/common :: sqlHelp('security', 'roles')}"></button>
+  <div class="app-page-heading"><th:block th:replace="~{fragments/common :: pageTitle('security')}"></th:block><button th:replace="~{fragments/common :: sqlHelp('security', 'roles')}"></button>
     <a class="btn app-btn app-btn-secondary" th:href="@{/db/audit}" th:text="#{audit.title}">감사 기록</a>
     <details class="app-dds-help"><summary aria-label="Deep Data Security ?">?</summary><div th:text="#{dds.help}"></div></details>
   </div>
@@ -19,10 +19,11 @@
     <p role="status" data-dm-message></p>
     <form data-dm-form hidden>
       <div class="app-creation-grid">
-        <label class="app-field"><span th:text="#{ddsManage.kind}"></span><select class="form-select" data-dm-kind><option value="GRANT">SELECT Data Grant</option><option value="ROLE">Data Role · ADMIN</option></select></label>
+        <label class="app-field"><span th:text="#{ddsManage.kind}"></span><select class="form-select" data-dm-kind><option value="GRANT">SELECT Data Grant</option><option value="ROLE">Data Role · ADMIN</option><option value="APPLICATION">OCI Application Identity · ADMIN</option></select></label>
         <label class="app-field"><span th:text="#{ddsManage.action}"></span><select class="form-select" data-dm-action><option value="CREATE" th:text="#{ddsManage.create}"></option><option value="UPDATE" th:text="#{ddsManage.update}"></option></select></label>
         <label class="app-field"><span th:text="#{ddsManage.existing}"></span><select class="form-select" data-dm-existing></select></label>
         <label class="app-field"><span th:text="#{ddsManage.name}"></span><input class="form-control" data-dm-name required maxlength="128" pattern="[A-Z][A-Z0-9_]{0,127}"></label>
+        <label class="app-field" data-dm-client-field hidden><span>OCI OAuth Client ID</span><input class="form-control" data-dm-client maxlength="200" pattern="[A-Za-z0-9_-]+"></label>
         <div data-dm-role-field>
           <label class="app-field"><span th:text="#{ddsManage.roleMode}"></span><select class="form-select" data-dm-role-mode><option value="LOCAL" th:text="#{ddsManage.local}"></option><option value="IAM_OAUTH_GROUP">OCI OAuth · IAM_OAUTH_GROUP</option><option value="IAM_GROUP_NAME">OCI IAM · IAM_GROUP_NAME</option></select></label>
           <label class="app-field" data-dm-group-field hidden><span th:text="#{ddsManage.group}"></span><input class="form-control" data-dm-group maxlength="480"></label>
@@ -50,6 +51,7 @@
     </section>
   </details>
   <section th:replace="~{fragments/dds-identities :: identities}"></section>
+  <section th:replace="~{fragments/dds-runtime :: runtime}"></section>
   <section data-dds th:attr="data-schema=${selectedSchema},data-base=@{/db/security}">
     <nav class="app-dds-tabs" th:aria-label="#{dds.sections}">
       <button type="button" data-dds-tab="roles" aria-pressed="true" th:text="#{dds.roles}">역할</button>
@@ -70,4 +72,4 @@
     </div>
     <section class="app-card app-dds-detail" data-dds-detail aria-live="polite" hidden></section>
   </section>
-</main></div><script type="module" th:src="@{/js/deep-data-security.mjs}"></script><script type="module" th:src="@{/js/dds-management.mjs}"></script><script type="module" th:src="@{/js/dds-identities.mjs}"></script></body></html>
+</main></div><script type="module" th:src="@{/js/deep-data-security.mjs}"></script><script type="module" th:src="@{/js/dds-management.mjs}"></script><script type="module" th:src="@{/js/dds-identities.mjs}"></script><script type="module" th:src="@{/js/dds-runtime.mjs}"></script></body></html>

@@ -33,6 +33,7 @@ public class AiSetupController {
         model.addAttribute("purposes", com.dbcompanion.service.AiSetupCatalog.purposes());
         model.addAttribute("purpose", com.dbcompanion.service.AiSetupCatalog.purposes().contains(purpose) ? purpose : "");
         model.addAttribute("profile", profile);
+        model.addAttribute("requirements", com.dbcompanion.service.AiSetupCatalog.spec().requirements().stream().collect(java.util.stream.Collectors.toMap(r -> r.scope() + "." + r.id(), r -> r)));
         model.addAttribute("profiles", List.of());
         model.addAttribute("checks", List.of());
         model.addAttribute("observations", List.of());

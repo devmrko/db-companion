@@ -50,7 +50,7 @@ class AiSetupTest {
             source.bind(session.pool(),"APP"); source.clear();
         }
     }
-    @Test void allLanguagesRenderPurposeAndEscapedProfileLinks() {
+    @Test void allLanguagesRenderPurposeAndEscapedProfileLinks() throws java.io.IOException {
         var resolver = new org.thymeleaf.templateresolver.ClassLoaderTemplateResolver();
         resolver.setPrefix("templates/"); resolver.setSuffix(".html"); resolver.setCharacterEncoding("UTF-8");
         var engine = new org.thymeleaf.spring6.SpringTemplateEngine();
@@ -65,8 +65,12 @@ class AiSetupTest {
             context.setVariable("activePage","ai-setup"); context.setVariable("languageReturn","/ai-setup");
             context.setVariable("purpose","nl2sql"); context.setVariable("profile","P&<test>");
             context.setVariable("purposes",com.dbcompanion.service.AiSetupCatalog.purposes());
+            context.setVariable("requirements", com.dbcompanion.service.AiSetupCatalog.spec().requirements().stream()
+                    .collect(java.util.stream.Collectors.toMap(r -> r.scope() + "." + r.id(), r -> r)));
             context.setVariable("profiles",List.of(new com.dbcompanion.model.AiProfile("P&<test>","ENABLED","","","","")));
             context.setVariable("checks",List.of(new AiSetupService.Check("model",AiSetupService.State.CONFIGURED,"/ai-profiles"),
+                    new AiSetupService.Check("provider",AiSetupService.State.ACTION,"/ai-profiles"),
+                    new AiSetupService.Check("external",AiSetupService.State.UNKNOWN,"/db/admin-help"),
                     new AiSetupService.Check("execution",AiSetupService.State.UNKNOWN,"/ai-test")));
             context.setVariable("observations",List.of(new AiSetupService.Observation("SQL","r1",java.time.Instant.EPOCH,"RETURNED",null)));
             context.setVariable("savedEvidence",List.of(new com.dbcompanion.model.SetupEvidence.Group("conversation","RECORDED",
@@ -77,9 +81,18 @@ class AiSetupTest {
                             new com.dbcompanion.model.SetupHistoryReview.Recovery("note","retest"),"MATCH"))));
             context.setVariable("historyChecks",List.of("records","conversation","conversationView","profileStore","profileAudit","profileCollect","auditSource","auditStore","auditCollector","auditSchedule","objectHistory").stream()
                     .map(key->new com.dbcompanion.service.AiSetupHistoryService.Check(key,AiSetupService.State.UNKNOWN,"/ai-profiles","synthetic")).toList());
-            assertThat(engine.process("ai-setup",context)).contains("app-setup-CONFIGURED","app-setup-UNKNOWN",
+            var rendered = engine.process("ai-setup",context);
+            if (language.equals("ko") && System.getProperty("setup.preview") != null) {
+                var css = java.nio.file.Files.readString(java.nio.file.Path.of("src/main/resources/static/css/common.css"))
+                        + java.nio.file.Files.readString(java.nio.file.Path.of("src/main/resources/static/css/configuration.css"));
+                java.nio.file.Files.writeString(java.nio.file.Path.of(System.getProperty("setup.preview")),
+                        rendered.replace("<head>", "<head><base href=\"http://localhost:18094/\">")
+                                .replace("</head>", "<style>" + css + "</style></head>"));
+            }
+            assertThat(rendered).contains("app-setup-CONFIGURED","app-setup-ACTION","app-setup-UNKNOWN","app-setup-REVIEW",
                     "/ai-profiles/detail?profile=P%26%3Ctest%3E", "P&amp;&lt;test&gt;")
-                    .contains("data-saved-evidence", "&lt;script&gt;unsafe&lt;/script&gt;", "data-history-review", "safe-id", "retest")
+                    .contains("data-saved-evidence", "&lt;script&gt;unsafe&lt;/script&gt;", "data-history-review", "safe-id", "retest",
+                            "app-menu-group", "app-requirement", "SQL execution / Business validation")
                     .doesNotContain("??", "th:", "<test>", "<script>unsafe</script>");
         }
     }

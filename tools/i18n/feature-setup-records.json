@@ -1,0 +1,182 @@
+{
+  "setup.saved.title": [
+    "보관된 프로필 기록",
+    "Saved profile records",
+    "已保存的配置记录",
+    "保存済みプロファイル記録"
+  ],
+  "setup.saved.help": [
+    "선택 프로필의 대화·테스트 기록 각 최근 10건. 현재 설정·정답의 검증 근거는 아님. 질문·응답 원문 전송 없음.",
+    "Shows up to 10 recent conversation records and saved test records matching the exact profile name. Historical records do not prove current execution success or business correctness. Prompt and response content is neither read nor sent to AI.",
+    "分别显示与所选配置名称完全匹配的最近10条对话记录和测试记录。历史记录不能证明当前执行成功或业务结果正确。不会读取问题和回答正文，也不会将其发送给AI。",
+    "選択したプロファイル名と完全一致する会話記録とテスト記録を、それぞれ最新10件まで表示します。過去の記録は現在の実行成功や業務上の正しさを証明しません。質問・応答の本文は読み取りもAIへの送信もしません。"
+  ],
+  "setup.saved.conversation": [
+    "DB 대화 기록",
+    "DB conversation records",
+    "数据库对话记录",
+    "DB会話記録"
+  ],
+  "setup.saved.problem": [
+    "저장된 테스트 기록",
+    "Saved test records",
+    "已保存的测试记录",
+    "保存済みテスト記録"
+  ],
+  "setup.saved.RECORDED": [
+    "기록 있음",
+    "Records found",
+    "存在记录",
+    "記録あり"
+  ],
+  "setup.saved.EMPTY": [
+    "기록 없음",
+    "No records found",
+    "无记录",
+    "記録なし"
+  ],
+  "setup.saved.UNKNOWN": [
+    "미확인",
+    "Unknown",
+    "未确认",
+    "未確認"
+  ],
+  "setup.saved.help.RECORDED": [
+    "표시된 ID·기록 시각·유형을 확인하고 기존 이력 화면에서 내용을 검토하세요. 테스트 기록은 저장 순서이며 수동 입력도 포함될 수 있습니다.",
+    "Review record IDs, timestamps and types, then open the existing history screen for details. Test records are ordered by save time and may include manual entries.",
+    "请核对记录ID、时间和类型，然后在现有历史页面查看详情。测试记录按保存顺序排列，可能包含手动输入。",
+    "ID・記録時刻・種類を確認し、既存の履歴画面で詳細を確認してください。テスト記録は保存順で、手動入力を含む場合があります。"
+  ],
+  "setup.saved.help.EMPTY": [
+    "조회는 완료했지만 일치하는 보관 기록이 없습니다. 실행한 적이 없다는 뜻은 아니며, 기록 설정·보관 기간·프로필명을 확인하세요.",
+    "The query completed with no matching saved records. This does not prove the profile was never used. Check recording settings, retention and the profile name.",
+    "查询已完成，但没有匹配的保存记录。这并不表示从未执行过。请检查记录设置、保留期限和配置名称。",
+    "照会は完了しましたが、一致する保存記録はありません。未実行を意味するものではありません。記録設定・保存期間・プロファイル名を確認してください。"
+  ],
+  "setup.saved.help.UNKNOWN": [
+    "기록을 조회하지 못했습니다. 저장소 준비 상태와 조회 권한을 확인하세요. 기록 없음으로 판정하지 않았습니다.",
+    "Records could not be queried. Check storage readiness and read permissions. This is not classified as an empty history.",
+    "无法查询记录。请检查存储准备状态和读取权限。此情况未判定为无记录。",
+    "記録を照会できませんでした。保存先の準備状態と参照権限を確認してください。記録なしとは判定していません。"
+  ],
+  "setup.review.title": [
+    "이력 기반 재확인",
+    "Review saved history",
+    "复核保存的历史",
+    "保存履歴の再確認"
+  ],
+  "setup.review.help": [
+    "저장된 테스트 최근 10건의 실행 전 설정과 현재 설정을 비교합니다. 기록된 항목만 비교하며 값 원문은 표시하지 않습니다. 설정 차이는 실패 원인이나 복구 성공을 증명하지 않습니다. 업무 정답은 검증하지 않으며, AI 호출이나 재시험은 실행하지 않습니다.",
+    "Compares recorded pre-execution settings with current settings for up to 10 recent saved tests. Only recorded fields are compared; raw values are not shown. Differences do not prove a failure cause or successful recovery. Business correctness is not verified. No AI call or retest is run.",
+    "比较最近10条保存测试中记录的执行前设置与当前设置。仅比较已记录的字段，不显示原始值。差异不能证明失败原因或恢复成功。不验证业务正确性，不调用AI或执行复测。",
+    "保存済みテストの最新10件について、記録された実行前の設定と現在の設定を比較します。記録済み項目のみ比較し、値の原文は表示しません。差異は失敗原因や復旧成功の証明ではありません。業務上の正しさは検証せず、AI呼出しや再試験も実行しません。"
+  ],
+  "setup.version.help": [
+    "프로필 버전은 요청에 기록된 해시와 현재 프로필 ID·상태·전체 저장 속성을 비교합니다. Credential 내용, 연결 지식·테이블 데이터, 호출별 재정의는 비교 대상이 아닙니다. 버전 일치는 실행 성공을 뜻하지 않습니다.",
+    "Profile version compares the request's stored fingerprint with the current profile ID, status and all stored attributes. It does not cover credential contents, linked knowledge, table data or per-call overrides. A match does not prove execution success.",
+    "配置版本比较请求中记录的哈希与当前配置ID、状态和全部保存属性。不比较Credential内容、关联知识、表数据或每次调用的覆盖设置。版本一致不表示执行成功。",
+    "プロファイルのバージョンは、要求に記録されたハッシュと現在のID・状態・全保存属性を比較します。Credentialの内容、関連知識・テーブルデータ、呼出しごとの上書きは対象外です。一致は実行成功を意味しません。"
+  ],
+  "setup.version.MATCH": [
+    "요청에 기록된 프로필 버전과 일치",
+    "Profile version matches the recorded request",
+    "与请求中记录的配置版本一致",
+    "要求に記録されたプロファイルバージョンと一致"
+  ],
+  "setup.version.CHANGED": [
+    "프로필 버전 변경 — 재시험 필요",
+    "Profile version changed — retest needed",
+    "配置版本已变化 — 需要复测",
+    "プロファイルバージョンが変更 — 再試験が必要"
+  ],
+  "setup.version.UNAVAILABLE": [
+    "저장된 프로필 버전 미확인",
+    "Recorded profile version unavailable",
+    "保存的配置版本未确认",
+    "保存されたプロファイルバージョン未確認"
+  ],
+  "setup.version.CURRENT_UNKNOWN": [
+    "현재 프로필 버전 조회 실패",
+    "Current profile version could not be read",
+    "无法读取当前配置版本",
+    "現在のプロファイルバージョンを取得できません"
+  ],
+  "setup.review.MANUAL": [
+    "수동·출처 미확인 기록 — 자동 비교 안 함",
+    "Manual or unverified origin — not compared",
+    "手动输入或来源未确认 — 不自动比较",
+    "手動入力・出所未確認 — 自動比較しません"
+  ],
+  "setup.review.UNAVAILABLE": [
+    "비교할 설정·시각을 확인할 수 없음",
+    "Settings or timestamps unavailable for comparison",
+    "无法确认用于比较的设置或时间",
+    "比較に必要な設定・時刻を確認できません"
+  ],
+  "setup.review.AFTER": [
+    "실행 후 조회한 설정 — 당시 설정으로 사용 안 함",
+    "Post-execution settings — not treated as execution-time settings",
+    "执行后读取的设置 — 不作为执行时设置",
+    "実行後に取得した設定 — 実行時の設定として扱いません"
+  ],
+  "setup.review.SAME_FIELDS": [
+    "기록된 비교 항목 일치 — 실행 재확인 필요",
+    "Recorded fields match — execution still needs checking",
+    "已记录字段一致 — 仍需复核执行",
+    "記録済み項目は一致 — 実行の再確認が必要"
+  ],
+  "setup.review.DIFFERENT": [
+    "기록된 설정과 다름 — 재시험 필요",
+    "Recorded settings differ — retest needed",
+    "与已记录设置不同 — 需要复测",
+    "記録済み設定と差異あり — 再試験が必要"
+  ],
+  "setup.review.error": [
+    "오류 또는 처리 단계 정보가 기록되어 있습니다. 저장 내용을 확인하고 재시험으로 현재 상태를 확인하세요.",
+    "Error or diagnostic information was recorded. Review the saved details and retest to check the current state.",
+    "记录了错误或处理阶段信息。请查看保存内容，并通过复测确认当前状态。",
+    "エラーまたは処理段階の情報が記録されています。保存内容を確認し、再試験で現在の状態を確認してください。"
+  ],
+  "setup.review.noError": [
+    "저장된 오류 정보가 없습니다. 실행 성공을 의미하지 않습니다.",
+    "No error information was saved. This does not mean execution succeeded.",
+    "没有保存错误信息。这不表示执行成功。",
+    "保存されたエラー情報はありません。実行成功を意味しません。"
+  ],
+  "setup.review.compared": [
+    "비교한 항목:",
+    "Compared fields:",
+    "已比较字段：",
+    "比較した項目:"
+  ],
+  "setup.review.changed": [
+    "달라진 항목:",
+    "Changed fields:",
+    "已变化字段：",
+    "変化した項目:"
+  ],
+  "setup.review.noRecovery": [
+    "이 기록에 연결된 복구 메모를 찾지 못했습니다.",
+    "No recovery note linked to this record was found.",
+    "未找到关联此记录的恢复备注。",
+    "この記録に関連する復旧メモが見つかりません。"
+  ],
+  "setup.review.recovery": [
+    "최근 연결 복구 메모 (사용자 기록, 성공 미판정):",
+    "Latest linked recovery note (user-reported, success unverified):",
+    "最近的关联恢复备注（用户记录，未确认成功）：",
+    "最新の関連復旧メモ（ユーザー記録、成功未確認）:"
+  ],
+  "setup.review.retest": [
+    "메모에 연결한 재시험 기록 ID:",
+    "Retest record ID linked in the note:",
+    "备注中关联的复测记录ID：",
+    "メモに関連付けた再試験記録ID:"
+  ],
+  "setup.review.noRetest": [
+    "최근 복구 메모에 재시험 기록이 연결되지 않았습니다.",
+    "The latest recovery note has no linked retest record.",
+    "最近的恢复备注未关联复测记录。",
+    "最新の復旧メモには再試験記録が関連付けられていません。"
+  ]
+}

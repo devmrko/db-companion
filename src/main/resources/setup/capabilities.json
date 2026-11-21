@@ -13,7 +13,9 @@
         "execution"
       ],
       "actions": [
-        "enable-conversation", "enable-comments", "enable-constraints"
+        "enable-conversation",
+        "enable-comments",
+        "enable-constraints"
       ]
     },
     {
@@ -30,7 +32,9 @@
         "execution"
       ],
       "actions": [
-        "enable-conversation", "enable-comments", "enable-constraints"
+        "enable-conversation",
+        "enable-comments",
+        "enable-constraints"
       ]
     },
     {
@@ -47,7 +51,9 @@
         "execution"
       ],
       "actions": [
-        "enable-conversation", "enable-comments", "enable-constraints"
+        "enable-conversation",
+        "enable-comments",
+        "enable-constraints"
       ]
     }
   ],
@@ -58,7 +64,9 @@
       "actor": "USER",
       "link": "/ai-profiles",
       "condition": "Enabled owner profile",
-      "probe": "DatabaseService.profiles"
+      "probe": "DatabaseService.profiles",
+      "level": "REQUIRED",
+      "technicalTerm": "Select AI Profile"
     },
     {
       "id": "provider",
@@ -66,7 +74,9 @@
       "actor": "USER",
       "link": "/ai-profiles",
       "condition": "Model provider configured",
-      "probe": "DatabaseService.profiles"
+      "probe": "DatabaseService.profiles",
+      "level": "REQUIRED",
+      "technicalTerm": "provider"
     },
     {
       "id": "model",
@@ -74,7 +84,9 @@
       "actor": "USER",
       "link": "/ai-profiles",
       "condition": "Model identifier configured",
-      "probe": "DatabaseService.profiles"
+      "probe": "DatabaseService.profiles",
+      "level": "REQUIRED",
+      "technicalTerm": "model"
     },
     {
       "id": "objects",
@@ -82,7 +94,9 @@
       "actor": "USER",
       "link": "/ai-profiles",
       "condition": "Valid object_list entries; object privileges require separate verification",
-      "probe": "DatabaseService.profiles"
+      "probe": "DatabaseService.profiles",
+      "level": "REQUIRED",
+      "technicalTerm": "object_list"
     },
     {
       "id": "credential",
@@ -90,7 +104,9 @@
       "actor": "DB_ADMIN",
       "link": "/db/credentials",
       "condition": "Available credential or resource principal; external IAM separately verified",
-      "probe": "ProfileEditRepository.credentials"
+      "probe": "ProfileEditRepository.credentials",
+      "level": "REQUIRED",
+      "technicalTerm": "Credential / Resource Principal"
     },
     {
       "id": "semantic",
@@ -98,7 +114,9 @@
       "actor": "USER",
       "link": "/ai-profiles",
       "condition": "Supported Semantic Context API and active linked sources",
-      "probe": "SemanticContextService.status"
+      "probe": "SemanticContextService.status",
+      "level": "REQUIRED",
+      "technicalTerm": "Semantic Source"
     },
     {
       "id": "glossary",
@@ -106,7 +124,9 @@
       "actor": "USER",
       "link": "/business-glossary",
       "condition": "Definitions and reference SQL match the intended business meaning",
-      "probe": "MANUAL"
+      "probe": "MANUAL",
+      "level": "REQUIRED",
+      "technicalTerm": "Business Glossary / Reference SQL"
     },
     {
       "id": "mcp",
@@ -114,7 +134,9 @@
       "actor": "USER",
       "link": "/ai-profiles",
       "condition": "MCP tool mapping and remote response verified",
-      "probe": "MANUAL"
+      "probe": "MANUAL",
+      "level": "REQUIRED",
+      "technicalTerm": "Model Context Protocol (MCP)"
     },
     {
       "id": "external",
@@ -122,7 +144,9 @@
       "actor": "OCI_ADMIN",
       "link": "/db/admin-help",
       "condition": "External network, IAM and model access verified",
-      "probe": "MANUAL"
+      "probe": "MANUAL",
+      "level": "CONDITIONAL",
+      "technicalTerm": "IAM / Network / Model access"
     },
     {
       "id": "execution",
@@ -130,7 +154,9 @@
       "actor": "USER",
       "link": "/ai-test",
       "condition": "Generated SQL executed and independently compared to a business baseline",
-      "probe": "MANUAL"
+      "probe": "MANUAL",
+      "level": "REQUIRED",
+      "technicalTerm": "SQL execution / Business validation"
     },
     {
       "id": "records",
@@ -138,7 +164,9 @@
       "actor": "USER",
       "link": "/ai-test/problems",
       "condition": "Shared app record store compatible",
-      "probe": "ProblemQuestionService.status"
+      "probe": "ProblemQuestionService.status",
+      "level": "OPTIONAL",
+      "technicalTerm": "DBC_APP_RECORD"
     },
     {
       "id": "conversation",
@@ -146,7 +174,9 @@
       "actor": "USER",
       "link": "/ai-profiles",
       "condition": "conversation enabled; caller must provide conversation ID",
-      "probe": "DatabaseService.profiles"
+      "probe": "DatabaseService.profiles",
+      "level": "OPTIONAL",
+      "technicalTerm": "conversation"
     },
     {
       "id": "conversationView",
@@ -154,7 +184,9 @@
       "actor": "DB_ADMIN",
       "link": "/ai-executions",
       "condition": "Required conversation view columns readable",
-      "probe": "AiExecutionHistoryRepository.readable"
+      "probe": "AiExecutionHistoryRepository.readable",
+      "level": "OPTIONAL",
+      "technicalTerm": "Conversation history view"
     },
     {
       "id": "profileStore",
@@ -162,7 +194,9 @@
       "actor": "DB_ADMIN",
       "link": "/ai-profiles",
       "condition": "Profile archive compatible",
-      "probe": "ProfileHistoryService.state"
+      "probe": "ProfileHistoryService.state",
+      "level": "OPTIONAL",
+      "technicalTerm": "Profile history archive"
     },
     {
       "id": "profileAudit",
@@ -170,7 +204,9 @@
       "actor": "DB_ADMIN",
       "link": "/ai-profiles",
       "condition": "Profile audit policy enabled",
-      "probe": "ProfileHistoryService.state"
+      "probe": "ProfileHistoryService.state",
+      "level": "OPTIONAL",
+      "technicalTerm": "Profile audit policy"
     },
     {
       "id": "profileCollect",
@@ -178,7 +214,9 @@
       "actor": "DB_ADMIN",
       "link": "/ai-profiles",
       "condition": "Profile collection prerequisites ready; actual collection separately verified",
-      "probe": "ProfileHistoryService.state"
+      "probe": "ProfileHistoryService.state",
+      "level": "OPTIONAL",
+      "technicalTerm": "Profile history collection"
     },
     {
       "id": "auditSource",
@@ -186,7 +224,9 @@
       "actor": "DB_ADMIN",
       "link": "/db/audit",
       "condition": "Audit source readable",
-      "probe": "AuditHistoryService.status"
+      "probe": "AuditHistoryService.status",
+      "level": "OPTIONAL",
+      "technicalTerm": "Audit trail"
     },
     {
       "id": "auditStore",
@@ -194,7 +234,9 @@
       "actor": "DB_ADMIN",
       "link": "/db/audit",
       "condition": "Audit archive and settings tables compatible",
-      "probe": "AuditHistoryService.status"
+      "probe": "AuditHistoryService.status",
+      "level": "OPTIONAL",
+      "technicalTerm": "Audit archive"
     },
     {
       "id": "auditCollector",
@@ -202,7 +244,9 @@
       "actor": "DB_ADMIN",
       "link": "/db/audit",
       "condition": "Audit collector package compatible and valid",
-      "probe": "AuditHistoryService.status"
+      "probe": "AuditHistoryService.status",
+      "level": "OPTIONAL",
+      "technicalTerm": "Audit collection package"
     },
     {
       "id": "auditSchedule",
@@ -210,7 +254,9 @@
       "actor": "DB_ADMIN",
       "link": "/db/audit",
       "condition": "Collector scheduled and enabled; interval and retention configured",
-      "probe": "AuditHistoryService.status"
+      "probe": "AuditHistoryService.status",
+      "level": "OPTIONAL",
+      "technicalTerm": "Scheduler / Retention"
     },
     {
       "id": "objectHistory",
@@ -218,21 +264,37 @@
       "actor": "USER",
       "link": "/tables",
       "condition": "Object-specific metadata and row history settings checked",
-      "probe": "MANUAL"
+      "probe": "MANUAL",
+      "level": "OPTIONAL",
+      "technicalTerm": "Object change history"
     }
   ],
   "actions": [
     {
-      "id": "enable-comments", "actor": "USER", "attribute": "comments", "value": "true",
-      "requires": ["configuration.profile", "history.profileStore"],
-      "preview": "ProfileEditService.edit", "apply": "ProfileEditService.save",
+      "id": "enable-comments",
+      "actor": "USER",
+      "attribute": "comments",
+      "value": "true",
+      "requires": [
+        "configuration.profile",
+        "history.profileStore"
+      ],
+      "preview": "ProfileEditService.edit",
+      "apply": "ProfileEditService.save",
       "verification": "Existing editor readback and before/after archive; future model prompts may include table and column descriptions; quality is not verified",
       "confirmationRequired": true
     },
     {
-      "id": "enable-constraints", "actor": "USER", "attribute": "constraints", "value": "true",
-      "requires": ["configuration.profile", "history.profileStore"],
-      "preview": "ProfileEditService.edit", "apply": "ProfileEditService.save",
+      "id": "enable-constraints",
+      "actor": "USER",
+      "attribute": "constraints",
+      "value": "true",
+      "requires": [
+        "configuration.profile",
+        "history.profileStore"
+      ],
+      "preview": "ProfileEditService.edit",
+      "apply": "ProfileEditService.save",
       "verification": "Existing editor readback and before/after archive; future model prompts may include constraints; quality is not verified",
       "confirmationRequired": true
     },

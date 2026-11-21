@@ -1,8 +1,8 @@
 /* Shared configuration surfaces: Memory, Guardrail and Agent Engine. */
 .app-setup-state { display:inline-block; padding:3px 9px; margin-right:8px; border-radius:5px; font-size:12px; font-weight:600; }
 .app-setup-CONFIGURED { background:#e5f3ec; color:#155a38; }
-.app-setup-ACTION { background:#fff0d9; color:#784900; }
-.app-setup-UNKNOWN { background:#eaf0f8; color:#304b6c; }
+.app-setup-ACTION { background:#fce8e6; color:#8c2821; }
+.app-setup-UNKNOWN { background:#eeedeb; color:#55524f; }
 .app-memory-dialog { width:min(960px,calc(100vw - 32px)); max-height:85vh; padding:0; }
 .app-memory-dialog-header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 24px; border-bottom:1px solid var(--app-border); }
 .app-memory-dialog-header h2 { margin:0; font-size:18px; }
@@ -66,3 +66,11 @@
 .app-engine-flow-arrow { fill:var(--app-accent); }
 .app-engine-flow-label { fill:var(--app-text); font-size:11px; paint-order:stroke; stroke:var(--app-canvas); stroke-width:5px; stroke-linejoin:round; }
 @media(max-width:900px) { .app-config-grid,.app-config-summary { grid-template-columns:1fr; } .app-config-panel,.app-config-card { padding:16px; } }
+
+.app-requirement { display:inline-block; padding:2px 7px; border:1px solid var(--app-border); border-radius:4px; font-size:12px; margin-left:8px; }
+
+.app-setup-REVIEW { background:#fff0d9; color:#784900; }
+
+[data-ddsm], [data-ddsi], [data-dds-runtime] { padding:20px; margin-bottom:18px; }
+[data-ddsm] > summary, [data-dds-runtime] > summary { font-weight:650; cursor:pointer; }
+@media(max-width:600px) { [data-ddsm], [data-ddsi], [data-dds-runtime] { padding:14px; } }

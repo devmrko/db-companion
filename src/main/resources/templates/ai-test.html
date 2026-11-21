@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head(#{aitest.title})}"></head>
+<head th:replace="~{fragments/common :: head(#{menu.item.ai-test})}"></head>
 <body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content" data-ai-test th:attr="data-execution-timeout-seconds=${executionTimeoutSeconds}">
-  <div class="app-page-heading"><h1 th:text="#{aitest.title}">Select AI 테스트</h1><button th:replace="~{fragments/common :: sqlHelp('ai-test', 'showsql')}"></button><a th:href="@{/ai-executions/sql}" th:text="#{aitest.history}">실행 이력</a></div>
+  <div class="app-page-heading"><th:block th:replace="~{fragments/common :: pageTitle('ai-test')}"></th:block><button th:replace="~{fragments/common :: sqlHelp('ai-test', 'showsql')}"></button><a th:href="@{/ai-executions/sql}" th:text="#{aitest.history}">실행 이력</a></div>
   <p><a class="app-inline-link" th:href="@{/db/functions/ai-query}" th:text="#{callable.test}">DB 함수 호출 테스트</a></p>
   <th:block th:replace="~{fragments/select-ai-setup :: guide}"></th:block>
   <section th:replace="~{fragments/semantic-release :: panel}"></section>

@@ -367,7 +367,7 @@ textarea.form-control { resize: vertical; }
   .app-login-header { padding: 12px 18px; }
   .app-login-layout { max-width: 420px; margin-top: 24px; padding: 0 20px; }
   .app-shell { flex-direction: column; }
-  .app-sidebar { width: 100%; padding: 0 18px 14px; border-right: 0; border-bottom: 1px solid var(--app-border); }
+  .app-sidebar { width: 100%; max-height: 40vh; overflow-y: auto; padding: 0 18px 14px; border-right: 0; border-bottom: 1px solid var(--app-border); }
   .is-sidebar-collapsed .app-sidebar { display: none; }
   .app-sidebar > .app-brand { margin: 0 -18px 14px; padding: 0 18px; }
   .app-topbar { padding: 0 20px; }
@@ -1396,3 +1396,14 @@ dialog.app-profile-editor-compact { width: min(640px, calc(100vw - 32px)); }
 [data-scheduler-manage] summary { cursor: pointer; font-weight: 600; }
 [data-scheduler-manage] pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 320px; overflow: auto; }
 [data-scheduler-manage] .app-field { margin-block: .5rem; }
+
+.app-menu-group { margin-top:12px; }
+.app-menu-group > summary { padding:8px 12px; font-size:13px; font-weight:600; cursor:pointer; color:var(--app-muted); }
+.app-menu-group > summary:focus-visible { outline:2px solid var(--app-focus); outline-offset:-2px; }
+.app-menu-group > nav { padding-left:8px; }
+.app-menu-group:has(.is-active) > summary { color:var(--app-accent); }
+.is-sidebar-collapsed .app-menu-group { display:contents; }
+.is-sidebar-collapsed .app-menu-group > summary { display:none; }
+.is-sidebar-collapsed .app-menu-group > nav { display:block; padding-left:0; }
+
+.app-nav-term { display:block; margin-top:2px; font-size:10px; line-height:1.4; font-weight:400; overflow-wrap:anywhere; }

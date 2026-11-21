@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.*;
 public class DdsManagementController {
     private final DdsManagementService service;
     private com.dbcompanion.service.DdsIdentityProbeService probe;
+    private com.dbcompanion.service.DdsRuntimeProbeService runtimeProbe;
+    @org.springframework.beans.factory.annotation.Autowired
+    public void setRuntimeProbe(com.dbcompanion.service.DdsRuntimeProbeService runtimeProbe){this.runtimeProbe=runtimeProbe;}
     @org.springframework.beans.factory.annotation.Autowired
     public void setProbe(com.dbcompanion.service.DdsIdentityProbeService probe){this.probe=probe;}
     public DdsManagementController(DdsManagementService service){this.service=service;}
@@ -29,6 +32,8 @@ public class DdsManagementController {
     @PostMapping("/identity-preview") @ResponseBody public ResponseEntity<?> identityPreview(@RequestBody DdsIdentity.Request d,HttpServletRequest r){return call(r,s->service.identityPreview(s,d));}
     @PostMapping("/identity-apply") @ResponseBody public ResponseEntity<?> identityApply(@RequestBody DdsIdentity.Apply a,HttpServletRequest r){return call(r,s->service.identityApply(s,a));}
     @PostMapping("/identity-probe") @ResponseBody public ResponseEntity<?> identityProbe(@RequestBody com.dbcompanion.service.DdsIdentityProbeService.Request a,HttpServletRequest r){return call(r,s->probe.probe(s,a));}
+    @PostMapping("/runtime-probe") @ResponseBody public ResponseEntity<?> runtimeProbe(@RequestBody com.dbcompanion.service.DdsRuntimeProbeService.Request a,HttpServletRequest r){return call(r,s->runtimeProbe.probe(s,a));}
+    @GetMapping("/runtime-readiness") @ResponseBody public ResponseEntity<?> runtimeReadiness(HttpServletRequest r){return call(r,service::runtimeReadiness);}
     private ResponseEntity<?> call(HttpServletRequest r,Function<PoolSession,Object> action){
         var http=r.getSession(false);var session=http==null?null:(PoolSession)http.getAttribute(PoolSession.ATTRIBUTE);
         if(session==null)return error(401,"expired");

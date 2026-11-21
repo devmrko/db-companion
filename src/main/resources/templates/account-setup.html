@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head(#{accountSetup.title})}"></head>
+<head th:replace="~{fragments/common :: head(#{menu.item.accounts})}"></head>
 <body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside><div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
-<main class="app-content"><h1 th:text="#{accountSetup.title}"></h1><p th:text="#{accountSetup.help}"></p>
+<main class="app-content"><th:block th:replace="~{fragments/common :: pageTitle('accounts')}"></th:block><p th:text="#{accountSetup.help}"></p>
 <p class="app-alert" th:unless="${accountAdmin}" th:text="#{accountSetup.admin}"></p>
 <section th:if="${accountAdmin}" class="app-card" data-account-setup>
   <input type="hidden" data-as-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">

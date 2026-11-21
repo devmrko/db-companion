@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head(#{problemQuestion.title})}"></head>
+<head th:replace="~{fragments/common :: head(#{menu.item.ai-problems})}"></head>
 <body class="app-shell"><link rel="stylesheet" th:href="@{/css/management-workbench.css}"><aside th:replace="~{fragments/common :: sidebar}"></aside><div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content app-management-workbench" data-problem-questions>
-  <div class="app-page-heading"><h1 th:text="#{problemQuestion.title}">문제 질문</h1><a th:href="@{/ai-test}" th:text="#{aitest.title}">Select AI 테스트</a></div>
+  <div class="app-page-heading"><th:block th:replace="~{fragments/common :: pageTitle('ai-problems')}"></th:block><a th:href="@{/ai-test}" th:text="#{aitest.title}">Select AI 테스트</a></div>
   <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-problem-csrf>
   <section class="app-card workbench-intro"><p th:text="#{problemQuestion.help}"></p><p class="app-filter-message" role="status" aria-live="polite" data-problem-storage th:text="#{problemQuestion.storageChecking}"></p>
     <p data-problem-storage-guide hidden th:text="#{problemQuestion.storageGuide}"></p>

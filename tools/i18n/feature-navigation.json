@@ -1,0 +1,362 @@
+{
+  "menu.group.start": [
+    "시작",
+    "Start",
+    "开始",
+    "開始"
+  ],
+  "menu.group.use": [
+    "AI 조회·검색",
+    "AI queries and search",
+    "AI 查询与搜索",
+    "AI 照会・検索"
+  ],
+  "menu.group.knowledge": [
+    "업무 지식",
+    "Business knowledge",
+    "业务知识",
+    "業務知識"
+  ],
+  "menu.group.access": [
+    "접근 제어",
+    "Access control",
+    "访问控制",
+    "アクセス制御"
+  ],
+  "menu.group.operate": [
+    "운영",
+    "Operations",
+    "运维",
+    "運用"
+  ],
+  "menu.item.ai-setup": [
+    "준비 상태",
+    "Readiness",
+    "准备状态",
+    "準備状況"
+  ],
+  "menu.item.overview": [
+    "접속 정보",
+    "Connection",
+    "连接信息",
+    "接続情報"
+  ],
+  "menu.item.ai-test": [
+    "자연어 데이터 조회",
+    "Natural-language queries",
+    "自然语言查询",
+    "自然言語照会"
+  ],
+  "menu.item.agents": [
+    "에이전트 구성",
+    "Agent configuration",
+    "智能体配置",
+    "エージェント構成"
+  ],
+  "menu.item.memory": [
+    "에이전트 메모리",
+    "Agent memory",
+    "智能体记忆",
+    "エージェントメモリ"
+  ],
+  "menu.item.engine": [
+    "워크플로우 편집·실행",
+    "Workflow editing and execution",
+    "工作流编辑与执行",
+    "ワークフロー編集・実行"
+  ],
+  "menu.item.vectors": [
+    "의미 검색",
+    "Semantic search",
+    "语义搜索",
+    "意味検索"
+  ],
+  "menu.item.business-glossary": [
+    "업무 용어",
+    "Business terms",
+    "业务术语",
+    "業務用語"
+  ],
+  "menu.item.ontology": [
+    "온톨로지",
+    "Ontology",
+    "本体",
+    "オントロジー"
+  ],
+  "menu.item.ontology-query": [
+    "온톨로지 기반 질의",
+    "Ontology-based queries",
+    "基于本体的查询",
+    "オントロジー照会"
+  ],
+  "menu.item.semantic-versions": [
+    "업무 지식 배포",
+    "Business knowledge releases",
+    "业务知识发布",
+    "業務知識の公開"
+  ],
+  "menu.item.tables": [
+    "테이블·컬럼",
+    "Tables and columns",
+    "表和列",
+    "テーブル・列"
+  ],
+  "menu.item.accounts": [
+    "DB 계정·권한",
+    "DB accounts and privileges",
+    "数据库账户和权限",
+    "DB アカウント・権限"
+  ],
+  "menu.item.security": [
+    "사용자별 접근 제어",
+    "Per-user access control",
+    "按用户访问控制",
+    "ユーザー別アクセス制御"
+  ],
+  "menu.item.vpd": [
+    "행 단위 접근 정책",
+    "Row-level access policies",
+    "行级访问策略",
+    "行単位のアクセスポリシー"
+  ],
+  "menu.item.profiles": [
+    "AI 프로필 설정",
+    "AI profile settings",
+    "AI 配置文件设置",
+    "AI プロファイル設定"
+  ],
+  "menu.item.assistant": [
+    "AI 도우미 설정",
+    "AI assistant settings",
+    "AI 助手设置",
+    "AI アシスタント設定"
+  ],
+  "menu.item.credentials": [
+    "인증 정보",
+    "Credentials",
+    "凭据",
+    "認証情報"
+  ],
+  "menu.item.external": [
+    "외부 데이터 연결",
+    "External data",
+    "外部数据连接",
+    "外部データ接続"
+  ],
+  "menu.item.ords": [
+    "REST API 관리",
+    "REST API management",
+    "REST API 管理",
+    "REST API 管理"
+  ],
+  "menu.item.scheduler": [
+    "DB 작업 스케줄",
+    "DB job schedules",
+    "数据库作业计划",
+    "DB ジョブのスケジュール"
+  ],
+  "menu.item.executions": [
+    "실행 이력",
+    "Execution history",
+    "执行历史",
+    "実行履歴"
+  ],
+  "menu.item.ai-problems": [
+    "실패·복구 기록",
+    "Failure and recovery",
+    "失败和恢复记录",
+    "失敗・復旧記録"
+  ],
+  "menu.item.feedback": [
+    "AI 피드백",
+    "AI feedback",
+    "AI 反馈",
+    "AI フィードバック"
+  ],
+  "menu.item.audit": [
+    "감사 기록",
+    "Audit records",
+    "审计记录",
+    "監査記録"
+  ],
+  "menu.item.functions": [
+    "DB 함수",
+    "DB functions",
+    "数据库函数",
+    "DB 関数"
+  ],
+  "menu.item.scott-demo": [
+    "예제 스키마 설치",
+    "Sample schema setup",
+    "示例模式安装",
+    "サンプルスキーマの導入"
+  ],
+  "setup.requirement.REQUIRED": [
+    "필수",
+    "Required",
+    "必需",
+    "必須"
+  ],
+  "setup.requirement.CONDITIONAL": [
+    "조건부 필수",
+    "Conditionally required",
+    "条件必需",
+    "条件付き必須"
+  ],
+  "setup.requirement.OPTIONAL": [
+    "선택",
+    "Optional",
+    "可选",
+    "任意"
+  ],
+  "setup.requirement.help": [
+    "필수: 선택한 목적에 필요 · 조건부 필수: 해당 방식 사용 시 필요 · 선택: 이력 기능 사용 시 설정",
+    "Required for this goal · Conditional for the selected method · Optional for history features",
+    "必需：当前目标需要 · 条件必需：使用相应方式时需要 · 可选：用于历史功能",
+    "必須: 選択した目的に必要 · 条件付き: 該当方式で必要 · 任意: 履歴機能用"
+  ],
+  "setup.technical": [
+    "기술 용어",
+    "Technical term",
+    "技术术语",
+    "技術用語"
+  ],
+  "setup.condition.external": [
+    "외부 모델·서비스 사용 시 필요",
+    "Required when using external models or services",
+    "使用外部模型或服务时需要",
+    "外部モデル・サービス利用時に必要"
+  ],
+  "setup.condition.history": [
+    "해당 이력 기능 사용 시 필요",
+    "Required for the corresponding history feature",
+    "使用对应历史功能时需要",
+    "該当する履歴機能の利用時に必要"
+  ],
+  "setup.legend": [
+    "설정 확인은 실행 성공을 의미하지 않음 · 미확인은 누락과 구분",
+    "Configuration does not prove execution success · Unknown does not mean missing",
+    "配置确认不代表执行成功 · 未确认不等于缺失",
+    "設定確認は実行成功を意味しません · 未確認と不足は別です"
+  ],
+  "setup.state.REVIEW": [
+    "추가 확인 필요",
+    "Verification needed",
+    "需要进一步验证",
+    "追加確認が必要"
+  ],
+  "menu.group.agents": [
+    "AI 에이전트",
+    "AI agents",
+    "AI 智能体",
+    "AI エージェント"
+  ],
+  "menu.group.database": [
+    "DB 관리",
+    "Database management",
+    "数据库管理",
+    "DB 管理"
+  ],
+  "menu.group.history": [
+    "실행·감사 이력",
+    "Execution and audit",
+    "执行与审计",
+    "実行・監査履歴"
+  ],
+  "menu.term.vectors": [
+    "벡터 검색",
+    "Vector search",
+    "向量搜索",
+    "ベクトル検索"
+  ],
+  "menu.term.ontology": [
+    "업무 개념·관계",
+    "Business concepts and relationships",
+    "业务概念与关系",
+    "業務概念・関係"
+  ],
+  "menu.term.ontology-query": [
+    "개념·관계 기반 SQL",
+    "Concept and relationship based SQL",
+    "基于概念与关系的 SQL",
+    "概念・関係に基づく SQL"
+  ],
+  "menu.term.semantic-versions": [
+    "버전 비교·적용",
+    "Compare and apply versions",
+    "比较与应用版本",
+    "バージョン比較・適用"
+  ],
+  "menu.term.profiles": [
+    "Select AI Profile",
+    "Select AI Profile",
+    "Select AI Profile",
+    "Select AI Profile"
+  ],
+  "menu.term.ai-test": [
+    "Select AI",
+    "Select AI",
+    "Select AI",
+    "Select AI"
+  ],
+  "menu.term.agents": [
+    "Select AI Agent",
+    "Select AI Agent",
+    "Select AI Agent",
+    "Select AI Agent"
+  ],
+  "menu.term.memory": [
+    "Agent Memory",
+    "Agent Memory",
+    "Agent Memory",
+    "Agent Memory"
+  ],
+  "menu.term.engine": [
+    "Agent Engine · AgentSpec",
+    "Agent Engine · AgentSpec",
+    "Agent Engine · AgentSpec",
+    "Agent Engine · AgentSpec"
+  ],
+  "menu.term.feedback": [
+    "Select AI Feedback",
+    "Select AI Feedback",
+    "Select AI Feedback",
+    "Select AI Feedback"
+  ],
+  "menu.term.ords": [
+    "Oracle REST Data Services",
+    "Oracle REST Data Services",
+    "Oracle REST Data Services",
+    "Oracle REST Data Services"
+  ],
+  "menu.term.scheduler": [
+    "DBMS_SCHEDULER",
+    "DBMS_SCHEDULER",
+    "DBMS_SCHEDULER",
+    "DBMS_SCHEDULER"
+  ],
+  "menu.term.security": [
+    "Deep Data Security (DDS)",
+    "Deep Data Security (DDS)",
+    "Deep Data Security (DDS)",
+    "Deep Data Security (DDS)"
+  ],
+  "menu.term.vpd": [
+    "Virtual Private Database (VPD)",
+    "Virtual Private Database (VPD)",
+    "Virtual Private Database (VPD)",
+    "Virtual Private Database (VPD)"
+  ],
+  "menu.term.credentials": [
+    "Credential",
+    "Credential",
+    "Credential",
+    "Credential"
+  ],
+  "menu.term.scott-demo": [
+    "SCOTT",
+    "SCOTT",
+    "SCOTT",
+    "SCOTT"
+  ]
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<details th:fragment="runtime" class="app-card" data-dds-runtime>
+  <summary th:text="#{ddsRuntime.title}"></summary>
+  <p th:text="#{ddsRuntime.help}"></p>
+  <p th:text="#{ddsRuntime.setup}"></p>
+  <button type="button" class="btn app-btn" data-dr-readiness th:text="#{ddsManage.refresh}"></button>
+  <div role="status" data-dr-readiness-result></div>
+  <p th:text="#{ddsRuntime.readinessLimit}"></p>
+  <p th:text="#{ddsRuntime.requiredInputs}"></p>
+  <input type="hidden" data-dr-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+  <form data-dr-form class="app-config-form" autocomplete="off">
+    <label><span th:text="#{ddsRuntime.mode}"></span><select class="form-select" data-dr-mode><option value="NAME" th:text="#{ddsRuntime.local}"></option><option value="TOKEN">IAM OAuth tokens</option></select></label>
+    <label><span th:text="#{ddsRuntime.poolUser}"></span><input class="form-control" data-dr-pool-user required maxlength="128" pattern="[A-Z][A-Z0-9_]{0,127}"></label>
+    <label><span th:text="#{ddsRuntime.poolPassword}"></span><input class="form-control" data-dr-pool-password type="password" required maxlength="128" autocomplete="new-password"></label>
+    <label><span th:text="#{ddsRuntime.databaseToken}"></span><input class="form-control" data-dr-database-token type="password" required maxlength="32768" autocomplete="new-password"></label>
+    <label><span th:text="#{ddsRuntime.userA}"></span><input class="form-control" data-dr-user-a required maxlength="256"></label>
+    <label data-dr-token-field><span>IAM token A</span><input class="form-control" data-dr-token-a type="password" maxlength="32768" autocomplete="new-password"></label>
+    <label><span th:text="#{ddsRuntime.userB}"></span><input class="form-control" data-dr-user-b required maxlength="256"></label>
+    <label data-dr-token-field><span>IAM token B</span><input class="form-control" data-dr-token-b type="password" maxlength="32768" autocomplete="new-password"></label>
+    <label><span th:text="#{ddsRuntime.target}"></span><select class="form-select" data-dr-target><option value="TABLE" th:text="#{ddsManage.table}"></option><option value="MEMORY" th:text="#{ddsRuntime.memory}"></option></select></label>
+    <label data-dr-table-field><span th:text="#{ddsManage.table}"></span><input class="form-control" data-dr-table maxlength="128" pattern="[A-Z][A-Z0-9_]{0,127}"></label>
+    <fieldset data-dr-memory-fields hidden><legend th:text="#{ddsRuntime.memory}"></legend>
+      <p th:text="#{ddsRuntime.memoryHelp}"></p>
+      <label><span th:text="#{ddsRuntime.store}"></span><input class="form-control" data-dr-store maxlength="16" pattern="[A-Z][A-Z0-9_]{0,15}"></label>
+      <label><span th:text="#{ddsRuntime.recordA}"></span><input class="form-control" data-dr-record-a maxlength="256"></label>
+      <label><span th:text="#{ddsRuntime.recordB}"></span><input class="form-control" data-dr-record-b maxlength="256"></label>
+    </fieldset>
+    <label><input type="checkbox" data-dr-consent required><span th:text="#{ddsRuntime.consent}"></span></label>
+    <button type="submit" class="btn app-btn" th:text="#{ddsRuntime.run}"></button>
+  </form>
+  <pre role="status" data-dr-result style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+</details></body></html>

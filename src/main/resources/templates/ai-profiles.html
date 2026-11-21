@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head(#{ui.e65249eb5f3c})}"></head>
+<head th:replace="~{fragments/common :: head(#{menu.item.profiles})}"></head>
 <body class="app-shell" th:classappend="${profileName != null} ? 'app-profile-detail-page'">
 <aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main">
@@ -8,7 +8,7 @@
   <main class="app-content">
     <a class="app-back-link" th:if="${profileName != null}" th:href="@{/ai-profiles}" th:text="#{ui.ab881c31afb0}">← 프로필 목록</a>
     <div class="app-page-heading">
-      <h1 th:text="${profileName == null ? #messages.msg('ui.e65249eb5f3c') : profileName}"></h1>
+      <th:block th:if="${profileName == null}"><th:block th:replace="~{fragments/common :: pageTitle('profiles')}"></th:block></th:block><h1 th:if="${profileName != null}" th:text="${profileName}"></h1>
       <div class="app-profile-heading-actions"><button th:replace="~{fragments/common :: sqlHelp('profiles', 'list')}"></button><a class="btn app-btn app-btn-secondary" th:href="${profileName == null} ? @{/ai-profiles} : @{/ai-profiles(profile=${profileName})}" th:text="#{ui.8259f9d35351}">새로고침</a></div>
     </div>
     <th:block th:replace="~{fragments/select-ai-setup :: guide}"></th:block>

@@ -34,9 +34,12 @@
   </section>
   <section class="app-config-card" th:if="${!#lists.isEmpty(checks)}">
     <h2 th:text="#{setup.results}"></h2>
-    <p class="app-config-notice" th:text="#{setup.limits}"></p>
-    <details class="app-config-disclosure" th:each="check : ${checks}">
-      <summary><span class="app-setup-state" th:classappend="${'app-setup-' + check.state}" th:text="${#messages.msg('setup.state.' + check.state)}"></span> <span th:text="${#messages.msg('setup.check.' + check.key)}"></span></summary>
+    <p class="app-config-notice" th:text="#{setup.legend}"></p>
+    <p th:text="#{setup.requirement.help}"></p>
+    <details class="app-config-disclosure" th:each="check : ${checks}" th:with="definition=${requirements != null ? requirements['configuration.' + check.key] : null}, displayState=${definition != null and definition.probe == 'MANUAL' and check.state.toString() == 'UNKNOWN' ? 'REVIEW' : check.state}">
+      <summary><span class="app-setup-state" th:classappend="${'app-setup-' + displayState}" th:text="${#messages.msg('setup.state.' + displayState)}"></span> <span th:text="${#messages.msg('setup.check.' + check.key)}"></span> <span class="app-requirement" th:if="${definition != null}" th:text="${#messages.msg('setup.requirement.' + definition.level)}"></span></summary>
+      <p th:if="${definition != null}"><span th:text="#{setup.technical}"></span>: <code th:text="${definition.technicalTerm}"></code></p>
+      <p th:if="${definition != null and definition.level == 'CONDITIONAL'}" th:text="#{setup.condition.external}"></p>
       <p th:text="${#messages.msg('setup.help.' + check.key)}"></p>
       <a class="app-btn" target="_blank" rel="noopener" th:href="${check.link == '/ai-profiles' and profile != '' ? '/ai-profiles/detail?profile=' + #uris.escapeQueryParam(profile) : check.link}" th:text="#{setup.openAction}"></a>
     </details>
@@ -51,8 +54,11 @@
   <section class="app-config-card" th:if="${historyChecks != null and !#lists.isEmpty(historyChecks)}">
     <h2 th:text="#{setup.historyReady}"></h2>
     <p th:text="#{setup.historyLimits}"></p>
-    <details class="app-config-disclosure" th:each="check : ${historyChecks}">
-      <summary><span class="app-setup-state" th:classappend="${'app-setup-' + check.state}" th:text="${#messages.msg('setup.state.' + check.state)}"></span> <span th:text="${#messages.msg('setup.history.' + check.key)}"></span></summary>
+    <details class="app-config-disclosure" th:each="check : ${historyChecks}" th:with="definition=${requirements != null ? requirements['history.' + check.key] : null}">
+      <summary><span class="app-setup-state" th:classappend="${'app-setup-' + check.state}" th:text="${#messages.msg('setup.state.' + check.state)}"></span> <span th:text="${#messages.msg('setup.history.' + check.key)}"></span> <span class="app-requirement" th:if="${definition != null}" th:text="${#messages.msg('setup.requirement.' + definition.level)}"></span></summary>
+      <p th:if="${definition != null}"><span th:text="#{setup.technical}"></span>: <code th:text="${definition.technicalTerm}"></code></p>
+      <p th:if="${definition != null and definition.level == 'CONDITIONAL'}" th:text="#{setup.condition.external}"></p>
+      <p th:text="#{setup.condition.history}"></p>
       <p th:text="${#messages.msg('setup.historyHelp.' + check.key)}"></p>
       <p th:if="${check.detail != ''}" th:text="${check.detail}"></p>
       <a class="app-btn" target="_blank" rel="noopener" th:href="${check.link == '/ai-profiles' ? '/ai-profiles/detail?profile=' + #uris.escapeQueryParam(profile) : check.link}" th:text="#{setup.openAction}"></a>

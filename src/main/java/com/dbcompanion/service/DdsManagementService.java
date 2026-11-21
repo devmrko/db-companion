@@ -25,6 +25,8 @@ public class DdsManagementService {
     public State state(PoolSession s){synchronized(s){return run(s,()->repository.state(owner(s)));}}
     private void identityAdmin(PoolSession s){DdsManagement.require("ADMIN".equals(owner(s)),"adminRole");}
     public DdsIdentity.State identities(PoolSession s){synchronized(s){identityAdmin(s);return run(s,repository::identities);}}
+    public String memoryProbeTable(PoolSession s,String store){synchronized(s){identityAdmin(s);return run(s,()->repository.memoryProbeTable(store));}}
+    public Map<String,String> runtimeReadiness(PoolSession s){synchronized(s){identityAdmin(s);return run(s,repository::runtimeReadiness);}}
     public DdsIdentity.Preview identityPreview(PoolSession s,DdsIdentity.Request request){synchronized(s){
         identityPending.remove(s);identityAdmin(s);
         return run(s,()->{

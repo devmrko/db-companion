@@ -1,8 +1,9 @@
 export function normalizeResourceName(value) { return String(value??'').trim().toUpperCase(); }
 export function memoryPrerequisite(profile, settings) {
-  if(!profile)return {ready:false,message:'추출·임베딩에 사용할 프로필을 선택하세요.'};
+  if(!profile)return {ready:false,state:'ACTION',message:'필수: 추출·임베딩용 프로필 선택'};
+  if(!settings)return {ready:false,state:'UNKNOWN',message:'미확인: 프로필 설정 조회 필요'};
   const embedding=String(settings?.embedding_model||'').trim();
-  return embedding?{ready:true,message:`${profile} · 임베딩 모델: ${embedding}. 생성 요청 시 실제 모델 접근을 DB가 확인합니다.`}:{ready:false,message:`${profile}에 임베딩 모델이 설정되어 있지 않습니다. 먼저 ‘임베딩 모델 설정’에서 사용할 모델을 저장한 뒤 새로고침하세요. conversation 설정만으로는 저장소를 만들 수 없습니다.`};
+  return embedding?{ready:true,state:'CONFIGURED',message:`설정 확인: ${profile} · ${embedding}. 모델 실행 미검증.`}:{ready:false,state:'ACTION',message:`필수: ${profile}의 임베딩 모델 설정. 대화 저장 설정과 별도.`};
 }
 export function creationInput(form, schema) {
   const data = new FormData(form), kind = form.dataset.mpForm;
@@ -40,7 +41,7 @@ export function mountMemoryPolicy(root) {
   async function prerequisite() {
     const revision=++prerequisiteRevision;
     const form=root.querySelector('[data-mp-form="memory"]'),profile=form.elements.profile.value;
-    memoryReady=false;get('prerequisite').textContent='선택한 프로필의 임베딩 모델 설정 확인 중…';controls();
+    memoryReady=false;get('prerequisite').className='app-config-notice app-setup-state app-setup-UNKNOWN';get('prerequisite').textContent='임베딩 모델 설정 확인 중…';controls();
     get('embedding-edit').hidden=profile!==root.dataset.profile;
     get('profile-link').hidden=!profile||profile===root.dataset.profile;
     get('profile-link').href='/ai-profiles/detail?'+new URLSearchParams({profile});
@@ -48,7 +49,8 @@ export function mountMemoryPolicy(root) {
       const selected=profile===root.dataset.profile?status:profile?await api({},'/ai-profiles/memory-policy?'+new URLSearchParams({schema:root.dataset.schema,profile})):null;
       if(revision!==prerequisiteRevision)return;
       const result=memoryPrerequisite(profile,selected?.settings);memoryReady=result.ready;get('prerequisite').textContent=result.message;
-    }catch(error){if(revision===prerequisiteRevision)get('prerequisite').textContent=error.message;}
+      get('prerequisite').className='app-config-notice app-setup-state app-setup-'+result.state;
+    }catch(error){if(revision===prerequisiteRevision){get('prerequisite').className='app-config-notice app-setup-state app-setup-UNKNOWN';get('prerequisite').textContent=error.message;}}
     finally{if(revision===prerequisiteRevision)controls();}
   }
   function list(host,items) {

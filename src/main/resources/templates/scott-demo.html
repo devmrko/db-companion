@@ -1,6 +1,6 @@
-<!DOCTYPE html><html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/common :: head(#{scottSetup.title})}"></head>
+<!DOCTYPE html><html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/common :: head(#{menu.item.scott-demo})}"></head>
 <body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside><div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content" data-scott-setup>
-<h1 th:text="#{scottSetup.title}"></h1><p><strong th:text="${info.database}"></strong> · <strong th:text="${info.username}"></strong></p><p th:text="#{scottSetup.help}"></p>
+<th:block th:replace="~{fragments/common :: pageTitle('scott-demo')}"></th:block><p><strong th:text="${info.database}"></strong> · <strong th:text="${info.username}"></strong></p><p th:text="#{scottSetup.help}"></p>
 <input type="hidden" data-sc-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
 <section class="app-card"><a th:href="@{/db/accounts}" th:text="#{accountSetup.title}"></a><p class="app-alert" th:text="#{scottSetup.owner}"></p>
 <button type="button" class="btn app-btn app-btn-quiet" data-sc-status th:text="#{scottSetup.status}"></button> <button type="button" class="btn app-btn app-btn-secondary" data-sc-preview disabled th:text="#{scottSetup.preview}"></button>

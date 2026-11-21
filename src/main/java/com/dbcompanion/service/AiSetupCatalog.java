@@ -8,7 +8,7 @@ import tools.jackson.databind.json.JsonMapper;
 public final class AiSetupCatalog {
     private AiSetupCatalog() {}
     public record Goal(String id,List<String> requires,List<String> actions) {}
-    public record Requirement(String id,String scope,String actor,String link,String condition,String probe) {}
+    public record Requirement(String id,String scope,String actor,String link,String condition,String probe,String level,String technicalTerm) {}
     public record Action(String id,String actor,String attribute,String value,List<String> requires,String preview,String apply,String verification,boolean confirmationRequired) {}
     public record Spec(int version,List<Goal> goals,List<Requirement> requirements,List<Action> actions,List<String> evidenceRules) {}
     private static final Spec SPEC=load();

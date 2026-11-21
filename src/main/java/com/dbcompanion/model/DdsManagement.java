@@ -12,7 +12,9 @@ public final class DdsManagement {
         public Draft(String schema,String kind,String action,String name,String table,String role,String column,String valueType,String value,boolean enabled){this(schema,kind,action,name,table,role,column,valueType,value,enabled,"");}
     }
     public record State(List<Map<String,String>> roles,List<Map<String,String>> grants,
-                        List<Map<String,String>> columns,Set<String> privileges) {}
+                        List<Map<String,String>> columns,Set<String> privileges,List<Map<String,String>> applications) {
+        public State(List<Map<String,String>> roles,List<Map<String,String>> grants,List<Map<String,String>> columns,Set<String> privileges){this(roles,grants,columns,privileges,List.of());}
+    }
     public record Preview(String token,String confirmation,String sql,String revision,Draft draft,Draft previous) {}
     public record Apply(String token,String confirmation,boolean consent) {}
     public record PreviewRequest(Draft draft,String revision) {}
@@ -31,9 +33,13 @@ public final class DdsManagement {
         require("TEXT".equals(d.valueType())&&d.value()!=null&&!d.value().isEmpty(),"invalid");
         return col+" = "+literal(d.value());
     }
-    public static List<Map<String,String>> target(Draft d,State s){return (d.kind().equals("ROLE")?s.roles():s.grants()).stream().filter(r->Objects.equals(r.get(d.kind().equals("ROLE")?"DATA_ROLE":"GRANT_NAME"),d.name())).toList();}
+    public static List<Map<String,String>> target(Draft d,State s){
+        String key=d.kind().equals("APPLICATION")?"APPLICATION_NAME":d.kind().equals("ROLE")?"DATA_ROLE":"GRANT_NAME";
+        return (d.kind().equals("APPLICATION")?s.applications():d.kind().equals("ROLE")?s.roles():s.grants()).stream().filter(r->Objects.equals(r.get(key),d.name())).toList();
+    }
     public static Draft previous(Draft d,State state){
         var rows=target(d,state);require(rows.size()==1,"unsupported");var r=rows.getFirst();
+        if(d.kind().equals("APPLICATION"))return new Draft(d.schema(),"APPLICATION","UPDATE",d.name(),"","","","","",false,applicationMapping(r.get("MAPPED_TO")));
         if(d.kind().equals("ROLE")){
             require(r.keySet().equals(Set.of("DATA_ROLE","MAPPED_TO","ENABLED_BY_DEFAULT")),"unsupported");
             String mapped=Objects.toString(r.get("MAPPED_TO"),"");
@@ -66,10 +72,17 @@ public final class DdsManagement {
     }
     public static String sql(Draft d,State state,String username){
         require(d!=null&&Objects.equals(d.schema(),username),"ownSchema");id(d.schema());id(d.name());
-        require(Set.of("ROLE","GRANT").contains(d.kind())&&Set.of("CREATE","UPDATE").contains(d.action()),"invalid");
+        require(Set.of("ROLE","GRANT","APPLICATION").contains(d.kind())&&Set.of("CREATE","UPDATE").contains(d.action()),"invalid");
         var existing=target(d,state);boolean update=d.action().equals("UPDATE");
         require(update?!existing.isEmpty():existing.isEmpty(),update?"missing":"exists");
         Draft old=update?previous(d,state):null;
+        if(d.kind().equals("APPLICATION")){
+            require("ADMIN".equals(username),"adminRole");
+            require(state.privileges().contains("CREATE APPLICATION IDENTITY"),"applicationPrivilege");
+            String mapped=applicationMapping(d.mapping());
+            require(state.applications().stream().noneMatch(r->!d.name().equals(r.get("APPLICATION_NAME"))&&mapped.equalsIgnoreCase(r.get("MAPPED_TO"))),"mappingExists");
+            return "CREATE "+(update?"OR REPLACE ":"")+"APPLICATION IDENTITY "+id(d.name())+" MAPPED TO "+literal(mapped);
+        }
         if(d.kind().equals("ROLE")){
             require("ADMIN".equals(username),"adminRole");require(state.privileges().contains("CREATE DATA ROLE"),"rolePrivilege");
             String mapped=mapping(d.mapping());
@@ -86,6 +99,11 @@ public final class DdsManagement {
     }
     public static void verify(Draft d,State after){
         Draft actual=previous(d,after);
+        if(d.kind().equals("APPLICATION")){require(applicationMapping(d.mapping()).equalsIgnoreCase(actual.mapping()),"verifyFailed");return;}
         require(d.kind().equals("ROLE")?(blank(d.mapping())?blank(actual.mapping())&&actual.enabled()==d.enabled():Objects.equals(mapping(actual.mapping()),mapping(d.mapping()))):Objects.equals(actual.table(),d.table())&&Objects.equals(actual.role(),d.role())&&predicate(actual).equals(predicate(d)),"verifyFailed");
+    }
+    public static String applicationMapping(String value){
+        require(value!=null&&value.matches("(?i)IAM_OAUTH_CLIENT_ID=[A-Za-z0-9_-]{1,200}"),"mappingInvalid");
+        return "IAM_OAUTH_CLIENT_ID="+value.substring(value.indexOf('=')+1);
     }
 }

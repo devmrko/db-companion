@@ -65,16 +65,57 @@ successful policy enforcement, and zero rows or a successful count alone does
 not prove isolation. Counts do not establish which individual rows were visible;
 use independent expected-result checks when validating a policy.
 
+## IAM and shared-connection checks
+
+In **DDS create/change**, choose **OCI Application Identity** and enter the
+OAuth client ID of an existing IAM application. Preview and confirm the SQL.
+Creation and replacement use the same expiring plan, concurrency check and
+database readback as other DDS changes. IAM application registration and group
+membership remain external operations.
+
+Open **IAM, shared connection and Memory A/B checks** to supply a dedicated
+password-authenticated pool account, its password and a database-access OAuth
+token. The pool account requires `CREATE SESSION` and
+`CREATE END USER SECURITY CONTEXT`. ADMIN, SYS and SYSTEM are rejected. The
+database must trust the token issuer and audience; creating the application
+mapping alone does not configure that trust.
+
+For OCI IAM, the database OAuth configuration uses the database resource's
+**Application ID**, while `CREATE APPLICATION IDENTITY` uses the calling
+application's **OAuth Client ID**. These are different identifiers. Compare
+`IDENTITY_PROVIDER_OAUTH_CONFIG.app_id` with the database token's
+`resource_app_id`, and `domain_url` with `tenant_iss` exactly, including an
+explicit `:443` if present. Decode tokens locally only; do not send them to an
+online decoder. Decoded claims are diagnostic inputs, not signature verification.
+
+Choose local user names or two IAM end-user tokens, and enter the exact expected
+database identity for A and B. The application borrows one connection from a
+temporary pool and runs A, B, then A again. Before reading an owned table it
+checks the effective identity. Each step rolls back, clears the context and
+checks that the original identity is restored. Identity mismatch, query failure
+or cleanup failure stops the experiment; no automatic retry or ADMIN fallback
+is performed. This checks sequential reuse of one borrowed connection, not
+concurrent requests or release/reborrow behavior of every connection-pool type.
+
+For **Memory test-record access**, supply an existing native `plsql-001` store
+and two synthetic record IDs with independently known ownership. The result
+reports visible counts for each ID without returning contents. Compare A/B/A
+with the expected access matrix; a row count alone does not establish ownership
+or prove the policy is correct. These reads do not call a model.
+
+Tokens and the pool password are used only for that request, cleared from the
+form on submission, and excluded from response bodies and pending plans. Do not
+paste them into chat, save them in browser storage or include them in reports.
+
 ## Boundaries and next stage
 
-This is a local direct-logon check, not IAM token propagation or switching
-authenticated end users on a shared application connection pool. Those paths
-must supply verified identity/context, clear it on connection reuse and verify
-the effective identity before protected operations. Creating users and mappings
-alone does not implement that runtime path.
+The local direct-logon check and the administrator-run token experiment are
+separate paths. They do not add IAM login to the management application or
+change its ordinary request connections into a multi-user runtime.
 
 Memory extraction, search and recall must separately enforce the same end-user
-policy. The current administrative Memory browser is not a personal-memory
+policy. The record-access experiment does not validate those native API paths.
+The current administrative Memory browser is not a personal-memory
 application. A shared DB account or a separate store name is not an end-user
 authorization boundary.
 

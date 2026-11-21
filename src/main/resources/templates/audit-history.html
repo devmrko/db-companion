@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head(#{audit.title})}"></head>
+<head th:replace="~{fragments/common :: head(#{menu.item.audit})}"></head>
 <body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
 <main class="app-content" data-audit>
  <link rel="stylesheet" th:href="@{/css/audit-history.css}">
  <input type="hidden" data-au-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
- <div class="app-page-heading"><div><h1 th:text="#{audit.title}"></h1><p class="app-muted" th:text="#{audit.intro}"></p></div><div class="audit-actions">
+ <div class="app-page-heading"><div><th:block th:replace="~{fragments/common :: pageTitle('audit')}"></th:block><p class="app-muted" th:text="#{audit.intro}"></p></div><div class="audit-actions">
   <button type="button" class="btn app-btn app-btn-secondary" data-au-help>SQL ?</button>
   <button type="button" class="btn app-btn app-btn-secondary" data-au-refresh th:text="#{ui.8259f9d35351}"></button>
  </div></div>

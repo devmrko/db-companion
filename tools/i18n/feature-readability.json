@@ -1,0 +1,98 @@
+{
+  "ddsRuntime.check.provider": [
+    "IAM 인증 방식",
+    "IAM authentication",
+    "IAM 认证方式",
+    "IAM 認証方式"
+  ],
+  "ddsRuntime.check.oauth": [
+    "DB OAuth 연결",
+    "Database OAuth configuration",
+    "数据库 OAuth 配置",
+    "DB OAuth 設定"
+  ],
+  "ddsRuntime.check.credential": [
+    "토큰 검증 인증 정보",
+    "Token verification credential",
+    "令牌验证凭据",
+    "トークン検証資格情報"
+  ],
+  "ddsRuntime.readinessLimit": [
+    "설정 존재 여부만 확인. 사용자 로그인·토큰·역할 매핑·실행은 별도 검증.",
+    "Checks configuration presence only. Login, tokens, role mappings and execution require separate verification.",
+    "仅检查配置是否存在。登录、令牌、角色映射及执行需单独验证。",
+    "設定の存在のみ確認。ログイン・トークン・ロール対応・実行は別途検証。"
+  ],
+  "ddsRuntime.requiredInputs": [
+    "표시된 입력은 모두 필수. IAM 토큰과 메모리 기록은 해당 방식 선택 시 필요.",
+    "All visible inputs are required. IAM tokens and memory records apply only to the selected mode.",
+    "所有可见输入均必需。IAM 令牌及记忆记录仅在选择对应方式时需要。",
+    "表示された入力はすべて必須。IAM トークンとメモリ記録は該当方式で必要。"
+  ],
+  "setup.historyLimits": [
+    "이력 기능 준비 상태. 조회만 수행하며, 실제 수집 성공은 별도 확인.",
+    "Configure only the history you need. Checks storage, read access and settings without installing, collecting or changing configuration. Readiness does not prove successful collection.",
+    "仅配置所需的历史记录。检查存储、读取权限和设置，不安装、采集或更改配置。准备就绪不代表实际采集成功。",
+    "必要な履歴のみ設定してください。保存先・参照・有効化を確認し、作成・収集・設定変更は行いません。準備完了は収集成功を意味しません。"
+  ],
+  "setup.observedHelp": [
+    "현재 세션의 최근 결과. 정답·최신 설정 반영은 미검증. 로그아웃 시 소멸. 보관은 실패·복구 기록에서 저장.",
+    "Recent requests for this profile. A returned response does not prove business correctness. Results may precede configuration changes and disappear at logout. Save evidence in Problem Questions.",
+    "此配置文件的近期请求。返回响应不证明业务正确，可能早于配置更改，注销后消失。请在问题记录中保存证据。",
+    "このプロファイルの最近の要求です。応答は業務上の正しさを証明しません。設定変更前の結果を含み、ログアウトで消えます。問題質問に保存してください。"
+  ],
+  "setup.saved.help": [
+    "선택 프로필의 대화·테스트 기록 각 최근 10건. 현재 설정·정답의 검증 근거는 아님. 질문·응답 원문 전송 없음.",
+    "Shows up to 10 recent conversation records and saved test records matching the exact profile name. Historical records do not prove current execution success or business correctness. Prompt and response content is neither read nor sent to AI.",
+    "分别显示与所选配置名称完全匹配的最近10条对话记录和测试记录。历史记录不能证明当前执行成功或业务结果正确。不会读取问题和回答正文，也不会将其发送给AI。",
+    "選択したプロファイル名と完全一致する会話記録とテスト記録を、それぞれ最新10件まで表示します。過去の記録は現在の実行成功や業務上の正しさを証明しません。質問・応答の本文は読み取りもAIへの送信もしません。"
+  ],
+  "setup.ai.help": [
+    "진단 결과로 설정 안내. 대화 기록·테이블 설명·제약조건 사용을 한 항목씩 변경 가능. 적용 전 확인.",
+    "Explain settings from the shared catalogue and checks. Enable conversation recording, comments or constraints, one setting at a time.",
+    "根据共同规范和诊断解释设置。可逐项启用对话记录、说明或约束条件。",
+    "共通定義と診断結果から設定を説明します。会話記録、説明文、制約条件の使用を一項目ずつ有効化できます。"
+  ],
+  "setup.runTest": [
+    "자연어 조회·검증",
+    "Open Select AI Test",
+    "打开 Select AI 测试",
+    "Select AI テストへ"
+  ],
+  "setup.openAction": [
+    "설정·확인 화면",
+    "Open settings / guidance",
+    "打开设置或说明",
+    "確認・設定画面を開く"
+  ],
+  "ddsRuntime.title": [
+    "사용자별 접근 검증",
+    "IAM, shared connection and Memory A/B checks",
+    "IAM、共享连接与 Memory A/B 验证",
+    "IAM・共有接続・Memory A/B 検証"
+  ],
+  "ddsRuntime.help": [
+    "같은 연결에서 A → B → A 조회. 신원·조회 건수·컨텍스트 해제 확인. 건수만으로 전체 격리를 보장하지 않음.",
+    "Run A→B→A on one test connection. Verify identity, read, roll back and clear context at each step. Counts alone do not prove complete isolation.",
+    "在同一测试连接上执行 A→B→A。每步验证身份、只读查询、回滚并清除上下文。行数差异不能证明完全隔离。",
+    "1つのテスト接続で A→B→A を実行し、各段階で本人確認・読み取り・ロールバック・コンテキスト解除を確認します。件数のみでは完全な分離を証明できません。"
+  ],
+  "ddsRuntime.setup": [
+    "사전 준비: 앱 식별자·역할 매핑·토큰·풀 계정 권한. ADMIN·SYS·SYSTEM은 풀 계정으로 사용 불가.",
+    "Configure OCI Application Identity Client ID and IAM group roles in the DDS editor first. Prepare IAM registration, tokens and pool privileges separately. ADMIN, SYS and SYSTEM are blocked as pool users.",
+    "先在 DDS 编辑器中配置 OCI 应用身份 Client ID 和 IAM 组角色。另行准备 IAM 注册、令牌及连接池权限。禁止使用 ADMIN、SYS、SYSTEM。",
+    "DDS エディターで OCI Application Identity の Client ID と IAM グループロールを設定してください。IAM 登録・トークン・プール権限は別途準備します。ADMIN・SYS・SYSTEM は使用できません。"
+  ],
+  "memoryPolicy.title": [
+    "메모리 · 가드레일",
+    "Memory · Guardrail",
+    "记忆 · 防护策略",
+    "メモリ · ガードレール"
+  ],
+  "memoryPolicy.browse": [
+    "에이전트 메모리 조회",
+    "Browse agent memory",
+    "查看智能体记忆",
+    "エージェントメモリを表示"
+  ]
+}

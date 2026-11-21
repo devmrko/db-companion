@@ -1,5 +1,134 @@
 # Release validation
 
+## Translation regeneration and narrow layout (2026-11-21)
+
+The translation sources omitted 29 readiness-record keys and retained four
+obsolete descriptions of conversation storage and supported setup changes.
+Those sources now match the shipped locale bundles. The default bundle also
+uses Korean consistently for the readiness-record messages.
+
+- A regression test runs the actual bundle generator with captured writes and
+  compares all five bundles by decoded key/value. It catches removed keys and
+  changed wording without modifying working files.
+- Full Java: 1,527 passed; JavaScript: 730 passed, one optional skip. Packaging,
+  PMD, publication scanning (1,205 files, no findings) and whitespace checks passed.
+  Process inspection and Maven cache updates required the supported sandbox
+  approval path; the unrestricted reruns passed.
+- Memory links and panel headings now use translated labels. Narrow-screen
+  navigation limits the menu height and allows scrolling within it. Keyboard
+  focus on menu groups has an explicit outline.
+- Chrome verified Tab/Enter expansion and navigation to semantic search,
+  scrolling within the height-limited menu, and collapse/expand behavior at
+  300% browser zoom. English labels and the semantic-search heading remained
+  readable. Korean and 100% zoom were restored afterward. This is desktop
+  reflow verification, not a physical mobile-device or all-page accessibility audit.
+- The test database was stopped during final verification. After its previously
+  authorized startup, saved browser credentials restored access without another
+  user login request. No database settings or model calls were changed for these
+  UI checks.
+
+## Navigation and readiness labels (2026-11-20)
+
+Menu groups expose task names alongside technical terms. Main page headings
+reuse those menu labels. Setup checks distinguish required, conditional and
+optional requirements, and separate configured, action needed, additional
+verification and unknown states. Configuration presence does not imply execution
+success.
+
+- Chrome verified grouped navigation, collapse/restore behavior and the live
+  setup diagnosis flow, including links and rechecking.
+- The subsequent heading consistency and DDS/Memory readiness changes passed
+  1,527 Java tests, packaging and PMD. JavaScript passed 729 tests with one
+  optional skip. Missing Memory settings and failed DDS metadata reads remain
+  unknown rather than being reported as absent.
+- Chrome on the isolated app verified matching menu/page titles for DDS,
+  semantic search, Memory and profiles. DDS prerequisites changed from unknown
+  to configured after a live read-only check; technical terms opened in details.
+  The Memory creation panel showed the configured embedding model and explicitly
+  stated that model execution was unverified. No creation or model call ran.
+- DDS cards lacked inner spacing; a scoped CSS correction adds padding and
+  separation, including a narrow-screen rule. Rebuilt packaging and PMD passed;
+  Chrome verified the corrected desktop spacing. Narrow-screen layout was not
+  separately exercised. Publication scan: 1,203 files, no findings.
+- IAM end-user A/B token attachment and Memory recall isolation remain pending.
+  User A reached My Apps; user B login was rejected, with the cause unresolved.
+  The browser-token fixture was rejected at app creation because its HTTP
+  callback required HTTPS. It created no resources and ran no DB probe.
+
+## IAM and shared-connection probe (in progress)
+
+Checked on 2026-11-19–20. The management editor now supports OCI Application
+Identity preview/apply/readback; the new input form accepts a dedicated pool
+account, database-access token and local names or IAM tokens for A/B/A.
+The Memory option checks two record IDs in a verified native store table and
+does not execute extraction, search or recall.
+
+- OCI CLI DEFAULT could read the existing test client and obtain a client
+  credentials OAuth token. No IAM application or membership was changed.
+- The application API created and read back a disposable Application Identity.
+  The first runtime probe failed with ORA-52600. Follow-up read-only inspection
+  found the database OAuth configuration unset and its signing-key credential
+  absent. Token issuance is not proof of database token acceptance. All test
+  application identities, users, roles, grants and tables were removed.
+- A readiness endpoint now distinguishes missing configuration from an
+  unverified metadata read. Known missing OCI OAuth setup stops the probe before
+  opening the test pool. With user approval, the existing OCI IAM provider was
+  configured for the database resource application and its signing credential.
+  Initial ORA-52602 failures exposed an Application ID / Client ID mix-up and
+  a domain URL mismatch. The resource Application ID and exact token issuer
+  domain URL (including `:443`) were corrected before the successful test.
+- The live NAME-mode probe used an OCI client-credentials database token and
+  two disposable local DDS users. On one borrowed connection, A/B/A returned
+  the expected identities and row counts 1/2/1; each context cleared back to
+  the baseline. All temporary identities, users, roles, grants and tables were
+  removed. This does not test IAM end-user tokens or concurrent pool reuse.
+- A disposable native Memory store was populated directly with two synthetic
+  records and separate DDS SELECT grants. In NAME mode, A/B/A saw record counts
+  `(1,0)/(0,1)/(1,0)` for the two IDs, with one visible row each and context
+  restoration after every step. No extraction, embedding, search or recall was
+  invoked. The initial fixture insert failed on an automatically generated
+  identity column; the cleaned-up fixture was corrected before this test.
+  Temporary stores, profiles and DDS fixtures were confirmed absent afterward.
+- Final full Java suite: 1,527 passed. Full JavaScript: 728 passed, one optional skip;
+  five affected JavaScript tests passed again after the final template edit.
+  The initial sandboxed lifecycle checks were denied process inspection and
+  passed through the supported approval path. Final package and PMD passed;
+  publication scanning checked 1,201 files with no findings; whitespace checks passed.
+- On the isolated app, the readiness API returned both missing prerequisites,
+  the runtime endpoint rejected that state before authentication, and the server
+  rendered the new form without unresolved template attributes or message keys.
+  This is HTTP/template evidence, not browser interaction evidence.
+- Chrome on the isolated app verified NAME/TOKEN and table/Memory form changes,
+  required-field submission blocking and the live OCI IAM readiness display.
+  Saved login details initially autofilled the probe form. The form autocomplete
+  policy was corrected; after rebuilding and signing in again, pool password
+  and expected-user fields remained empty. Browser checks did not submit tokens
+  or run an authenticated probe; real probe results above are API/DB evidence.
+  Application Identity preview showed the expected SQL, kept apply disabled
+  without confirmation/consent, and disappeared when its Client ID was edited.
+  No Application Identity change was applied through the browser.
+- Synthetic JDBC tests cover A/B/A identity checks, cleanup failure, read denial,
+  parameter-bound Memory IDs and missing-setup rejection. These are not live
+  IAM identity, connection-pool concurrency or Memory recall evidence.
+
+IAM end-user token attachment and Memory extraction/recall under DDS remain
+unverified for this addition. Existing local direct-logon evidence below is a
+separate path.
+
+An additional disposable IAM experiment on 2026-11-20 created a confidential
+client, two users, a group and an application assignment through OCI CLI DEFAULT.
+The existing domain-wide group claim was inspected and left unchanged. The
+database client-credentials token was issued, but password-grant end-user token
+issuance returned `invalid_grant` requiring an initial password change. Setting
+the temporary user's password-state flag did not resolve it. The documented
+self-service password-change endpoint rejected the CLI administrator's identity
+with HTTP 401. No IAM end-user token reached the DB probe, and no Memory model
+request was made in this experiment. Temporary IAM resources were deleted; an
+earlier cleanup dependency error was resolved after removing the temporary app.
+The next end-user-token test needs completion of the test users' own first-login
+flow or already usable test-user tokens. Shared IAM authentication policy was
+not relaxed for this test.
+
 ## DDS end-user management
 
 Checked on 2026-11-19 on the isolated application with disposable local DDS

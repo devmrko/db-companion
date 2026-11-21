@@ -19,4 +19,7 @@ test('lowercase resource names normalize before submission and missing embedding
   assert.match(memoryPrerequisite('APP',{}).message,/임베딩 모델 설정/);
   assert.equal(memoryPrerequisite('APP',{embedding_model:'database: APP.EMBED_MODEL'}).ready,true);
   assert.equal(memoryPrerequisite('',{}).ready,false);
+  assert.equal(memoryPrerequisite('APP',undefined).state,'UNKNOWN');
+  assert.equal(memoryPrerequisite('APP',{}).state,'ACTION');
+  assert.equal(memoryPrerequisite('APP',{embedding_model:'database: APP.EMBED_MODEL'}).state,'CONFIGURED');
 });

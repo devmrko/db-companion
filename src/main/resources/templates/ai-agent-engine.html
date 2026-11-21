@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head('Agent Engine')}"></head>
+<head th:replace="~{fragments/common :: head(#{menu.item.engine})}"></head>
 <body class="app-shell">
 <link rel="stylesheet" th:href="@{/vendor/ontology-flow/engine-workbench.css}">
 <aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
 <main class="app-content app-config" data-engine th:attr="data-schema=${selectedSchema}">
-  <div class="app-page-heading"><h1>Agent Engine</h1><span class="app-badge">AgentSpec · Flow</span></div>
+  <div class="app-page-heading"><th:block th:replace="~{fragments/common :: pageTitle('engine')}"></th:block></div>
   <p class="app-muted">등록된 Agent를 조회하거나 워크플로우 JSON을 불러와 입력값을 설정하고, DB 실행 결과와 trace를 확인합니다.</p>
   <p class="app-config-notice" data-engine-status role="status">DB 실행 API 확인 중…</p>
   <input type="hidden" data-engine-csrf th:value="${_csrf.token}" th:attr="data-header=${_csrf.headerName}">

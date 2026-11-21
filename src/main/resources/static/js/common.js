@@ -21,6 +21,15 @@ document.querySelectorAll('[data-language-form]').forEach(form=>{
 document.querySelectorAll('[data-sidebar-toggle]').forEach((button) => {
   const setCollapsed = (collapsed) => {
     document.body.classList.toggle('is-sidebar-collapsed', collapsed);
+    document.querySelectorAll('.app-menu-group').forEach(group => {
+      if (collapsed) {
+        if (group.dataset.expandedBeforeCollapse === undefined) group.dataset.expandedBeforeCollapse = String(group.open);
+        group.open = true;
+      } else if (group.dataset.expandedBeforeCollapse !== undefined) {
+        group.open = group.dataset.expandedBeforeCollapse === 'true';
+        delete group.dataset.expandedBeforeCollapse;
+      }
+    });
     button.setAttribute('aria-expanded', String(!collapsed));
     button.setAttribute('aria-label', collapsed ? t('ui.1f213133dc70', "메뉴 펼치기") : t('ui.9f6ec12024c7', "메뉴 접기"));
     button.title = collapsed ? t('ui.1f213133dc70', "메뉴 펼치기") : t('ui.9f6ec12024c7', "메뉴 접기");
