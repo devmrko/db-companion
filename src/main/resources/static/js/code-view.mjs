@@ -20,7 +20,7 @@ export function mountCodeViews(root){
       view.source=pre.textContent;view.replaceChildren();
       mountSourceViewer(view,[{type:'SQL / PL/SQL',text:view.source}],null);
     }
-    pre.classList.add('app-code-source');view.hidden=pre.hidden;
+    pre.classList.add('app-code-source');view.hidden=pre.hidden||!pre.textContent.trim();
   };
   const scan=node=>{
     if(node.nodeType===1&&node.matches('pre'))update(node);

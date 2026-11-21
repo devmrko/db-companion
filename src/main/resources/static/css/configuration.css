@@ -70,7 +70,3 @@
 .app-requirement { display:inline-block; padding:2px 7px; border:1px solid var(--app-border); border-radius:4px; font-size:12px; margin-left:8px; }
 
 .app-setup-REVIEW { background:#fff0d9; color:#784900; }
-
-[data-ddsm], [data-ddsi], [data-dds-runtime] { padding:20px; margin-bottom:18px; }
-[data-ddsm] > summary, [data-dds-runtime] > summary { font-weight:650; cursor:pointer; }
-@media(max-width:600px) { [data-ddsm], [data-ddsi], [data-dds-runtime] { padding:14px; } }

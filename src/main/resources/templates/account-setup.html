@@ -3,20 +3,20 @@
 <body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside><div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
 <main class="app-content"><th:block th:replace="~{fragments/common :: pageTitle('accounts')}"></th:block><p th:text="#{accountSetup.help}"></p>
 <p class="app-alert" th:unless="${accountAdmin}" th:text="#{accountSetup.admin}"></p>
-<section th:if="${accountAdmin}" class="app-card" data-account-setup>
+<section th:if="${accountAdmin}" class="app-card app-module-card" data-account-setup>
   <input type="hidden" data-as-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
   <p><strong th:text="${info.database}"></strong> · ADMIN</p>
   <form data-as-form><div class="app-creation-grid">
     <label class="app-field"><span th:text="#{accountSetup.name}"></span><input class="form-control" data-as-name required pattern="[A-Z][A-Z0-9_]{2,29}" maxlength="30" autocomplete="off"></label>
     <label class="app-field"><span th:text="#{accountSetup.preset}"></span><select class="form-select" data-as-preset><option value="LIMITED" th:text="#{accountSetup.limited}"></option><option value="WORKSPACE" th:text="#{accountSetup.workspace}"></option><option value="AI_WORKSPACE" th:text="#{accountSetup.aiWorkspace}"></option></select></label>
-  </div><p th:text="#{accountSetup.scope}"></p><button class="btn app-btn app-btn-secondary" type="submit" data-as-preview th:text="#{accountSetup.preview}"></button> <button class="btn app-btn app-btn-quiet" type="button" data-as-status th:text="#{accountSetup.status}"></button></form>
+  </div><p th:text="#{accountSetup.scope}"></p><div class="app-actions"><button class="btn app-btn app-btn-secondary" type="submit" data-as-preview th:text="#{accountSetup.preview}"></button> <button class="btn app-btn app-btn-quiet" type="button" data-as-status th:text="#{accountSetup.status}"></button></div></form>
   <section data-as-review hidden><h2 th:text="#{accountSetup.review}"></h2><pre class="app-preview-source" data-code-language="sql" data-as-sql></pre>
     <p class="app-alert" th:text="#{accountSetup.warning}"></p>
     <label class="app-field"><span th:text="#{accountSetup.password}"></span><input type="password" class="form-control" data-as-password autocomplete="new-password" minlength="12" maxlength="30"></label>
     <p th:text="#{accountSetup.passwordHelp}"></p>
     <label class="app-check-field"><input type="checkbox" data-as-consent><span th:text="#{accountSetup.consent}"></span></label>
-    <button type="button" class="btn app-btn app-btn-primary" data-as-create disabled th:text="#{accountSetup.create}"></button>
-    <button type="button" class="btn app-btn app-btn-secondary" data-as-configure hidden disabled th:text="#{accountSetup.configure}"></button>
+    <div class="app-actions"><button type="button" class="btn app-btn app-btn-primary" data-as-create disabled th:text="#{accountSetup.create}"></button>
+    <button type="button" class="btn app-btn app-btn-secondary" data-as-configure hidden disabled th:text="#{accountSetup.configure}"></button></div>
   </section><p role="status" aria-live="polite" data-as-message></p><pre class="app-preview-source" data-code-language="json" data-as-result></pre>
 </section>
 <section th:if="${accountAdmin}" class="app-card app-module-card" data-privilege-setup>
@@ -33,8 +33,8 @@
  <input type="hidden" data-an-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
  <div class="app-creation-grid"><label class="app-field"><span th:text="#{aiNetwork.name}"></span><input class="form-control" data-an-name maxlength="30" autocomplete="off"></label>
  <label class="app-field"><span th:text="#{aiNetwork.provider}"></span><select class="form-select" data-an-provider><option value="OPENAI">OpenAI · api.openai.com</option><option value="COHERE">Cohere · api.cohere.ai</option><option value="ANTHROPIC">Anthropic · api.anthropic.com</option><option value="GOOGLE">Google · generativelanguage.googleapis.com</option></select></label></div>
- <button type="button" class="btn app-btn app-btn-secondary" data-an-status th:text="#{aiNetwork.status}"></button>
- <button type="button" class="btn app-btn app-btn-secondary" data-an-preview th:text="#{aiNetwork.preview}"></button>
+ <div class="app-actions"><button type="button" class="btn app-btn app-btn-secondary" data-an-status th:text="#{aiNetwork.status}"></button>
+ <button type="button" class="btn app-btn app-btn-secondary" data-an-preview th:text="#{aiNetwork.preview}"></button></div>
  <section data-an-review hidden><pre class="app-preview-source" data-code-language="sql" data-an-sql></pre><label class="app-check-field"><input type="checkbox" data-an-consent><span th:text="#{aiNetwork.consent}"></span></label><button type="button" class="btn app-btn app-btn-primary" data-an-apply disabled th:text="#{aiNetwork.apply}"></button></section>
  <p role="status" aria-live="polite" data-an-message></p><pre class="app-preview-source" data-code-language="json" data-an-result></pre>
 </section></main></div><script type="module" th:src="@{/js/account-setup.mjs}"></script><script type="module" th:src="@{/js/account-grants.mjs}"></script><script type="module" th:src="@{/js/ai-network-setup.mjs}"></script></body></html>

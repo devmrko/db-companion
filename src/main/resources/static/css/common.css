@@ -38,6 +38,7 @@
   --bs-link-color: var(--app-link);
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; -webkit-font-smoothing: antialiased; }
 a { color: var(--app-link); text-decoration: none; }
 h1, h2, p { margin-top: 0; }
@@ -1350,6 +1351,14 @@ dialog.app-profile-editor-compact { width: min(640px, calc(100vw - 32px)); }
 }
 .app-code-source { display: none; }
 .app-module-card { padding: 24px; margin-block: 20px; min-width: 0; }
+.app-module-card > :last-child { margin-bottom: 0; }
+.app-module-card > p, .app-module-card form > p { overflow-wrap: anywhere; }
+.app-module-card > .app-field { margin-block: 16px; }
+.app-module-card > summary { cursor: pointer; font-weight: 650; }
+.app-module-card[open] > summary { margin-bottom: 16px; }
+.app-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-block: 16px; }
+.app-actions > .app-btn { margin: 0; }
+.app-preview-source:empty, [role="status"]:empty { display: none; }
 .app-module-card h2 { font-size: 1.15rem; }
 .app-module-card > button { margin-block: 12px; }
 .app-module-status { display: grid; grid-template-columns: minmax(120px,1fr) minmax(0,2fr); gap: 8px 16px; }

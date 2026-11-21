@@ -54,7 +54,7 @@
       </dl>
     </section>
     <section class="app-card table-responsive mt-3" th:if="${page != null and profileName != null}">
-      <p class="app-muted" th:text="#{profileSetup.help}"></p>
+      <p class="app-muted app-card-note" th:text="#{profileSetup.help}"></p>
       <p class="app-muted app-profile-owner-note" th:unless="${profileEditable}" th:text="#{ui.5f6566f910f8}">프로필 소유자 계정으로 로그인하면 편집할 수 있습니다.</p>
       <table class="table app-table">
         <caption class="visually-hidden" th:text="#{ui.827b08f12021}">선택한 프로필 설정</caption>

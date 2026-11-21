@@ -16,7 +16,7 @@ FROM user_scheduler_job_run_details
 WHERE job_name = :job_name
 ORDER BY log_id DESC FETCH FIRST 10 ROWS ONLY;</pre></div></details></div>
   <p class="app-alert is-error" th:if="${schemaError}" th:text="${schemaError}"></p>
-  <details class="app-card" data-scheduler-manage th:attr="data-schema=${selectedSchema}">
+  <details class="app-card app-module-card" data-scheduler-manage th:attr="data-schema=${selectedSchema}">
     <summary th:text="#{schedulerManage.title}"></summary>
     <p th:text="#{schedulerManage.scope}"></p>
     <p th:text="#{schedulerManage.privilege}"></p>
@@ -36,14 +36,14 @@ ORDER BY log_id DESC FETCH FIRST 10 ROWS ONLY;</pre></div></details></div>
           <label class="app-field"><span th:text="#{schedulerManage.comments}"></span><input class="form-control" data-sm-comments maxlength="500"></label>
         </div>
       </div>
-      <button class="btn app-btn" type="submit" data-sm-preview th:text="#{schedulerManage.preview}"></button>
-      <button class="btn app-btn" type="button" data-sm-restore hidden th:text="#{schedulerManage.restore}"></button>
+      <div class="app-actions"><button class="btn app-btn" type="submit" data-sm-preview th:text="#{schedulerManage.preview}"></button>
+      <button class="btn app-btn" type="button" data-sm-restore hidden th:text="#{schedulerManage.restore}"></button></div>
     </form>
     <section data-sm-review hidden>
       <p th:text="#{schedulerManage.warning}"></p>
       <pre data-sm-sql></pre><h3 th:text="#{schedulerManage.code}"></h3><pre data-sm-execution></pre><pre data-sm-before></pre>
       <label class="app-field"><span data-sm-confirm-label></span><input class="form-control" data-sm-confirm autocomplete="off"></label>
-      <label class="app-field"><span th:text="#{schedulerManage.consent}"></span><input type="checkbox" data-sm-consent></label>
+      <label class="app-check-field"><input type="checkbox" data-sm-consent><span th:text="#{schedulerManage.consent}"></span></label>
       <button class="btn app-btn" type="button" data-sm-apply disabled th:text="#{schedulerManage.apply}"></button>
     </section>
   </details>

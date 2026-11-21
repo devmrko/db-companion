@@ -1,5 +1,5 @@
 <!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
-<section th:fragment="identities" class="app-card" data-ddsi>
+<section th:fragment="identities" class="app-card app-module-card" data-ddsi>
   <h2 th:text="#{ddsIdentity.title}"></h2>
   <p th:text="#{ddsIdentity.scope}"></p>
   <input type="hidden" data-di-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">

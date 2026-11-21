@@ -9,7 +9,7 @@
     <details class="app-dds-help"><summary aria-label="Deep Data Security ?">?</summary><div th:text="#{dds.help}"></div></details>
   </div>
   <p class="app-alert is-error" th:if="${schemaError}" th:text="${schemaError}"></p>
-  <details class="app-card" data-ddsm th:attr="data-schema=${selectedSchema},data-user=${info.username}">
+  <details class="app-card app-module-card" data-ddsm th:attr="data-schema=${selectedSchema},data-user=${info.username}">
     <summary th:text="#{ddsManage.title}">DDS 생성·변경</summary>
     <p th:text="#{ddsManage.scope}"></p>
     <p th:text="#{ddsManage.adminHelp}"></p>
@@ -28,7 +28,7 @@
           <label class="app-field"><span th:text="#{ddsManage.roleMode}"></span><select class="form-select" data-dm-role-mode><option value="LOCAL" th:text="#{ddsManage.local}"></option><option value="IAM_OAUTH_GROUP">OCI OAuth · IAM_OAUTH_GROUP</option><option value="IAM_GROUP_NAME">OCI IAM · IAM_GROUP_NAME</option></select></label>
           <label class="app-field" data-dm-group-field hidden><span th:text="#{ddsManage.group}"></span><input class="form-control" data-dm-group maxlength="480"></label>
           <p th:text="#{ddsManage.mappingHelp}"></p>
-          <label class="app-field" data-dm-enabled-field><span th:text="#{ddsManage.enabled}"></span><input type="checkbox" data-dm-enabled checked></label>
+          <label class="app-check-field" data-dm-enabled-field><input type="checkbox" data-dm-enabled checked><span th:text="#{ddsManage.enabled}"></span></label>
         </div>
       </div>
       <div class="app-creation-grid" data-dm-grant-fields>
@@ -46,7 +46,7 @@
       <pre data-dm-sql style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
       <pre data-dm-before style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
       <label class="app-field"><span data-dm-confirm-label></span><input class="form-control" data-dm-confirm autocomplete="off"></label>
-      <label class="app-field"><span th:text="#{ddsManage.consent}"></span><input type="checkbox" data-dm-consent></label>
+      <label class="app-check-field"><input type="checkbox" data-dm-consent><span th:text="#{ddsManage.consent}"></span></label>
       <button class="btn app-btn" type="button" data-dm-apply disabled th:text="#{ddsManage.apply}"></button>
     </section>
   </details>
