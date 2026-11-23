@@ -8,6 +8,21 @@
   <main class="app-content">
     <div class="app-alert is-error" role="alert" th:if="${schemaError}" th:text="${schemaError}"></div>
     <div class="app-page-heading"><h1 th:text="#{ui.6c9c3023153d}">접속 정보</h1><a class="btn app-btn app-btn-secondary" th:href="@{/}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg><th:block th:text="#{ui.8259f9d35351}">새로고침</th:block></a></div>
+    <section class="app-card app-section" data-dashboard-readiness th:attr="data-summary-url=@{/ai-setup/summary}">
+      <div class="app-card-heading"><h2 th:text="#{setup.title}"></h2></div>
+      <p th:text="#{dashboard.ready.help}"></p>
+      <div data-summary-content aria-live="polite" aria-busy="true">
+        <dl class="app-detail-list"><div th:each="key : ${ {'profile','provider','model','objects','credential','external','execution'} }">
+          <dt th:text="${#messages.msg('setup.check.' + key)}"></dt>
+          <dd><span class="app-setup-state app-setup-UNKNOWN" th:text="#{dashboard.ready.UNKNOWN}"></span></dd>
+        </div></dl>
+      </div>
+      <div class="app-config-actions">
+        <a class="app-btn" th:href="@{/ai-setup(purpose='nl2sql')}" th:text="#{dashboard.ready.details}"></a>
+        <a class="app-btn" th:href="@{/tables}" th:text="#{dashboard.ready.metadata}"></a>
+        <a class="app-btn" th:href="@{/ai-test}" th:text="#{dashboard.ready.query}"></a>
+      </div>
+    </section>
     <div class="row g-3 app-summary-row">
       <div class="col-md-4"><section class="app-card app-stat"><span class="app-stat-label"><svg th:replace="~{fragments/common :: icon('database')}"></svg><th:block th:text="#{ui.cb53ca6fdafa}">데이터베이스</th:block></span><strong th:text="${info.database}">—</strong></section></div>
       <div class="col-md-4"><section class="app-card app-stat"><span class="app-stat-label"><svg th:replace="~{fragments/common :: icon('layers')}"></svg><th:block th:text="#{ui.6e84bc961027}">선택 스키마</th:block></span><strong th:text="${selectedSchema}">—</strong></section></div>
@@ -19,4 +34,5 @@
     <section class="app-card app-section"><div class="app-card-heading"><h2 th:text="#{auditFixes.build.title}">앱 버전</h2></div><dl class="app-detail-list"><div><dt th:text="#{auditFixes.build.version}">실행 버전</dt><dd th:text="${appBuild.version}"></dd></div><div><dt th:text="#{auditFixes.build.id}">빌드 식별자 (UTC)</dt><dd th:text="${appBuild.id}"></dd></div></dl></section>
   </main>
 </div>
+<script type="module" th:src="@{/js/dashboard-readiness.mjs}"></script>
 </body></html>

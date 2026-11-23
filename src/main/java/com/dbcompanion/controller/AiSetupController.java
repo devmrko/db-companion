@@ -20,6 +20,15 @@ public class AiSetupController {
     @org.springframework.beans.factory.annotation.Autowired(required=false)
     private com.dbcompanion.service.AiSetupEvidenceService evidence;
     public AiSetupController(DatabaseService database, AiSetupService setup) { this.database = database; this.setup = setup; }
+    @GetMapping("/ai-setup/summary")
+    public String summary(HttpServletRequest request, HttpServletResponse response, Model model) {
+        response.setHeader("Cache-Control", "no-store");
+        var http = request.getSession(false);
+        var session = http == null ? null : (PoolSession) http.getAttribute(PoolSession.ATTRIBUTE);
+        if (session == null) { response.setStatus(401); return "fragments/setup-summary"; }
+        model.addAttribute("summary", setup.summary(session));
+        return "fragments/setup-summary";
+    }
     @GetMapping("/ai-setup")
     public String page(@RequestParam(defaultValue="") String purpose, @RequestParam(defaultValue="") String profile,
                        HttpServletRequest request, HttpServletResponse response, Model model) {

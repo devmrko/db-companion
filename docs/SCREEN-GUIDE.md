@@ -8,6 +8,10 @@ This guide describes the purpose of each screen. Feature availability depends on
 
 Select a configured Oracle Wallet and a TNS service, then sign in with a database account. The connection screen identifies the database and user in use.
 
+First use: **sign in → check readiness → browse metadata → generate, review and run SQL**.
+See [first-use steps](GETTING-STARTED.md) and the [readiness guide](setup-readiness.md).
+History installation and collection are optional, after the basic query path.
+
 Where available, the schema selector changes the browsing context; it does not change the authenticated user or grant additional privileges. SQL help is available on many screens to explain the underlying database operations.
 
 ## Workspace
@@ -15,6 +19,13 @@ Where available, the schema selector changes the browsing context; it does not c
 ### Connection information
 
 Check the current database, authenticated user, selected schema, TNS service, connection method, and session policy. Use this screen to confirm the target environment before inspecting or changing database objects.
+
+The dashboard loads a short readiness summary separately: **Complete / Missing / Unknown**.
+It prefers the first enabled profile and identifies it; choose your intended profile in
+**Readiness details**. Complete means configuration checked, not execution success.
+Missing items link to setup screens. Failed or timed-out checks remain unknown.
+Use **Browse metadata** for the first object inspection or **Generate, review and run SQL**
+after checking AI setup. The full diagnosis remains on the existing Readiness screen.
 
 ## AI data management
 

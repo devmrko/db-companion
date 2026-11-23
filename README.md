@@ -103,6 +103,49 @@ check. No SQL embedded in a document or glossary criterion is executed.
 
 No database credentials, Wallet, customer dataset, or private documentation are included.
 
+### Before you start
+
+- **Database:** use an Oracle database reachable through Wallet-based JDBC/mTLS.
+  Select AI additionally requires `DBMS_CLOUD_AI`, supported provider/model settings
+  and grants. Version alone does not establish feature support; non-Oracle databases
+  and password-only connections are not this app's login path. See the
+  [tested scope and limits](docs/validation.md).
+- **Wallet:** for Autonomous Database, open the database in OCI Console and select
+  **Database connection → Download wallet**, or request it from your DB administrator.
+  See Oracle's [Wallet download instructions](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/connect-download-wallet.html).
+  Extract the ZIP into a private directory outside the repository. Configure the
+  directory, not the ZIP. Keep the supplied files together, including `tnsnames.ora`,
+  `sqlnet.ora`, `cwallet.sso` and `ewallet.p12`; this app checks that `tnsnames.ora`
+  and `cwallet.sso` are readable. The Wallet password is not your DB password.
+- **Network:** from the app host, confirm DNS and TCP access to the host and port
+  of the selected service in `tnsnames.ora`. Check VPN/private endpoint routing and
+  source-IP allowlisting with your administrator. A reachable login page or successful
+  ping does not establish DB connectivity.
+- **Account:** obtain a named DB account with `CREATE SESSION` and access only to
+  required objects. Metadata browsing, AI setup and history installation are separate.
+
+### Request to the DB administrator
+
+Fill in this request. Deliver passwords and Wallet files through your approved
+private channel, never an issue or pull request.
+
+```text
+Purpose: metadata browsing, then reviewed read-only Select AI queries in DB Companion.
+Database/environment and target schemas/objects: <fill in>
+Account: <named user>; CREATE SESSION and SELECT only on approved query objects.
+Wallet: client Wallet for this DB, intended TNS alias and renewal/contact details.
+Network: app host/source IP <fill in>; DB host/port, VPN/private route and allowlist.
+If using Select AI: DBMS_CLOUD_AI availability, required package access,
+  owner-managed profile/credential, approved provider/model and outbound access.
+Optional history/collection: not needed for first use; request separately by feature.
+Verify: reconnect, browse approved metadata, check readiness, then review payload,
+  cost and generated SQL before any execution.
+```
+
+Do not request DBA, `SELECT ANY TABLE`, broad dictionary grants or `PUBLIC` grants
+just to enable unavailable screens. Follow [least-privilege guidance](#safety-and-limitations)
+and the app's **DB administrator instructions** (`/db/admin-help`) for feature-specific access.
+
 First-use guide: [English](docs/GETTING-STARTED.md) · [한국어](docs/GETTING-STARTED.ko.md) · [简体中文](docs/GETTING-STARTED.zh-CN.md) · [日本語](docs/GETTING-STARTED.ja.md).
 
 The [changelog](CHANGELOG.md) describes shared RDF question grounding,
@@ -125,6 +168,10 @@ node --test src/test/js/*.test.mjs
 Open `http://127.0.0.1:8080/login`, select a Wallet and TNS service, and log in with a
 database account. Enter the database password in the login form, not in Git or the
 example configuration. Do not source `.env` in your shell; the application reads it.
+
+First success: **sign in → check readiness → browse metadata → generate, review and
+run SQL**. The dashboard links to [readiness details](docs/setup-readiness.md).
+Follow the [first-use steps](docs/GETTING-STARTED.md); history installation is optional.
 
 Example configuration:
 
