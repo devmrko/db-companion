@@ -24,6 +24,10 @@ In **Select AI test**, select the profile checked in Readiness and enter a quest
 
 ## Optional features
 
+For fictional practice data, open **Scenario data generation**, select industry, size and
+dates, and download files for local Claude Code/Codex. The app does not write to the DB.
+Follow [account preparation and local execution](scenario-data.en.md) before running them.
+
 Request history and collection setup separately when needed. `ADMIN` is not universally required.
 
 ### Roles and order

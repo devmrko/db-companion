@@ -11,6 +11,8 @@ vendor support commitment. Product names identify the systems with which it work
 
 ## Features
 
+- [Scenario data generation](docs/scenario-data.en.md): export a prompt and password-free
+  configuration for local Claude Code/Codex and SQLcl; the app makes no AI calls or DB writes.
 - Wallet selection at login and database connections scoped to the login session.
 - Table/view filtering by schema, name, or Select AI profile object list.
 - Table/view/column comments, annotations, constraints, and optional change-history controls.

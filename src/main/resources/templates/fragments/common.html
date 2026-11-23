@@ -62,7 +62,7 @@
     <a class="app-nav-item" th:title="#{menu.term.vpd}" th:classappend="${activePage == 'vpd'} ? 'is-active'" th:href="@{/db/vpd}" th:attr="aria-current=${activePage == 'vpd' ? 'page' : null}" th:aria-label="#{menu.item.vpd}"><svg th:replace="~{fragments/common :: icon('shield')}"></svg><span class="app-nav-text"><span th:text="#{menu.item.vpd}"></span><small class="app-nav-term" th:text="#{menu.term.vpd}"></small></span></a>
     </nav>
   </details>
-  <details class="app-menu-group" th:open="${activePage == 'tables' or activePage == 'credentials' or activePage == 'external' or activePage == 'ords' or activePage == 'scheduler' or activePage == 'functions' or activePage == 'scott-demo'}">
+  <details class="app-menu-group" th:open="${activePage == 'tables' or activePage == 'credentials' or activePage == 'external' or activePage == 'ords' or activePage == 'scheduler' or activePage == 'functions' or activePage == 'scott-demo' or activePage == 'scenario-data'}">
     <summary th:text="#{menu.group.database}"></summary>
     <nav th:aria-label="#{menu.group.database}">
     <a class="app-nav-item" th:classappend="${activePage == 'tables'} ? 'is-active'" th:href="@{/tables}" th:attr="aria-current=${activePage == 'tables' ? 'page' : null}" th:title="#{ui.31c660ef0b9a}" th:aria-label="#{menu.item.tables}"><svg th:replace="~{fragments/common :: icon('table')}"></svg><span class="app-nav-text" th:text="#{menu.item.tables}"></span></a>
@@ -72,6 +72,7 @@
     <a class="app-nav-item" th:title="#{menu.term.scheduler}" th:classappend="${activePage == 'scheduler'} ? 'is-active'" th:href="@{/db/scheduler}" th:attr="aria-current=${activePage == 'scheduler' ? 'page' : null}" th:aria-label="#{menu.item.scheduler}"><svg th:replace="~{fragments/common :: icon('history')}"></svg><span class="app-nav-text"><span th:text="#{menu.item.scheduler}"></span><small class="app-nav-term" th:text="#{menu.term.scheduler}"></small></span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'functions'} ? 'is-active'" th:href="@{/db/functions}" th:attr="aria-current=${activePage == 'functions' ? 'page' : null}" th:title="#{functions.title}" th:aria-label="#{menu.item.functions}"><svg th:replace="~{fragments/common :: icon('code')}"></svg><span class="app-nav-text" th:text="#{menu.item.functions}"></span></a>
     <a class="app-nav-item" th:title="#{menu.term.scott-demo}" th:classappend="${activePage == 'scott-demo'} ? 'is-active'" th:href="@{/db/scott-demo}" th:aria-label="#{menu.item.scott-demo}"><svg th:replace="~{fragments/common :: icon('code')}"></svg><span class="app-nav-text"><span th:text="#{menu.item.scott-demo}"></span><small class="app-nav-term" th:text="#{menu.term.scott-demo}"></small></span></a>
+    <a class="app-nav-item" th:classappend="${activePage == 'scenario-data'} ? 'is-active'" th:href="@{/db/scenario-data}" th:attr="aria-current=${activePage == 'scenario-data' ? 'page' : null}" th:aria-label="#{menu.item.scenario-data}"><svg th:replace="~{fragments/common :: icon('code')}"></svg><span class="app-nav-text" th:text="#{menu.item.scenario-data}"></span></a>
     </nav>
   </details>
   <details class="app-menu-group" th:open="${activePage == 'executions' or activePage == 'ai-problems' or activePage == 'audit'}">
