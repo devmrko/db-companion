@@ -1,0 +1,11 @@
+<section xmlns:th="http://www.thymeleaf.org" data-setup-summary-result th:if="${summary != null}">
+  <p th:if="${summary.profile != ''}"><span th:text="#{dashboard.ready.profile}"></span> <strong th:text="${summary.profile}"></strong></p>
+  <dl class="app-detail-list">
+    <div th:each="check : ${summary.checks}">
+      <dt th:text="${#messages.msg('setup.check.' + check.key)}"></dt>
+      <dd><span class="app-setup-state" th:classappend="${'app-setup-' + check.state}" th:text="${#messages.msg('dashboard.ready.' + check.state)}"></span>
+        <a th:href="${check.link}" th:text="#{setup.openAction}"></a></dd>
+    </div>
+  </dl>
+  <a class="app-btn" th:href="@{/ai-setup(purpose='nl2sql',profile=${summary.profile})}" th:text="#{dashboard.ready.details}"></a>
+</section>

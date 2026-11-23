@@ -2,13 +2,31 @@
 
 [한국어](GETTING-STARTED.ko.md) · [简体中文](GETTING-STARTED.zh-CN.md) · [日本語](GETTING-STARTED.ja.md) · [Screen guide](SCREEN-GUIDE.md)
 
-Some history and collection features need privileged setup before ordinary users can see records. Identify the target owner and collector installer; `ADMIN` is not universally required.
+Follow **sign in → check readiness → browse metadata → generate, review and run SQL**.
+First obtain the [prerequisites and administrator request](../README.md#before-you-start).
+History installation is not required for your first query.
 
 ## 1. Confirm your connection
 
 Choose the correct Wallet and TNS service, then sign in with your Oracle account. On **Connection**, check the database, authenticated user and selected schema. The schema selector changes browsing context, not login or privileges. Give the installer the same database/Wallet and target schema/object, never your password.
 
-## 2. Agree on the order
+## 2. Check readiness
+
+The dashboard shows **Complete / Missing / Unknown** per item. Open **Readiness details** and select the intended profile; the summary prefers the first enabled profile. Complete means configuration checked, not successful execution. Follow setup links for missing items; check access, connectivity and feature support for unknown items. See the [readiness guide](setup-readiness.md) for the inspection scope.
+
+## 3. Browse metadata
+
+Open **Tables, views & columns**, choose an accessible schema and object, and inspect its columns and constraints. Seeing the expected object and columns confirms metadata browsing. For an empty list or access error, check the schema and permissions. Editing comments or installing history is unnecessary. Accessible metadata remains usable even when AI setup is incomplete.
+
+## 4. Generate, review and run SQL
+
+In **Select AI test**, select the profile checked in Readiness and enter a question. Review the external payload and possible cost before generating SQL. Inspect eligible objects, context and SQL before explicitly running an approved read query. Compare results with a trusted business answer: AI review or successful execution alone does not validate it. Business-data changes are not an onboarding step. See the [screen guide](SCREEN-GUIDE.md) and **SQL ?**.
+
+## Optional features
+
+Request history and collection setup separately when needed. `ADMIN` is not universally required.
+
+### Roles and order
 
 | Who | First action |
 | --- | --- |
@@ -18,7 +36,7 @@ Choose the correct Wallet and TNS service, then sign in with your Oracle account
 
 Installation and grants may commit separately. Review the preview and permissions before applying.
 
-## 3. Set up metadata change history, if needed
+### Set up metadata change history
 
 This history covers table/view/column comments and supported annotations, not business rows:
 
@@ -30,7 +48,7 @@ This history covers table/view/column comments and supported annotations, not bu
 
 For ownership, partial DDL and delegation, see [history access](metadata-history-access.md) and [code updates](metadata-history-upgrades.md).
 
-## 4. Know which history you are viewing
+### Know which history you are viewing
 
 | Source | What to expect |
 | --- | --- |
@@ -41,9 +59,7 @@ For ownership, partial DDL and delegation, see [history access](metadata-history
 
 Retention depends on each source and its configured policy; do not infer a universal number of days from an empty screen.
 
-## 5. Make a first useful query
-
-Confirm the connection, select a prepared profile and inspect relevant business definitions. In **Select AI test**, generate SQL; review eligible objects, context and SQL before explicitly querying. Compare results with a trusted business answer: AI review does not validate numbers. AI requests may send questions, SQL and selected context to a provider and incur charges; check payload and cost first. Business-data changes are not an onboarding step. See the [screen guide](SCREEN-GUIDE.md), **SQL ?** and separate [callable AI](callable-ai.md) workflow.
+For separate package execution, see [callable AI](callable-ai.md).
 
 ## If something looks wrong
 

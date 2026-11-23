@@ -18,6 +18,25 @@ import tools.jackson.databind.json.JsonMapper;
 public class AiSetupService {
     public enum State { CONFIGURED, ACTION, UNKNOWN }
     public record Check(String key, State state, String link) {}
+    public record Summary(String profile, List<Check> checks) {}
+
+    /** Uses the same diagnosis as the detail screen, without history or model calls. */
+    public Summary summary(PoolSession session) {
+        synchronized (session) {
+            if (!session.metadata().info().username().equals(session.metadata().selectedSchema()))
+                return new Summary("", List.of(new Check("owner", State.ACTION, "/ai-setup?purpose=nl2sql")));
+            try {
+                var available = database.profiles(session, null).profiles();
+                if (available.isEmpty())
+                    return new Summary("", List.of(new Check("profile", State.ACTION, "/ai-profiles")));
+                var selected = available.stream().filter(p -> "ENABLED".equals(p.status()))
+                        .findFirst().orElse(available.getFirst());
+                return new Summary(selected.name(), diagnose(session, selected.name(), "nl2sql"));
+            } catch (RuntimeException ex) {
+                return new Summary("", List.of(new Check("profile", State.UNKNOWN, "/ai-setup?purpose=nl2sql")));
+            }
+        }
+    }
     public record Observation(String kind,String id,java.time.Instant at,String state,String code) {}
     public static List<Observation> observations(String owner,String profile,
             List<com.dbcompanion.model.SelectAiTest.Outcome> outcomes,

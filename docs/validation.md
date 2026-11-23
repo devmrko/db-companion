@@ -1,5 +1,26 @@
 # Release validation
 
+## First-use path and dashboard readiness (2026-11-23)
+
+- Java: 1,532 tests passed; packaging and PMD passed with `mvn -Pquality verify`.
+  Dashboard and summary templates rendered in Korean, English, Chinese and Japanese
+  with synthetic session data, including escaped profile names and all three states.
+- JavaScript: the full suite passed. Focused tests cover failed/redirected requests,
+  the eight-second browser timeout, fragment replacement and the unknown fallback.
+  The optional real-app lifecycle suite was also run with the built JAR and passed.
+- The JAR ran directly on localhost port 18087. The login page and dashboard module
+  returned 200; an unauthenticated summary request redirected to login. The test app
+  was stopped afterward. The existing port 8080 app was not touched; no container
+  runtime was used.
+- No live DB account or Wallet was configured in this worktree, so authenticated
+  DB diagnosis, grants and actual query results were not tested. No DB writes or AI
+  requests were made. Browser tooling reported its access host unavailable; no
+  screenshot or visual-layout verification is claimed.
+- The summary reuses `AiSetupService.diagnose` and excludes history inspection.
+  Browser timeout does not guarantee server-side cancellation; existing JDBC and
+  pool timeouts still apply. Configuration presence does not establish successful
+  external authentication, execution or business correctness.
+
 ## Translation regeneration and narrow layout (2026-11-21)
 
 The translation sources omitted 29 readiness-record keys and retained four
