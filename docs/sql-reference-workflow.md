@@ -33,3 +33,9 @@ APEX Ask Oracle 설치와 Codex MCP 등록은 외부 앱·클라이언트 구성
 새 표현은 별칭으로, 새 업무 기준은 정의·SQL 조건으로 추가합니다. 기존 검색·CUSTOM 콜백·프로필 경로를 재사용하고 검색 반환·생성 SQL·기준 결과와 기존 질문을 다시 확인합니다. 새 데이터나 접근 범위가 필요하면 테이블·대상 객체·권한도 보완합니다. 용어 추가만으로 모든 질문의 정답을 보장하지 않습니다.
 
 Source 설정 이력의 상세 범위는 [설정 변경 이력](semantic-source-history.md)을 참고합니다.
+
+## 새 ADB의 OCI 모델 호출 준비
+
+Credential의 SQL? → **Resource Principal 활성화 안내**에서 DB 활성화 SQL과 OCI IAM 선행 조건을 확인합니다. DB 사용자에게 패키지 실행 권한을 주고 프로필을 생성하는 것만으로 OCI 모델 추론 권한이 완성되지는 않습니다. 관리자는 새 ADB가 정책 대상인지, 모델의 구획·리전·모델 ID가 맞는지 확인해야 합니다. 기존 ADB 하나에 제한한 정책은 새 ADB를 포함하지 않습니다.
+
+설정 후 작은 대표 질문 한 건으로 실제 모델 호출·SQL·결과를 검증합니다. `ORA-20404`가 나면 모델 존재 여부와 접근 권한을 함께 확인하고, 실패 기록을 보존한 뒤 원인을 바꾼 경우에만 명시적으로 재검증합니다. [OCI Resource Principal 준비](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/resource-principal.html)와 [모델별 추론 권한 제한](https://docs.oracle.com/en-us/iaas/Content/generative-ai/limit-model-access.htm)을 참고합니다.
