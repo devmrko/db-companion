@@ -1,6 +1,6 @@
 CREATE FUNCTION {{CONTEXT}}(p_context CLOB)
   RETURN CLOB AUTHID CURRENT_USER AS
-  -- DB Companion semantic glossary callback v3. Search the original question, not attached evidence.
+  -- DB Companion semantic glossary callback v4. Global scope; original question only.
   context_obj JSON_OBJECT_T;
   response_obj JSON_OBJECT_T;
   glossary_obj JSON_OBJECT_T;
@@ -102,7 +102,7 @@ BEGIN
       item_obj := JSON_OBJECT_T();
       item_obj.put('term',entry_obj.get_string('term'));
       item_obj.put('definition',definition_text);
-      item_obj.put('applies_to',JSON_ARRAY_T());
+      -- Global callbacks accept term/definition only. applies_to is object-scope metadata.
       result_array.append(item_obj);
     END LOOP;
     output_text := result_array.to_clob();

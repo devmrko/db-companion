@@ -70,6 +70,7 @@ export function mountGlossaryFunction(root){
     const input={token:preview.token,consent:true};invalidate();busy=true;controls();
     try{
       render(await api('create',input));
+      document.dispatchEvent(new CustomEvent('semantic-history-changed'));
       say(t(status.function==='READY'?'glossaryFunction.created':'glossaryFunction.inspect',
         status.function==='READY'?'함수가 생성되었습니다. 질문으로 검색을 확인하세요.':'생성 결과를 확인해 주세요. 자동 재생성하지 않습니다.'));
     }catch(ex){uncertain=true;status=null;say(t('glossaryFunction.uncertain','생성 결과를 확인하지 못했습니다. 객체가 남았을 수 있습니다. 다시 확인한 뒤 판단하세요.')+' '+ex.message);}

@@ -7,6 +7,7 @@
   <a class="app-inline-link" th:href="@{/db/functions}" th:text="#{glossaryFunction.back}">← 함수 목록</a>
   <div class="app-page-heading"><h1 th:text="#{glossaryFunction.title}">용어사전 검색 함수 만들기</h1></div>
   <p th:text="#{glossaryFunction.description}">자연어 질문 → 용어·별칭 검색 → 업무 정의·SQL 기준 JSON. AI 호출이나 SQL 실행은 하지 않습니다.</p>
+  <p th:text="#{glossaryFunction.globalContract}"></p>
   <input type="hidden" data-gf-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
   <p role="status" aria-live="polite" data-gf-message></p>
   <section class="app-card app-module-card">
@@ -38,4 +39,5 @@
     <button type="button" class="btn app-btn app-btn-primary" data-gf-test disabled th:text="#{glossaryFunction.search}">사전 검색</button>
     <div data-gf-result hidden><h3 th:text="#{glossaryFunction.result}">전달용 JSON · 실행된 SQL이 아님</h3><pre class="app-preview-source" data-gf-json></pre></div>
   </section>
+  <th:block th:replace="~{fragments/semantic-history :: panel(${info.username},'CALLBACK')}"></th:block>
 </main></div><script type="module" th:src="@{/js/glossary-function.mjs}"></script></body></html>

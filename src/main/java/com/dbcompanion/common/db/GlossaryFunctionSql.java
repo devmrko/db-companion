@@ -31,6 +31,10 @@ public final class GlossaryFunctionSql {
         return CallableAiSql.resource("glossary-context-v2.sql").replace("{{API}}",ProfileHistorySql.object(owner,API))
             .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT));
     }
+    public static String legacyContextV3(String owner){
+        return CallableAiSql.resource("glossary-context-v3.sql").replace("{{API}}",ProfileHistorySql.object(owner,API))
+            .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT));
+    }
     /** Exact v1 fingerprint recognition only; never displayed as the new source. */
     public static String legacyCreate(String owner){
         return """

@@ -69,6 +69,30 @@ public class SemanticContextRepository {
                     statement.setClob(5, new java.io.StringReader(input.description()));
                 });
     }
+    public java.util.Map<String,Object> snapshot(String owner,String name){
+        var found=sources(owner).stream().filter(s->s.name().equals(name)).toList();
+        if(found.isEmpty())return java.util.Map.of("exists",false);
+        if(found.size()!=1)throw SemanticContext.error(409,"unavailable");
+        var s=found.getFirst();var attributes=new java.util.TreeMap<String,String>();
+        jdbc.query("SELECT ATTRIBUTE_NAME,ATTRIBUTE_VALUE FROM "+object(owner,"USER_AI_SEMANTIC_SOURCE_ATTRIBUTES")+" WHERE SOURCE_NAME=?",
+            (org.springframework.jdbc.core.RowCallbackHandler)r->{String value=r.getString(2);if(value!=null&&value.length()>32767)throw SemanticContext.error(413,"invalid");attributes.put(r.getString(1).toLowerCase(java.util.Locale.ROOT),Objects.toString(value,""));},name);
+        var snapshot=new java.util.TreeMap<String,Object>();snapshot.put("exists",true);snapshot.put("name",s.name());snapshot.put("type",s.type());
+        snapshot.put("status",s.status());snapshot.put("description",Objects.toString(s.description(),""));snapshot.put("attributes",attributes);
+        // Validate stored supported attributes before capturing them; no credential contents.
+        var json=new tools.jackson.databind.json.JsonMapper();
+        for(var entry:attributes.entrySet()){
+            if(!com.dbcompanion.common.db.ProfileEditPolicy.editableAttribute(entry.getKey()))throw SemanticContext.error(409,"secret");
+            try{SemanticContext.checkSecrets(json.readTree(entry.getValue()));}catch(tools.jackson.core.JacksonException ignored){/* Plain scalar attribute. */}
+        }
+        return snapshot;
+    }
+    public void update(String owner,String name,String operation,String value){
+        if(operation.equals("ENABLE")||operation.equals("DISABLE")){
+            jdbc.update("BEGIN "+object(owner,"DBMS_AI_SEM")+"."+operation+"_SEMANTIC_SOURCE(source_name=>?); END;",name);
+        }else if(operation.equals("ATTRIBUTES")){
+            jdbc.update("BEGIN "+object(owner,"DBMS_AI_SEM")+".UPDATE_SEMANTIC_SOURCE(source_name=>?,attributes=>?); END;",s->{s.setString(1,name);s.setClob(2,new java.io.StringReader(value));});
+        }else throw SemanticContext.error(400,"invalid");
+    }
     public boolean matches(String owner, Create input, tools.jackson.databind.JsonNode expected) {
         var rows = sources(owner).stream().filter(s -> s.name().equals(input.name())).toList();
         if (rows.size() != 1 || !rows.getFirst().type().equalsIgnoreCase(input.type()) || !rows.getFirst().status().equalsIgnoreCase("enabled")

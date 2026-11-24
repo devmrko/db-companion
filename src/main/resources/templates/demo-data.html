@@ -1,0 +1,28 @@
+<!DOCTYPE html><html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{demoData.title})}"></head>
+<body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside><div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content" data-demo-data>
+  <div class="app-page-heading"><h1 th:text="#{demoData.title}"></h1></div>
+  <p th:text="#{demoData.help}"></p>
+  <p><strong th:text="${info.database}"></strong> · <strong th:text="${info.username}"></strong></p>
+  <p class="app-alert" th:text="#{demoData.ownerRequired}"></p>
+  <input type="hidden" data-demo-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+  <section class="app-card app-section" data-demo-input>
+    <h2 th:text="#{demoData.step1}"></h2>
+    <form data-demo-form class="app-form">
+      <label for="demo-scenario" th:text="#{demoData.scenario}"></label><textarea id="demo-scenario" name="scenario" class="form-control" maxlength="2000" rows="3" required></textarea>
+      <label for="demo-questions" th:text="#{demoData.questions}"></label><textarea id="demo-questions" name="questions" class="form-control" maxlength="4000" rows="4" required></textarea>
+      <label for="demo-rules" th:text="#{demoData.rules}"></label><textarea id="demo-rules" name="rules" class="form-control" maxlength="4000" rows="4" required></textarea>
+      <label for="demo-date" th:text="#{demoData.date}"></label><input id="demo-date" name="date" type="date" class="form-control" required>
+      <label for="demo-rows" th:text="#{demoData.rows}"></label><input id="demo-rows" name="rows" type="number" class="form-control" min="1" max="10000" value="120" required>
+      <button type="submit" class="btn app-btn app-btn-primary" data-demo-build th:text="#{demoData.build}"></button>
+    </form>
+  </section>
+  <section class="app-card app-section" data-demo-review hidden>
+    <h2 th:text="#{demoData.step2}"></h2><p th:text="#{demoData.review}"></p>
+    <textarea class="form-control" rows="18" readonly data-demo-prompt th:aria-label="#{demoData.title}"></textarea>
+    <div class="app-actions"><button type="button" class="btn app-btn app-btn-primary" data-demo-copy th:text="#{demoData.copy}"></button><button type="button" class="btn app-btn app-btn-quiet" data-demo-back th:text="#{demoData.back}"></button></div>
+    <details><summary th:text="#{demoData.step3}"></summary><p th:text="#{demoData.verify}"></p><a th:href="@{/tables}" th:text="#{dashboard.ready.metadata}"></a> · <a th:href="@{/business-glossary}" th:text="#{businessGlossary.title}"></a></details>
+  </section>
+  <p role="status" aria-live="polite" data-demo-message></p>
+</main></div><script type="module" th:src="@{/js/demo-data.mjs}"></script></body></html>

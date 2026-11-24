@@ -27,7 +27,7 @@ class SemanticAccessTest {
         @Override public boolean accessGranted(String owner,String user){if(!accessUsers().contains(user))throw new IllegalArgumentException();return granted;}
         @Override public void grantAccess(String owner,String user){if(accessGranted(owner,user))throw new IllegalArgumentException();writes++;granted=true;}
     };
-    final SemanticContextService service=new SemanticContextService(source,repository);
+    final SemanticContextService service=new SemanticContextService(source,repository,SemanticChangeTest.immediate(source));
     PoolSession session(String owner){
         var s=new PoolSession(new HikariDataSource(),"TEST",()->{});
         s.initialize(new DatabaseSession(new DatabaseInfo(owner,owner,"TEST","SYNTHETIC"),List.of(owner)));return s;

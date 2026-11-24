@@ -32,7 +32,7 @@
           <p th:text="#{semanticContext.setupHelp}"></p>
           <label for="sem-callback" th:text="#{semanticContext.callback}"></label>
           <input id="sem-callback" data-sem-callback class="form-control" list="sem-functions" pattern="[A-Za-z][A-Za-z0-9_$#]*(\.[A-Za-z][A-Za-z0-9_$#]*){0,2}" required>
-          <p class="app-muted">global · (p_context CLOB) RETURN CLOB · [{"term":"…","definition":"…","applies_to":[]}]</p>
+          <p class="app-muted">global · (p_context CLOB) RETURN CLOB · [{"term":"…","definition":"…"}]</p>
           <datalist id="sem-functions" data-sem-functions></datalist>
           <a data-sem-function-link target="_blank" rel="noopener" th:text="#{semanticContext.inspectFunction}"></a>
         </div>
@@ -47,6 +47,16 @@
     </details>
   </div>
   <p data-sem-message role="status" aria-live="polite"></p>
+  <dialog class="app-preview-dialog" data-sem-editor aria-labelledby="semantic-source-editor-title"><h3 id="semantic-source-editor-title" th:text="#{semanticHistory.edit}"></h3><p data-sem-edit-name></p>
+    <label><span th:text="#{semanticHistory.operation}"></span><select class="form-select" data-sem-edit-operation><option value="ATTRIBUTES" th:text="#{semanticHistory.attributes}"></option><option value="ENABLE" th:text="#{semanticHistory.enable}"></option><option value="DISABLE" th:text="#{semanticHistory.disable}"></option></select></label>
+    <textarea class="form-control" rows="10" data-sem-edit-attributes></textarea>
+    <button type="button" class="btn app-btn app-btn-secondary" data-sem-edit-preview th:text="#{semanticHistory.preview}"></button>
+    <pre class="app-preview-source" data-sem-edit-plan></pre>
+    <label><input type="checkbox" data-sem-edit-consent><span th:text="#{semanticHistory.editConsent}"></span></label>
+    <button type="button" class="btn app-btn app-btn-primary" data-sem-edit-apply disabled th:text="#{semanticHistory.apply}"></button>
+    <button type="button" class="btn app-btn app-btn-secondary" data-sem-edit-close th:text="#{semanticHistory.close}"></button><p role="status" data-sem-edit-message></p>
+  </dialog>
+  <th:block th:if="${info != null and info.username == selectedSchema}"><th:block th:replace="~{fragments/semantic-history :: panel(${selectedSchema},'SOURCE')}"></th:block></th:block>
   <script type="module" th:src="@{/js/semantic-context.mjs}"></script>
   <script type="module" th:src="@{/js/semantic-access.mjs}"></script>
 </section>

@@ -22,6 +22,8 @@ public final class SemanticContext {
     }
     public record Create(String schema, String name, String type, String attributes, String description, boolean confirmed) {}
     public record Result(boolean verified, String message) {}
+    public record Edit(String schema,String name,String operation,String attributes,String version) {}
+    public static void checkSecrets(JsonNode node){if(node!=null)noSecrets(node);}
     public static MetadataEditException error(int status, String key) {
         return new MetadataEditException(status, key, UiMessages.text("semanticContext." + key, key));
     }

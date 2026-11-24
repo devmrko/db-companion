@@ -30,10 +30,10 @@
     "再確認"
   ],
   "glossaryFunction.scope": [
-    "로그인 소유 스키마에 설치합니다. 앱이 생성한 기존 v1 검색 함수만 확인 후 교체할 수 있습니다. 다른 객체나 권한은 변경하지 않습니다.",
-    "Installs in the login owner's schema. Only the app-generated v1 search function can be replaced after confirmation. No other objects or grants change.",
-    "安装于登录用户模式。确认后仅可替换本应用生成的 v1 搜索函数，不改变其他对象或权限。",
-    "ログイン所有スキーマにインストール。確認後にアプリ生成のv1検索関数のみ置換できます。他のオブジェクト・権限は変更しません。"
+    "로그인 소유 스키마에 설치합니다. 원문이 확인된 앱 구버전 함수만 검토 후 업데이트할 수 있습니다. 다른 객체나 권한은 변경하지 않습니다.",
+    "Installs in the login owner's schema. Only recognized app-generated legacy functions can be updated after review. Other objects and grants remain unchanged.",
+    "安装于登录用户模式。仅在核对源码后更新本应用已知旧版函数，不改变其他对象或权限。",
+    "ログイン所有スキーマに導入します。ソースを確認できるアプリの旧版関数のみ、確認後に更新できます。他のオブジェクト・権限は変更しません。"
   ],
   "glossaryFunction.code": [
     "2. 함수 코드 확인",
@@ -66,10 +66,10 @@
     "作成前の最終確認"
   ],
   "glossaryFunction.consent": [
-    "패키지 명세·본문과 호출 함수의 코드 및 DDL 영향을 확인했고 표시된 설치·v1 교체에 동의합니다.",
-    "I reviewed the package specification, body, wrapper and DDL effects and consent to the displayed installation/v1 replacement.",
-    "我已检查包规范、包体、调用函数和 DDL 影响，同意显示的安装/v1 替换。",
-    "パッケージ仕様・本体・呼出関数とDDLの影響を確認し、表示されたインストール・v1置換に同意します。"
+    "패키지·호출 함수의 코드와 DDL 영향을 확인했고 표시된 설치·구버전 업데이트에 동의합니다.",
+    "I reviewed the package, wrapper code and DDL effects and consent to the displayed installation or legacy update.",
+    "我已核对程序包、调用函数及 DDL 影响，同意显示的安装或旧版更新。",
+    "パッケージ・呼出関数と DDL の影響を確認し、表示された導入または旧版更新に同意します。"
   ],
   "glossaryFunction.create": [
     "모듈 설치·v1 업데이트",
@@ -252,10 +252,10 @@
     "導入済みコードを維持"
   ],
   "glossaryFunction.action.REPLACE_V1": [
-    "확인된 v1 호출 함수 교체",
-    "Replace recognized v1 function",
-    "替换已确认的 v1 函数",
-    "確認済みv1関数を置換"
+    "확인된 구버전 함수 업데이트",
+    "Update recognized legacy function",
+    "更新已确认的旧版函数",
+    "確認済みの旧版関数を更新"
   ],
   "glossaryFunction.state.LEGACY": [
     "기존 v1 · 업데이트 가능",

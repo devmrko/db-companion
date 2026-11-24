@@ -33,8 +33,9 @@ class GlossaryFunctionTest {
             if(!current.equals("READY"))throw new IllegalArgumentException("Not ready");
             reads++;return new JsonMapper().readTree("{\"aiCalled\":false,\"glossary\":{\"definitions\":[]}}");
         }
+        @Override public java.util.Map<String,Object> versions(String owner){return java.util.Map.of("moduleState",current,"fingerprint",current);}
     };
-    private final GlossaryFunctionService service=new GlossaryFunctionService(source,repo);
+    private final GlossaryFunctionService service=new GlossaryFunctionService(source,repo,SemanticChangeTest.immediate(source));
     private PoolSession session(){
         var s=new PoolSession(new HikariDataSource(),"LOW",()->{});
         s.initialize(new DatabaseSession(new DatabaseInfo("APP","APP","LOW","DB"),List.of("APP","OTHER")));
@@ -105,7 +106,8 @@ class GlossaryFunctionTest {
         assertThat(GlossaryFunctionRepository.moduleState(List.of("READY","READY","READY","LEGACY"))).isEqualTo("LEGACY");
         assertThat(GlossaryFunctionSql.legacyContext("APP")).contains("callback v1").doesNotContain("repair_start");
         assertThat(GlossaryFunctionSql.legacyContextV2("APP")).contains("callback v2","repair_start").doesNotContain("dictionary_start");
-        assertThat(GlossaryFunctionSql.statements("APP").get(3)).contains("callback v3",
+        assertThat(GlossaryFunctionSql.legacyContextV3("APP")).contains("callback v3", "item_obj.put('applies_to',JSON_ARRAY_T())");
+        assertThat(GlossaryFunctionSql.statements("APP").get(3)).contains("callback v4",
             "dictionary_obj.get_clob('originalQuestion')","END BUSINESS DICTIONARY JSON",
             "DBMS_LOB.GETLENGTH(question)<=64000");
         assertThat(GlossaryFunctionSql.statements("APP").get(3)).contains("error_start>repair_start AND correction_start>error_start","DBMS_LOB.GETLENGTH(question)>8000");
@@ -126,5 +128,12 @@ class GlossaryFunctionTest {
             assertThatThrownBy(()->service.install(s,p)).isInstanceOf(IllegalArgumentException.class);
             assertThat(writes).isZero();
         }
+    }
+    @Test void globalCallbackOmitsObjectScopeFieldsRejectedByNativeSelectAi(){
+        String sql=GlossaryFunctionSql.statements("APP").get(3);
+        var keys=java.util.regex.Pattern.compile("item_obj\\.put\\('([^']+)'",java.util.regex.Pattern.MULTILINE)
+            .matcher(sql).results().map(m->m.group(1)).toList();
+        assertThat(keys).containsExactly("term","definition");
+        assertThat(sql).contains("RETURN CLOB AUTHID CURRENT_USER", "definition_text := definition_text || CHR(10) || 'SQL criteria: '");
     }
 }

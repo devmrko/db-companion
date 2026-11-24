@@ -47,6 +47,7 @@ public class GlossaryFunctionRepository {
                 else if(i==2&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyCreate(owner)))))state="LEGACY";
                 else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContext(owner)))))state="LEGACY";
                 else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContextV2(owner)))))state="LEGACY";
+                else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContextV3(owner)))))state="LEGACY";
             }
             states.add(state);
             snapshots.add(name+":"+type+":"+objects+":"+actual);
@@ -93,6 +94,20 @@ public class GlossaryFunctionRepository {
             jdbc.execute(code.sql());
         }
         return status(owner);
+    }
+    /** Deployment evidence only: full generated SQL remains versioned in Git. */
+    public java.util.Map<String,Object> versions(String owner){
+        var status=status(owner);
+        var code=new java.util.TreeMap<String,StringBuilder>();
+        jdbc.query("SELECT NAME,TYPE,TEXT FROM USER_SOURCE WHERE NAME IN ('DBC_GLOSSARY_API','DBC_GLOSSARY_SEARCH','DBC_GLOSSARY_CONTEXT') ORDER BY NAME,TYPE,LINE",
+            (org.springframework.jdbc.core.RowCallbackHandler)r->code.computeIfAbsent(r.getString(1)+":"+r.getString(2),k->new StringBuilder()).append(r.getString(3)));
+        var components=new ArrayList<java.util.Map<String,String>>();
+        code.forEach((name,body)->{
+            var matcher=java.util.regex.Pattern.compile("(?i)DB Companion[^\\r\\n]*\\bv([0-9]+)\\b").matcher(body);
+            components.add(java.util.Map.of("component",name,"version",matcher.find()?"v"+matcher.group(1):"UNRECOGNIZED",
+                "sha256",com.dbcompanion.service.OntologyQueryService.hash(body.toString())));
+        });
+        return java.util.Map.of("moduleState",status.function(),"fingerprint",status.fingerprint(),"components",components);
     }
     public Object search(String owner,String question){
         var status=status(owner);

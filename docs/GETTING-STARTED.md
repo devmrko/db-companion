@@ -12,6 +12,8 @@ Choose the correct Wallet and TNS service, then sign in with your Oracle account
 
 ## 2. Check readiness
 
+For an empty dedicated training schema, first open **Start → Prepare demo data** (`/db/demo-data`). Enter the scenario, questions, rules, reference date and row limit, then review the generated prompt. Ask Codex to propose DDL, synthetic data, verification SQL and business-rule files. Review them and verify the actual database and owner before using SQLcl. Save SQL as UTF-8 and use `SET ENCODING UTF-8` before loading files. This page only produces text; it does not call AI or change the database. Continue with the same objects after creating the data.
+
 The dashboard shows **Complete / Missing / Unknown** per item. Open **Readiness details** and select the intended profile; the summary prefers the first enabled profile. Complete means configuration checked, not successful execution. Follow setup links for missing items; check access, connectivity and feature support for unknown items. See the [readiness guide](setup-readiness.md) for the inspection scope.
 
 ## 3. Browse metadata
@@ -21,6 +23,8 @@ Open **Tables, views & columns**, choose an accessible schema and object, and in
 ## 4. Generate, review and run SQL
 
 In **Select AI test**, select the profile checked in Readiness and enter a question. Review the external payload and possible cost before generating SQL. Inspect eligible objects, context and SQL before explicitly running an approved read query. Compare results with a trusted business answer: AI review or successful execution alone does not validate it. Business-data changes are not an onboarding step. See the [screen guide](SCREEN-GUIDE.md) and **SQL ?**.
+
+If Semantic Release storage exists without a deployed version, execution can be blocked. For a development exercise, explicitly select development mode (current settings) in **Semantic releases**, or deploy a reviewed first version. Do not globally bypass production release protection.
 
 ## Optional features
 
@@ -35,6 +39,22 @@ Request history and collection setup separately when needed. `ADMIN` is not univ
 | App store or collector owner | Prepare that feature's storage, direct grants and job as needed. Profile owners manage profiles; SQL-cache and DDS archives have their own owners. `ADMIN` does not create every store. |
 
 Installation and grants may commit separately. Review the preview and permissions before applying.
+
+### Feature-specific administrator preparation
+
+For a fresh ordinary ADB account, use **Account creation & privileges** and each feature's access help. Confirm the same database and target schema, then enable only the required capabilities.
+
+| Feature | Administrator action | Ordinary-account verification |
+| --- | --- | --- |
+| Native Semantic Source | Preview and grant EXECUTE on the resolved DBMS_AI_SEM package through the Semantic Source access screen | Read/create a source, link semantic_source and make a real SQL-generation request |
+| Business-term search | Grant CTXSYS.CTX_DDL through TEXT access help when Oracle Text is needed | Prepare term/history storage and Text index; verify search and edit history |
+| SQL-cache archive | Review SYS.V_$SQL access through SQL_CACHE help; prepare CREATE TABLE/JOB and quota for the collector owner | Install, check recent job success, then inspect actual candidate rows and details |
+| DDS Data Grants | Preview both DDS access and DDS own-schema Data Grant management | Create/read back owned policies; separately test real A/B access |
+| Profile account audit | An authorized audit manager explicitly enables and collects the target account's audit | Distinguish app before/after edits from audited calls; do not infer edits from unclassified calls |
+
+For Resource Principal, ADB ADMIN enables `DBMS_CLOUD_ADMIN.ENABLE_RESOURCE_PRINCIPAL` for the intended account, and the OCI administrator configures the ADB's model-call policy, region and compartment. A visible credential name does not verify OCI access or a successful model request. Do not paste API key contents into the app or documentation.
+
+A global CUSTOM glossary callback must follow the global response contract. The generated callback returns `term`/`definition`. Older code returning `applies_to` globally can pass source creation yet fail actual SQL generation; inspect its state and reviewed update SQL under **Glossary search function**. **Configuration history** records source before/after settings and generated-callback deployment versions, hashes and outcomes. Profile links and terms retain their separate histories; full function code remains in Git. See [source configuration and deployment records](semantic-source-history.md).
 
 ### Set up metadata change history
 
@@ -54,6 +74,7 @@ For ownership, partial DDL and delegation, see [history access](metadata-history
 | --- | --- |
 | Metadata change history | Database triggers record supported comments/annotations when installed and enabled. A missing collector differs from an enabled collector with no later changes. |
 | App-saved histories | Explicitly saved execution/problem-question material and supported configuration edits have their own app storage and scope. Session-only state is not a persistent database record; external edits may not appear retroactively. |
+| Native question / Agent history | The native views expose question/response records with a conversation ID and configured retention, and Team/Task inputs/results. Pass a prepared conversation_id in RUN_TEAM params. This does not automatically archive every result cell of ordinary SQL. |
 | SQL-cache archive | The login owner explicitly registers a table and Oracle Scheduler job for selected Select AI call candidates. Polling `V$SQL` can miss evicted SQL; observed cursor statistics are not a complete execution audit. No automatic purge is promised. See [SQL-cache archive](sql-cache-archive.md). |
 | Oracle audit / DDS archive | Source audit records and optional DDS archived records have separate coverage and setup. Archiving does not enable source auditing or recover expired records. Database Scheduler jobs continue after app logout. |
 

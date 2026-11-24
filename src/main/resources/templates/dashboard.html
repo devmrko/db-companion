@@ -18,6 +18,7 @@
         </div></dl>
       </div>
       <div class="app-config-actions">
+        <a class="app-btn" th:href="@{/db/demo-data}" th:text="#{demoData.title}"></a>
         <a class="app-btn" th:href="@{/ai-setup(purpose='nl2sql')}" th:text="#{dashboard.ready.details}"></a>
         <a class="app-btn" th:href="@{/tables}" th:text="#{dashboard.ready.metadata}"></a>
         <a class="app-btn" th:href="@{/ai-test}" th:text="#{dashboard.ready.query}"></a>

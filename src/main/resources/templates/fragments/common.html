@@ -20,9 +20,10 @@
 </a>
 <aside th:fragment="sidebar" class="app-sidebar" id="app-sidebar">
   <a th:replace="~{fragments/common :: brand}"></a>
-  <details class="app-menu-group" th:open="${activePage == 'ai-setup' or activePage == 'overview'}">
+  <details class="app-menu-group" th:open="${activePage == 'ai-setup' or activePage == 'overview' or activePage == 'demo-data'}">
     <summary th:text="#{menu.group.start}"></summary>
     <nav th:aria-label="#{menu.group.start}">
+    <a class="app-nav-item" th:classappend="${activePage == 'demo-data'} ? 'is-active'" th:href="@{/db/demo-data}" th:attr="aria-current=${activePage == 'demo-data' ? 'page' : null}"><svg th:replace="~{fragments/common :: icon('database')}"></svg><span class="app-nav-text" th:text="#{demoData.title}"></span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'ai-setup'} ? 'is-active'" th:href="@{/ai-setup}" th:attr="aria-current=${activePage == 'ai-setup' ? 'page' : null}" th:aria-label="#{menu.item.ai-setup}"><svg th:replace="~{fragments/common :: icon('grid')}"></svg><span class="app-nav-text" th:text="#{menu.item.ai-setup}"></span></a>
     <a class="app-nav-item" th:classappend="${activePage == 'overview'} ? 'is-active'" th:href="@{/}" th:attr="aria-current=${activePage == 'overview' ? 'page' : null}" th:title="#{ui.6c9c3023153d}" th:aria-label="#{menu.item.overview}"><svg th:replace="~{fragments/common :: icon('grid')}"></svg><span class="app-nav-text" th:text="#{menu.item.overview}"></span></a>
     </nav>

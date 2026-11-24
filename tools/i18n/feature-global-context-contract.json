@@ -1,0 +1,8 @@
+{
+  "glossaryFunction.globalContract": [
+    "DBC_GLOSSARY_CONTEXT는 CUSTOM scope=global용 콜백입니다. term·definition 배열을 반환하며 applies_to를 넣지 않습니다. object/all 범위에는 별도 콜백 구현이 필요합니다.",
+    "DBC_GLOSSARY_CONTEXT is a CUSTOM scope=global callback. It returns term/definition items without applies_to. Object/all scopes require a separate callback implementation.",
+    "DBC_GLOSSARY_CONTEXT 用于 CUSTOM scope=global，返回 term/definition 数组且不含 applies_to。object/all 范围需要单独实现回调。",
+    "DBC_GLOSSARY_CONTEXT は CUSTOM scope=global 用で、applies_to を含めず term/definition の配列を返します。object/all 用には別のコールバックが必要です。"
+  ]
+}
