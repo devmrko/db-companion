@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"><body>
 <section th:fragment="panel" class="app-card mt-3 p-3" data-semantic-context th:attr="data-schema=${selectedSchema}">
-  <div class="app-card-heading"><h2>Semantic Context</h2><button type="button" class="btn app-btn app-btn-secondary" data-sem-refresh th:text="#{ui.8259f9d35351}">새로고침</button></div>
+  <div class="app-card-heading"><h2>Semantic Context</h2><button th:replace="~{fragments/common :: sqlHelp('semantic-context', 'sources')}"></button><button type="button" class="btn app-btn app-btn-secondary" data-sem-refresh th:text="#{ui.8259f9d35351}">새로고침</button></div>
   <p th:text="#{semanticContext.intro}"></p>
   <p class="app-muted" data-sem-status role="status" aria-live="polite"></p>
   <p class="app-muted" th:text="#{semanticContext.baseline}"></p>

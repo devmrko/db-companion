@@ -1,6 +1,6 @@
 <!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
 <section th:fragment="panel(schema,kind)" class="app-card app-module-card" data-sem-history th:attr="data-schema=${schema},data-kind=${kind}">
-  <div class="app-card-heading"><h3 th:text="#{semanticHistory.title}"></h3><button type="button" class="btn app-btn app-btn-secondary" data-sh-refresh th:text="#{semanticHistory.refresh}"></button></div>
+  <div class="app-card-heading"><h3 th:text="#{semanticHistory.title}"></h3><button th:replace="~{fragments/common :: sqlHelp('semantic-history', 'history')}"></button><button type="button" class="btn app-btn app-btn-secondary" data-sh-refresh th:text="#{semanticHistory.refresh}"></button></div>
   <p th:text="#{semanticHistory.scope}"></p><p role="status" data-sh-message></p>
   <input type="hidden" data-sh-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
   <div data-sh-setup hidden><details class="app-disclosure"><summary th:text="#{semanticHistory.installReview}"></summary><pre class="app-preview-source" data-sh-sql></pre></details>

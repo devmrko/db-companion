@@ -80,6 +80,10 @@ Resource Principal을 사용할 때는 ADB ADMIN이 해당 실습 계정에 `DBM
 
 별도 패키지 호출은 [Callable AI](callable-ai.md)를 참고하세요.
 
+## SQL을 참고해 다른 방식으로 구현하기
+
+기본 구성·검증은 DB Companion 화면에서 진행합니다. 같은 기능을 SQLcl·자체 코드·다른 UI로 구현하려면 해당 메뉴의 **SQL?**와 실행 전 DDL 미리보기, 생성 함수의 전체 코드를 참고하세요. [기능별 SQL 위치](sql-reference-workflow.md)에 메뉴와 작업별 확인 경로를 정리했습니다. 직접 SQL 실행은 앱의 검증·동시 변경 검사·이력 기록을 자동 수행하지 않습니다.
+
 ## 빠른 문제 해결
 
 | 증상 | 확인 |

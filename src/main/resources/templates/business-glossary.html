@@ -10,6 +10,7 @@
   <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-glossary-csrf>
   <section class="app-card app-glossary-card">
     <h2 th:text="#{businessGlossary.storage}">저장소와 검색 설정</h2>
+    <button th:replace="~{fragments/common :: sqlHelp('business-glossary', 'tokens')}"></button>
     <p th:text="#{businessGlossary.independent}">온톨로지·프로필과 독립적이며 로그인 소유 스키마에 저장합니다. 등록된 정의는 검증된 정답을 뜻하지 않습니다.</p>
     <p data-glossary-status class="app-filter-message"></p>
     <p data-glossary-text-status class="app-filter-message" role="status" aria-live="polite" th:text="#{businessGlossary.textState.checking}">Oracle Text 구성 상태 확인 중…</p>

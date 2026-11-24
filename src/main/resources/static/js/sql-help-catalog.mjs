@@ -3,6 +3,7 @@ import {nativeRdfHelp} from './sql-help-native-rdf.mjs';
 import {metadataGraphHelp} from './sql-help-metadata-graph.mjs';
 import {taskDefinition,delegatedHistory,resultReview,discoveryHistory,ordsChanges} from './sql-help-workflows.mjs';
 import {referenceFor} from './sql-help-references.mjs';
+import {semanticSourceHelp,glossarySearchHelp,semanticHistoryHelp} from './sql-help-semantics.mjs';
 // Each recipe is a DB operation, not a claim that SQL reproduces Java validation or UI state.
 const aiDoc='https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/dbms-cloud-ai-package.html';
 const pair=(ko,en)=>({ko,en});
@@ -670,6 +671,9 @@ WHERE RECORD_ID = '<RECORD_UUID>' AND STATE = 'REQUESTED';`,'repository/AppRecor
   ]
 };
 sqlHelpCatalog.ords.push(...ordsChanges);
+sqlHelpCatalog['semantic-context']=semanticSourceHelp;
+sqlHelpCatalog['business-glossary']=glossarySearchHelp;
+sqlHelpCatalog['semantic-history']=semanticHistoryHelp;
 sqlHelpCatalog.agents.push(taskDefinition);
 sqlHelpCatalog.ontology.push(discoveryHistory);
 for(const [feature,operations] of Object.entries(sqlHelpCatalog))for(const operation of operations){
