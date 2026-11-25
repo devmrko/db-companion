@@ -1,6 +1,6 @@
 CREATE FUNCTION {{CONTEXT}}(p_context CLOB)
   RETURN CLOB AUTHID CURRENT_USER AS
-  -- DB Companion semantic glossary callback v4. Global scope; original question only.
+  -- DB Companion semantic glossary callback v6. Global scope; bounded original-question normalization.
   context_obj JSON_OBJECT_T;
   response_obj JSON_OBJECT_T;
   glossary_obj JSON_OBJECT_T;
@@ -26,6 +26,45 @@ CREATE FUNCTION {{CONTEXT}}(p_context CLOB)
   PRAGMA EXCEPTION_INIT(invalid_input,-20064);
   invalid_result EXCEPTION;
   PRAGMA EXCEPTION_INIT(invalid_result,-20065);
+  previous_length PLS_INTEGER;
+  FUNCTION last_marker(p_marker VARCHAR2) RETURN PLS_INTEGER IS
+    found PLS_INTEGER:=DBMS_LOB.INSTR(question,p_marker);
+    next_found PLS_INTEGER;
+  BEGIN
+    IF found=0 THEN RETURN 0; END IF;
+    LOOP
+      next_found:=DBMS_LOB.INSTR(question,p_marker,found+LENGTH(p_marker));
+      EXIT WHEN next_found=0;
+      found:=next_found;
+    END LOOP;
+    RETURN found;
+  END;
+  PROCEDURE unwrap_reference(p_begin VARCHAR2,p_end VARCHAR2,p_guard VARCHAR2) IS
+    guard_start PLS_INTEGER;
+    next_question CLOB;
+  BEGIN
+    dictionary_start := last_marker(p_begin);
+    dictionary_end := DBMS_LOB.GETLENGTH(question)-LENGTH(p_end)+1;
+    guard_start := last_marker(p_guard);
+    IF dictionary_start>0 AND guard_start>0 AND guard_start<dictionary_start
+      AND DBMS_LOB.INSTR(question,CHR(10),guard_start+1)=dictionary_start
+      AND dictionary_end>dictionary_start
+      AND DBMS_LOB.SUBSTR(question,LENGTH(p_end),dictionary_end)=p_end THEN
+      dictionary_start := dictionary_start+LENGTH(p_begin);
+      DBMS_LOB.CREATETEMPORARY(dictionary_json,TRUE);
+      DBMS_LOB.COPY(dictionary_json,question,dictionary_end-dictionary_start,1,dictionary_start);
+      dictionary_obj := JSON_OBJECT_T.parse(dictionary_json);
+      dictionary_obj.on_error(1);
+      value_element := dictionary_obj.get('originalQuestion');
+      IF value_element IS NULL OR NOT value_element.is_string() THEN RAISE invalid_input; END IF;
+      next_question := dictionary_obj.get_clob('originalQuestion');
+      IF next_question IS NULL OR DBMS_LOB.GETLENGTH(next_question)>=DBMS_LOB.GETLENGTH(question) THEN
+        RAISE invalid_input;
+      END IF;
+      question := next_question;
+      DBMS_LOB.FREETEMPORARY(dictionary_json);
+    END IF;
+  END;
 BEGIN
   BEGIN
     context_obj := JSON_OBJECT_T.parse(p_context);
@@ -35,33 +74,30 @@ BEGIN
       RAISE invalid_input;
     END IF;
     question := context_obj.get_clob('user_prompt');
-    -- A SQL validation repair appends generated SQL and Oracle errors. These are
-    -- not business search terms. Only recognize the complete ordered envelope.
-    repair_start := DBMS_LOB.INSTR(question,CHR(10)||CHR(10)||'The previous Oracle SQL generated was:'||CHR(10));
-    error_start := DBMS_LOB.INSTR(question,CHR(10)||CHR(10)||'It failed with the following error:'||CHR(10));
-    correction_start := DBMS_LOB.INSTR(question,'Correct the SQL to address the error and respond with a valid Oracle SQL statement only.');
-    IF repair_start>1 AND error_start>repair_start AND correction_start>error_start THEN
-      DBMS_LOB.CREATETEMPORARY(original_question,TRUE);
-      DBMS_LOB.COPY(original_question,question,repair_start-1,1,1);
-      question := original_question;
-    END IF;
-    -- Companion appends a complete terminal JSON evidence envelope. Its terms
-    -- and SQL criteria belong to the LLM context, not the tokenized lookup.
-    dictionary_start := DBMS_LOB.INSTR(question,CHR(10)||'BEGIN BUSINESS DICTIONARY JSON'||CHR(10));
-    dictionary_end := DBMS_LOB.INSTR(question,CHR(10)||'END BUSINESS DICTIONARY JSON');
-    IF dictionary_start>0 AND dictionary_end>dictionary_start
-      AND dictionary_end+LENGTH(CHR(10)||'END BUSINESS DICTIONARY JSON')-1=DBMS_LOB.GETLENGTH(question)
-      AND DBMS_LOB.GETLENGTH(question)<=64000
-      AND DBMS_LOB.INSTR(question,CHR(10)||'BUSINESS DICTIONARY EVIDENCE: ')>0 THEN
-      dictionary_start := dictionary_start+LENGTH(CHR(10)||'BEGIN BUSINESS DICTIONARY JSON'||CHR(10));
-      DBMS_LOB.CREATETEMPORARY(dictionary_json,TRUE);
-      DBMS_LOB.COPY(dictionary_json,question,dictionary_end-dictionary_start,1,dictionary_start);
-      dictionary_obj := JSON_OBJECT_T.parse(dictionary_json);
-      dictionary_obj.on_error(1);
-      value_element := dictionary_obj.get('originalQuestion');
-      IF value_element IS NULL OR NOT value_element.is_string() THEN RAISE invalid_input; END IF;
-      question := dictionary_obj.get_clob('originalQuestion');
-    END IF;
+    -- Evidence and SQL-repair text must never become a new dictionary search.
+    -- Normalize both UI and callable-AI envelopes, including nested combinations.
+    -- Each pass must strictly shorten the input; reject more than eight layers.
+    IF question IS NULL OR DBMS_LOB.GETLENGTH(question)>64000 THEN RAISE invalid_input; END IF;
+    FOR depth IN 1..9 LOOP
+      previous_length := DBMS_LOB.GETLENGTH(question);
+      repair_start := DBMS_LOB.INSTR(question,CHR(10)||CHR(10)||'The previous Oracle SQL generated was:'||CHR(10));
+      error_start := DBMS_LOB.INSTR(question,CHR(10)||CHR(10)||'It failed with the following error:'||CHR(10));
+      correction_start := DBMS_LOB.INSTR(question,'Correct the SQL to address the error and respond with a valid Oracle SQL statement only.');
+      IF repair_start>1 AND error_start>repair_start AND correction_start>error_start THEN
+        DBMS_LOB.CREATETEMPORARY(original_question,TRUE);
+        DBMS_LOB.COPY(original_question,question,repair_start-1,1,1);
+        question := original_question;
+      ELSE
+        unwrap_reference(CHR(10)||'BEGIN BUSINESS DICTIONARY JSON'||CHR(10),
+          CHR(10)||'END BUSINESS DICTIONARY JSON',CHR(10)||'BUSINESS DICTIONARY EVIDENCE: ');
+        IF DBMS_LOB.GETLENGTH(question)=previous_length THEN
+          unwrap_reference(CHR(10)||'BEGIN REFERENCE JSON'||CHR(10),
+            CHR(10)||'END REFERENCE JSON',CHR(10)||'REFERENCE DATA: ');
+        END IF;
+      END IF;
+      EXIT WHEN DBMS_LOB.GETLENGTH(question)=previous_length;
+      IF depth=9 THEN RAISE invalid_input; END IF;
+    END LOOP;
     IF question IS NULL OR DBMS_LOB.GETLENGTH(question)>8000
       OR TRIM(DBMS_LOB.SUBSTR(question,8000,1)) IS NULL THEN
       RAISE invalid_input;

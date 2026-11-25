@@ -131,9 +131,11 @@ class GlossaryFunctionTest {
         assertThat(GlossaryFunctionSql.legacyContext("APP")).contains("callback v1").doesNotContain("repair_start");
         assertThat(GlossaryFunctionSql.legacyContextV2("APP")).contains("callback v2","repair_start").doesNotContain("dictionary_start");
         assertThat(GlossaryFunctionSql.legacyContextV3("APP")).contains("callback v3", "item_obj.put('applies_to',JSON_ARRAY_T())");
-        assertThat(GlossaryFunctionSql.statements("APP").get(3)).contains("callback v4",
+        assertThat(GlossaryFunctionSql.legacyContextV4("APP")).contains("callback v4").doesNotContain("BEGIN REFERENCE JSON");
+        assertThat(GlossaryFunctionSql.legacyContextV5("APP")).contains("callback v5").doesNotContain("FUNCTION last_marker");
+        assertThat(GlossaryFunctionSql.statements("APP").get(3)).contains("callback v6",
             "dictionary_obj.get_clob('originalQuestion')","END BUSINESS DICTIONARY JSON",
-            "DBMS_LOB.GETLENGTH(question)<=64000");
+            "DBMS_LOB.GETLENGTH(question)>64000", "BEGIN REFERENCE JSON", "FOR depth IN 1..9 LOOP");
         assertThat(GlossaryFunctionSql.statements("APP").get(3)).contains("error_start>repair_start AND correction_start>error_start","DBMS_LOB.GETLENGTH(question)>8000");
         assertThat(GlossaryFunctionRepository.moduleState(List.of("READY","READY","READY","MISSING"))).isEqualTo("INCOMPLETE");
         assertThat(GlossaryFunctionRepository.moduleState(List.of("READY","READY","READY","CONFLICT"))).isEqualTo("CONFLICT");

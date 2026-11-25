@@ -49,6 +49,8 @@ public class GlossaryFunctionRepository {
                 else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContext(owner)))))state="LEGACY";
                 else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContextV2(owner)))))state="LEGACY";
                 else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContextV3(owner)))))state="LEGACY";
+                else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContextV4(owner)))))state="LEGACY";
+                else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContextV5(owner)))))state="LEGACY";
             }
             states.add(state);
             snapshots.add(name+":"+type+":"+objects+":"+actual);

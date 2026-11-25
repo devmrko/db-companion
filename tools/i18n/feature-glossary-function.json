@@ -30,10 +30,10 @@
     "再確認"
   ],
   "glossaryFunction.scope": [
-    "로그인 소유 스키마에 설치합니다. 원문이 확인된 앱 구버전 함수만 검토 후 업데이트할 수 있습니다. 다른 객체나 권한은 변경하지 않습니다.",
-    "Installs in the login owner's schema. Only recognized app-generated legacy functions can be updated after review. Other objects and grants remain unchanged.",
-    "安装于登录用户模式。仅在核对源码后更新本应用已知旧版函数，不改变其他对象或权限。",
-    "ログイン所有スキーマに導入します。ソースを確認できるアプリの旧版関数のみ、確認後に更新できます。他のオブジェクト・権限は変更しません。"
+    "로그인 소유 스키마에 설치합니다. 원문이 확인된 앱 구버전 구성요소를 검토 후 업데이트할 수 있습니다. 다른 객체나 권한은 변경하지 않습니다.",
+    "Installs in the login owner's schema. Recognized app-generated legacy components can be updated after review. Other objects and grants remain unchanged.",
+    "安装于登录用户模式。核对源码后可更新本应用已知旧版组件，不改变其他对象或权限。",
+    "ログイン所有スキーマに導入します。ソースを確認できるアプリの旧版コンポーネントを確認後に更新できます。他のオブジェクト・権限は変更しません。"
   ],
   "glossaryFunction.code": [
     "2. 함수 코드 확인",
@@ -72,10 +72,10 @@
     "パッケージ・呼出関数と DDL の影響を確認し、表示された導入または旧版更新に同意します。"
   ],
   "glossaryFunction.create": [
-    "모듈 설치·v1 업데이트",
-    "Install module / update v1",
-    "安装模块 / 更新 v1",
-    "モジュール導入・v1更新"
+    "모듈 설치·업데이트",
+    "Install / update module",
+    "安装 / 更新模块",
+    "モジュール導入・更新"
   ],
   "glossaryFunction.test": [
     "3. 질문으로 검색 테스트",
@@ -252,16 +252,16 @@
     "導入済みコードを維持"
   ],
   "glossaryFunction.action.REPLACE_V1": [
-    "확인된 구버전 함수 업데이트",
-    "Update recognized legacy function",
-    "更新已确认的旧版函数",
-    "確認済みの旧版関数を更新"
+    "확인된 구버전 구성요소 업데이트",
+    "Update recognized legacy component",
+    "更新已确认的旧版组件",
+    "確認済みの旧版コンポーネントを更新"
   ],
   "glossaryFunction.state.LEGACY": [
-    "기존 v1 · 업데이트 가능",
-    "Legacy v1 · update available",
-    "旧版 v1 · 可更新",
-    "既存v1・更新可能"
+    "이전 생성 코드 · 업데이트 가능",
+    "Earlier generated code · update available",
+    "先前生成的代码 · 可更新",
+    "以前の生成コード・更新可能"
   ],
   "glossaryFunction.state.INCOMPLETE": [
     "일부 설치됨 · 나머지 설치 가능",
