@@ -23,6 +23,10 @@ public final class GlossaryFunctionSql {
                 .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT)));
     }
     public static String script(String owner){return String.join("\n/\n\n",statements(owner))+"\n/\n";}
+    public static String legacyApiBodyV2(String owner){
+        return CallableAiSql.resource("glossary-api-body-v2.sql")
+            .replace("{{API}}",ProfileHistorySql.object(owner,API));
+    }
     public static String legacyContext(String owner){
         return CallableAiSql.resource("glossary-context-v1.sql").replace("{{API}}",ProfileHistorySql.object(owner,API))
             .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT));

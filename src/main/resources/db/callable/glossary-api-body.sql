@@ -1,8 +1,8 @@
 CREATE PACKAGE BODY {{API}} AS
-  -- DB Companion glossary API v2
+  -- DB Companion glossary API v3: dictionary owner is fixed at compilation.
   FUNCTION dictionary_table RETURN VARCHAR2 IS
   BEGIN
-    RETURN DBMS_ASSERT.ENQUOTE_NAME(SYS_CONTEXT('USERENV','CURRENT_USER'),FALSE)
+    RETURN DBMS_ASSERT.ENQUOTE_NAME($$PLSQL_UNIT_OWNER,FALSE)
       ||'."DBC_BUSINESS_TERM"';
   END;
 
@@ -34,7 +34,7 @@ CREATE PACKAGE BODY {{API}} AS
     word_text VARCHAR2(32767);
   BEGIN
     CTX_DOC.POLICY_TOKENS(
-      policy_name=>'DBC_BT_KO_POLICY',document=>p_question,
+      policy_name=>DBMS_ASSERT.ENQUOTE_NAME($$PLSQL_UNIT_OWNER,FALSE)||'.DBC_BT_KO_POLICY',document=>p_question,
       restab=>native_tokens,format=>'TEXT');
     IF native_tokens.COUNT>256 THEN
       RAISE_APPLICATION_ERROR(-20061,'Token limit exceeded');
@@ -115,7 +115,7 @@ CREATE PACKAGE BODY {{API}} AS
       FETCH p_candidates INTO term_id,label_text,match_kind;
       EXIT WHEN p_candidates%NOTFOUND;
       CTX_DOC.POLICY_HIGHLIGHT(
-        policy_name=>'DBC_BT_KO_POLICY',document=>p_question,
+        policy_name=>DBMS_ASSERT.ENQUOTE_NAME($$PLSQL_UNIT_OWNER,FALSE)||'.DBC_BT_KO_POLICY',document=>p_question,
         text_query=>escape_text_phrase(label_text),
         restab=>spans,plaintext=>TRUE,format=>'TEXT');
       position_no:=spans.FIRST;
@@ -251,7 +251,7 @@ CREATE PACKAGE BODY {{API}} AS
     END IF;
     response.put('formatVersion',1);
     response.put('question',p_question);
-    response.put('schema',SYS_CONTEXT('USERENV','CURRENT_USER'));
+    response.put('schema',$$PLSQL_UNIT_OWNER);
     response.put('glossary',glossary);
     response.put('aiCalled',FALSE);
     RETURN response.to_clob();

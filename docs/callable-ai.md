@@ -41,6 +41,49 @@ source-matching components. Back up source before a deliberate v1 migration;
 fingerprint checks are not a database-wide DDL lock.
 The limits and Oracle invocation-chain rules below still apply.
 
+### Sharing the search module with DDS callers
+
+Search package body v3 resolves the dictionary and Oracle Text policy using
+its compiled owner (`$$PLSQL_UNIT_OWNER`). It retains `AUTHID CURRENT_USER`:
+the caller still needs permission to execute the callback and read the dictionary.
+A DDS caller can have `CURRENT_USER=XS$NULL`; that value is not the dictionary
+schema. The response's `schema` field identifies the dictionary owner.
+
+The existing preview/update flow recognizes the exact generated v2 package body
+and replaces that body only. The package specification and entry functions remain
+unchanged. Customized bodies are conflicts and are never silently replaced.
+
+Sharing an AI profile does not also share its Semantic Sources. The source owner
+must grant those separately. For example, after creating the ordinary database
+role `AI_READER`:
+
+```sql
+BEGIN
+  DBMS_CLOUD_AI.GRANT_PROFILE_ACCESS(
+    profile_name=>'BUSINESS_PROFILE', user_or_role_name=>'AI_READER');
+  DBMS_AI_SEM.GRANT_SEMANTIC_SOURCE_ACCESS(
+    source_name=>'BUSINESS_CONTEXT', user_or_role_name=>'AI_READER');
+END;
+/
+GRANT EXECUTE ON APP_SCHEMA.DBC_GLOSSARY_CONTEXT TO AI_READER;
+GRANT EXECUTE ON APP_SCHEMA.DBC_GLOSSARY_API TO AI_READER;
+```
+
+The runtime role also needs Oracle Text query API access (`CTXSYS.CTX_DOC`).
+Do not give a read-only caller the Oracle Text setup privileges used by the owner.
+For DDS, place the ordinary role in an appropriate Data Role and grant that Data
+Role to the application identity. A dictionary Data Grant is separate, for example:
+
+```sql
+CREATE DATA GRANT APP_SCHEMA.TERM_READ
+  AS SELECT ON APP_SCHEMA.DBC_BUSINESS_TERM TO APP_DATA_ROLE;
+```
+
+Review which dictionary rows may be shared before omitting a predicate. These
+grants do not grant access to business fact tables. Check the actual end-user
+identity, matched definitions, generated SQL and business rows through the same
+application session; an owner-session test alone does not verify a DDS caller.
+
 SQL/PLSQL blocks use the common read-only source UI: line numbers, syntax
 highlighting, source search, optional wrapping and copying the original code.
 These display controls never execute code or modify its text.

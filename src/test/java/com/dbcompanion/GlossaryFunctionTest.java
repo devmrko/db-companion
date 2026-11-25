@@ -67,6 +67,30 @@ class GlossaryFunctionTest {
         assertThat(GlossaryFunctionRepository.normalize("FUNCTION \"DBC_GLOSSARY_SEARCH\"\r\n RETURN CLOB")).isEqualTo("FUNCTION DBC_GLOSSARY_SEARCH\n RETURN CLOB");
         assertThat(GlossaryFunctionRepository.storedSource("APP",GlossaryFunctionSql.API,scripts.getFirst())).startsWith("PACKAGE DBC_GLOSSARY_API");
     }
+    @Test void sharedDictionaryKeepsInvokerRightsAndResolvesTheInstalledOwner(){
+        var scripts=GlossaryFunctionSql.statements("OWNER_SCHEMA");
+        assertThat(scripts.getFirst()).contains("AUTHID CURRENT_USER","glossary API v2");
+        assertThat(scripts.get(1)).contains("glossary API v3");
+        assertThat(scripts.get(1)).contains("ENQUOTE_NAME($$PLSQL_UNIT_OWNER,FALSE)",
+            "'.DBC_BT_KO_POLICY'","response.put('schema',$$PLSQL_UNIT_OWNER)");
+        assertThat(scripts.get(1)).doesNotContain("SYS_CONTEXT('USERENV','CURRENT_USER')","AUTHID DEFINER");
+    }
+    @Test void onlyRecognizedVersionTwoPackagesAreEligibleForReplacement(){
+        String source=GlossaryFunctionRepository.storedSource("APP",GlossaryFunctionSql.API,
+            GlossaryFunctionSql.legacyApiBodyV2("APP"));
+        assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",1,source)).isTrue();
+        assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",1,source+"\n-- custom")).isFalse();
+        assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",0,source)).isFalse();
+        assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",1,
+            GlossaryFunctionRepository.storedSource("APP",GlossaryFunctionSql.API,
+                GlossaryFunctionSql.statements("APP").get(1)))).isFalse();
+        assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",2,"")).isFalse();
+        assertThat(GlossaryFunctionRepository.replacementSql(GlossaryFunctionSql.statements("APP").getFirst()))
+            .startsWith("CREATE OR REPLACE PACKAGE ");
+        assertThat(GlossaryFunctionRepository.replacementSql(GlossaryFunctionSql.statements("APP").get(1)))
+            .startsWith("CREATE OR REPLACE PACKAGE BODY ");
+        assertThatThrownBy(()->GlossaryFunctionRepository.replacementSql("DROP TABLE T")).isInstanceOf(IllegalArgumentException.class);
+    }
     @Test void creationRequiresConsentUsesLoginOwnerAndConsumesPreviewOnce(){
         try(var s=session()){
             var controller=new GlossaryFunctionController(service);var r=request(s);
