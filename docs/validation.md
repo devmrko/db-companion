@@ -1,5 +1,12 @@
 # Release validation
 
+## Discoverable natural-language setup entry (2026-11-26)
+
+- Added **AI 조회·검색 → 자연어 설정 도우미** at `/ai-setup/assistant`. It defaults to the query purpose, explains a missing assistant model, and keeps model selection, target selection and the request form on a focused path. The existing readiness page remains available for full diagnosis and stored evidence.
+- Java: 1,568 passed; JavaScript: 737 passed, one intentional skip. Build, PMD and publication scan passed. Four-language rendering checks cover the dedicated form route and one active menu item; login and safe language-return boundaries are tested.
+- Authenticated Chrome navigation verified the menu, missing-model guidance, model/target selection, optional service-tool preview and 390px layout. No analyze/apply calls or page errors. This verifies discovery and preview; the previous actual model/Tool execution evidence remains a separate rehearsal.
+- The user's existing 8080 JAR was inspected without changing it and did not include the optional Tool flag. Source publication or isolated-port verification alone is not deployment to an existing app. An in-use application requires an explicitly authorized update/restart.
+
 ## Optional setup service tools (2026-11-26)
 
 - Added an opt-in service-tool mode to the existing setup assistant. Default and omitted input remain the single-call path. JDBC/Select AI supplies text; a bounded Java loop executes three registered read-only services and reuses the existing profile editor for separately reviewed changes. No additional framework or schema objects.

@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/common :: head(#{setup.title})}"></head>
+<head th:replace="~{fragments/common :: head(${assistantOnly == true ? #messages.msg('setup.natural.title') : #messages.msg('setup.title')})}"></head>
 <body class="app-shell">
 <aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
 <main class="app-content app-config">
-  <h1 th:text="#{setup.title}"></h1>
-  <p th:text="#{setup.intro}"></p>
+  <h1 th:text="${assistantOnly == true ? #messages.msg('setup.natural.title') : #messages.msg('setup.title')}"></h1>
+  <p th:text="${assistantOnly == true ? #messages.msg('setup.natural.intro') : #messages.msg('setup.intro')}"></p>
+  <section class="app-config-card" th:if="${assistantOnly == true}">
+    <p th:if="${assistantSelection == null}" th:text="#{setup.natural.modelRequired}"></p>
+    <p th:if="${assistantSelection != null}"><span th:text="#{setup.ai.settings}"></span>: <strong th:text="${assistantSelection.owner + '.' + assistantSelection.name}"></strong></p>
+    <a class="app-btn" th:href="@{/ai-assistant}" th:text="#{setup.ai.settings}"></a>
+  </section>
   <nav class="app-config-actions" th:aria-label="#{setup.purpose}">
     <a th:each="item : ${purposes}" class="app-btn"
        th:classappend="${purpose == item} ? 'app-btn-primary'"
        th:attr="aria-current=${purpose == item ? 'step' : null}"
-       th:href="@{/ai-setup(purpose=${item})}" th:text="${#messages.msg('setup.purpose.' + item)}"></a>
+       th:href="@{${setupPath ?: '/ai-setup'}(purpose=${item})}" th:text="${#messages.msg('setup.purpose.' + item)}"></a>
   </nav>
   <section class="app-config-card" th:if="${purpose != ''}">
     <h2 th:text="${#messages.msg('setup.purpose.' + purpose)}"></h2>
@@ -19,7 +24,7 @@
     <p><span th:text="#{setup.account}"></span> <strong th:text="${info.username}"></strong></p>
     <p class="app-alert" th:if="${ownerRequired == true}"><span th:text="#{setup.ownerHelp}"></span> <a th:href="@{/ai-profiles}" th:text="#{setup.manageProfiles}"></a></p>
     <p class="app-alert" th:if="${unavailable == true}" th:text="#{setup.unavailable}"></p>
-    <form th:if="${ownerRequired != true}" method="get" th:action="@{/ai-setup}" class="app-config-form">
+    <form th:if="${ownerRequired != true}" method="get" th:action="@{${setupPath ?: '/ai-setup'}}" class="app-config-form">
       <input type="hidden" name="purpose" th:value="${purpose}">
       <label class="app-field"><span th:text="#{setup.chooseProfile}"></span>
         <select name="profile" required class="form-select">
@@ -27,11 +32,12 @@
           <option th:each="item : ${profiles}" th:value="${item.name}" th:text="${item.name}" th:selected="${item.name == profile}"></option>
         </select>
       </label>
-      <div class="app-config-actions"><button type="submit" class="app-btn app-btn-primary" th:disabled="${#lists.isEmpty(profiles)}" th:text="#{setup.inspect}"></button>
+      <div class="app-config-actions"><button type="submit" class="app-btn app-btn-primary" th:disabled="${#lists.isEmpty(profiles)}" th:text="${assistantOnly == true ? #messages.msg('setup.natural.start') : #messages.msg('setup.inspect')}"></button>
         <a class="app-btn" th:href="@{/ai-profiles}" th:text="#{setup.manageProfiles}"></a></div>
     </form>
     <p th:if="${ownerRequired != true and unavailable != true and #lists.isEmpty(profiles)}" th:text="#{setup.noProfiles}"></p>
   </section>
+  <th:block th:if="${assistantOnly != true}">
   <section class="app-config-card" th:if="${!#lists.isEmpty(checks)}">
     <h2 th:text="#{setup.results}"></h2>
     <p class="app-config-notice" th:text="#{setup.legend}"></p>
@@ -111,7 +117,9 @@
       </details>
     </details>
   </section>
-  <section class="app-config-card" th:if="${!#lists.isEmpty(checks)}" data-setup-assistant th:attr="data-purpose=${purpose},data-profile=${profile}">
+  </th:block>
+  <p th:if="${assistantOnly == true and #lists.isEmpty(checks) and ownerRequired != true and unavailable != true}" th:text="#{setup.natural.chooseTarget}"></p>
+  <section id="setup-assistant" class="app-config-card" th:if="${!#lists.isEmpty(checks)}" data-setup-assistant th:attr="data-purpose=${purpose},data-profile=${profile}">
     <h2 th:text="#{setup.ai.title}"></h2>
     <p th:text="#{setup.ai.help}"></p>
     <a class="app-btn" th:href="@{/ai-assistant}" th:text="#{setup.ai.settings}"></a>
@@ -134,7 +142,8 @@
       <button type="button" class="app-btn app-btn-primary" data-setup-apply disabled th:text="#{setup.ai.apply}"></button>
     </section>
     <p role="status" data-setup-status></p>
-    <a class="app-btn" th:href="@{/ai-setup(purpose=${purpose},profile=${profile})}" th:text="#{setup.inspect}"></a>
+    <a class="app-btn" th:href="@{${setupPath ?: '/ai-setup'}(purpose=${purpose},profile=${profile})}" th:text="#{setup.inspect}"></a>
+    <a class="app-btn" th:if="${assistantOnly == true}" th:href="@{/ai-setup(purpose=${purpose},profile=${profile})}" th:text="#{setup.results}"></a>
   </section>
 </main></div>
 <script type="module" th:src="@{/js/setup-assistant.mjs}"></script>

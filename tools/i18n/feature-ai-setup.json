@@ -1,4 +1,9 @@
 {
+  "setup.natural.start": ["이 프로필로 시작", "Use this profile", "使用此配置文件", "このプロファイルで開始"],
+  "setup.natural.title": ["자연어 설정 도우미", "Natural-language setup", "自然语言配置助手", "自然言語設定アシスタント"],
+  "setup.natural.intro": ["대상 프로필 선택 → 요청 입력 → 변경안 확인. 현재는 설정·이력 준비 조회와 대화 저장·설명·제약조건 사용 활성화 지원.", "Select a target profile, describe your goal, then review changes. Supports readiness inspection and enabling conversation, comments and constraints.", "选择目标配置文件，输入请求，再确认更改。目前支持准备状态检查及启用对话、说明和约束。", "対象プロファイルを選び、依頼を入力して変更を確認。準備状況の参照と会話・説明・制約の有効化に対応。"],
+  "setup.natural.modelRequired": ["분석에 사용할 AI 도우미 모델을 먼저 선택. DB 설정 변경이나 모델 호출은 자동 실행하지 않음.", "First select an assistant model. No automatic model calls or DB changes.", "请先选择助手模型。不会自动调用模型或更改数据库。", "先にアシスタントモデルを選択。モデル呼び出し・DB変更は自動実行しません。"],
+  "setup.natural.chooseTarget": ["위에서 대상 프로필 선택 후 다시 확인. 요청 입력은 프로필 확인 뒤 표시.", "Select and inspect a target profile above to open the request form.", "在上方选择并检查目标配置文件后显示请求输入区。", "上で対象プロファイルを選び確認すると依頼欄を表示。"],
   "setup.ai.toolsStopped": ["서비스 Tool 응답을 확인하지 못해 중단했습니다. 변경하지 않았으며 자동 재시도하지 않았습니다.", "Stopped because the service Tool response could not be verified. No changes or automatic retries.", "无法确认服务 Tool 响应，已停止。未更改，也未自动重试。", "サービス Tool の応答を確認できず中断しました。変更・自動再試行は行っていません。"],
   "setup.ai.tools": ["서비스 Tool 사용 (선택)", "Use service tools (optional)", "使用服务 Tool（可选）", "サービス Tool を使用（任意）"],
   "setup.ai.toolsHelp": ["필요한 조회 서비스를 선택해 호출. 최대 AI 4회 호출. 변경은 별도 확인 후 적용.", "Select and call read-only services. Up to 4 AI calls. Changes require separate review and confirmation.", "选择并调用只读服务。最多4次 AI 调用。更改需另行预览和确认。", "必要な参照サービスを選択して呼び出し。AI 呼び出しは最大4回。変更は別途確認後に適用。"],
