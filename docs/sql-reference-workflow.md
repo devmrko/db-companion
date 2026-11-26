@@ -19,12 +19,15 @@ DB Companion에서 기능을 구성·검증하면서 실제 DB API와 SQL을 확
 | 한국어 검색 설정 | 업무 용어 사전의 사전 테이블 생성·Oracle Text 설정 미리보기 | KOREAN_MORPH_LEXER·정책·CONTEXT 인덱스와 ON COMMIT 동기화 |
 | 형태소·용어 검색 | 업무 용어 사전 SQL? | POLICY_TOKENS·CONTAINS 후보·검색 API·CUSTOM 콜백 시험 |
 | 검색 함수·콜백 | 함수 → 업무 용어 검색 함수의 코드·실제 실행 DDL, SQL? | 패키지·wrapper·전역 콜백 전체 코드와 시험 SQL |
+| 첨부 문맥 재검색 확인 | 업무 용어 사전 또는 검색 함수 SQL? → 첨부 문맥에서 원 질문만 검색하는지 확인 | 원 질문과 긴 REFERENCE JSON 첨부의 콜백 결과 비교. AI 호출 없음 |
 | Semantic Source | AI 프로필 → Semantic Context의 SQL? | 조회·CREATE/UPDATE·ENABLE/DISABLE·프로필 연결 |
 | Source·콜백 배포 이력 | 설정 변경 이력의 SQL?와 저장소 설치 미리보기 | 설정 전후값 또는 배포 버전·해시·결과 조회 |
 | AI 프로필·변경 이력 | AI 프로필의 SQL?·속성 편집·변경 이력 | CREATE_PROFILE·SET_ATTRIBUTE·DBC_AI_HISTORY |
 | SQL 생성·검토·실행 | 자연어 데이터 조회의 SQL?·생성 결과·실행 미리보기 | GENERATE의 showsql, 생성된 업무 SQL, 실행 대상 확인 |
+| 사용자용 AI 함수 | DB 함수 → 사용자용 AI 함수 → SQL? | CONTEXT·SQL·QUERY 단계별 SQL, 소유자·프로필·질문 치환. QUERY는 앞 단계 SQL을 재사용하지 않음 |
 | Agent·Tool·실행 이력 | AI 에이전트의 SQL?·생성 미리보기, 실행 이력 SQL? | CREATE_TOOL/AGENT/TASK/TEAM·RUN_TEAM·조회 뷰. 사용자 Tool 함수는 업무별 구현 |
 | DDS 정책·조회 감사 | DDS의 SQL?·정책/감사 생성·보관 미리보기 | 사용자·역할·Data Grant, 실제 신원, 감사 정책·보관 DDL과 조회 |
+| DDS 최종 사용자 대조 | DDS SQL? → 로그인·DB 실행·DDS 신원 대조 | 실제 연결의 APP_USER·SESSION_USER·CURRENT_USER·DDS_USER와 허용/제외 행 ID 비교. 로그인 성공과 DDS 적용 구분 |
 
 APEX Ask Oracle 설치와 Codex MCP 등록은 외부 앱·클라이언트 구성입니다. DB Companion 내부 DB 설정 SQL과 구분하며 [첫 사용 안내](GETTING-STARTED.ko.md)와 기능별 공식 설치 문서를 참고합니다. MCP의 실제 조회 SQL에는 사용자 신원·허용/제외 데이터·기대 결과 검증을 포함합니다.
 

@@ -4,6 +4,21 @@
 
 The generated PL/SQL is standalone: Oracle Text matching, definition retrieval, prompt composition, `DBMS_CLOUD_AI.GENERATE(action=>'showsql')`, and optional query execution happen inside Oracle. It does not call DB Companion or an application endpoint. Business rules stay in the dictionary, ontology, comments and profile Feedback, not in Java or the package source.
 
+The page's **SQL?** offers separate CONTEXT, SQL and QUERY calls with owner,
+profile and question placeholders. Inspect CONTEXT before a billed request.
+QUERY generates again; it does not reuse the SQL from a preceding call. To test
+the exact same SQL under A/B identities, review SQL-mode output and run that
+SELECT on each actual end-user connection. **Deep Data Security → SQL? → Compare
+identities** provides identity and row-ID queries. Owner generation, DDS native
+generation and final-user querying are separate verification results.
+
+For attached-evidence lookup errors, **Business glossary → SQL? → Verify lookup
+uses only the original question** compares the callback with and without a
+REFERENCE JSON envelope, without AI. Callback v6 normalizes both supported
+evidence formats and SQL-repair envelopes; install through the recognized-code
+preview and inspect the before/after version/hash history. The bundled
+`/help/sql-reference.html` describes the sequence and error checks inside the app.
+
 ## Search-only module
 
 **Functions → Create glossary search function** previews and creates one

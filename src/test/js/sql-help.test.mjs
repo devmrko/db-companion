@@ -46,6 +46,32 @@ test('audit fixes retain default operations and make reference labels change wit
     assert.match(helpFor('tables',locale,'list').labels.doc,/Oracle/);
   }
 });
+test('callable SQL help separates no-AI evidence, billed generation and fresh query generation',()=>{
+  const h=harness();h.open('callable-ai','context');
+  assert.match(helpFor('callable-ai','ko','context').sql,/p_mode => 'CONTEXT'/);
+  assert.equal(helpFor('callable-ai','ko','context').risk,'read');
+  for(const mode of ['sql','query']){
+    h.change(mode);
+    const recipe=helpFor('callable-ai','ko',mode);
+    assert.equal(recipe.risk,'ai');assert.match(recipe.sql,new RegExp(`p_mode => '${mode.toUpperCase()}'`));
+    assert.match(recipe.variables,/<SCHEMA>.*<QUESTION>.*<PROFILE_NAME>/s);
+    assert.match(recipe.result,/앞 단계 SQL을 재사용하지 않습니다/);
+    assert.match(recipe.doc,/#callable-pipeline$/);
+  }
+  assert.match(read('src/main/resources/templates/callable-ai.html'),/sqlHelp\('callable-ai', 'context'\)/);
+});
+test('DDS help compares actual runtime identity and rows without configuring identity or granting privileges',()=>{
+  const recipe=helpFor('security','ko','identity');
+  for(const value of ['APP_USER','SESSION_USER','CURRENT_USER','ORA_END_USER_CONTEXT.username','<ROW_ID_COLUMN>','<POLICY_COLUMN>'])assert.ok(recipe.sql.includes(value),value);
+  assert.doesNotMatch(recipe.sql,/\b(GRANT|CREATE|ALTER|BEGIN)\b/);
+  assert.match(recipe.result,/A→B→A/);assert.match(recipe.result,/로그인 성공이나 소유자 조회만으로/);
+  assert.equal(recipe.risk,'read');assert.match(recipe.doc,/#runtime-identity$/);
+  const reference=helpFor('business-glossary','ko','callback-reference');
+  assert.match(reference.sql,/originalQuestion/);assert.match(reference.sql,/DBMS_LOB.COMPARE\(expected,actual\)/);
+  assert.match(reference.sql,/FOR i IN 1\.\.100 LOOP/);
+  assert.doesNotMatch(reference.sql,/DBMS_CLOUD_AI\.GENERATE|CREATE OR REPLACE/);
+  assert.equal(reference.risk,'read');
+});
 test('task definition help reads definitions instead of team execution history',()=>{
   const help=helpFor('agents','ko','task-definition');
   assert.match(help.sql,/USER_AI_AGENT_TASKS WHERE TASK_NAME/);
