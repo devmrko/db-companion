@@ -98,10 +98,10 @@ class AiSetupTest {
                     .doesNotContain("??", "th:", "<test>", "<script>unsafe</script>");
             context.setVariable("assistantOnly",true);context.setVariable("setupPath","/ai-setup/assistant");
             context.setVariable("activePage","setup-assistant");context.setVariable("languageReturn","/ai-setup/assistant");
-            String focused=engine.process("ai-setup",context);
-            assertThat(focused).contains("action=\"/ai-setup/assistant\"","id=\"setup-assistant\"","data-setup-tools",
-                    "/ai-setup/assistant?purpose=nl2sql")
-                    .doesNotContain("data-saved-evidence","data-history-review","??","th:");
+            String focused=engine.process("setup-workbench",context);
+            assertThat(focused).contains("data-setup-workbench","data-wb-log","data-wb-workspace","data-wb-input",
+                    "data-wb-profiles","setup-workbench.mjs","P&amp;&lt;test&gt;")
+                    .doesNotContain("data-saved-evidence","data-history-review","??","th:","<iframe");
             assertThat(focused.split("aria-current=\"page\"",-1)).hasSize(2);
         }
     }
@@ -139,7 +139,7 @@ class AiSetupTest {
         try(var session=new OntologyReadCacheTest().session()) {
             var request=new MockHttpServletRequest("GET","/ai-setup/assistant");request.getSession().setAttribute(com.dbcompanion.common.db.PoolSession.ATTRIBUTE,session);
             var model=new ExtendedModelMap();var response=new MockHttpServletResponse();
-            assertThat(new AiSetupController(database,null).page("","",request,response,model)).isEqualTo("ai-setup");
+            assertThat(new AiSetupController(database,null).page("","P",request,response,model)).isEqualTo("setup-workbench");
             assertThat(model).containsEntry("purpose","nl2sql").containsEntry("assistantOnly",true)
                     .containsEntry("activePage","setup-assistant").containsEntry("setupPath","/ai-setup/assistant");
             assertThat((List<?>)model.get("profiles")).hasSize(1);assertThat((List<?>)model.get("checks")).isEmpty();

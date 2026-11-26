@@ -42,6 +42,7 @@ public class AiSetupController {
         model.addAttribute("assistantOnly",natural);
         model.addAttribute("setupPath",setupPath);
         model.addAttribute("assistantSelection",session.metadata().assistant().selected());
+        model.addAttribute("selectedSchema",session.metadata().selectedSchema());
         model.addAttribute("info", session.metadata().info());
         model.addAttribute("activePage", natural?"setup-assistant":"ai-setup");
         model.addAttribute("languageReturn", setupPath);
@@ -54,16 +55,17 @@ public class AiSetupController {
         model.addAttribute("observations", List.of());
         model.addAttribute("historyChecks", List.of());
         model.addAttribute("savedEvidence", List.of());
-        if (!com.dbcompanion.service.AiSetupCatalog.purposes().contains(purpose)) return "ai-setup";
+        String view=natural?"setup-workbench":"ai-setup";
+        if (!com.dbcompanion.service.AiSetupCatalog.purposes().contains(purpose)) return view;
         synchronized (session) {
             if (!session.metadata().info().username().equals(session.metadata().selectedSchema())) {
                 model.addAttribute("ownerRequired", true);
-                return "ai-setup";
+                return view;
             }
             try {
                 var profiles = database.profiles(session, null).profiles();
                 model.addAttribute("profiles", profiles);
-                if (!profile.isBlank()) {
+                if (!natural && !profile.isBlank()) {
                     model.addAttribute("checks", setup.diagnose(session, profile, purpose));
                     if(history!=null)model.addAttribute("historyChecks",history.diagnose(session,database.profiles(session,profile).attributes()));
                     if(!natural&&evidence!=null)model.addAttribute("savedEvidence",evidence.read(session,profile));
@@ -75,6 +77,6 @@ public class AiSetupController {
                 }
             } catch (RuntimeException ex) { model.addAttribute("unavailable", true); }
         }
-        return "ai-setup";
+        return view;
     }
 }
