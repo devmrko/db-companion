@@ -33,8 +33,9 @@ class GlossaryFunctionTest {
             if(!current.equals("READY"))throw new IllegalArgumentException("Not ready");
             reads++;return new JsonMapper().readTree("{\"aiCalled\":false,\"glossary\":{\"definitions\":[]}}");
         }
+        @Override public java.util.Map<String,Object> versions(String owner){return java.util.Map.of("moduleState",current,"fingerprint",current);}
     };
-    private final GlossaryFunctionService service=new GlossaryFunctionService(source,repo);
+    private final GlossaryFunctionService service=new GlossaryFunctionService(source,repo,SemanticChangeTest.immediate(source));
     private PoolSession session(){
         var s=new PoolSession(new HikariDataSource(),"LOW",()->{});
         s.initialize(new DatabaseSession(new DatabaseInfo("APP","APP","LOW","DB"),List.of("APP","OTHER")));
@@ -65,6 +66,30 @@ class GlossaryFunctionTest {
         assertThat(GlossaryFunctionSql.example("APP")).contains(":question").doesNotContain("showsql");
         assertThat(GlossaryFunctionRepository.normalize("FUNCTION \"DBC_GLOSSARY_SEARCH\"\r\n RETURN CLOB")).isEqualTo("FUNCTION DBC_GLOSSARY_SEARCH\n RETURN CLOB");
         assertThat(GlossaryFunctionRepository.storedSource("APP",GlossaryFunctionSql.API,scripts.getFirst())).startsWith("PACKAGE DBC_GLOSSARY_API");
+    }
+    @Test void sharedDictionaryKeepsInvokerRightsAndResolvesTheInstalledOwner(){
+        var scripts=GlossaryFunctionSql.statements("OWNER_SCHEMA");
+        assertThat(scripts.getFirst()).contains("AUTHID CURRENT_USER","glossary API v2");
+        assertThat(scripts.get(1)).contains("glossary API v3");
+        assertThat(scripts.get(1)).contains("ENQUOTE_NAME($$PLSQL_UNIT_OWNER,FALSE)",
+            "'.DBC_BT_KO_POLICY'","response.put('schema',$$PLSQL_UNIT_OWNER)");
+        assertThat(scripts.get(1)).doesNotContain("SYS_CONTEXT('USERENV','CURRENT_USER')","AUTHID DEFINER");
+    }
+    @Test void onlyRecognizedVersionTwoPackagesAreEligibleForReplacement(){
+        String source=GlossaryFunctionRepository.storedSource("APP",GlossaryFunctionSql.API,
+            GlossaryFunctionSql.legacyApiBodyV2("APP"));
+        assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",1,source)).isTrue();
+        assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",1,source+"\n-- custom")).isFalse();
+        assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",0,source)).isFalse();
+        assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",1,
+            GlossaryFunctionRepository.storedSource("APP",GlossaryFunctionSql.API,
+                GlossaryFunctionSql.statements("APP").get(1)))).isFalse();
+        assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",2,"")).isFalse();
+        assertThat(GlossaryFunctionRepository.replacementSql(GlossaryFunctionSql.statements("APP").getFirst()))
+            .startsWith("CREATE OR REPLACE PACKAGE ");
+        assertThat(GlossaryFunctionRepository.replacementSql(GlossaryFunctionSql.statements("APP").get(1)))
+            .startsWith("CREATE OR REPLACE PACKAGE BODY ");
+        assertThatThrownBy(()->GlossaryFunctionRepository.replacementSql("DROP TABLE T")).isInstanceOf(IllegalArgumentException.class);
     }
     @Test void creationRequiresConsentUsesLoginOwnerAndConsumesPreviewOnce(){
         try(var s=session()){
@@ -105,9 +130,12 @@ class GlossaryFunctionTest {
         assertThat(GlossaryFunctionRepository.moduleState(List.of("READY","READY","READY","LEGACY"))).isEqualTo("LEGACY");
         assertThat(GlossaryFunctionSql.legacyContext("APP")).contains("callback v1").doesNotContain("repair_start");
         assertThat(GlossaryFunctionSql.legacyContextV2("APP")).contains("callback v2","repair_start").doesNotContain("dictionary_start");
-        assertThat(GlossaryFunctionSql.statements("APP").get(3)).contains("callback v3",
+        assertThat(GlossaryFunctionSql.legacyContextV3("APP")).contains("callback v3", "item_obj.put('applies_to',JSON_ARRAY_T())");
+        assertThat(GlossaryFunctionSql.legacyContextV4("APP")).contains("callback v4").doesNotContain("BEGIN REFERENCE JSON");
+        assertThat(GlossaryFunctionSql.legacyContextV5("APP")).contains("callback v5").doesNotContain("FUNCTION last_marker");
+        assertThat(GlossaryFunctionSql.statements("APP").get(3)).contains("callback v6",
             "dictionary_obj.get_clob('originalQuestion')","END BUSINESS DICTIONARY JSON",
-            "DBMS_LOB.GETLENGTH(question)<=64000");
+            "DBMS_LOB.GETLENGTH(question)>64000", "BEGIN REFERENCE JSON", "FOR depth IN 1..9 LOOP");
         assertThat(GlossaryFunctionSql.statements("APP").get(3)).contains("error_start>repair_start AND correction_start>error_start","DBMS_LOB.GETLENGTH(question)>8000");
         assertThat(GlossaryFunctionRepository.moduleState(List.of("READY","READY","READY","MISSING"))).isEqualTo("INCOMPLETE");
         assertThat(GlossaryFunctionRepository.moduleState(List.of("READY","READY","READY","CONFLICT"))).isEqualTo("CONFLICT");
@@ -126,5 +154,12 @@ class GlossaryFunctionTest {
             assertThatThrownBy(()->service.install(s,p)).isInstanceOf(IllegalArgumentException.class);
             assertThat(writes).isZero();
         }
+    }
+    @Test void globalCallbackOmitsObjectScopeFieldsRejectedByNativeSelectAi(){
+        String sql=GlossaryFunctionSql.statements("APP").get(3);
+        var keys=java.util.regex.Pattern.compile("item_obj\\.put\\('([^']+)'",java.util.regex.Pattern.MULTILINE)
+            .matcher(sql).results().map(m->m.group(1)).toList();
+        assertThat(keys).containsExactly("term","definition");
+        assertThat(sql).contains("RETURN CLOB AUTHID CURRENT_USER", "definition_text := definition_text || CHR(10) || 'SQL criteria: '");
     }
 }

@@ -5,14 +5,14 @@
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
 <main class="app-content app-callable" data-callable>
   <link rel="stylesheet" th:href="@{/css/callable-ai.css}">
-  <div class="app-page-heading"><h1 th:text="#{callable.title}">사용자용 AI 함수</h1><a th:href="@{/db/functions}" th:text="#{functions.title}">함수</a></div>
+  <div class="app-page-heading"><h1 th:text="#{callable.title}">사용자용 AI 함수</h1><button th:replace="~{fragments/common :: sqlHelp('callable-ai', 'context')}"></button><a th:href="@{/db/functions}" th:text="#{functions.title}">함수</a></div>
   <p th:text="#{callable.intro}">DB 패키지에서 용어·온톨로지 근거 조회 → Select AI → 결과 조회를 수행합니다. 앱 없이도 같은 함수를 호출할 수 있습니다.</p>
   <input type="hidden" data-ca-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
   <section class="app-card">
     <div class="app-card-heading"><h2>DBC_AI_QUERY</h2><span data-ca-status></span></div>
     <p th:text="#{callable.scope}">호출 DB 사용자의 권한·프로필·용어사전·온톨로지를 사용합니다. MCP 연결 계정과 최종 사용자는 같지 않을 수 있습니다. 사용자별 접근 제어는 VPD·DDS 등 DB 설정이 필요합니다.</p>
     <div class="app-callable-actions"><button class="btn app-btn" data-ca-refresh th:text="#{businessGlossary.refresh}">새로고침</button><button class="btn app-btn" data-ca-script th:text="#{callable.script}">생성 SQL 보기</button><button class="btn app-btn app-btn-primary" data-ca-install disabled th:text="#{callable.install}">패키지 생성</button></div>
-    <p><a th:href="@{/db/functions/glossary-search}" th:text="#{semantic.function}"></a></p>
+    <p><a th:href="@{/db/functions/glossary-search}" th:text="#{glossaryFunction.title}"></a></p>
     <pre data-ca-errors hidden></pre>
   </section>
   <section class="app-card" data-ca-access th:if="${callableAdmin}">

@@ -13,7 +13,8 @@ import org.springframework.stereotype.Service;
 public class GlossaryFunctionService {
     private final SessionDataSource source;
     private final GlossaryFunctionRepository repository;
-    public GlossaryFunctionService(SessionDataSource source,GlossaryFunctionRepository repository){this.source=source;this.repository=repository;}
+    private final SemanticChangeService history;
+    public GlossaryFunctionService(SessionDataSource source,GlossaryFunctionRepository repository,SemanticChangeService history){this.source=source;this.repository=repository;this.history=history;}
     private <T>T bound(PoolSession session,Supplier<T> work){
         synchronized(session){
             source.bind(session.pool(),session.metadata().info().username());
@@ -35,7 +36,16 @@ public class GlossaryFunctionService {
             if(!preview.owner().equals(owner(session))||!Instant.now().isBefore(preview.expires())
                     ||!preview.sql().equals(current.sql())||!preview.fingerprint().equals(current.fingerprint()))
                 throw new IllegalArgumentException("The creation preview expired or changed; preview again");
-            return repository.install(owner(session));
+            String owner=owner(session);
+            var result=history.change(owner,"CALLBACK","DBC_GLOSSARY_CONTEXT","INSTALL_OR_UPGRADE",repository.versions(owner),
+                java.util.Map.of("plannedComponents",current.codes().stream().filter(c->!c.action().equals("KEEP"))
+                    .map(c->java.util.Map.of("name",c.name(),"type",c.type(),"action",c.action())).toList()),
+                ()->{
+                    if(!repository.status(owner).fingerprint().equals(preview.fingerprint()))throw new IllegalArgumentException("Stored code changed; preview again");
+                    repository.install(owner);
+                },()->repository.versions(owner),after->"READY".equals(after.get("moduleState")));
+            if(!result.verified())throw com.dbcompanion.model.SemanticChange.error(503,"uncertain");
+            return repository.status(owner);
         });
     }
     public Object search(PoolSession session,Question question){return bound(session,()->repository.search(owner(session),question.question()));}

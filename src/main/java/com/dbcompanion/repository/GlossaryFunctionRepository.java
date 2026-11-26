@@ -44,22 +44,35 @@ public class GlossaryFunctionRepository {
             if(!wrongType){
                 if(objects.stream().noneMatch(o->o.startsWith(type+":")))state="MISSING";
                 else if(normalize(actual).equals(normalize(expected)))state=objects.contains(type+":VALID")?"READY":"INVALID";
+                else if(isLegacyApiSource(owner,i,actual))state="LEGACY";
                 else if(i==2&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyCreate(owner)))))state="LEGACY";
                 else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContext(owner)))))state="LEGACY";
                 else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContextV2(owner)))))state="LEGACY";
+                else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContextV3(owner)))))state="LEGACY";
+                else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContextV4(owner)))))state="LEGACY";
+                else if(i==3&&normalize(actual).equals(normalize(storedSource(owner,name,GlossaryFunctionSql.legacyContextV5(owner)))))state="LEGACY";
             }
             states.add(state);
             snapshots.add(name+":"+type+":"+objects+":"+actual);
             errors.addAll(jdbc.query("SELECT LINE,POSITION,TEXT FROM USER_ERRORS WHERE NAME=? AND TYPE=? ORDER BY SEQUENCE",
                 (r,n)->name+" "+type+" "+r.getInt(1)+":"+r.getInt(2)+" "+r.getString(3),name,type));
             String action=state.equals("MISSING")?"CREATE":state.equals("LEGACY")?"REPLACE_V1":"KEEP";
-            String sql=action.equals("REPLACE_V1")?scripts.get(i).replaceFirst("CREATE FUNCTION","CREATE OR REPLACE FUNCTION"):scripts.get(i);
+            String sql=action.equals("REPLACE_V1")?replacementSql(scripts.get(i)):scripts.get(i);
             codes.add(new Code(name,type,action,sql));
         }
         String state=moduleState(states);
         String sql=String.join("\n/\n\n",codes.stream().filter(c->!c.action().equals("KEEP")).map(Code::sql).toList());
         return new Status(owner,dictionary,text,state,canCreate,errors,sql,GlossaryFunctionSql.example(owner),List.copyOf(codes),
             com.dbcompanion.service.OntologyQueryService.hash(String.join("\n",snapshots)));
+    }
+    public static boolean isLegacyApiSource(String owner,int index,String actual){
+        return index==1&&normalize(actual).equals(normalize(storedSource(owner,
+            GlossaryFunctionSql.API,GlossaryFunctionSql.legacyApiBodyV2(owner))));
+    }
+    public static String replacementSql(String sql){
+        if(!sql.startsWith("CREATE FUNCTION ")&&!sql.startsWith("CREATE PACKAGE "))
+            throw new IllegalArgumentException("Unexpected module statement");
+        return "CREATE OR REPLACE "+sql.substring("CREATE ".length());
     }
     private static boolean iTypeConflict(String name,String object){
         return !name.equals(GlossaryFunctionSql.API)?!object.startsWith("FUNCTION:"):
@@ -93,6 +106,20 @@ public class GlossaryFunctionRepository {
             jdbc.execute(code.sql());
         }
         return status(owner);
+    }
+    /** Deployment evidence only: full generated SQL remains versioned in Git. */
+    public java.util.Map<String,Object> versions(String owner){
+        var status=status(owner);
+        var code=new java.util.TreeMap<String,StringBuilder>();
+        jdbc.query("SELECT NAME,TYPE,TEXT FROM USER_SOURCE WHERE NAME IN ('DBC_GLOSSARY_API','DBC_GLOSSARY_SEARCH','DBC_GLOSSARY_CONTEXT') ORDER BY NAME,TYPE,LINE",
+            (org.springframework.jdbc.core.RowCallbackHandler)r->code.computeIfAbsent(r.getString(1)+":"+r.getString(2),k->new StringBuilder()).append(r.getString(3)));
+        var components=new ArrayList<java.util.Map<String,String>>();
+        code.forEach((name,body)->{
+            var matcher=java.util.regex.Pattern.compile("(?i)DB Companion[^\\r\\n]*\\bv([0-9]+)\\b").matcher(body);
+            components.add(java.util.Map.of("component",name,"version",matcher.find()?"v"+matcher.group(1):"UNRECOGNIZED",
+                "sha256",com.dbcompanion.service.OntologyQueryService.hash(body.toString())));
+        });
+        return java.util.Map.of("moduleState",status.function(),"fingerprint",status.fingerprint(),"components",components);
     }
     public Object search(String owner,String question){
         var status=status(owner);

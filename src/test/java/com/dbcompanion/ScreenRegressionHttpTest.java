@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ScreenRegressionHttpTest {
     static final List<String> MENUS=List.of("/","/ai-setup","/business-glossary","/ontology","/ontology-query","/ai-assistant","/vector-search",
             "/tables","/ai-profiles","/ai-test","/ai-test/problems","/ai-feedback","/ai-agents","/ai-executions","/db/scheduler",
-            "/db/external-sources","/db/credentials","/db/security","/db/functions","/db/ords","/db/scenario-data");
+            "/db/external-sources","/db/credentials","/db/security","/db/functions","/db/ords","/db/demo-data");
     @LocalServerPort int port;
     @Autowired RequestMappingHandlerMapping mappings;
     final HttpClient client=HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();

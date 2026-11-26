@@ -46,6 +46,7 @@ public class GlossaryFunctionController {
         if(session==null)return ResponseEntity.status(401).header("Cache-Control","no-store").body(Map.of("error","Session expired"));
         synchronized(session){
             try{return ResponseEntity.ok().header("Cache-Control","no-store").body(action.get());}
+            catch(com.dbcompanion.common.exception.MetadataEditException ex){return ResponseEntity.status(ex.status()).header("Cache-Control","no-store").body(Map.of("error",ex.userMessage()));}
             catch(IllegalArgumentException ex){return ResponseEntity.badRequest().header("Cache-Control","no-store").body(Map.of("error",ex.getMessage()));}
             catch(RuntimeException ex){return ResponseEntity.status(503).header("Cache-Control","no-store").body(Map.of("error",CredentialCatalogRepository.error(ex),"unconfirmed",true));}
         }

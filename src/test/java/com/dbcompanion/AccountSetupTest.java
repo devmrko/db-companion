@@ -21,7 +21,7 @@ class AccountSetupTest {
         for(var locale:List.of(java.util.Locale.KOREAN,java.util.Locale.ENGLISH,java.util.Locale.JAPANESE,java.util.Locale.SIMPLIFIED_CHINESE)){
             var context=new org.thymeleaf.context.Context(locale);context.setVariable("info",new DatabaseInfo("ADMIN","ADMIN","LOW","DB<script>"));context.setVariable("accountAdmin",true);context.setVariable("activePage","accounts");context.setVariable("_csrf",new org.springframework.security.web.csrf.DefaultCsrfToken("X-CSRF-TOKEN","_csrf","synthetic"));
             context.setVariable("instructions",com.dbcompanion.controller.AdminHelpController.instructions("APP_TEST"));
-            for(var page:List.of("account-setup","scott-demo","admin-help","function-repair"))assertThat(engine.process(page,context)).contains("DB&lt;script&gt;").doesNotContain("??","th:","DB<script>");
+            for(var page:List.of("account-setup","scott-demo","admin-help","function-repair","demo-data"))assertThat(engine.process(page,context)).contains("DB&lt;script&gt;").doesNotContain("??","th:","DB<script>");
             context.setVariable("accountAdmin",false);assertThat(engine.process("account-setup",context)).doesNotContain("data-as-password","data-as-create");
         }
     }

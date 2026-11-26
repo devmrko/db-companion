@@ -1,0 +1,16 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="panel(schema,kind)" class="app-card app-module-card" data-sem-history th:attr="data-schema=${schema},data-kind=${kind}">
+  <div class="app-card-heading"><h3 th:text="#{semanticHistory.title}"></h3><button th:replace="~{fragments/common :: sqlHelp('semantic-history', 'history')}"></button><button type="button" class="btn app-btn app-btn-secondary" data-sh-refresh th:text="#{semanticHistory.refresh}"></button></div>
+  <p th:text="#{semanticHistory.scope}"></p><p role="status" data-sh-message></p>
+  <input type="hidden" data-sh-csrf th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}">
+  <div data-sh-setup hidden><details class="app-disclosure"><summary th:text="#{semanticHistory.installReview}"></summary><pre class="app-preview-source" data-sh-sql></pre></details>
+    <label><input type="checkbox" data-sh-consent><span th:text="#{semanticHistory.installConsent}"></span></label>
+    <button type="button" class="btn app-btn app-btn-secondary" data-sh-install disabled th:text="#{semanticHistory.install}"></button>
+  </div>
+  <div data-sh-records hidden><p data-sh-filter></p><div class="table-responsive"><table class="table app-table"><thead><tr><th th:text="#{semanticHistory.target}"></th><th th:text="#{semanticHistory.operation}"></th><th th:text="#{semanticHistory.actorTime}"></th><th th:text="#{semanticHistory.outcome}"></th><th></th></tr></thead><tbody data-sh-list></tbody></table></div></div>
+  <dialog class="app-preview-dialog" data-sh-dialog aria-labelledby="semantic-history-detail-title"><h3 id="semantic-history-detail-title" th:text="#{semanticHistory.detail}"></h3><button type="button" class="btn app-btn app-btn-secondary" data-sh-close th:text="#{semanticHistory.close}"></button><p data-sh-meta></p>
+    <h4 th:text="#{semanticHistory.before}"></h4><pre class="app-preview-source" data-sh-before></pre>
+    <h4 th:text="#{semanticHistory.after}"></h4><pre class="app-preview-source" data-sh-after></pre>
+  </dialog>
+  <script type="module" th:src="@{/js/semantic-history.mjs}"></script>
+</section></body></html>

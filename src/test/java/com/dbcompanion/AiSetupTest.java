@@ -93,7 +93,16 @@ class AiSetupTest {
                     "/ai-profiles/detail?profile=P%26%3Ctest%3E", "P&amp;&lt;test&gt;")
                     .contains("data-saved-evidence", "&lt;script&gt;unsafe&lt;/script&gt;", "data-history-review", "safe-id", "retest",
                             "app-menu-group", "app-requirement", "SQL execution / Business validation")
+                    .contains("data-setup-tools", "data-setup-tool-results", "data-setup-consent-text")
+                    .doesNotContain("checked=\"checked\"")
                     .doesNotContain("??", "th:", "<test>", "<script>unsafe</script>");
+            context.setVariable("assistantOnly",true);context.setVariable("setupPath","/ai-setup/assistant");
+            context.setVariable("activePage","setup-assistant");context.setVariable("languageReturn","/ai-setup/assistant");
+            String focused=engine.process("ai-setup",context);
+            assertThat(focused).contains("action=\"/ai-setup/assistant\"","id=\"setup-assistant\"","data-setup-tools",
+                    "/ai-setup/assistant?purpose=nl2sql")
+                    .doesNotContain("data-saved-evidence","data-history-review","??","th:");
+            assertThat(focused.split("aria-current=\"page\"",-1)).hasSize(2);
         }
     }
     @Test void placeholderRowsAndDisabledProfileAreNotReady() {
@@ -120,6 +129,29 @@ class AiSetupTest {
                 .isEqualTo("redirect:/login");
         assertThat(request.getSession(false)).isNull();
         assertThat(response.getHeader("Cache-Control")).isEqualTo("no-store");
+    }
+    @Test void naturalEntryDefaultsToQueryPurposeAndKeepsTheDedicatedRoute() {
+        var database=new com.dbcompanion.service.DatabaseService(null,new com.dbcompanion.common.db.SessionDataSource(),null,null,null) {
+            @Override public ProfilePage profiles(com.dbcompanion.common.db.PoolSession s,String name) {
+                return new ProfilePage(List.of(new com.dbcompanion.model.AiProfile("P","ENABLED","","","","")),List.of());
+            }
+        };
+        try(var session=new OntologyReadCacheTest().session()) {
+            var request=new MockHttpServletRequest("GET","/ai-setup/assistant");request.getSession().setAttribute(com.dbcompanion.common.db.PoolSession.ATTRIBUTE,session);
+            var model=new ExtendedModelMap();var response=new MockHttpServletResponse();
+            assertThat(new AiSetupController(database,null).page("","",request,response,model)).isEqualTo("ai-setup");
+            assertThat(model).containsEntry("purpose","nl2sql").containsEntry("assistantOnly",true)
+                    .containsEntry("activePage","setup-assistant").containsEntry("setupPath","/ai-setup/assistant");
+            assertThat((List<?>)model.get("profiles")).hasSize(1);assertThat((List<?>)model.get("checks")).isEmpty();
+            assertThat(response.getHeader("Cache-Control")).isEqualTo("no-store");
+        }
+    }
+    @Test void naturalEntryIsOnlyAReadPageAndRequiresLogin() {
+        var request=new MockHttpServletRequest("GET","/ai-setup/assistant");
+        assertThat(new AiSetupController(null,null).page("","",request,new MockHttpServletResponse(),new ExtendedModelMap())).isEqualTo("redirect:/login");
+        assertThat(request.getSession(false)).isNull();
+        assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/ai-setup/assistant")).isEqualTo("/ai-setup/assistant");
+        assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/ai-setup/assistant/apply")).isEqualTo("/login");
     }
     @Test void foreignSchemaStopsBeforeAnyProfileRead() {
         try(var session = new OntologyReadCacheTest().session()) {

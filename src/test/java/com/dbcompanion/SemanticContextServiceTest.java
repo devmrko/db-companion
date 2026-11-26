@@ -21,8 +21,9 @@ class SemanticContextServiceTest {
         @Override public List<Source> sources(String owner){lists++;return List.of();}
         @Override public void create(String owner,Create input){writes++;}
         @Override public boolean matches(String owner,Create input,tools.jackson.databind.JsonNode expected){return matched;}
+        @Override public java.util.Map<String,Object> snapshot(String owner,String name){return java.util.Map.of("exists",false);}
     };
-    final SemanticContextService service=new SemanticContextService(source,repository);
+    final SemanticContextService service=new SemanticContextService(source,repository,SemanticChangeTest.immediate(source));
     PoolSession session(){
         var result=new PoolSession(new HikariDataSource(),"TEST",()->{});
         result.initialize(new DatabaseSession(new DatabaseInfo("APP","APP","TEST","SYNTHETIC"),List.of("APP","OTHER")));

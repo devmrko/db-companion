@@ -4,6 +4,7 @@ import com.dbcompanion.common.db.PoolSession;
 import com.dbcompanion.common.exception.MetadataEditException;
 import com.dbcompanion.model.AiAssistant;
 import com.dbcompanion.service.AiSetupAssistantService;
+import com.dbcompanion.service.AiSetupToolLoop;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Locale;
 import java.util.Map;
@@ -27,6 +28,9 @@ public class AiSetupAssistantController {
         try{return ResponseEntity.ok().header("Cache-Control","no-store").body(action.apply(s));}
         catch(AiAssistant.Failure ex){return error(ex.status(),ex.getMessage());}
         catch(MetadataEditException ex){return error(ex.status(),ex.userMessage());}
+        catch(AiSetupToolLoop.ProtocolException ex){return ResponseEntity.badRequest().header("Cache-Control","no-store").body(Map.of(
+                "error",com.dbcompanion.common.i18n.UiMessages.text("setup.ai.toolsStopped","서비스 Tool 응답을 확인하지 못해 중단했습니다. 변경하지 않았으며 자동 재시도하지 않았습니다.")+" · "+ex.code(),
+                "diagnostic",Map.of("code",ex.code(),"modelCalls",ex.modelCalls(),"executions",ex.executions())));}
         catch(IllegalArgumentException ex){return error(400,"요청 또는 AI 응답 형식을 확인할 수 없습니다. 변경하지 않았습니다.");}
         catch(RuntimeException ex){return error(503,"처리 결과를 확인하지 못했습니다. 설정과 이력을 확인하세요. 자동 재시도하지 않았습니다.");}
     }

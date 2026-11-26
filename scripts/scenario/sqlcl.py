@@ -83,7 +83,7 @@ def run(config_path, script_path):
     if re.search(r"(?im)^\s*(?:@|host\b|spool\b|conn(?:ect)?\b|start\b|script\b|set\s+(?:echo|define)\b)", script):
         raise Refused("SQLcl connection, scripting, echo and spool commands are not allowed in the SQL file.")
     password = secret["PASSWORD"]
-    preamble = ("set echo off\nset define off\nset verify off\n"
+    preamble = ("set echo off\nset define off\nset verify off\nset encoding UTF-8\n"
                 "whenever oserror exit failure rollback\nwhenever sqlerror exit failure rollback\n"
                 f'connect {username}/"{password}"@{alias}\n'
                 "begin\n"

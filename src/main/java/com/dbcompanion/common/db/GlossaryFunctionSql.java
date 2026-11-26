@@ -23,12 +23,28 @@ public final class GlossaryFunctionSql {
                 .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT)));
     }
     public static String script(String owner){return String.join("\n/\n\n",statements(owner))+"\n/\n";}
+    public static String legacyApiBodyV2(String owner){
+        return CallableAiSql.resource("glossary-api-body-v2.sql")
+            .replace("{{API}}",ProfileHistorySql.object(owner,API));
+    }
     public static String legacyContext(String owner){
         return CallableAiSql.resource("glossary-context-v1.sql").replace("{{API}}",ProfileHistorySql.object(owner,API))
             .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT));
     }
     public static String legacyContextV2(String owner){
         return CallableAiSql.resource("glossary-context-v2.sql").replace("{{API}}",ProfileHistorySql.object(owner,API))
+            .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT));
+    }
+    public static String legacyContextV3(String owner){
+        return CallableAiSql.resource("glossary-context-v3.sql").replace("{{API}}",ProfileHistorySql.object(owner,API))
+            .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT));
+    }
+    public static String legacyContextV4(String owner){
+        return CallableAiSql.resource("glossary-context-v4.sql").replace("{{API}}",ProfileHistorySql.object(owner,API))
+            .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT));
+    }
+    public static String legacyContextV5(String owner){
+        return CallableAiSql.resource("glossary-context-v5.sql").replace("{{API}}",ProfileHistorySql.object(owner,API))
             .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT));
     }
     /** Exact v1 fingerprint recognition only; never displayed as the new source. */

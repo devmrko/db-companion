@@ -18,6 +18,10 @@ public class FeatureAccessController {
     private record Snapshot(PoolSession owner,Instant expires,Map<String,?> value) {}
     public FeatureAccessController(DeepDataSecurityService dds,AuditHistoryService audit){this.dds=dds;this.audit=audit;}
     @GetMapping("/app/feature-access") public ResponseEntity<?> access(HttpServletRequest request){
+        try{return existingSession(request);}
+        catch(IllegalStateException expired){return ResponseEntity.status(401).body(Map.of("error","Login required"));}
+    }
+    private ResponseEntity<?> existingSession(HttpServletRequest request){
         var http=request.getSession(false);var session=http==null?null:(PoolSession)http.getAttribute(PoolSession.ATTRIBUTE);
         if(session==null)return ResponseEntity.status(401).body(Map.of("error","Login required"));
         synchronized(session){

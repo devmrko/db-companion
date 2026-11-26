@@ -1,0 +1,278 @@
+{
+  "demoData.title": [
+    "실습 데이터 준비",
+    "Prepare practice data",
+    "准备练习数据",
+    "実習データの準備"
+  ],
+  "demoData.help": [
+    "업무 상황을 입력해 프롬프트를 받고 Codex·SQLcl로 테이블과 합성 데이터를 준비합니다. 이 화면은 DB 변경이나 AI 호출을 하지 않습니다.",
+    "Describe the scenario, copy the prompt, then use Codex and SQLcl to prepare tables and synthetic data. This page makes no database changes or AI calls.",
+    "输入业务场景并复制提示词，再用 Codex 和 SQLcl 准备表和合成数据。本页不会修改数据库或调用 AI。",
+    "業務状況からプロンプトを作り、Codex と SQLcl でテーブルと合成データを準備します。この画面は DB 変更や AI 呼出しを行いません。"
+  ],
+  "demoData.ownerRequired": [
+    "전용 실습 계정으로 로그인하고 같은 스키마를 선택하세요.",
+    "Sign in with a dedicated practice account and select its own schema.",
+    "请使用专用练习账户登录并选择其自己的模式。",
+    "専用の実習アカウントでログインし、同じスキーマを選択してください。"
+  ],
+  "demoData.step1": [
+    "1. 업무 상황과 검증 조건",
+    "1. Scenario and verification criteria",
+    "1. 场景和验证条件",
+    "1. 業務状況と検証条件"
+  ],
+  "demoData.scenario": [
+    "업무 상황·해결할 문제",
+    "Business scenario and problem",
+    "业务场景和问题",
+    "業務状況と解決する問題"
+  ],
+  "demoData.questions": [
+    "대표 질문 (줄마다 하나)",
+    "Representative questions (one per line)",
+    "代表问题（每行一个）",
+    "代表的な質問（1 行に 1 件）"
+  ],
+  "demoData.rules": [
+    "업무 규칙·예외·사용자 A/B의 접근 범위",
+    "Business rules, edge cases and A/B access scopes",
+    "业务规则、边界情况和 A/B 访问范围",
+    "業務規則・境界条件・A/B のアクセス範囲"
+  ],
+  "demoData.date": [
+    "기준일",
+    "Reference date",
+    "基准日期",
+    "基準日"
+  ],
+  "demoData.rows": [
+    "합성 사실 데이터 행 수 (1~10,000)",
+    "Synthetic fact rows (1–10,000)",
+    "合成事实数据行数（1–10,000）",
+    "合成ファクト行数（1～10,000）"
+  ],
+  "demoData.build": [
+    "프롬프트 만들기",
+    "Create prompt",
+    "生成提示词",
+    "プロンプトを作成"
+  ],
+  "demoData.step2": [
+    "2. 프롬프트를 검토하고 Codex에 전달",
+    "2. Review the prompt and pass it to Codex",
+    "2. 审阅提示词并交给 Codex",
+    "2. プロンプトを確認して Codex に渡す"
+  ],
+  "demoData.review": [
+    "DB·로그인 계정과 입력한 조건을 확인하세요. 비밀번호·Wallet 내용을 추가하지 마세요. SQL 생성·실행은 Codex와 SQLcl에서 진행합니다.",
+    "Check the database, login owner and criteria. Do not add passwords or Wallet contents. SQL generation and execution take place in Codex and SQLcl.",
+    "检查数据库、登录账户和条件。不要添加密码或 Wallet 内容。SQL 的生成和执行在 Codex 和 SQLcl 中进行。",
+    "DB・ログイン所有者・条件を確認してください。パスワードや Wallet の内容を追加しないでください。SQL の生成と実行は Codex と SQLcl で行います。"
+  ],
+  "demoData.copy": [
+    "프롬프트 복사",
+    "Copy prompt",
+    "复制提示词",
+    "プロンプトをコピー"
+  ],
+  "demoData.back": [
+    "조건 수정",
+    "Edit criteria",
+    "修改条件",
+    "条件を編集"
+  ],
+  "demoData.step3": [
+    "3. 실행 후 확인하고 설정으로 이동",
+    "3. Verify execution, then configure",
+    "3. 执行验证后进入配置",
+    "3. 実行を検証して設定へ進む"
+  ],
+  "demoData.verify": [
+    "SQLcl의 실제 대상, 생성 객체·건수·기준값을 확인한 뒤 테이블 목록을 새로고침합니다. 그 데이터를 대상으로 메타데이터·업무 용어·프로필·시멘틱 문맥·이력·DDS를 구성합니다.",
+    "Verify the actual SQLcl target, objects, counts and expected values, then refresh the table list. Configure metadata, glossary, profiles, semantic context, history and DDS for those same objects.",
+    "验证 SQLcl 的实际目标、对象、行数和预期值后刷新表列表，再为同一批对象配置元数据、术语、配置文件、语义上下文、历史和 DDS。",
+    "SQLcl の接続先・生成オブジェクト・件数・期待値を確認してテーブル一覧を更新し、同じ対象にメタデータ・用語・プロファイル・文脈・履歴・DDS を設定します。"
+  ],
+  "demoData.copied": [
+    "프롬프트를 복사했습니다. Codex에 전달하세요.",
+    "Prompt copied. Pass it to Codex.",
+    "提示词已复制。请交给 Codex。",
+    "コピーしました。Codex に渡してください。"
+  ],
+  "demoData.manualCopy": [
+    "선택한 프롬프트를 직접 복사하세요.",
+    "Copy the selected prompt manually.",
+    "请手动复制选中的提示词。",
+    "選択したプロンプトを手動でコピーしてください。"
+  ],
+  "demoData.invalid": [
+    "필수 입력과 행 수(1~10,000)를 확인하세요.",
+    "Check the required fields and row count (1–10,000).",
+    "请检查必填项和行数（1–10,000）。",
+    "必須項目と行数（1～10,000）を確認してください。"
+  ],
+  "demoData.prompt": [
+    "Oracle 실습용 테이블과 합성 데이터를 만들겠습니다.\n대상: 새 전용 스키마 {0}, Oracle Autonomous AI Database 26ai.\n업무 상황: {1}\n대표 질문:\n{2}\n업무 규칙과 예외:\n{3}\n기준일: {4}, 합성 사실 데이터: {5}행.\n\n먼저 SQLcl의 실제 연결 DB·SESSION_USER·CURRENT_SCHEMA가 지정 대상과 일치하는지 확인하세요.\nWallet 내용·비밀번호는 출력하거나 파일·프롬프트에 넣지 마세요.\n기존 객체 목록을 확인하고 같은 이름이 있으면 중단하세요. 기존 객체의 수정·삭제는 하지 마세요.\n아래 파일을 작성하고 SQL을 검토한 뒤 지정한 빈 실습 스키마에서 순서대로 실행하세요.\n01-schema.sql: 질문을 재현할 테이블 1~3개, 키·필요 관계, 컬럼 타입. 업무 정답을 담은 COMMENT·Annotation은 아직 설정하지 마세요.\n02-data.sql: 실제 고객 자료를 사용하지 않는 합성 데이터, 정상·중복·제외·기간 경계·사용자 A/B 접근 범위가 다른 행. 재현 가능한 값을 사용하세요.\n03-verify.sql: 객체·행 수·키 무결성·대표 질문의 기준 SQL·기대 결과. 생성 SQL과 별도로 기대값도 계산해 대조하세요.\n04-business-rules.md: 업무 용어·별칭·집계/필터 기준과 A/B별 허용·제외 행·기대 결과. 교육용 가정임을 표시하세요.\nDDL은 별도로 커밋됩니다. 중간 실패 시 현재 상태를 확인하고 전체 파일을 자동 재실행하지 마세요.\n실행 후 실제 객체와 건수·기준값을 조회하고 성공/실패를 보고하세요.\n데이터 준비가 끝나면 DB Companion에서 대상 객체를 새로고침하세요.\n그다음 메타데이터·용어·Select AI 프로필·CUSTOM Semantic Context·이력·DDS를 순서대로 구성합니다.\n",
+    "Prepare Oracle practice tables and synthetic data.\nTarget: new dedicated schema {0}, Oracle Autonomous AI Database 26ai.\nBusiness scenario: {1}\nQuestions:\n{2}\nRules and edge cases:\n{3}\nReference date: {4}; synthetic fact rows: {5}.\n\nFirst verify the actual SQLcl database, SESSION_USER and CURRENT_SCHEMA match this target.\nDo not print or store passwords or Wallet contents. Check existing objects; stop on name collisions. Do not alter or delete existing objects.\nWrite and review these files, then execute them in order in the designated empty practice schema:\n01-schema.sql: 1–3 tables, keys, required relationships and types. Leave business-definition COMMENT and Annotation values unset for the later exercise.\n02-data.sql: reproducible synthetic rows covering normal, duplicate, excluded, date-boundary and different A/B access scopes. Do not use customer records.\n03-verify.sql: objects, counts, key integrity, reference queries and expected results. Independently calculate expected values and compare them with actual results.\n04-business-rules.md: terms, aliases, aggregation/filter rules, allowed/excluded rows and expected A/B results. Label these as training assumptions.\nDDL commits separately. After a partial failure inspect current state; do not rerun the entire script automatically.\nReport actual objects, counts, expected-value comparisons and failures. Refresh the objects in DB Companion.\nOnly then configure metadata, glossary, Select AI profiles, CUSTOM Semantic Context, history and DDS.",
+    "Prepare Oracle practice tables and synthetic data.\nTarget: new dedicated schema {0}, Oracle Autonomous AI Database 26ai.\nBusiness scenario: {1}\nQuestions:\n{2}\nRules and edge cases:\n{3}\nReference date: {4}; synthetic fact rows: {5}.\n\nFirst verify the actual SQLcl database, SESSION_USER and CURRENT_SCHEMA match this target.\nDo not print or store passwords or Wallet contents. Check existing objects; stop on name collisions. Do not alter or delete existing objects.\nWrite and review these files, then execute them in order in the designated empty practice schema:\n01-schema.sql: 1–3 tables, keys, required relationships and types. Leave business-definition COMMENT and Annotation values unset for the later exercise.\n02-data.sql: reproducible synthetic rows covering normal, duplicate, excluded, date-boundary and different A/B access scopes. Do not use customer records.\n03-verify.sql: objects, counts, key integrity, reference queries and expected results. Independently calculate expected values and compare them with actual results.\n04-business-rules.md: terms, aliases, aggregation/filter rules, allowed/excluded rows and expected A/B results. Label these as training assumptions.\nDDL commits separately. After a partial failure inspect current state; do not rerun the entire script automatically.\nReport actual objects, counts, expected-value comparisons and failures. Refresh the objects in DB Companion.\nOnly then configure metadata, glossary, Select AI profiles, CUSTOM Semantic Context, history and DDS.",
+    "Prepare Oracle practice tables and synthetic data.\nTarget: new dedicated schema {0}, Oracle Autonomous AI Database 26ai.\nBusiness scenario: {1}\nQuestions:\n{2}\nRules and edge cases:\n{3}\nReference date: {4}; synthetic fact rows: {5}.\n\nFirst verify the actual SQLcl database, SESSION_USER and CURRENT_SCHEMA match this target.\nDo not print or store passwords or Wallet contents. Check existing objects; stop on name collisions. Do not alter or delete existing objects.\nWrite and review these files, then execute them in order in the designated empty practice schema:\n01-schema.sql: 1–3 tables, keys, required relationships and types. Leave business-definition COMMENT and Annotation values unset for the later exercise.\n02-data.sql: reproducible synthetic rows covering normal, duplicate, excluded, date-boundary and different A/B access scopes. Do not use customer records.\n03-verify.sql: objects, counts, key integrity, reference queries and expected results. Independently calculate expected values and compare them with actual results.\n04-business-rules.md: terms, aliases, aggregation/filter rules, allowed/excluded rows and expected A/B results. Label these as training assumptions.\nDDL commits separately. After a partial failure inspect current state; do not rerun the entire script automatically.\nReport actual objects, counts, expected-value comparisons and failures. Refresh the objects in DB Companion.\nOnly then configure metadata, glossary, Select AI profiles, CUSTOM Semantic Context, history and DDS."
+  ],
+  "demoData.export.wallet": [
+    "등록된 Wallet",
+    "Registered wallet",
+    "已注册 Wallet",
+    "登録済み Wallet"
+  ],
+  "demoData.export.alias": [
+    "TNS 별칭",
+    "TNS alias",
+    "TNS 别名",
+    "TNS 別名"
+  ],
+  "demoData.export.preset": [
+    "업종",
+    "Industry",
+    "行业",
+    "業種"
+  ],
+  "demoData.export.preset.commerce": [
+    "이커머스",
+    "E-commerce",
+    "电子商务",
+    "電子商取引"
+  ],
+  "demoData.export.preset.logistics": [
+    "물류",
+    "Logistics",
+    "物流",
+    "物流"
+  ],
+  "demoData.export.preset.hospital": [
+    "병원",
+    "Hospital",
+    "医院",
+    "病院"
+  ],
+  "demoData.export.preset.school": [
+    "학교",
+    "School",
+    "学校",
+    "学校"
+  ],
+  "demoData.export.preset.public": [
+    "공공",
+    "Public sector",
+    "公共部门",
+    "公共部門"
+  ],
+  "demoData.export.preset.custom": [
+    "자유 설명",
+    "Custom description",
+    "自定义说明",
+    "自由記述"
+  ],
+  "demoData.export.noSecrets": [
+    "비밀번호·고객 정보·실존 인물 정보를 입력하지 마세요.",
+    "Do not enter passwords, customer data or real personal information.",
+    "请勿输入密码、客户数据或真实个人信息。",
+    "パスワード、顧客情報、実在する個人情報は入力しないでください。"
+  ],
+  "demoData.export.start": [
+    "시작일",
+    "Start date",
+    "开始日期",
+    "開始日"
+  ],
+  "demoData.export.end": [
+    "종료일",
+    "End date",
+    "结束日期",
+    "終了日"
+  ],
+  "demoData.export.prefix": [
+    "테이블 접두어",
+    "Table prefix",
+    "表前缀",
+    "テーブル接頭辞"
+  ],
+  "demoData.export.prefixHelp": [
+    "영문자로 시작하고 영문·숫자·밑줄만 사용하며 밑줄로 끝나는 2~16자입니다. 대문자로 변환합니다.",
+    "2–16 letters, digits or underscores; start with a letter and end with an underscore. Converted to uppercase.",
+    "2–16 个字母、数字或下划线；以字母开头、下划线结尾。转换为大写。",
+    "英字で始まり下線で終わる2～16文字の英数字・下線。大文字に変換します。"
+  ],
+  "demoData.export.run": [
+    "두 파일을 DB Companion 저장소 루트에 저장하고 Claude Code 또는 Codex에 읽고 실행하도록 요청하세요. 전용 로그인 계정과 비밀 파일을 먼저 준비하세요. 기존 객체가 있으면 수정·삭제하지 않고 중단합니다. 상세: docs/scenario-data.md",
+    "Save both files in the DB Companion checkout root and ask Claude Code or Codex to read and execute them. Prepare the dedicated login account and private file first. Stop on existing objects; never alter or delete them. Details: docs/scenario-data.en.md",
+    "将两个文件保存到 DB Companion 仓库根目录，请 Claude Code 或 Codex 读取执行。先准备专用登录账户和私密文件。遇到已有对象即停止，不得修改或删除。详情：docs/scenario-data.en.md",
+    "両ファイルを DB Companion のルートに保存し、Claude Code または Codex に実行を依頼します。専用ログインアカウントと秘密ファイルを先に準備します。既存オブジェクトは変更・削除せず停止します。詳細：docs/scenario-data.en.md"
+  ],
+  "demoData.export.copy": [
+    "복사",
+    "Copy",
+    "复制",
+    "コピー"
+  ],
+  "demoData.export.download": [
+    "다운로드",
+    "Download",
+    "下载",
+    "ダウンロード"
+  ],
+  "demoData.export.admin": [
+    "관리자용 계정 준비 안내",
+    "Administrator account preparation",
+    "管理员账户准备",
+    "管理者向けアカウント準備"
+  ],
+  "demoData.export.adminHelp": [
+    "기존 전용 계정에 관리자가 검토 후 적용할 예시입니다. 이 화면은 실행하지 않습니다. DBA·ANY 권한과 PUBLIC 부여는 금지합니다.",
+    "An administrator must review this example for an existing dedicated account. This screen never executes it. Do not grant DBA, ANY privileges or privileges to PUBLIC.",
+    "管理员须审核此现有专用账户示例。本页面不会执行。禁止授予 DBA、ANY 权限或向 PUBLIC 授权。",
+    "既存の専用アカウント向けに管理者が確認する例です。この画面では実行しません。DBA・ANY 権限や PUBLIC への付与は禁止です。"
+  ],
+  "demoData.export.adminReason": [
+    "CREATE SESSION은 접속, CREATE TABLE은 자기 테이블, CREATE VIEW·CREATE SEQUENCE는 필요 시 자기 뷰·시퀀스용입니다. quota는 자기 스키마의 저장 공간을 제한합니다. 이번 프롬프트는 테이블만 생성합니다.",
+    "CREATE SESSION permits login; CREATE TABLE permits own tables. CREATE VIEW and CREATE SEQUENCE permit own views/sequences when needed. Quota limits schema storage. This prompt creates tables only.",
+    "CREATE SESSION 用于连接，CREATE TABLE 用于本账户的表，CREATE VIEW 和 CREATE SEQUENCE 按需用于本账户的视图和序列。quota 限制存储。本提示仅创建表。",
+    "CREATE SESSION は接続、CREATE TABLE は自分の表、CREATE VIEW・CREATE SEQUENCE は必要時の自分のビュー・シーケンス用です。quota は保存容量を制限します。このプロンプトは表のみを作成します。"
+  ],
+  "demoData.export.invalid": [
+    "입력값과 접두어 형식을 확인해 주세요.",
+    "Check the inputs and prefix format.",
+    "请检查输入和前缀格式。",
+    "入力値と接頭辞の形式を確認してください。"
+  ],
+  "demoData.export.working": [
+    "파일 생성 중…",
+    "Generating files…",
+    "正在生成文件…",
+    "ファイル生成中…"
+  ],
+  "demoData.export.changed": [
+    "입력이 바뀌었습니다. 다시 생성해 주세요.",
+    "Inputs changed. Generate again.",
+    "输入已更改，请重新生成。",
+    "入力が変更されました。再生成してください。"
+  ],
+  "demoData.export.ready": [
+    "파일을 확인하고 다운로드하세요. DB 작업은 실행하지 않았습니다.",
+    "Review and download the files. No database work was executed.",
+    "请查看并下载文件。未执行数据库操作。",
+    "ファイルを確認してダウンロードしてください。DB 操作は実行していません。"
+  ],
+  "demoData.export.copied": [
+    "복사했습니다.",
+    "Copied.",
+    "已复制。",
+    "コピーしました。"
+  ],
+  "demoData.export.copyFailed": [
+    "복사하지 못했습니다. 파일을 다운로드하세요.",
+    "Copy failed. Download the file instead.",
+    "复制失败，请下载文件。",
+    "コピーできませんでした。ファイルをダウンロードしてください。"
+  ]
+}

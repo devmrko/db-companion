@@ -1,4 +1,4 @@
-# Scenario data generation
+# Prepare practice data with a local agent
 
 Engineers can hand a chosen industry, date range and approximate size to a local agent
 to prepare fictional tables and data. The app generates a prompt and password-free
@@ -9,15 +9,18 @@ this app feature makes no AI calls or database writes.
 
 ## Generate the files
 
-1. Sign in and open **Scenario data generation**, next to the SCOTT demo.
+1. Sign in with a dedicated practice account, select its own schema and open **Start → Prepare practice data** (`/db/demo-data`). Old `/db/scenario-data` bookmarks redirect here.
 2. Select a wallet registered through `ORACLE_WALLET_PATH` or `ORACLE_WALLET_PATHS`
    and an alias from its `tnsnames.ora`. This reuses the login wallet catalog.
 3. Select e-commerce, logistics, hospital, school, public sector or a custom description.
-   Enter approximate total rows (1–10 million), inclusive dates (1900–2100), an existing
-   dedicated scenario username and a table prefix. The scenario account may differ from
-   the app login account. Prefixes are 2–16 letters/digits/underscores, beginning with a
+   Enter the business scenario, questions, rules/edge cases, synthetic fact rows (1–10,000),
+   inclusive dates (1900–2100) and a table prefix. The target username is fixed to the
+   dedicated app login owner; administrative accounts and a different selected schema
+   are refused. Prefixes are 2–16 letters/digits/underscores, beginning with a
    letter and ending with an underscore; identifiers are converted to uppercase.
-4. Generate, review and copy/download both files. Changing input invalidates the output.
+4. Create the prompt, review and copy/download both files. Use **Edit criteria** to return;
+   changing input invalidates the output. Stop on existing object names, even for the same
+   prefix; never alter/delete them. Use a new prefix or a separate empty practice schema.
    Never put passwords, customer data or real identities in the description.
 
 Save `scenario-prompt.md` and `scenario-config.json` in the checkout root. The configuration
@@ -52,7 +55,7 @@ Ask Claude Code or Codex:
 
 > Read scenario-prompt.md and scenario-config.json and prepare the scenario data.
 > Do not read secrets or wallet contents; use only the prescribed connection wrapper.
-> Ask before installing software or dropping existing prefix tables.
+> Ask before installing software; stop on existing objects without altering/deleting them.
 
 After reviewing the SQL, the agent runs it in this form (replace `DEMO_` with your prefix):
 
@@ -89,13 +92,19 @@ do not reuse an account with excessive existing privileges.
 
 ## Results and limits
 
-The prompt requires PK/FK relationships, table/column comments, business definitions,
+The prompt requires 1–3 tables, PK/FK relationships, business definitions,
 database-generated fictional data, counts, orphan/uniqueness/date checks and around ten
 validation questions with reference SQL and calculated answers. The answer key consists
 of reference values calculated by SQL, not independently verified business truth.
 
-The wrapper is credential transport, not a SQL sandbox. Review SQL and exact-prefix drop
-lists, use a least-privilege account and trust the SQLcl installation and its global startup
+Review `01-schema.sql`, `02-data.sql`, `03-verify.sql` and `04-business-rules.md` in order.
+Draft table/column comments in the business-rules file; leave business-answer COMMENT and
+Annotation values unset until the metadata exercise. Include reproducible normal, duplicate,
+excluded, date-boundary and A/B-scope examples, and independently calculated expected values.
+After partial failure inspect current state; never automatically rerun the entire script.
+
+The wrapper is credential transport, not a SQL sandbox. Review SQL and new object names,
+use a least-privilege account and trust the SQLcl installation and its global startup
 scripts. Execution clears SQLPATH and uses a fresh working directory, but does not guarantee
 isolation from installation-wide SQLcl settings. DDL commits implicitly and cannot be undone
 by rollback. Stop for administrator help when permissions/quota are missing.

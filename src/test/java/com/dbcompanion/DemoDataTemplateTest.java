@@ -1,7 +1,7 @@
 package com.dbcompanion;
 
 import com.dbcompanion.model.DatabaseInfo;
-import com.dbcompanion.service.ScenarioDataService;
+import com.dbcompanion.model.DemoDataPrompt;
 import com.dbcompanion.service.WalletCatalogService;
 import java.util.*;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import static org.assertj.core.api.Assertions.*;
 
-class ScenarioDataTemplateTest {
+class DemoDataTemplateTest {
     @Test void rendersLocalizedFormOutputAndAdminGuidanceWithoutLoginOrDatabase() {
         var resolver = new ClassLoaderTemplateResolver();
         resolver.setPrefix("templates/"); resolver.setSuffix(".html"); resolver.setCharacterEncoding("UTF-8");
@@ -21,16 +21,24 @@ class ScenarioDataTemplateTest {
         });
         for (String language : List.of("ko", "en", "zh-CN", "ja")) {
             var context = new Context(Locale.forLanguageTag(language));
-            context.setVariable("activePage", "scenario-data");
-            context.setVariable("languageReturn", "/db/scenario-data");
+            context.setVariable("activePage", "demo-data");
+            context.setVariable("languageReturn", "/db/demo-data");
             context.setVariable("info", new DatabaseInfo("APP", "APP", "LOW", "DB"));
-            context.setVariable("presets", ScenarioDataService.PRESETS);
+            context.setVariable("presets", DemoDataPrompt.PRESETS);
             context.setVariable("walletOptions", List.of(new WalletCatalogService.Option("id", "<test>")));
             context.setVariable("_csrf", new org.springframework.security.web.csrf.DefaultCsrfToken("X-CSRF-TOKEN", "_csrf", "fixture"));
-            String html = engine.process("scenario-data", context);
-            assertThat(html).contains("&lt;test&gt;", "scenario-config.json", "scenario-prompt.md", "CREATE SESSION", "QUOTA 100M", "data-scenario-generate", "data-copy=\"config\"", "data-download=\"prompt\"")
+            String html = engine.process("demo-data", context);
+            assertThat(html).contains("&lt;test&gt;", "scenario-config.json", "scenario-prompt.md", "CREATE SESSION", "QUOTA 100M", "data-demo-build", "data-copy=\"config\"", "data-download=\"prompt\"")
                     .doesNotContain("??", "th:", "name=\"password\"");
-            assertThat(html).containsPattern("<a[^>]*href=\"/db/scenario-data\"[^>]*aria-current=\"page\"");
+            assertThat(html).containsPattern("<a[^>]*href=\"/db/demo-data\"[^>]*aria-current=\"page\"");
+            assertThat(html).doesNotContain("href=\"/db/scenario-data\"");
         }
+    }
+
+    @Test void oldBookmarksAndLanguageReturnUseTheUnifiedRoute() {
+        assertThat(new com.dbcompanion.controller.DemoDataRedirectController().legacyPage()).isEqualTo("redirect:/db/demo-data");
+        assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/db/scenario-data")).isEqualTo("/db/demo-data");
+        assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/db/demo-data")).isEqualTo("/db/demo-data");
+        assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/db/demo-data/prompt")).isEqualTo("/login");
     }
 }

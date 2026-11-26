@@ -1,21 +1,24 @@
 import {assistantApi, assistantPost} from './ai-assistant.mjs';
 import {t} from './i18n.mjs';
 
-export function scenarioInput(formData) {
+export function demoDataInput(formData) {
   const input = Object.fromEntries(formData);
   input.rows = Number(input.rows);
-  return input;
+  const {scenario, questions, rules, date, rows, ...target} = input;
+  return {...target, criteria: {scenario, questions, rules, date, rows}};
 }
 
-export function mountScenario(root) {
-  const form = root.querySelector('[data-scenario-form]');
+export function mountDemoData(root) {
+  const form = root.querySelector('[data-demo-form]');
   const field = name => form.elements.namedItem(name);
-  const status = root.querySelector('[data-scenario-status]');
-  const button = root.querySelector('[data-scenario-generate]');
-  const section = root.querySelector('[data-scenario-output]');
+  const status = root.querySelector('[data-demo-message]');
+  const button = root.querySelector('[data-demo-build]');
+  const section = root.querySelector('[data-demo-review]');
   let output = null, revision = 0, walletRevision = 0, busy = false;
-  const message = key => t('scenario.' + key, key);
-  const clear = () => { output = null; section.hidden = true; };
+  const message = key => t('demoData.export.' + key, key);
+  const inputSection = root.querySelector('[data-demo-input]');
+  const clear = () => { output = null; section.hidden = true; inputSection.hidden = false; };
+  root.querySelector('[data-demo-back]').addEventListener('click', () => { clear(); status.textContent = ''; field('scenario').focus(); });
   form.addEventListener('input', () => { revision++; clear(); });
   async function aliases() {
     revision++;
@@ -24,25 +27,24 @@ export function mountScenario(root) {
     field('tnsAlias').replaceChildren(); status.textContent = '';
     if (!field('walletId').value) return;
     try {
-      const options = await assistantApi('/db/scenario-data/aliases?walletId=' + encodeURIComponent(field('walletId').value));
+      const options = await assistantApi('/db/demo-data/aliases?walletId=' + encodeURIComponent(field('walletId').value));
       if (current !== walletRevision) return;
       for (const item of options) field('tnsAlias').add(new Option(item.alias + ' · ' + item.description, item.alias));
       field('tnsAlias').disabled = false; button.disabled = busy || !options.length;
     } catch (error) { if (current === walletRevision) status.textContent = error.message; }
   }
   field('walletId').addEventListener('change', aliases);
-  field('preset').addEventListener('change', () => { field('description').required = field('preset').value === 'custom'; });
   form.addEventListener('submit', async event => {
     event.preventDefault();
     if (busy || !form.reportValidity()) return;
     const current = revision;
     clear(); busy = true; button.disabled = true; status.textContent = message('working');
     try {
-      const result = await assistantApi('/db/scenario-data/generate', assistantPost(root.querySelector('[data-scenario-csrf]'), scenarioInput(new FormData(form))));
+      const result = await assistantApi('/db/demo-data/prompt', assistantPost(root.querySelector('[data-demo-csrf]'), demoDataInput(new FormData(form))));
       if (current !== revision) { status.textContent = message('changed'); return; }
       output = result;
-      for (const key of ['prompt', 'config']) root.querySelector('[data-scenario-' + key + ']').textContent = result[key];
-      section.hidden = false; status.textContent = message('ready');
+      for (const key of ['prompt', 'config']) root.querySelector('[data-demo-' + key + ']').textContent = result[key];
+      section.hidden = false; inputSection.hidden = true; status.textContent = message('ready');
     } catch (error) { status.textContent = error.message; }
     finally { busy = false; button.disabled = field('tnsAlias').disabled; }
   });
@@ -62,4 +64,4 @@ export function mountScenario(root) {
   return aliases();
 }
 
-if (typeof document !== 'undefined') document.querySelectorAll('[data-scenario]').forEach(mountScenario);
+if (typeof document !== 'undefined') document.querySelectorAll('[data-demo-data]').forEach(mountDemoData);

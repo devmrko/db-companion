@@ -50,4 +50,26 @@ class AiSetupAssistantTest {
             assertThatThrownBy(()->AiSetupAssistantService.parse("{\"explanation\":\"x\",\"action\":\""+action+"\"}",mapper)).isInstanceOf(IllegalArgumentException.class);
         assertThat(AiSetupAssistantService.parse("{\"explanation\":\"No change\",\"action\":\"\"}",mapper).action()).isEmpty();
     }
+    @Test void assistantReplyMustBeOneUnambiguousJsonObject() {
+        var mapper=new JsonMapper();
+        for(String response:List.of(
+                "{\"explanation\":\"Review\",\"action\":\"enable-comments\"} {\"action\":\"enable-constraints\"}",
+                "{\"explanation\":\"Review\",\"action\":\"enable-comments\",\"action\":\"enable-constraints\"}",
+                "{\"explanation\":\"First\",\"explanation\":\"Second\",\"action\":\"enable-comments\"}"))
+            assertThatThrownBy(()->AiSetupAssistantService.parse(response,mapper)).isInstanceOf(IllegalArgumentException.class);
+    }
+    @Test void disabledOptionsAreAvailableChangesAndNotUnsupportedFeatures() {
+        var checks=List.of(new AiSetupService.Check("profile",AiSetupService.State.CONFIGURED,"/ai-profiles"));
+        var histories=List.of(new AiSetupHistoryService.Check("profileStore",AiSetupService.State.CONFIGURED,"/ai-profiles",""));
+        var values=java.util.Map.of("constraints","false","comments","true");
+        var candidates=AiSetupCatalog.candidates("nl2sql",values,checks,histories);
+        assertThat(candidates).filteredOn(c->c.attribute().equals("constraints")).singleElement().satisfies(c->{
+            assertThat(c.currentStoredValue()).isEqualTo("false");assertThat(c.changeAvailable()).isTrue();assertThat(c.prerequisitesReady()).isTrue();
+        });
+        assertThat(candidates).filteredOn(c->c.attribute().equals("comments")).singleElement().satisfies(c->assertThat(c.changeAvailable()).isFalse());
+        assertThat(candidates).filteredOn(c->c.attribute().equals("conversation")).singleElement().satisfies(c->{
+            assertThat(c.currentStoredValue()).isEqualTo("UNSET");assertThat(c.changeAvailable()).isTrue();
+        });
+        assertThat(AiSetupCatalog.candidates("nl2sql",values,checks,List.of())).noneMatch(AiSetupCatalog.Candidate::changeAvailable);
+    }
 }

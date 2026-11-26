@@ -32,7 +32,7 @@ class CallableAiTemplateTest {
             c.setVariable("languageReturn","/db/functions/ai-query");c.setVariable("callableAdmin",false);
             c.setVariable("_csrf",new org.springframework.security.web.csrf.DefaultCsrfToken("X-CSRF-TOKEN","_csrf","test-token"));
             var html=engine.process("callable-ai",c);assertThat(html).contains("data-callable","data-ca-glossary","data-ca-ontology","data-ca-consent","callable-ai.css","value=\"CONTEXT\"")
-                .doesNotContain("??callable.","data-ca-access-user","th:");
+                .doesNotContain("??callable.","??semantic.","data-ca-access-user","th:");
             c.setVariable("callableAdmin",true);assertThat(engine.process("callable-ai",c)).contains("data-ca-access-user","data-ca-access-grant").doesNotContain("??callable.");
         }
         assertThat(LanguageController.safeReturn("/db/functions/ai-query")).isEqualTo("/db/functions/ai-query");

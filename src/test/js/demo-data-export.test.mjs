@@ -4,19 +4,19 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
-import {mountScenario, scenarioInput} from '../../main/resources/static/js/scenario-data.mjs';
+import {mountDemoData, demoDataInput} from '../../main/resources/static/js/demo-data.mjs';
 
 test('scenario inputs preserve dates and coerce only row count', () => {
-  assert.deepEqual(scenarioInput([['rows','1200'],['startDate','2025-01-01'],['prefix','DEMO_']]), {rows:1200,startDate:'2025-01-01',prefix:'DEMO_'});
+  assert.deepEqual(demoDataInput([['rows','1200'],['date','2025-01-01'],['prefix','DEMO_'],['scenario','Fictional'],['questions','Q'],['rules','R']]), {criteria:{rows:1200,date:'2025-01-01',scenario:'Fictional',questions:'Q',rules:'R'},prefix:'DEMO_'});
 });
 
 test('all scenario translations and template keys exist in every bundle', () => {
-  const catalog = JSON.parse(fs.readFileSync('tools/i18n/feature-zz-scenario-data.json','utf8'));
-  const html = fs.readFileSync('src/main/resources/templates/scenario-data.html','utf8');
-  for (const match of html.matchAll(/#\{((?:scenario\.|menu\.item\.scenario)[^}]+)\}/g)) assert.ok(catalog[match[1]],match[1]);
+  const catalog = JSON.parse(fs.readFileSync('tools/i18n/feature-demo-data.json','utf8'));
+  const html = fs.readFileSync('src/main/resources/templates/demo-data.html','utf8');
+  for (const match of html.matchAll(/#\{(demoData\.[^}]+)\}/g)) assert.ok(catalog[match[1]],match[1]);
   for (const [suffix,index] of [['',0],['_ko',0],['_en',1],['_zh_CN',2],['_ja',3]]) {
     const bundle = fs.readFileSync('src/main/resources/i18n/messages'+suffix+'.properties','utf8');
-    for (const [key,values] of Object.entries(catalog)) assert.ok(bundle.includes(key+'='+values[index]+'\n'),key+suffix);
+    for (const [key,values] of Object.entries(catalog).filter(([key])=>key.startsWith('demoData.export.'))) assert.ok(bundle.includes(key+'='+values[index]+'\n'),key+suffix);
   }
 });
 
@@ -100,14 +100,15 @@ test('screen generates, copies, downloads and invalidates late output after edit
     addEventListener(name,fn) { this.events[name]=fn; }
     fire(name,event={preventDefault(){}}) { return this.events[name]?.(event); }
     replaceChildren() { this.children=[]; this.value=''; }
+    focus() {}
     add(option) { this.children.push(option); this.value ||= option.value; }
   }
-  const fields=Object.fromEntries(Object.entries({walletId:'wallet',tnsAlias:'',preset:'commerce',description:'',rows:'20',startDate:'2025-01-01',endDate:'2025-12-31',username:'SCENARIO_USER',prefix:'DEMO_'}).map(([key,value])=>[key,new Element(value)]));
+  const fields=Object.fromEntries(Object.entries({walletId:'wallet',tnsAlias:'',preset:'commerce',scenario:'Fictional',questions:'Q',rules:'R',rows:'20',date:'2025-01-01',endDate:'2025-12-31',prefix:'DEMO_'}).map(([key,value])=>[key,new Element(value)]));
   const form=new Element(); form.elements={namedItem:key=>fields[key]}; form.reportValidity=()=>true;
-  const nodes=Object.fromEntries(['status','generate','output','prompt','config','csrf'].map(key=>[key,new Element()]));
-  nodes.csrf.dataset.csrfHeader='X-CSRF-TOKEN'; nodes.csrf.value='fixture'; nodes.output.hidden=true;
+  const nodes=Object.fromEntries(['message','build','review','prompt','config','csrf','input','back'].map(key=>[key,new Element()]));
+  nodes.csrf.dataset.csrfHeader='X-CSRF-TOKEN'; nodes.csrf.value='fixture'; nodes.review.hidden=true;
   const copy=new Element(),download=new Element(); copy.dataset.copy='config'; download.dataset.download='prompt';
-  const root={querySelector:selector=>selector==='[data-scenario-form]'?form:nodes[selector.slice(15,-1)],querySelectorAll:selector=>selector==='[data-copy]'?[copy]:[download]};
+  const root={querySelector:selector=>selector==='[data-demo-form]'?form:nodes[selector.slice(11,-1)],querySelectorAll:selector=>selector==='[data-copy]'?[copy]:[download]};
   const saved=new Map(['fetch','document','FormData','Option','navigator'].map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)]));
   t.after(()=>{for(const [key,descriptor] of saved) descriptor?Object.defineProperty(globalThis,key,descriptor):delete globalThis[key];});
   let copied='',downloaded='',finish;
@@ -121,18 +122,18 @@ test('screen generates, copies, downloads and invalidates late output after edit
     const data=url.includes('/aliases')?[{alias:'fixture_low',description:'fixture'}]:await new Promise(resolve=>{finish=resolve;});
     return {ok:true,status:200,headers:{get:()=> 'application/json'},json:async()=>data};
   };
-  await mountScenario(root);
-  assert.equal(nodes.generate.disabled,false); assert.equal(fields.tnsAlias.value,'fixture_low');
+  await mountDemoData(root);
+  assert.equal(nodes.build.disabled,false); assert.equal(fields.tnsAlias.value,'fixture_low');
   const pending=form.fire('submit');
   assert.equal(calls.at(-1).options.headers['X-CSRF-TOKEN'],'fixture');
-  assert.equal(JSON.parse(calls.at(-1).options.body).rows,20);
+  assert.equal(JSON.parse(calls.at(-1).options.body).criteria.rows,20);
   finish({prompt:'Prompt text',config:'{"version":1}'}); await pending;
-  assert.equal(nodes.output.hidden,false); assert.equal(nodes.prompt.textContent,'Prompt text');
+  assert.equal(nodes.review.hidden,false); assert.equal(nodes.prompt.textContent,'Prompt text');
   await copy.fire('click'); assert.equal(copied,'{"version":1}');
   await download.fire('click'); assert.equal(downloaded,'scenario-prompt.md');
-  const late=form.fire('submit'); fields.description.value='changed'; form.fire('input');
+  const late=form.fire('submit'); fields.scenario.value='changed'; form.fire('input');
   finish({prompt:'stale',config:'stale'}); await late;
-  assert.equal(nodes.output.hidden,true); assert.notEqual(nodes.prompt.textContent,'stale');
+  assert.equal(nodes.review.hidden,true); assert.equal(nodes.input.hidden,false); assert.notEqual(nodes.prompt.textContent,'stale');
   fields.walletId.value='other'; await fields.walletId.fire('change');
   assert.match(calls.at(-1).url,/walletId=other/);
 });

@@ -4,6 +4,7 @@
 <body class="app-shell"><aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header><main class="app-content">
   <div class="app-page-heading"><th:block th:replace="~{fragments/common :: pageTitle('assistant')}"></th:block><button th:replace="~{fragments/common :: sqlHelp('assistant', 'profiles')}"></button></div>
+  <p><a class="app-btn" th:href="@{/ai-setup/assistant}" th:text="#{setup.natural.title}"></a></p>
   <section class="app-card app-assistant-settings" data-assistant-settings th:attr="data-base=@{/ai-assistant}">
     <div class="app-card-heading"><h2 th:text="${info.username}"></h2><button type="button" class="btn app-btn app-btn-quiet app-icon-button" data-as-refresh th:title="#{ui.8259f9d35351}" th:aria-label="#{ui.8259f9d35351}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg></button></div>
     <form data-as-form>

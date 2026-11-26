@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/db/audit")
 public class AuditHistoryController {
+    private static final org.slf4j.Logger LOG=org.slf4j.LoggerFactory.getLogger(AuditHistoryController.class);
     private static final String PREVIEW=AuditHistoryController.class.getName()+".preview",SELECTION=AuditHistoryController.class.getName()+".selection";
     private final AuditHistoryService service;
     public AuditHistoryController(AuditHistoryService service){this.service=service;}
@@ -68,7 +69,7 @@ public class AuditHistoryController {
         synchronized(s){try{return ResponseEntity.ok().header("Cache-Control","no-store").body(action.get());}
             catch(IllegalArgumentException|DateTimeException ex){return error(400,"audit.invalid");}
             catch(AuditHistoryRepository.PartialChange ex){return ResponseEntity.status(503).header("Cache-Control","no-store").body(Map.of("error",UiMessages.text("audit.partial","Partial change")+" · "+ex.completed+" · "+OracleErrorDetails.forDisplay(ex)));}
-            catch(RuntimeException ex){return ResponseEntity.status(503).header("Cache-Control","no-store").body(Map.of("error",UiMessages.text("audit.error","Audit request failed")+" · "+OracleErrorDetails.forDisplay(ex)));}
+            catch(RuntimeException ex){LOG.error("Audit request failed",ex);return ResponseEntity.status(503).header("Cache-Control","no-store").body(Map.of("error",UiMessages.text("audit.error","Audit request failed")+" · "+OracleErrorDetails.forDisplay(ex)));}
         }
     }
     private ResponseEntity<?> error(int code,String key){return ResponseEntity.status(code).header("Cache-Control","no-store").body(Map.of("error",UiMessages.text(key,key)));}

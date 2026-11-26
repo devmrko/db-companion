@@ -3,6 +3,7 @@ import {nativeRdfHelp} from './sql-help-native-rdf.mjs';
 import {metadataGraphHelp} from './sql-help-metadata-graph.mjs';
 import {taskDefinition,delegatedHistory,resultReview,discoveryHistory,ordsChanges} from './sql-help-workflows.mjs';
 import {referenceFor} from './sql-help-references.mjs';
+import {semanticSourceHelp,glossarySearchHelp,semanticHistoryHelp,callableAiHelp,ddsIdentityHelp} from './sql-help-semantics.mjs';
 // Each recipe is a DB operation, not a claim that SQL reproduces Java validation or UI state.
 const aiDoc='https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/dbms-cloud-ai-package.html';
 const pair=(ko,en)=>({ko,en});
@@ -283,14 +284,20 @@ WHERE ATTRIBUTE_NAME = 'credential_name'
 END;
 /`,'repository/CredentialCatalogRepository',{risk:'write',source:'src/main/resources/templates/fragments/select-ai-setup.html',doc:'https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/dbms-cloud-subprograms.html',
       note:pair('화면의 시작 안내에 대응하는 수동 설정입니다(목록 화면은 생성 API를 실행하지 않습니다). 공개키를 OCI 사용자에 먼저 등록하고 대응하는 개인키를 안전한 CLOB 바인드로 전달하세요. 키를 화면·로그·소스에 저장하지 마세요.','Manual setup from the setup guide, not a catalog-screen API call. Register the public key with the OCI user first, supply its private key through a secure CLOB bind, and never store it in UI/logs/source.')}),
-    recipe('resource-principal','Resource Principal 활성화 안내','Enable Resource Principal',`-- Run as ADMIN, after configuring the OCI dynamic group and IAM policy.
+    recipe('resource-principal','Resource Principal 활성화 안내','Enable Resource Principal',`-- OCI IAM prerequisite (NOT SQL; configure with the OCI administrator):
+-- The dynamic-group matching rule must include THIS ADB's OCID.
+-- Example model-scoped policy in the model's compartment:
+-- Allow dynamic-group <DYNAMIC_GROUP> to use generative-ai-chat
+-- in compartment <COMPARTMENT_NAME> where target.model.id = '<OCI_MODEL_ID>'
+-- Check model availability in the profile's region before an inference test.
+-- Run as ADMIN after the OCI IAM prerequisite:
 BEGIN
   DBMS_CLOUD_ADMIN.ENABLE_RESOURCE_PRINCIPAL(username => '<DB_USER>');
 END;
 /
 SELECT OWNER, CREDENTIAL_NAME FROM DBA_CREDENTIALS
 WHERE OWNER = '<DB_USER>' AND CREDENTIAL_NAME = 'OCI$RESOURCE_PRINCIPAL';`,'repository/CredentialCatalogRepository',{risk:'write',source:'src/main/resources/templates/fragments/select-ai-setup.html',doc:'https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/resource-principal.html',
-      note:pair('DB 설정 외에 OCI Dynamic Group 및 IAM 정책이 필요합니다. 이 화면의 수동 시작 안내이며 앱이 자동 활성화하지 않습니다.','Also requires OCI dynamic group and IAM policy. Manual setup guide only; the app does not enable it automatically.')})
+      note:pair('DB 설정 외에 해당 ADB가 포함된 OCI Dynamic Group과 모델·구획에 맞는 IAM 추론 권한이 필요합니다. 새 ADB는 이전 ADB에만 허용한 정책을 자동 상속하지 않습니다. 모델이 활성 상태여도 ORA-20404는 권한·대상 불일치 확인이 필요합니다. 프로필 생성 성공 뒤 대표 질문의 실제 호출로 검증하세요. 이 화면은 수동 시작 안내이며 앱이 IAM을 변경하거나 자동 활성화하지 않습니다.','Requires an OCI dynamic group including this ADB and inference permission for the model and compartment. A new ADB does not inherit a policy scoped to an older ADB. Even an active model can return ORA-20404 when authorization or the target differs. Verify a real request after profile creation. This manual guide does not change IAM or enable access automatically.')})
   ],
   'ai-test':[generate('showsql','SQL 만들기','Generate SQL','showsql'),generate('showprompt','전체 프롬프트 보기','View reconstructed prompt','showprompt'),generate('chat','AI 검토·설명','AI review or explanation','chat'),resultReview],
   feedback:[
@@ -670,6 +677,11 @@ WHERE RECORD_ID = '<RECORD_UUID>' AND STATE = 'REQUESTED';`,'repository/AppRecor
   ]
 };
 sqlHelpCatalog.ords.push(...ordsChanges);
+sqlHelpCatalog['semantic-context']=semanticSourceHelp;
+sqlHelpCatalog['business-glossary']=glossarySearchHelp;
+sqlHelpCatalog['semantic-history']=semanticHistoryHelp;
+sqlHelpCatalog['callable-ai']=callableAiHelp;
+sqlHelpCatalog.security.push(ddsIdentityHelp);
 sqlHelpCatalog.agents.push(taskDefinition);
 sqlHelpCatalog.ontology.push(discoveryHistory);
 for(const [feature,operations] of Object.entries(sqlHelpCatalog))for(const operation of operations){
