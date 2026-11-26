@@ -12,7 +12,7 @@ export function assistantError(data,status,url=''){
   const remedy=adminRemedy(data,status,url,account);
   const error=new Error((data.error||`HTTP ${status}`)+(remedy?'\n'+remedy:''));
   error.status=status;
-  if(status===422&&data.diagnostic)error.diagnostic=data.diagnostic;
+  if((status===422||data.diagnostic?.modelCalls!==undefined)&&data.diagnostic)error.diagnostic=data.diagnostic;
   return error;
 }
 export async function assistantApi(url,options={}){

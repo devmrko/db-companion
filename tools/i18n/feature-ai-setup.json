@@ -1,4 +1,9 @@
 {
+  "setup.ai.toolsStopped": ["서비스 Tool 응답을 확인하지 못해 중단했습니다. 변경하지 않았으며 자동 재시도하지 않았습니다.", "Stopped because the service Tool response could not be verified. No changes or automatic retries.", "无法确认服务 Tool 响应，已停止。未更改，也未自动重试。", "サービス Tool の応答を確認できず中断しました。変更・自動再試行は行っていません。"],
+  "setup.ai.tools": ["서비스 Tool 사용 (선택)", "Use service tools (optional)", "使用服务 Tool（可选）", "サービス Tool を使用（任意）"],
+  "setup.ai.toolsHelp": ["필요한 조회 서비스를 선택해 호출. 최대 AI 4회 호출. 변경은 별도 확인 후 적용.", "Select and call read-only services. Up to 4 AI calls. Changes require separate review and confirmation.", "选择并调用只读服务。最多4次 AI 调用。更改需另行预览和确认。", "必要な参照サービスを選択して呼び出し。AI 呼び出しは最大4回。変更は別途確認後に適用。"],
+  "setup.ai.toolsConsent": ["표시된 정보와 후속 서비스 조회 결과의 외부 전송 및 최대 AI 호출 4회 비용 발생에 동의합니다.", "I agree to send the displayed information and subsequent service results and incur up to 4 AI calls.", "同意向外部发送所示信息和后续服务结果，并承担最多4次 AI 调用的费用。", "表示情報と後続サービス結果の外部送信、および最大4回の AI 呼び出し費用に同意します。"],
+  "setup.ai.toolResults": ["서비스 호출 결과", "Service call results", "服务调用结果", "サービス呼び出し結果"],
   "setup.title": ["준비 상태", "Setup readiness", "设置准备检查", "設定の準備確認"],
   "setup.intro": ["목적 선택 → AI 프로필 선택 → 준비 상태 확인", "Choose a task, then inspect the profile you will use.", "选择任务，然后检查要使用的配置文件。", "目的を選び、使用するプロファイルの設定を確認します。"],
   "setup.purpose": ["하려는 일", "Task", "任务", "目的"],

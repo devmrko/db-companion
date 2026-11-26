@@ -1,5 +1,14 @@
 # Release validation
 
+## Optional setup service tools (2026-11-26)
+
+- Added an opt-in service-tool mode to the existing setup assistant. Default and omitted input remain the single-call path. JDBC/Select AI supplies text; a bounded Java loop executes three registered read-only services and reuses the existing profile editor for separately reviewed changes. No additional framework or schema objects.
+- Java: 1,566 tests passed, packaging and PMD passed. JavaScript: 737 passed, one intentional skip. Publication scan: 1,239 files, no findings. Coverage includes strict response parsing, unregistered/repeated calls, input scope, partial-read diagnostics, consent, replay and concurrent profile changes.
+- An isolated synthetic DB account and separate control profile completed an actual model-selected `profile.inspectOptions` read and Korean final response. The original single-call request without the option also passed. Explicit transmission consent and replay rejection were verified; stored option values were unchanged and no apply request was made.
+- Chrome verified default off, consent invalidation on option changes, actual read-result display, no change calls and no horizontal page overflow at 390px. This is an authenticated local rehearsal, not VM deployment or proof for every model. The other registered read-service branches and editor delegation were covered by automated service tests.
+- Early actual-model trials stopped on malformed/missing response envelopes. The final parser accepts the existing strict two-field advice envelope only after a completed registered read; unknown actions, duplicate keys, extra JSON and approval fields remain rejected. Failure does not trigger an automatic retry.
+- Current support and instructions: [optional service tools](service-tools.md). The broader all-settings workflow remains a [design proposal](natural-language-control-design.md).
+
 ## First-use path and dashboard readiness (2026-11-23)
 
 - Java: 1,532 tests passed; packaging and PMD passed with `mvn -Pquality verify`.

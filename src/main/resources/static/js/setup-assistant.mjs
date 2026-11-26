@@ -7,20 +7,24 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-setup-assistan
   let preview=null,change=null,busy=false;
   const message=text=>{get('status').textContent=text;};
   const post=(path,value)=>assistantApi('/ai-setup/assistant/'+path,assistantPost(get('csrf'),value));
-  function controls(){get('preview').disabled=busy;get('question').disabled=busy;get('analyze').disabled=busy||!preview||!get('consent').checked;get('change').disabled=busy;get('apply').disabled=!canApplyChange(change,get('apply-consent').checked,busy);}
-  async function perform(work){if(busy)return;busy=true;controls();message('');try{await work();}catch(error){message(error.message);}finally{busy=false;controls();}}
-  function reset(){preview=null;change=null;get('consent').checked=false;get('apply-consent').checked=false;get('result').hidden=true;get('preview-panel').hidden=true;get('change-panel').hidden=true;}
+  function controls(){get('preview').disabled=busy;get('question').disabled=busy;get('tools').disabled=busy;get('analyze').disabled=busy||!preview||!get('consent').checked;get('change').disabled=busy;get('apply').disabled=!canApplyChange(change,get('apply-consent').checked,busy);}
+  function showTools(executions){get('tools-panel').hidden=!executions?.length;get('tool-results').textContent=(executions||[]).map(item=>`${item.sequence}. ${item.name}\n${item.result}`).join('\n\n');}
+  async function perform(work){if(busy)return;busy=true;controls();message('');try{await work();}catch(error){message(error.message);if(error.diagnostic?.executions?.length){get('explanation').textContent='';get('change').hidden=true;get('result').hidden=false;showTools(error.diagnostic.executions);}}finally{busy=false;controls();}}
+  function reset(){preview=null;change=null;get('consent').checked=false;get('apply-consent').checked=false;get('result').hidden=true;get('preview-panel').hidden=true;get('change-panel').hidden=true;get('tools-panel').hidden=true;get('tool-results').textContent='';}
   get('question').addEventListener('input',()=>{reset();message('');controls();});
+  get('tools').addEventListener('change',()=>{reset();message('');controls();});
   get('consent').addEventListener('change',controls);get('apply-consent').addEventListener('change',controls);
   get('preview').addEventListener('click',()=>perform(async()=>{
     reset();
-    preview=await post('preview',{purpose:root.dataset.purpose,profile:root.dataset.profile,question:get('question').value});
+    preview=await post('preview',{purpose:root.dataset.purpose,profile:root.dataset.profile,question:get('question').value,serviceTools:get('tools').checked});
     get('source').textContent=preview.source;get('model').textContent=`${preview.profile.selection.name} · ${preview.profile.provider} / ${preview.profile.model||'—'}`;
     get('consent').checked=false;get('preview-panel').hidden=false;
+    get('consent-text').textContent=get('tools').checked?t('setup.ai.toolsConsent','표시된 정보와 후속 서비스 조회 결과의 외부 전송 및 최대 AI 호출 4회 비용 발생에 동의합니다.'):t('setup.ai.consent','표시된 정보의 외부 전송과 AI 호출 1회 비용 발생에 동의합니다.');
   }));
   get('analyze').addEventListener('click',()=>perform(async()=>{
     const token=preview.token;preview=null;const result=await post('analyze',{token,consent:get('consent').checked});
     get('explanation').textContent=result.explanation;get('result').hidden=false;get('change').hidden=!(result.action||result.enableConversation);get('preview-panel').hidden=true;
+    showTools(result.executions);
   }));
   get('change').addEventListener('click',()=>perform(async()=>{
     change=await post('change-preview',{});get('change-value').textContent=`${change.profile} · ${change.attribute||'conversation'}: ${change.before||'—'} → ${change.after}`;

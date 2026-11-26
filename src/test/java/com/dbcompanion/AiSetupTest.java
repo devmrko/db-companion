@@ -93,6 +93,8 @@ class AiSetupTest {
                     "/ai-profiles/detail?profile=P%26%3Ctest%3E", "P&amp;&lt;test&gt;")
                     .contains("data-saved-evidence", "&lt;script&gt;unsafe&lt;/script&gt;", "data-history-review", "safe-id", "retest",
                             "app-menu-group", "app-requirement", "SQL execution / Business validation")
+                    .contains("data-setup-tools", "data-setup-tool-results", "data-setup-consent-text")
+                    .doesNotContain("checked=\"checked\"")
                     .doesNotContain("??", "th:", "<test>", "<script>unsafe</script>");
         }
     }

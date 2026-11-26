@@ -2,6 +2,7 @@ package com.dbcompanion.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import tools.jackson.databind.json.JsonMapper;
 
 /** Version-controlled prerequisite/action catalogue shared by screen diagnosis and assistant context. */
@@ -10,6 +11,7 @@ public final class AiSetupCatalog {
     public record Goal(String id,List<String> requires,List<String> actions) {}
     public record Requirement(String id,String scope,String actor,String link,String condition,String probe,String level,String technicalTerm) {}
     public record Action(String id,String actor,String attribute,String value,List<String> requires,String preview,String apply,String verification,boolean confirmationRequired) {}
+    public record Candidate(String id,String attribute,String currentStoredValue,String requestedValue,boolean prerequisitesReady,boolean changeAvailable) {}
     public record Spec(int version,List<Goal> goals,List<Requirement> requirements,List<Action> actions,List<String> evidenceRules) {}
     private static final Spec SPEC=load();
     private static Spec load() {
@@ -30,6 +32,15 @@ public final class AiSetupCatalog {
                 ? checks.stream().anyMatch(c->c.key().equals(parts[1])&&c.state()==AiSetupService.State.CONFIGURED)
                 : parts[0].equals("history")&&histories.stream().anyMatch(c->c.key().equals(parts[1])&&c.state()==AiSetupService.State.CONFIGURED));
         });
+    }
+    /** Stored false means disabled, not unsupported; execution support comes from the catalogue. */
+    public static List<Candidate> candidates(String purpose,Map<String,String> current,List<AiSetupService.Check> checks,List<AiSetupHistoryService.Check> histories) {
+        return goal(purpose).actions().stream().map(id->{
+            var definition=action(id);String value=current.getOrDefault(definition.attribute(),"UNSET");
+            boolean ready=eligible(id,checks,histories);
+            return new Candidate(id,definition.attribute(),value,definition.value(),ready,
+                    ready&&(value.equals("UNSET")||value.equalsIgnoreCase("false")));
+        }).toList();
     }
     public static List<AiSetupService.Check> configuration(String purpose,List<AiSetupService.Check> observed) {
         return goal(purpose).requires().stream().map(id->{

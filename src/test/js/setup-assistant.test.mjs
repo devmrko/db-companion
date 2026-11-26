@@ -15,12 +15,13 @@ test('editing or failing to refresh a preview hides stale data and clears consen
   };
   const root={dataset:{purpose:'query',profile:'TEST_PROFILE'},querySelector:selector=>get(selector.slice(12,-1))};
   const originalDocument=globalThis.document,originalFetch=globalThis.fetch;
-  const requests=[];let fail=false;
+  const requests=[];let fail=false,protocolFail=false;
   globalThis.document={querySelectorAll:selector=>selector==='[data-setup-assistant]'?[root]:[]};
   globalThis.fetch=async(url,options)=>{
     requests.push({url,body:JSON.parse(options.body)});
     if(fail)throw new Error('Preview unavailable');
-    const response=url.endsWith('/analyze')?{explanation:'Use comments',action:'enable-comments',enableConversation:false}
+    if(protocolFail&&url.endsWith('/analyze'))return {ok:false,status:400,headers:new Headers({'content-type':'application/json'}),json:async()=>({error:'Stopped without changes',diagnostic:{code:'INVALID_FINAL',modelCalls:2,executions:[{sequence:1,name:'profile.inspectOptions',result:'<script>untrusted</script>'}]}})};
+    const response=url.endsWith('/analyze')?{explanation:'Use comments',action:'enable-comments',enableConversation:false,executions:[{sequence:1,name:'profile.inspectOptions',result:'comments=false'}]}
       :url.endsWith('/change-preview')?{token:'change-token',profile:'TEST_PROFILE',attribute:'comments',before:'false',after:'true'}
       :url.endsWith('/apply')?{verified:true,message:'Readback verified'}:null;
     if(response)return {ok:true,status:200,headers:new Headers({'content-type':'application/json'}),json:async()=>response};
@@ -52,9 +53,19 @@ test('editing or failing to refresh a preview hides stale data and clears consen
     assert.equal(get('status').textContent,'');
     assert.ok(requests.every(request=>request.url==='/ai-setup/assistant/preview'));
     assert.equal(requests[0].body.question,'Explain readiness');
+    assert.equal(requests[0].body.serviceTools,false,'service tools must be opt-in');
+    get('tools').checked=true;get('tools').events.change();
+    assert.equal(get('preview-panel').hidden,true);
+    assert.equal(get('consent').checked,false);
+    assert.equal(get('apply-consent').checked,false);
+    assert.equal(get('analyze').disabled,true);
     await get('preview').events.click();
+    assert.equal(requests.at(-1).body.serviceTools,true);
+    assert.match(get('consent-text').textContent,/4/);
     get('consent').checked=true;get('consent').events.change();
     await get('analyze').events.click();
+    assert.equal(get('tools-panel').hidden,false);
+    assert.match(get('tool-results').textContent,/profile.inspectOptions/);
     assert.equal(get('change').hidden,false,'a non-conversation action must remain reviewable');
     await get('change').events.click();
     assert.equal(get('change-value').textContent,'TEST_PROFILE · comments: false → true');
@@ -65,6 +76,13 @@ test('editing or failing to refresh a preview hides stale data and clears consen
     assert.deepEqual(requests.at(-1).body,{token:'change-token',consent:true});
     assert.equal(get('change-panel').hidden,true);
     assert.equal(get('apply').disabled,true);
+    protocolFail=true;
+    await get('preview').events.click();get('consent').checked=true;
+    await get('analyze').events.click();
+    assert.equal(get('status').textContent,'Stopped without changes');
+    assert.equal(get('change').hidden,true);
+    assert.match(get('tool-results').textContent,/<script>untrusted<\/script>/,'untrusted tool metadata must remain plaintext');
+    assert.equal(get('explanation').textContent,'');
   }finally{
     if(originalDocument===undefined)delete globalThis.document;else globalThis.document=originalDocument;
     globalThis.fetch=originalFetch;

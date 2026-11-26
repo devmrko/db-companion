@@ -117,14 +117,18 @@
     <a class="app-btn" th:href="@{/ai-assistant}" th:text="#{setup.ai.settings}"></a>
     <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-setup-csrf>
     <label class="app-field"><span th:text="#{setup.ai.question}"></span><textarea class="form-control" rows="3" maxlength="2000" data-setup-question></textarea></label>
+    <label><input type="checkbox" data-setup-tools><span th:text="#{setup.ai.tools}"></span></label>
+    <p class="app-filter-message" th:text="#{setup.ai.toolsHelp}"></p>
     <button class="app-btn" type="button" data-setup-preview th:text="#{setup.ai.preview}"></button>
     <section hidden data-setup-preview-panel>
       <p data-setup-model></p>
       <details class="app-config-disclosure"><summary th:text="#{setup.ai.payload}"></summary><pre class="app-preview-value" data-setup-source></pre></details>
-      <label><input type="checkbox" data-setup-consent><span th:text="#{setup.ai.consent}"></span></label>
+      <label><input type="checkbox" data-setup-consent><span data-setup-consent-text th:text="#{setup.ai.consent}"></span></label>
       <button type="button" class="app-btn app-btn-primary" data-setup-analyze disabled th:text="#{setup.ai.analyze}"></button>
     </section>
-    <section hidden data-setup-result><p class="app-preview-value" data-setup-explanation></p><button type="button" class="app-btn" hidden data-setup-change th:text="#{setup.ai.change}"></button></section>
+    <section hidden data-setup-result><p class="app-preview-value" data-setup-explanation></p>
+      <details hidden data-setup-tools-panel><summary th:text="#{setup.ai.toolResults}"></summary><pre class="app-preview-value" data-setup-tool-results></pre></details>
+      <button type="button" class="app-btn" hidden data-setup-change th:text="#{setup.ai.change}"></button></section>
     <section hidden data-setup-change-panel>
       <p data-setup-change-value></p><label><input type="checkbox" data-setup-apply-consent><span th:text="#{setup.ai.applyConsent}"></span></label>
       <button type="button" class="app-btn app-btn-primary" data-setup-apply disabled th:text="#{setup.ai.apply}"></button>
