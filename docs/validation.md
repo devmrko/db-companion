@@ -1,5 +1,14 @@
 # Release validation
 
+## Conversational setup workspace (2026-11-26)
+
+- Replaced the dedicated form route with a persistent conversation and task workspace. Missing target selection continues the original request without page navigation. Registered profile edits, glossary registration/editing, existing semantic-source attachment and profile history reuse existing APIs and services; ambiguous requests retain the reviewed, opt-in AI path.
+- Java: 1,568 passed, no failures/errors/skips. JavaScript, including semantic-query-agent demo tests: 751 passed, one intentional runtime skip. Build, PMD and whitespace checks passed. Four-language rendering covers the chat, input, workspace, escaped profile names and exactly one active menu item. The dedicated GET no longer runs full diagnosis before a request.
+- Authenticated Chrome against an isolated synthetic workshop account on port 4191 performed an actual `comments` edit, readback and restoration; glossary registration, history lookup and a second revision marking the synthetic term inactive. Verified clarification, conversation retention, cancellation without a write, history display, 390px layout and no page errors. No paid model calls, schema/grant changes or customer database tests.
+- The actual account's existing source was already attached, so that rehearsal did not apply a new semantic attachment. A separate browser test with explicitly stubbed responses verified preserving existing sources in the comparison, explicit consent, cancelled proposals, one attempted uncertain write with no stale Apply button, AI-call consent and plaintext rendering of partial Tool diagnostics. These are UI contract tests, not actual source-write or model-execution evidence.
+- Actual DB rehearsal used candidate `9d60d16f938475183e557852daca82d11e40919cdbfb5bb7d585c98dd0c4ad0b`; final build `b2a8275ae01ece53b33476eef6e6968742b9f0d4c9510f922614c7fb8e5c4a27` also includes multilingual command matching, processing feedback, unchanged-value handling and failure diagnostics. The stubbed failure/consent browser checks ran against that final build.
+- This is a bounded conversation workflow, not autonomous configuration of every DB/OCI/APEX feature. Source/callback creation and account/grant changes remain in their existing screens. Conversation text is kept only in page memory and is lost on refresh. See [usage](service-tools.md) and [implementation contract](explanation/conversation-workspace.md).
+
 ## Discoverable natural-language setup entry (2026-11-26)
 
 - Added **AI 조회·검색 → 자연어 설정 도우미** at `/ai-setup/assistant`. It defaults to the query purpose, explains a missing assistant model, and keeps model selection, target selection and the request form on a focused path. The existing readiness page remains available for full diagnosis and stored evidence.

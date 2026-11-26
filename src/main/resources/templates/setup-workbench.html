@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head(#{setup.natural.title})}"></head>
+<body class="app-shell">
+<aside th:replace="~{fragments/common :: sidebar}"></aside>
+<div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
+<main class="app-content setup-workbench" data-setup-workbench th:attr="data-schema=${info.username},data-allowed=${ownerRequired != true and unavailable != true},data-initial-profile=${profile},data-model=${assistantSelection != null ? assistantSelection.name : ''}">
+  <div class="setup-workbench-heading"><h1 th:text="#{setup.natural.title}"></h1><span class="app-badge" data-wb-target th:text="#{workbench.noTarget}"></span><button type="button" class="app-btn" data-wb-retarget th:text="#{workbench.target}"></button></div>
+  <p class="app-alert" th:if="${ownerRequired == true}" th:text="#{setup.ownerHelp}"></p>
+  <p class="app-alert" th:if="${unavailable == true}" th:text="#{setup.unavailable}"></p>
+  <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-wb-csrf>
+  <select hidden data-wb-profiles aria-hidden="true"><option th:each="item : ${profiles}" th:value="${item.name}" th:text="${item.name}"></option></select>
+  <div class="setup-workbench-layout">
+    <section class="setup-chat" th:aria-label="#{workbench.conversation}">
+      <div class="setup-chat-log" role="log" aria-live="polite" aria-relevant="additions" data-wb-log></div>
+      <form class="setup-chat-compose" data-wb-form>
+        <label for="setup-chat-question" th:text="#{workbench.request}"></label>
+        <textarea id="setup-chat-question" class="form-control" rows="3" maxlength="2000" data-wb-input th:placeholder="#{workbench.placeholder}" required></textarea>
+        <div class="setup-chat-compose-actions"><small th:text="#{workbench.memory}"></small><button class="app-btn app-btn-primary" type="submit" data-wb-send th:text="#{workbench.send}"></button></div>
+      </form>
+    </section>
+    <section class="setup-workspace" th:aria-label="#{workbench.workspace}" data-wb-workspace tabindex="-1">
+      <header><span class="app-badge" data-wb-step th:text="#{workbench.waiting}"></span><h2 data-wb-title th:text="#{workbench.workspace}"></h2></header>
+      <div data-wb-body></div>
+    </section>
+  </div>
+  <p role="status" data-wb-status></p>
+</main></div>
+<script type="module" th:src="@{/js/setup-workbench.mjs}"></script>
+</body></html>

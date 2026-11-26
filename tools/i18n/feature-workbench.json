@@ -1,0 +1,495 @@
+{
+  "workbench.unchanged": ["이미 같은 값으로 설정되어 있습니다.", "This value is already configured.", "已设置为此值。", "既に同じ値が設定されています。"],
+  "workbench.noTarget": [
+    "대상 미선택",
+    "No target selected",
+    "未选择目标",
+    "対象未選択"
+  ],
+  "workbench.target": [
+    "대상 프로필",
+    "Target profile",
+    "目标配置文件",
+    "対象プロファイル"
+  ],
+  "workbench.conversation": [
+    "대화",
+    "Conversation",
+    "对话",
+    "会話"
+  ],
+  "workbench.workspace": [
+    "현재 작업",
+    "Current task",
+    "当前任务",
+    "現在の作業"
+  ],
+  "workbench.request": [
+    "요청",
+    "Request",
+    "请求",
+    "依頼"
+  ],
+  "workbench.placeholder": [
+    "예: 이 프로필에 업무 용어를 연결해줘",
+    "For example: connect business definitions to this profile",
+    "例如：为此配置文件连接业务定义",
+    "例：このプロファイルに業務用語を接続"
+  ],
+  "workbench.memory": [
+    "대화는 이 화면에서만 유지 · Enter 전송 / Shift+Enter 줄바꿈",
+    "Conversation stays on this page · Enter sends / Shift+Enter adds a line",
+    "对话仅保留在此页面 · Enter 发送 / Shift+Enter 换行",
+    "会話はこの画面内のみ · Enter 送信 / Shift+Enter 改行"
+  ],
+  "workbench.send": [
+    "전송",
+    "Send",
+    "发送",
+    "送信"
+  ],
+  "workbench.waiting": [
+    "요청 대기",
+    "Ready",
+    "等待请求",
+    "依頼待ち"
+  ],
+  "workbench.edit": [
+    "입력",
+    "Edit",
+    "输入",
+    "入力"
+  ],
+  "workbench.review": [
+    "변경안 확인",
+    "Review changes",
+    "确认更改",
+    "変更を確認"
+  ],
+  "workbench.result": [
+    "결과",
+    "Result",
+    "结果",
+    "結果"
+  ],
+  "workbench.select": [
+    "선택",
+    "Select",
+    "选择",
+    "選択"
+  ],
+  "workbench.you": [
+    "사용자",
+    "You",
+    "用户",
+    "ユーザー"
+  ],
+  "workbench.assistant": [
+    "도우미",
+    "Assistant",
+    "助手",
+    "アシスタント"
+  ],
+  "workbench.before": [
+    "변경 전",
+    "Before",
+    "更改前",
+    "変更前"
+  ],
+  "workbench.after": [
+    "변경 후",
+    "After",
+    "更改后",
+    "変更後"
+  ],
+  "workbench.apply": [
+    "적용",
+    "Apply",
+    "应用",
+    "適用"
+  ],
+  "workbench.cancel": [
+    "취소",
+    "Cancel",
+    "取消",
+    "キャンセル"
+  ],
+  "workbench.confirm": [
+    "표시된 대상과 변경 내용을 확인했습니다.",
+    "I reviewed the target and displayed changes.",
+    "已确认目标及所示更改。",
+    "対象と表示された変更内容を確認しました。"
+  ],
+  "workbench.welcome": [
+    "무엇을 설정할까요? 필요한 정보는 대화에서 확인합니다.",
+    "What would you like to configure? We will ask for missing information here.",
+    "需要配置什么？将在对话中询问缺少的信息。",
+    "何を設定しますか？必要な情報は会話で確認します。"
+  ],
+  "workbench.workspaceHelp": [
+    "요청에 맞는 설정·변경안·결과를 이곳에 표시합니다.",
+    "Settings, changes and results for your request appear here.",
+    "此处显示请求对应的设置、更改及结果。",
+    "依頼に応じた設定・変更案・結果をここに表示します。"
+  ],
+  "workbench.exampleConversation": [
+    "대화 저장 켜기",
+    "Enable conversation storage",
+    "启用对话保存",
+    "会話保存を有効化"
+  ],
+  "workbench.exampleTerm": [
+    "업무 용어 등록",
+    "Register business term",
+    "注册业务术语",
+    "業務用語を登録"
+  ],
+  "workbench.exampleSource": [
+    "업무 용어 연결",
+    "Connect business definitions",
+    "连接业务定义",
+    "業務用語を接続"
+  ],
+  "workbench.exampleHistory": [
+    "변경 이력 조회",
+    "Show change history",
+    "查看更改历史",
+    "変更履歴を表示"
+  ],
+  "workbench.invalidSources": [
+    "기존 연결값을 해석하지 못했습니다. 원래 값을 유지합니다.",
+    "Cannot interpret the current source list. Original values are preserved.",
+    "无法解析当前连接列表，保留原值。",
+    "既存の接続値を解釈できません。元の値を維持します。"
+  ],
+  "workbench.invalidSource": [
+    "활성 상태로 조회된 소스를 선택하세요.",
+    "Select a source returned as enabled.",
+    "请选择查询结果中已启用的来源。",
+    "有効と確認されたソースを選択してください。"
+  ],
+  "workbench.noProfiles": [
+    "조회된 프로필이 없습니다. 프로필 생성 후 다시 시작하세요.",
+    "No profiles were returned. Create a profile and start again.",
+    "未查到配置文件。创建后重新开始。",
+    "プロファイルがありません。作成後に再開してください。"
+  ],
+  "workbench.profiles": [
+    "프로필 설정",
+    "Profile settings",
+    "配置文件设置",
+    "プロファイル設定"
+  ],
+  "workbench.pickTarget": [
+    "목록의 프로필 이름을 선택하세요.",
+    "Choose a profile name from the list.",
+    "请选择列表中的配置文件名称。",
+    "一覧からプロファイル名を選択してください。"
+  ],
+  "workbench.whichTarget": [
+    "어느 프로필에서 진행할까요?",
+    "Which profile should we use?",
+    "使用哪个配置文件？",
+    "どのプロファイルで進めますか？"
+  ],
+  "workbench.reviewHelp": [
+    "오른쪽 변경안을 확인한 뒤 적용하세요. 수정 요청이나 취소를 입력하면 이 변경안은 무효화됩니다.",
+    "Review the changes in the workspace, then apply. A new request or cancellation invalidates this proposal.",
+    "请确认工作区中的更改后应用。新请求或取消将使此方案失效。",
+    "作業欄の変更を確認して適用してください。新しい依頼や取消でこの案は無効になります。"
+  ],
+  "workbench.writeFailed": [
+    "저장 결과를 확인하지 못했습니다. 설정·이력을 조회한 뒤 다시 진행하세요. 자동 재시도하지 않습니다.",
+    "Save outcome could not be confirmed. Inspect settings and history before proceeding. No automatic retry.",
+    "无法确认保存结果。请检查设置和历史后再继续，不会自动重试。",
+    "保存結果を確認できません。設定・履歴を確認してから進めてください。自動再試行はしません。"
+  ],
+  "workbench.history": [
+    "프로필 변경 이력",
+    "Profile change history",
+    "配置文件更改历史",
+    "プロファイル変更履歴"
+  ],
+  "workbench.noHistory": [
+    "조회된 이력이 없습니다.",
+    "No history entries returned.",
+    "未查到历史记录。",
+    "取得された履歴がありません。"
+  ],
+  "workbench.previous": [
+    "이전",
+    "Previous",
+    "上一页",
+    "前へ"
+  ],
+  "workbench.next": [
+    "다음",
+    "Next",
+    "下一页",
+    "次へ"
+  ],
+  "workbench.saved": [
+    "적용 결과",
+    "Apply result",
+    "应用结果",
+    "適用結果"
+  ],
+  "workbench.unverified": [
+    "저장 결과를 확정하지 못했습니다. 설정·이력을 확인하세요.",
+    "The save result is unverified. Inspect settings and history.",
+    "保存结果尚未确认。请检查设置和历史。",
+    "保存結果は未確認です。設定・履歴を確認してください。"
+  ],
+  "workbench.verified": [
+    "변경 후 저장값을 다시 조회해 일치를 확인했습니다.",
+    "Readback confirmed the stored values match the change.",
+    "已重新查询，确认保存值与更改一致。",
+    "再取得した保存値と変更内容の一致を確認しました。"
+  ],
+  "workbench.historyUnavailable": [
+    "이력 조회 실패: {0}",
+    "History lookup failed: {0}",
+    "历史查询失败：{0}",
+    "履歴の取得失敗：{0}"
+  ],
+  "workbench.current": [
+    "현재 값: {0}",
+    "Current value: {0}",
+    "当前值：{0}",
+    "現在の値：{0}"
+  ],
+  "workbench.newValue": [
+    "변경할 값",
+    "New value",
+    "新值",
+    "変更後の値"
+  ],
+  "workbench.attributeQuestion": [
+    "{0} 값을 입력하거나 오른쪽에서 수정하세요.",
+    "Enter a value for {0}, or edit it in the workspace.",
+    "请输入 {0} 的值，或在工作区修改。",
+    "{0} の値を入力するか、作業欄で編集してください。"
+  ],
+  "workbench.sources": [
+    "업무 지식 연결",
+    "Connect business knowledge",
+    "连接业务知识",
+    "業務知識を接続"
+  ],
+  "workbench.noSources": [
+    "연결 가능한 활성 소스가 없습니다. Semantic Context에서 소스를 준비한 뒤 다시 요청하세요.",
+    "No enabled sources are available. Prepare a source in Semantic Context, then request again.",
+    "没有可连接的已启用来源。请在 Semantic Context 准备后重试。",
+    "接続可能な有効ソースがありません。Semantic Context で準備後に再度依頼してください。"
+  ],
+  "workbench.alreadyAttached": [
+    "이미 연결된 소스입니다. 변경하지 않았습니다.",
+    "This source is already attached. Nothing changed.",
+    "此来源已连接，未更改。",
+    "既に接続済みのソースです。変更していません。"
+  ],
+  "workbench.callback": [
+    "콜백 정보",
+    "Callback details",
+    "回调信息",
+    "コールバック情報"
+  ],
+  "workbench.sourceQuestion": [
+    "어떤 소스를 연결할까요? 기존 연결은 유지합니다.",
+    "Which source should we attach? Existing connections are preserved.",
+    "连接哪个来源？保留现有连接。",
+    "どのソースを接続しますか？既存の接続は維持します。"
+  ],
+  "workbench.glossary": [
+    "업무 용어",
+    "Business terms",
+    "业务术语",
+    "業務用語"
+  ],
+  "workbench.termFilter": [
+    "대표 용어 검색",
+    "Search term names",
+    "搜索术语名称",
+    "代表用語を検索"
+  ],
+  "workbench.find": [
+    "검색",
+    "Search",
+    "搜索",
+    "検索"
+  ],
+  "workbench.noTerms": [
+    "조회된 용어가 없습니다.",
+    "No terms were returned.",
+    "未查到术语。",
+    "取得された用語がありません。"
+  ],
+  "workbench.newTerm": [
+    "용어 등록",
+    "Register term",
+    "注册术语",
+    "用語登録"
+  ],
+  "workbench.termHistory": [
+    "용어 변경 이력",
+    "Term change history",
+    "术语更改历史",
+    "用語変更履歴"
+  ],
+  "workbench.whichTerm": [
+    "수정할 용어를 선택하거나 “새 용어”를 입력하세요.",
+    "Select a term to edit, or enter “new term”.",
+    "选择要编辑的术语，或输入“new term”。",
+    "編集する用語を選択するか「new term」と入力してください。"
+  ],
+  "workbench.termFilterHelp": [
+    "검색할 대표 용어를 입력하세요.",
+    "Enter a term name to search.",
+    "请输入要搜索的术语名称。",
+    "検索する代表用語を入力してください。"
+  ],
+  "workbench.storageRequired": [
+    "용어와 이력 저장소 준비가 필요합니다. 기존 관리 화면에서 생성 SQL을 확인할 수 있습니다.",
+    "Term and history storage must be ready. The management page provides setup SQL.",
+    "需先准备术语及历史存储。可在管理页面查看创建 SQL。",
+    "用語と履歴の保存先の準備が必要です。管理画面で作成 SQL を確認できます。"
+  ],
+  "workbench.termNameQuestion": [
+    "등록할 업무 용어는 무엇인가요?",
+    "What business term would you like to register?",
+    "要注册哪个业务术语？",
+    "登録する業務用語は何ですか？"
+  ],
+  "workbench.termDefinitionQuestion": [
+    "“{0}”의 업무상 의미·집계 기준을 입력하세요.",
+    "Describe the meaning and counting rules for “{0}”.",
+    "请输入“{0}”的业务含义和统计标准。",
+    "「{0}」の業務上の意味・集計基準を入力してください。"
+  ],
+  "workbench.termAliasesQuestion": [
+    "별칭을 쉼표로 구분해 입력하세요. 없으면 “없음”을 입력하세요.",
+    "Enter comma-separated aliases, or “none”.",
+    "输入以逗号分隔的别名；无则输入“none”。",
+    "別名をカンマ区切りで入力してください。なければ「なし」。"
+  ],
+  "workbench.termCriteriaQuestion": [
+    "참고 SQL·필터 기준을 입력하세요. 없으면 “없음”을 입력하세요. SQL은 실행하지 않습니다.",
+    "Enter reference SQL or filter rules, or “none”. SQL will not be executed.",
+    "输入参考 SQL 或筛选条件；无则输入“none”。不会执行 SQL。",
+    "参考 SQL・フィルタ基準を入力してください。なければ「なし」。SQL は実行しません。"
+  ],
+  "workbench.editTermHelp": [
+    "오른쪽에서 용어를 수정한 뒤 변경안을 확인하세요. “취소”로 종료할 수 있습니다.",
+    "Edit the term in the workspace and review changes. Enter “cancel” to stop.",
+    "在工作区编辑术语并确认更改。输入“取消”结束。",
+    "作業欄で用語を編集して変更を確認してください。「キャンセル」で終了。"
+  ],
+  "workbench.termName": [
+    "업무 용어",
+    "Business term",
+    "业务术语",
+    "業務用語"
+  ],
+  "workbench.termDefinition": [
+    "업무 정의",
+    "Business definition",
+    "业务定义",
+    "業務定義"
+  ],
+  "workbench.termAliases": [
+    "별칭 (쉼표 구분)",
+    "Aliases (comma-separated)",
+    "别名（逗号分隔）",
+    "別名（カンマ区切り）"
+  ],
+  "workbench.termCriteria": [
+    "참고 SQL·기준 (실행하지 않음)",
+    "Reference SQL / criteria (not executed)",
+    "参考 SQL / 标准（不执行）",
+    "参考 SQL・基準（実行しない）"
+  ],
+  "workbench.termRequired": [
+    "용어와 업무 정의를 모두 입력하세요.",
+    "Enter both term and business definition.",
+    "请输入术语及业务定义。",
+    "用語と業務定義を両方入力してください。"
+  ],
+  "workbench.termLimit": [
+    "용어 256자, 정의·기준 각 4,000자, 별칭 20개 한도를 확인하세요.",
+    "Limits: 256 characters for term, 4,000 each for definition/criteria, 20 aliases.",
+    "上限：术语256字，定义和标准各4,000字，别名20个。",
+    "上限：用語256文字、定義・基準各4,000文字、別名20件。"
+  ],
+  "workbench.duplicateTerm": [
+    "같은 이름 또는 추가 후보가 있습니다. 용어 목록에서 기존 항목을 확인하고 수정하세요.",
+    "There is a matching name or additional candidates. Inspect and edit the existing term in the term list.",
+    "存在同名或更多候选项。请在术语列表确认并编辑现有项。",
+    "同名または追加候補があります。用語一覧で既存項目を確認して編集してください。"
+  ],
+  "workbench.termSaved": [
+    "용어와 변경 이력을 저장했습니다.",
+    "Saved the term and its change history.",
+    "已保存术语及更改历史。",
+    "用語と変更履歴を保存しました。"
+  ],
+  "workbench.analysis": [
+    "AI 분석",
+    "AI analysis",
+    "AI 分析",
+    "AI 分析"
+  ],
+  "workbench.prepare": [
+    "분석 요청 확인",
+    "Review analysis request",
+    "确认分析请求",
+    "分析依頼を確認"
+  ],
+  "workbench.analyze": [
+    "분석 실행",
+    "Run analysis",
+    "执行分析",
+    "分析を実行"
+  ],
+  "workbench.analysisReview": [
+    "전송할 정보를 준비했습니다. 내용을 확인하고 분석을 실행하세요.",
+    "The outbound request is ready. Review it before running analysis.",
+    "已准备发送信息。确认后执行分析。",
+    "送信情報を準備しました。内容を確認して分析を実行してください。"
+  ],
+  "workbench.analysisHelp": [
+    "명확한 설정 명령으로 연결하지 못한 요청입니다. 선택한 모델로 분석할 수 있습니다.",
+    "This request did not match a registered setup command. You can analyze it with the selected model.",
+    "此请求未匹配已注册设置命令。可用所选模型分析。",
+    "登録済みの設定コマンドに一致しません。選択したモデルで分析できます。"
+  ],
+  "workbench.model": [
+    "분석 모델",
+    "Analysis model",
+    "分析模型",
+    "分析モデル"
+  ],
+  "workbench.modelQuestion": [
+    "이 요청을 분석할 AI 도우미 모델을 선택하세요. 대상 프로필의 모델 설정은 변경하지 않습니다.",
+    "Select an assistant model for this request. This does not change the target profile model.",
+    "选择用于分析此请求的助手模型，不会更改目标配置文件的模型。",
+    "この依頼を分析するモデルを選択してください。対象プロファイルのモデル設定は変更しません。"
+  ],
+  "workbench.cancelled": [
+    "진행 중인 입력·변경안을 취소했습니다. 새 요청을 입력하세요.",
+    "Cancelled the pending input and proposal. Enter a new request.",
+    "已取消当前输入及方案。请输入新请求。",
+    "入力・変更案を取り消しました。新しい依頼を入力してください。"
+  ],
+  "workbench.targetChosen": [
+    "{0}에서 진행합니다. 요청을 입력하세요.",
+    "Using {0}. Enter your request.",
+    "将使用 {0}。请输入请求。",
+    "{0} で進めます。依頼を入力してください。"
+  ],
+  "workbench.historyLoaded": [
+    "현재 프로필의 변경 이력을 조회했습니다.",
+    "Loaded change history for the current profile.",
+    "已查询当前配置文件的更改历史。",
+    "現在のプロファイルの変更履歴を取得しました。"
+  ]
+}
