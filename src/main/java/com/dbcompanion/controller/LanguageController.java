@@ -25,6 +25,7 @@ public class LanguageController {
     }
     /** Only known read-only page routes; never redirect to a write endpoint or external site. */
     public static String safeReturn(String target) {
+        if("/db/scenario-data".equals(target)||"/db/demo-data".equals(target))return "/db/demo-data";
         if("/ai-setup".equals(target))return target;
         if("/ai-setup/assistant".equals(target))return target;
         if("/semantic-versions".equals(target))return target;

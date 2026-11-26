@@ -20,3 +20,6 @@ credentials.json
 secrets/
 node_modules/
 *.zip
+scenario-config.json
+scenario-prompt.md
+scenario-results/

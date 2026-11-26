@@ -28,6 +28,11 @@ If Semantic Release storage exists without a deployed version, execution can be 
 
 ## Optional features
 
+The same **Prepare practice data** screen also offers registered Wallet/TNS selection,
+industry, dates and a prefix, plus prompt/configuration downloads for local Claude Code/Codex.
+The app does not write to the DB, and existing objects must never be altered or deleted.
+Follow [account preparation and local execution](scenario-data.en.md) before running them.
+
 Request history and collection setup separately when needed. `ADMIN` is not universally required.
 
 ### Roles and order

@@ -1,22 +1,67 @@
-import {assistantApi,assistantPost} from './ai-assistant.mjs';
+import {assistantApi, assistantPost} from './ai-assistant.mjs';
 import {t} from './i18n.mjs';
-if(typeof document!=='undefined')document.querySelectorAll('[data-demo-data]').forEach(root=>{
-  const get=key=>root.querySelector('[data-demo-'+key+']');
-  const form=get('form');
-  let busy=false;
-  form.addEventListener('submit',async event=>{
-    event.preventDefault();if(busy||!form.reportValidity())return;
-    busy=true;get('build').disabled=true;get('message').textContent='';
-    const data=Object.fromEntries(new FormData(form));data.rows=Number(data.rows);
-    try{
-      const result=await assistantApi('/db/demo-data/prompt',assistantPost(get('csrf'),data));
-      get('prompt').value=result.prompt;get('input').hidden=true;get('review').hidden=false;get('copy').focus();
-    }catch(error){get('message').textContent=error.message;}
-    finally{busy=false;get('build').disabled=false;}
+
+export function demoDataInput(formData) {
+  const input = Object.fromEntries(formData);
+  input.rows = Number(input.rows);
+  const {scenario, questions, rules, date, rows, ...target} = input;
+  return {...target, criteria: {scenario, questions, rules, date, rows}};
+}
+
+export function mountDemoData(root) {
+  const form = root.querySelector('[data-demo-form]');
+  const field = name => form.elements.namedItem(name);
+  const status = root.querySelector('[data-demo-message]');
+  const button = root.querySelector('[data-demo-build]');
+  const section = root.querySelector('[data-demo-review]');
+  let output = null, revision = 0, walletRevision = 0, busy = false;
+  const message = key => t('demoData.export.' + key, key);
+  const inputSection = root.querySelector('[data-demo-input]');
+  const clear = () => { output = null; section.hidden = true; inputSection.hidden = false; };
+  root.querySelector('[data-demo-back]').addEventListener('click', () => { clear(); status.textContent = ''; field('scenario').focus(); });
+  form.addEventListener('input', () => { revision++; clear(); });
+  async function aliases() {
+    revision++;
+    const current = ++walletRevision;
+    clear(); button.disabled = true; field('tnsAlias').disabled = true;
+    field('tnsAlias').replaceChildren(); status.textContent = '';
+    if (!field('walletId').value) return;
+    try {
+      const options = await assistantApi('/db/demo-data/aliases?walletId=' + encodeURIComponent(field('walletId').value));
+      if (current !== walletRevision) return;
+      for (const item of options) field('tnsAlias').add(new Option(item.alias + ' · ' + item.description, item.alias));
+      field('tnsAlias').disabled = false; button.disabled = busy || !options.length;
+    } catch (error) { if (current === walletRevision) status.textContent = error.message; }
+  }
+  field('walletId').addEventListener('change', aliases);
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (busy || !form.reportValidity()) return;
+    const current = revision;
+    clear(); busy = true; button.disabled = true; status.textContent = message('working');
+    try {
+      const result = await assistantApi('/db/demo-data/prompt', assistantPost(root.querySelector('[data-demo-csrf]'), demoDataInput(new FormData(form))));
+      if (current !== revision) { status.textContent = message('changed'); return; }
+      output = result;
+      for (const key of ['prompt', 'config']) root.querySelector('[data-demo-' + key + ']').textContent = result[key];
+      section.hidden = false; inputSection.hidden = true; status.textContent = message('ready');
+    } catch (error) { status.textContent = error.message; }
+    finally { busy = false; button.disabled = field('tnsAlias').disabled; }
   });
-  get('back').addEventListener('click',()=>{get('prompt').value='';get('review').hidden=true;get('input').hidden=false;get('message').textContent='';form.elements.scenario.focus();});
-  get('copy').addEventListener('click',async()=>{
-    try{await navigator.clipboard.writeText(get('prompt').value);get('message').textContent=t('demoData.copied','프롬프트를 복사했습니다. Codex에 전달하세요.');}
-    catch{get('prompt').focus();get('prompt').select();get('message').textContent=t('demoData.manualCopy','선택한 프롬프트를 직접 복사하세요.');}
-  });
-});
+  root.querySelectorAll('[data-copy]').forEach(control => control.addEventListener('click', async () => {
+    if (!output) return;
+    try { await navigator.clipboard.writeText(output[control.dataset.copy]); status.textContent = message('copied'); }
+    catch { status.textContent = message('copyFailed'); }
+  }));
+  root.querySelectorAll('[data-download]').forEach(control => control.addEventListener('click', () => {
+    if (!output) return;
+    const key = control.dataset.download;
+    const url = URL.createObjectURL(new Blob([output[key]], {type: key === 'config' ? 'application/json' : 'text/markdown;charset=utf-8'}));
+    const link = document.createElement('a'); link.href = url;
+    link.download = key === 'config' ? 'scenario-config.json' : 'scenario-prompt.md';
+    document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }));
+  return aliases();
+}
+
+if (typeof document !== 'undefined') document.querySelectorAll('[data-demo-data]').forEach(mountDemoData);

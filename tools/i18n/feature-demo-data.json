@@ -118,5 +118,161 @@
     "Prepare Oracle practice tables and synthetic data.\nTarget: new dedicated schema {0}, Oracle Autonomous AI Database 26ai.\nBusiness scenario: {1}\nQuestions:\n{2}\nRules and edge cases:\n{3}\nReference date: {4}; synthetic fact rows: {5}.\n\nFirst verify the actual SQLcl database, SESSION_USER and CURRENT_SCHEMA match this target.\nDo not print or store passwords or Wallet contents. Check existing objects; stop on name collisions. Do not alter or delete existing objects.\nWrite and review these files, then execute them in order in the designated empty practice schema:\n01-schema.sql: 1–3 tables, keys, required relationships and types. Leave business-definition COMMENT and Annotation values unset for the later exercise.\n02-data.sql: reproducible synthetic rows covering normal, duplicate, excluded, date-boundary and different A/B access scopes. Do not use customer records.\n03-verify.sql: objects, counts, key integrity, reference queries and expected results. Independently calculate expected values and compare them with actual results.\n04-business-rules.md: terms, aliases, aggregation/filter rules, allowed/excluded rows and expected A/B results. Label these as training assumptions.\nDDL commits separately. After a partial failure inspect current state; do not rerun the entire script automatically.\nReport actual objects, counts, expected-value comparisons and failures. Refresh the objects in DB Companion.\nOnly then configure metadata, glossary, Select AI profiles, CUSTOM Semantic Context, history and DDS.",
     "Prepare Oracle practice tables and synthetic data.\nTarget: new dedicated schema {0}, Oracle Autonomous AI Database 26ai.\nBusiness scenario: {1}\nQuestions:\n{2}\nRules and edge cases:\n{3}\nReference date: {4}; synthetic fact rows: {5}.\n\nFirst verify the actual SQLcl database, SESSION_USER and CURRENT_SCHEMA match this target.\nDo not print or store passwords or Wallet contents. Check existing objects; stop on name collisions. Do not alter or delete existing objects.\nWrite and review these files, then execute them in order in the designated empty practice schema:\n01-schema.sql: 1–3 tables, keys, required relationships and types. Leave business-definition COMMENT and Annotation values unset for the later exercise.\n02-data.sql: reproducible synthetic rows covering normal, duplicate, excluded, date-boundary and different A/B access scopes. Do not use customer records.\n03-verify.sql: objects, counts, key integrity, reference queries and expected results. Independently calculate expected values and compare them with actual results.\n04-business-rules.md: terms, aliases, aggregation/filter rules, allowed/excluded rows and expected A/B results. Label these as training assumptions.\nDDL commits separately. After a partial failure inspect current state; do not rerun the entire script automatically.\nReport actual objects, counts, expected-value comparisons and failures. Refresh the objects in DB Companion.\nOnly then configure metadata, glossary, Select AI profiles, CUSTOM Semantic Context, history and DDS.",
     "Prepare Oracle practice tables and synthetic data.\nTarget: new dedicated schema {0}, Oracle Autonomous AI Database 26ai.\nBusiness scenario: {1}\nQuestions:\n{2}\nRules and edge cases:\n{3}\nReference date: {4}; synthetic fact rows: {5}.\n\nFirst verify the actual SQLcl database, SESSION_USER and CURRENT_SCHEMA match this target.\nDo not print or store passwords or Wallet contents. Check existing objects; stop on name collisions. Do not alter or delete existing objects.\nWrite and review these files, then execute them in order in the designated empty practice schema:\n01-schema.sql: 1–3 tables, keys, required relationships and types. Leave business-definition COMMENT and Annotation values unset for the later exercise.\n02-data.sql: reproducible synthetic rows covering normal, duplicate, excluded, date-boundary and different A/B access scopes. Do not use customer records.\n03-verify.sql: objects, counts, key integrity, reference queries and expected results. Independently calculate expected values and compare them with actual results.\n04-business-rules.md: terms, aliases, aggregation/filter rules, allowed/excluded rows and expected A/B results. Label these as training assumptions.\nDDL commits separately. After a partial failure inspect current state; do not rerun the entire script automatically.\nReport actual objects, counts, expected-value comparisons and failures. Refresh the objects in DB Companion.\nOnly then configure metadata, glossary, Select AI profiles, CUSTOM Semantic Context, history and DDS."
+  ],
+  "demoData.export.wallet": [
+    "등록된 Wallet",
+    "Registered wallet",
+    "已注册 Wallet",
+    "登録済み Wallet"
+  ],
+  "demoData.export.alias": [
+    "TNS 별칭",
+    "TNS alias",
+    "TNS 别名",
+    "TNS 別名"
+  ],
+  "demoData.export.preset": [
+    "업종",
+    "Industry",
+    "行业",
+    "業種"
+  ],
+  "demoData.export.preset.commerce": [
+    "이커머스",
+    "E-commerce",
+    "电子商务",
+    "電子商取引"
+  ],
+  "demoData.export.preset.logistics": [
+    "물류",
+    "Logistics",
+    "物流",
+    "物流"
+  ],
+  "demoData.export.preset.hospital": [
+    "병원",
+    "Hospital",
+    "医院",
+    "病院"
+  ],
+  "demoData.export.preset.school": [
+    "학교",
+    "School",
+    "学校",
+    "学校"
+  ],
+  "demoData.export.preset.public": [
+    "공공",
+    "Public sector",
+    "公共部门",
+    "公共部門"
+  ],
+  "demoData.export.preset.custom": [
+    "자유 설명",
+    "Custom description",
+    "自定义说明",
+    "自由記述"
+  ],
+  "demoData.export.noSecrets": [
+    "비밀번호·고객 정보·실존 인물 정보를 입력하지 마세요.",
+    "Do not enter passwords, customer data or real personal information.",
+    "请勿输入密码、客户数据或真实个人信息。",
+    "パスワード、顧客情報、実在する個人情報は入力しないでください。"
+  ],
+  "demoData.export.start": [
+    "시작일",
+    "Start date",
+    "开始日期",
+    "開始日"
+  ],
+  "demoData.export.end": [
+    "종료일",
+    "End date",
+    "结束日期",
+    "終了日"
+  ],
+  "demoData.export.prefix": [
+    "테이블 접두어",
+    "Table prefix",
+    "表前缀",
+    "テーブル接頭辞"
+  ],
+  "demoData.export.prefixHelp": [
+    "영문자로 시작하고 영문·숫자·밑줄만 사용하며 밑줄로 끝나는 2~16자입니다. 대문자로 변환합니다.",
+    "2–16 letters, digits or underscores; start with a letter and end with an underscore. Converted to uppercase.",
+    "2–16 个字母、数字或下划线；以字母开头、下划线结尾。转换为大写。",
+    "英字で始まり下線で終わる2～16文字の英数字・下線。大文字に変換します。"
+  ],
+  "demoData.export.run": [
+    "두 파일을 DB Companion 저장소 루트에 저장하고 Claude Code 또는 Codex에 읽고 실행하도록 요청하세요. 전용 로그인 계정과 비밀 파일을 먼저 준비하세요. 기존 객체가 있으면 수정·삭제하지 않고 중단합니다. 상세: docs/scenario-data.md",
+    "Save both files in the DB Companion checkout root and ask Claude Code or Codex to read and execute them. Prepare the dedicated login account and private file first. Stop on existing objects; never alter or delete them. Details: docs/scenario-data.en.md",
+    "将两个文件保存到 DB Companion 仓库根目录，请 Claude Code 或 Codex 读取执行。先准备专用登录账户和私密文件。遇到已有对象即停止，不得修改或删除。详情：docs/scenario-data.en.md",
+    "両ファイルを DB Companion のルートに保存し、Claude Code または Codex に実行を依頼します。専用ログインアカウントと秘密ファイルを先に準備します。既存オブジェクトは変更・削除せず停止します。詳細：docs/scenario-data.en.md"
+  ],
+  "demoData.export.copy": [
+    "복사",
+    "Copy",
+    "复制",
+    "コピー"
+  ],
+  "demoData.export.download": [
+    "다운로드",
+    "Download",
+    "下载",
+    "ダウンロード"
+  ],
+  "demoData.export.admin": [
+    "관리자용 계정 준비 안내",
+    "Administrator account preparation",
+    "管理员账户准备",
+    "管理者向けアカウント準備"
+  ],
+  "demoData.export.adminHelp": [
+    "기존 전용 계정에 관리자가 검토 후 적용할 예시입니다. 이 화면은 실행하지 않습니다. DBA·ANY 권한과 PUBLIC 부여는 금지합니다.",
+    "An administrator must review this example for an existing dedicated account. This screen never executes it. Do not grant DBA, ANY privileges or privileges to PUBLIC.",
+    "管理员须审核此现有专用账户示例。本页面不会执行。禁止授予 DBA、ANY 权限或向 PUBLIC 授权。",
+    "既存の専用アカウント向けに管理者が確認する例です。この画面では実行しません。DBA・ANY 権限や PUBLIC への付与は禁止です。"
+  ],
+  "demoData.export.adminReason": [
+    "CREATE SESSION은 접속, CREATE TABLE은 자기 테이블, CREATE VIEW·CREATE SEQUENCE는 필요 시 자기 뷰·시퀀스용입니다. quota는 자기 스키마의 저장 공간을 제한합니다. 이번 프롬프트는 테이블만 생성합니다.",
+    "CREATE SESSION permits login; CREATE TABLE permits own tables. CREATE VIEW and CREATE SEQUENCE permit own views/sequences when needed. Quota limits schema storage. This prompt creates tables only.",
+    "CREATE SESSION 用于连接，CREATE TABLE 用于本账户的表，CREATE VIEW 和 CREATE SEQUENCE 按需用于本账户的视图和序列。quota 限制存储。本提示仅创建表。",
+    "CREATE SESSION は接続、CREATE TABLE は自分の表、CREATE VIEW・CREATE SEQUENCE は必要時の自分のビュー・シーケンス用です。quota は保存容量を制限します。このプロンプトは表のみを作成します。"
+  ],
+  "demoData.export.invalid": [
+    "입력값과 접두어 형식을 확인해 주세요.",
+    "Check the inputs and prefix format.",
+    "请检查输入和前缀格式。",
+    "入力値と接頭辞の形式を確認してください。"
+  ],
+  "demoData.export.working": [
+    "파일 생성 중…",
+    "Generating files…",
+    "正在生成文件…",
+    "ファイル生成中…"
+  ],
+  "demoData.export.changed": [
+    "입력이 바뀌었습니다. 다시 생성해 주세요.",
+    "Inputs changed. Generate again.",
+    "输入已更改，请重新生成。",
+    "入力が変更されました。再生成してください。"
+  ],
+  "demoData.export.ready": [
+    "파일을 확인하고 다운로드하세요. DB 작업은 실행하지 않았습니다.",
+    "Review and download the files. No database work was executed.",
+    "请查看并下载文件。未执行数据库操作。",
+    "ファイルを確認してダウンロードしてください。DB 操作は実行していません。"
+  ],
+  "demoData.export.copied": [
+    "복사했습니다.",
+    "Copied.",
+    "已复制。",
+    "コピーしました。"
+  ],
+  "demoData.export.copyFailed": [
+    "복사하지 못했습니다. 파일을 다운로드하세요.",
+    "Copy failed. Download the file instead.",
+    "复制失败，请下载文件。",
+    "コピーできませんでした。ファイルをダウンロードしてください。"
   ]
 }

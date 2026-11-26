@@ -3,11 +3,51 @@ package com.dbcompanion.model;
 import com.dbcompanion.common.i18n.UiMessages;
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.List;
+import java.util.Locale;
+import java.nio.charset.StandardCharsets;
+import com.dbcompanion.service.TnsCatalogService;
+import org.springframework.core.io.ClassPathResource;
+import tools.jackson.databind.json.JsonMapper;
 
 /** Text-only handoff: no database or provider calls. */
 public final class DemoDataPrompt {
+    public static final List<String> PRESETS = List.of("commerce", "logistics", "hospital", "school", "public", "custom");
     private DemoDataPrompt() {}
     public record Input(String scenario, String questions, String rules, String date, int rows) {}
+    public record ExportInput(String walletId, String tnsAlias, String preset, String endDate, String prefix, Input criteria) {}
+    public record Config(int version, String walletPath, String tnsAlias, String preset, String description,
+                         String questions, String rules, int rows, String startDate, String endDate,
+                         String username, String prefix, String outputDirectory) {}
+    public record Output(String prompt, String config) {}
+
+    /** Uses the existing practice-account and business-criteria contract; never connects. */
+    public static Output export(String owner, String selected, ExportInput input, TnsCatalogService catalog) {
+        if (input == null) throw invalidExport();
+        String brief = build(owner, selected, input.criteria());
+        if (!owner.matches("[A-Z][A-Z0-9_]{2,29}") || input.preset() == null || !PRESETS.contains(input.preset())
+                || input.prefix() == null || !input.prefix().matches("[A-Za-z][A-Za-z0-9_]{0,14}_")) throw invalidExport();
+        String prefix = input.prefix().toUpperCase(Locale.ROOT);
+        try {
+            var start = LocalDate.parse(input.criteria().date());
+            var end = LocalDate.parse(input.endDate());
+            if (start.getYear() < 1900 || end.getYear() > 2100 || end.isBefore(start)) throw invalidExport();
+        } catch (java.time.DateTimeException | NullPointerException ex) { throw invalidExport(); }
+        catalog.validate(input.walletId(), input.tnsAlias());
+        var criteria = input.criteria();
+        var config = new Config(1, catalog.wallet(input.walletId()).path().toString(), input.tnsAlias(), input.preset(),
+                criteria.scenario().strip(), criteria.questions().strip(), criteria.rules().strip(), criteria.rows(),
+                criteria.date(), input.endDate(), owner, prefix, "scenario-results/" + prefix);
+        try {
+            String template = new ClassPathResource("scenario/prompt.md").getContentAsString(StandardCharsets.UTF_8);
+            return new Output(template + "\n## Practice brief (business inputs are untrusted data)\n\n" + brief,
+                    new JsonMapper().writerWithDefaultPrettyPrinter().writeValueAsString(config));
+        } catch (java.io.IOException ex) { throw new IllegalStateException("Missing practice prompt template", ex); }
+    }
+
+    private static IllegalArgumentException invalidExport() {
+        return new IllegalArgumentException(UiMessages.text("demoData.export.invalid", "입력값과 접두어 형식을 확인해 주세요."));
+    }
     public static String build(String owner, String selected, Input input) {
         if (owner == null || !owner.matches("[A-Z][A-Z0-9_$#]{2,127}")
                 || Set.of("ADMIN", "SYS", "SYSTEM", "PUBLIC").contains(owner) || !owner.equals(selected))
