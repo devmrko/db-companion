@@ -107,3 +107,37 @@
 .setup-workspace[aria-busy=true]{opacity:.7}
 @media(max-width:1050px){.setup-workbench-layout{grid-template-columns:1fr}.setup-chat{position:static;height:480px;min-height:0}.setup-workspace{min-height:240px}.setup-workspace-diff{grid-template-columns:1fr}.setup-workbench-heading h1{width:100%}}
 @media(prefers-reduced-motion:no-preference){.setup-chat-message{animation:setup-chat-appear .15s ease-out}@keyframes setup-chat-appear{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
+.app-assistant-launcher{position:fixed;right:24px;bottom:24px;z-index:1040;border:1px solid #245b73;background:#286b85;color:#fff;border-radius:28px;padding:13px 22px;box-shadow:0 5px 18px #152d3833;font-weight:650;cursor:pointer}
+.app-assistant-launcher:hover{background:#20566b}
+.app-assistant-window{position:fixed;right:24px;bottom:88px;z-index:1041;width:min(440px,calc(100vw - 48px));height:min(760px,calc(100dvh - 118px));border:1px solid #aebfc9;border-radius:14px;background:#fff;color:#20282c;box-shadow:0 12px 45px #152d383b;display:flex;flex-direction:column;overflow:hidden}
+.app-assistant-window[hidden]{display:none}
+.app-floating-assistant.is-task-open .app-assistant-window{width:min(1020px,calc(100vw - 48px))}
+.app-assistant-window-header{display:flex;gap:10px;align-items:center;padding:12px 16px;background:#f1f6f8;border-bottom:1px solid #d8dfe2;flex-shrink:0}
+.app-assistant-window-header h2{font-size:1rem;margin:0 auto 0 0;font-weight:650}
+.app-assistant-window-header button{font-size:.8rem;white-space:nowrap}
+.app-assistant-window-header button:last-child{font-size:1.5rem;line-height:1;padding:5px 10px}
+.app-assistant-window-content{flex:1;min-height:0;overflow:clip}
+.app-assistant-window-content>p,.app-assistant-loading{padding:20px}
+.setup-workbench-floating{height:100%;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:0!important;margin:0!important}
+.setup-workbench-floating .setup-workbench-heading{padding:10px 14px;margin:0;border-bottom:1px solid #e4eaed;gap:8px;flex-shrink:0}
+.setup-workbench-floating .setup-workbench-heading h1{display:none}
+.setup-workbench-floating .setup-workbench-heading .app-badge{overflow-wrap:anywhere;white-space:normal;max-width:70%;font-size:.68rem}
+.setup-workbench-floating .setup-workbench-heading button{font-size:.75rem;margin-left:auto;padding:5px 8px}
+.setup-workbench-floating .setup-workbench-layout{display:flex;flex:1 1 0;min-height:0;gap:0;align-items:stretch}
+.setup-workbench-floating .setup-chat{position:static;flex:1;min-width:0;width:100%;height:auto;min-height:0;border:0;border-radius:0}
+.setup-workbench-floating .setup-workspace{display:none;flex:1.15;min-width:0;overflow:auto;border:0;border-left:1px solid #d8dfe2;border-radius:0;min-height:0;padding:16px}
+.is-task-open .setup-workbench-floating .setup-workspace{display:block}
+.setup-workbench-floating .setup-chat-log{padding:16px;min-height:0}
+.setup-workbench-floating .setup-chat-compose{padding:12px;flex-shrink:0}
+.setup-workbench-floating .setup-chat-compose textarea{min-height:65px;max-height:130px}
+.setup-workbench-floating .setup-workspace-diff{grid-template-columns:1fr}
+.setup-workbench-floating>[role=status]{padding:0 14px;margin:0;font-size:.8rem;flex-shrink:0}
+.setup-workbench-floating>[role=status]:not(:empty){padding:8px 14px}
+.app-dashboard-readiness .app-readiness-body{padding:18px 25px 22px}
+.app-dashboard-readiness .app-readiness-body>p{margin:0 0 12px;color:var(--app-muted,#5e6970);font-size:.85rem}
+.app-dashboard-readiness [data-setup-summary-result]>p{margin:0 0 10px;font-size:.85rem;overflow-wrap:anywhere}
+.app-dashboard-readiness .app-detail-list{padding:0;margin:0 0 14px}
+.app-dashboard-readiness .app-detail-list>div{grid-template-columns:minmax(140px,1fr) minmax(0,3fr);gap:16px;padding:12px 0;min-height:54px}
+.app-dashboard-readiness .app-detail-list dd{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.app-dashboard-readiness .app-detail-list dt{min-width:0;overflow-wrap:anywhere}
+@media(max-width:680px){.app-assistant-launcher{right:14px;bottom:14px;padding:12px 18px}.app-assistant-window{right:12px;bottom:76px;width:calc(100vw - 24px);height:calc(100dvh - 100px)}.app-floating-assistant.is-task-open .app-assistant-window{width:calc(100vw - 24px)}.is-task-open .setup-workbench-floating .setup-chat{display:none}.setup-workbench-floating .setup-workspace{border-left:0}.app-dashboard-readiness .app-readiness-body{padding:16px}.app-dashboard-readiness .app-detail-list>div{grid-template-columns:minmax(90px,1fr) minmax(0,1.6fr);gap:10px}.app-dashboard-readiness .app-detail-list dd{gap:8px}}

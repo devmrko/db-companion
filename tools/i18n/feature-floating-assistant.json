@@ -1,0 +1,44 @@
+{
+  "floatingAssistant.open": [
+    "설정 도우미",
+    "Setup assistant",
+    "设置助手",
+    "設定アシスタント"
+  ],
+  "floatingAssistant.title": [
+    "설정 도우미",
+    "Setup assistant",
+    "设置助手",
+    "設定アシスタント"
+  ],
+  "floatingAssistant.task": [
+    "현재 작업",
+    "Current task",
+    "当前任务",
+    "現在の作業"
+  ],
+  "floatingAssistant.conversation": [
+    "대화 보기",
+    "Show conversation",
+    "查看对话",
+    "会話を表示"
+  ],
+  "floatingAssistant.close": [
+    "도우미 닫기",
+    "Close assistant",
+    "关闭助手",
+    "アシスタントを閉じる"
+  ],
+  "floatingAssistant.retry": [
+    "다시 불러오기",
+    "Load again",
+    "重新加载",
+    "再読み込み"
+  ],
+  "floatingAssistant.loadFailed": [
+    "도우미를 불러오지 못했습니다.",
+    "Could not load the assistant.",
+    "无法加载助手。",
+    "アシスタントを読み込めません。"
+  ]
+}

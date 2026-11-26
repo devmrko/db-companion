@@ -1,6 +1,12 @@
 # Conversational setup workspace
 
-Describe a setup task in one conversation and review the corresponding configuration beside it. The conversation remains visible while the workspace changes from target selection to editing, comparison and recorded results.
+Open **Setup assistant** at the lower right of any authenticated screen. The modeless window keeps the underlying page interactive. Closing and reopening preserves the conversation and pending task within the current document; page reload or navigation starts again.
+
+## Global modeless shell
+
+The common app shell mounts one launcher. The first open fetches the known server-rendered workbench component and mounts the existing workflow once. No iframe, backdrop, focus trap or new configuration API. Close hides the same DOM rather than destroying it. Target context comes from the current profile page, then the explicit target picker. A task opens beside conversation on desktop; on narrow screens the header switches between task and conversation. The dedicated route remains compatible, while its menu entry opens the same modeless window.
+
+Dashboard readiness keeps static help, the loaded summary and actions inside the card's padded content area. Status labels distinguish configuration evidence from execution success. Loaded content must not escape that area or duplicate navigation.
 
 ## Contract
 

@@ -1,5 +1,14 @@
 # Release validation
 
+## Global modeless assistant and dashboard spacing (2026-11-26)
+
+- User correction: setup chat belongs behind a lower-right button on existing screens, not another standalone page. The common app shell now mounts one lazy-loaded, modeless assistant. Background controls remain interactive; closing/reopening preserves the same conversation and pending task. The old route redirects to the dashboard and opens the panel. Page navigation/reload still resets page-memory state.
+- Dashboard help, inspected profile, loaded readiness rows and actions share the card's padded content area. Removed duplicate navigation while preserving the escaped, profile-specific diagnosis link. Configuration labels no longer say execution is complete.
+- Java: 1,569 passed, no errors/failures/skips; quality build and PMD passed. JavaScript including demo tests: 752 passed, one intentional runtime skip. Publication scan: 1,247 files, no findings. Source changes add no dependency, schema, security relaxation, iframe or new configuration API.
+- Authenticated Chrome on isolated port 4191 verified login has no launcher; dashboard and profile pages have exactly one; no component request before opening; background sidebar interaction; no refetch and no conversation/draft loss on reopening; model consent remains separate; Escape closes; legacy route opens the panel; mobile task/conversation switching and no horizontal overflow. Actual dashboard inset measured 26px. Profile-edit form data was explicitly stubbed and no configuration writes/model calls occurred.
+- Visual QA found a reused grid alignment causing the floating flex child to grow beyond its window, allowing focus/scroll to hide the target or composer. Fixed stretch alignment and bounded inner scrolling; added browser bounds assertions for the target heading and both desktop/mobile composers. Final screenshots were visually inspected after those assertions passed. Verified JAR: `5715f4baafc140f7f9c70d46ba112ed819fca92bdca100b0eb9b1b4c985bc536`.
+- Integration (2026-11-27): preserved the concurrently merged scenario-data feature from remote `84be5ab` and replayed this UI change without conflicts. Regenerated translation bundles with identical keys/values (ordering only). Combined Java: 1,576 passed; JavaScript/demo: 759 passed, one intentional skip. The running 8080 UI rehearsal JAR above remains distinguished from the combined source build; this does not claim scenario generation was redeployed or executed as part of the UI fix.
+
 ## Conversational setup workspace (2026-11-26)
 
 - Replaced the dedicated form route with a persistent conversation and task workspace. Missing target selection continues the original request without page navigation. Registered profile edits, glossary registration/editing, existing semantic-source attachment and profile history reuse existing APIs and services; ambiguous requests retain the reviewed, opt-in AI path.

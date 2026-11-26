@@ -137,7 +137,7 @@ class AiSetupTest {
             }
         };
         try(var session=new OntologyReadCacheTest().session()) {
-            var request=new MockHttpServletRequest("GET","/ai-setup/assistant");request.getSession().setAttribute(com.dbcompanion.common.db.PoolSession.ATTRIBUTE,session);
+            var request=new MockHttpServletRequest("GET","/ai-setup/assistant");request.setParameter("panel","1");request.getSession().setAttribute(com.dbcompanion.common.db.PoolSession.ATTRIBUTE,session);
             var model=new ExtendedModelMap();var response=new MockHttpServletResponse();
             assertThat(new AiSetupController(database,null).page("","P",request,response,model)).isEqualTo("setup-workbench");
             assertThat(model).containsEntry("purpose","nl2sql").containsEntry("assistantOnly",true)
@@ -152,6 +152,13 @@ class AiSetupTest {
         assertThat(request.getSession(false)).isNull();
         assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/ai-setup/assistant")).isEqualTo("/ai-setup/assistant");
         assertThat(com.dbcompanion.controller.LanguageController.safeReturn("/ai-setup/assistant/apply")).isEqualTo("/login");
+    }
+    @Test void ordinaryAssistantLinkReturnsToTheAppAndOpensTheModelessPanel() {
+        try(var session=new OntologyReadCacheTest().session()) {
+            var request=new MockHttpServletRequest("GET","/ai-setup/assistant");request.getSession().setAttribute(com.dbcompanion.common.db.PoolSession.ATTRIBUTE,session);
+            assertThat(new AiSetupController(null,null).page("","P&X",request,new MockHttpServletResponse(),new ExtendedModelMap()))
+                    .isEqualTo("redirect:/?assistant=open&profile=P%26X");
+        }
     }
     @Test void foreignSchemaStopsBeforeAnyProfileRead() {
         try(var session = new OntologyReadCacheTest().session()) {

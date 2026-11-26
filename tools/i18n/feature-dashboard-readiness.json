@@ -1,7 +1,7 @@
 {
-  "dashboard.ready.CONFIGURED": ["완료", "Complete", "完成", "完了"],
-  "dashboard.ready.ACTION": ["부족", "Missing", "不足", "不足"],
-  "dashboard.ready.UNKNOWN": ["확인 불가", "Unknown", "无法确认", "確認不可"],
+  "dashboard.ready.CONFIGURED": ["설정 확인", "Configured", "已确认设置", "設定確認済み"],
+  "dashboard.ready.ACTION": ["설정 필요", "Action needed", "需要设置", "設定が必要"],
+  "dashboard.ready.UNKNOWN": ["미확인", "Unverified", "未确认", "未確認"],
   "dashboard.ready.help": ["SQL 조회 준비 요약입니다. 완료는 설정 확인이며 실행 성공을 뜻하지 않습니다.", "SQL query setup summary. Complete means configuration checked, not successful execution.", "SQL 查询准备摘要。完成表示已检查配置，不代表执行成功。", "SQL 問い合わせの準備概要です。完了は設定確認を示し、実行成功を意味しません。"],
   "dashboard.ready.profile": ["확인 프로필 (첫 활성 프로필 우선):", "Checked profile (first enabled profile preferred):", "检查的配置文件（优先第一个已启用的配置文件）：", "確認対象（最初の有効なプロファイルを優先）："],
   "dashboard.ready.details": ["준비 상태 상세", "Readiness details", "准备状态详情", "準備状態の詳細"],

@@ -40,6 +40,8 @@ export function conversationRequest(turns,question){
 }
 
 export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
+  if(root.dataset.workbenchMounted==='true')return;
+  root.dataset.workbenchMounted='true';
   const get=name=>root.querySelector(`[data-wb-${name}]`),csrf=get('csrf');
   const profiles=Array.from(get('profiles').options).map(v=>v.value),schema=root.dataset.schema;
   let target=profiles.includes(root.dataset.initialProfile)?root.dataset.initialProfile:'',model=root.dataset.model||'';
@@ -59,7 +61,8 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
   }
   function workspace(title,step='edit'){
     pending=null;get('title').textContent=title;get('step').textContent=text(step,{edit:'입력',review:'변경안 확인',result:'결과',waiting:'요청 대기',select:'선택'}[step]||step);
-    const fields=el('fieldset');get('body').replaceChildren(fields);return fields;
+    const fields=el('fieldset');get('body').replaceChildren(fields);
+    root.dispatchEvent(new CustomEvent('setup-workspace-changed',{bubbles:true,detail:{step,title}}));return fields;
   }
   const detail=(host,label,value)=>{const item=el('details');item.append(el('summary',label),el('pre',typeof value==='string'?value:JSON.stringify(value,null,2),'app-preview-value'));host.append(item);return item;};
   const link=(host,label,url)=>{const a=el('a',label,'app-inline-link');a.href=url;a.target='_blank';a.rel='noopener';host.append(a);};

@@ -8,20 +8,22 @@
   <main class="app-content">
     <div class="app-alert is-error" role="alert" th:if="${schemaError}" th:text="${schemaError}"></div>
     <div class="app-page-heading"><h1 th:text="#{ui.6c9c3023153d}">접속 정보</h1><a class="btn app-btn app-btn-secondary" th:href="@{/}"><svg th:replace="~{fragments/common :: icon('refresh')}"></svg><th:block th:text="#{ui.8259f9d35351}">새로고침</th:block></a></div>
-    <section class="app-card app-section" data-dashboard-readiness th:attr="data-summary-url=@{/ai-setup/summary}">
+    <section class="app-card app-section app-dashboard-readiness" data-dashboard-readiness th:attr="data-summary-url=@{/ai-setup/summary}">
       <div class="app-card-heading"><h2 th:text="#{setup.title}"></h2></div>
+      <div class="app-readiness-body">
       <p th:text="#{dashboard.ready.help}"></p>
       <div data-summary-content aria-live="polite" aria-busy="true">
         <dl class="app-detail-list"><div th:each="key : ${ {'profile','provider','model','objects','credential','external','execution'} }">
           <dt th:text="${#messages.msg('setup.check.' + key)}"></dt>
           <dd><span class="app-setup-state app-setup-UNKNOWN" th:text="#{dashboard.ready.UNKNOWN}"></span></dd>
         </div></dl>
+        <a class="app-btn" th:href="@{/ai-setup(purpose='nl2sql')}" th:text="#{dashboard.ready.details}"></a>
       </div>
       <div class="app-config-actions">
         <a class="app-btn" th:href="@{/db/demo-data}" th:text="#{demoData.title}"></a>
-        <a class="app-btn" th:href="@{/ai-setup(purpose='nl2sql')}" th:text="#{dashboard.ready.details}"></a>
         <a class="app-btn" th:href="@{/tables}" th:text="#{dashboard.ready.metadata}"></a>
         <a class="app-btn" th:href="@{/ai-test}" th:text="#{dashboard.ready.query}"></a>
+      </div>
       </div>
     </section>
     <div class="row g-3 app-summary-row">

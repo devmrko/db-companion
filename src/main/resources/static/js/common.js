@@ -3,6 +3,7 @@ import {editGuard} from './edit-guard.mjs';
 import {mountSqlHelp,featureForPath} from './sql-help.mjs';
 import {mountHelpPanels} from './help-panels.mjs';
 import {mountCodeViews} from './code-view.mjs';
+import './floating-assistant.mjs';
 'use strict';
 
 document.querySelectorAll('[data-language-form]').forEach(form=>{

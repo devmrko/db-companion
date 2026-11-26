@@ -37,6 +37,8 @@ public class AiSetupController {
         var session = http == null ? null : (PoolSession) http.getAttribute(PoolSession.ATTRIBUTE);
         if (session == null) return "redirect:/login";
         boolean natural=request.getRequestURI().endsWith("/ai-setup/assistant");
+        if(natural&&!"1".equals(request.getParameter("panel")))return "redirect:/?assistant=open&profile="+
+                java.net.URLEncoder.encode(profile,java.nio.charset.StandardCharsets.UTF_8);
         if(natural&&purpose.isBlank())purpose="nl2sql";
         String setupPath=natural?"/ai-setup/assistant":"/ai-setup";
         model.addAttribute("assistantOnly",natural);
