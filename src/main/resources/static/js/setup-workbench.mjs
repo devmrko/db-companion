@@ -60,7 +60,7 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
   const post=(url,value)=>api(url,assistantPost(csrf,value));
   const button=(label,action)=>{const node=el('button',label,'btn app-btn app-btn-secondary');node.type='button';node.addEventListener('click',()=>{if(!busy)run(action);});return node;};
   function controls(){get('send').disabled=busy||root.dataset.allowed!=='true';get('input').disabled=busy||root.dataset.allowed!=='true';get('retarget').disabled=busy;const fields=get('body').querySelector('fieldset');if(fields)fields.disabled=busy;get('workspace').setAttribute('aria-busy',String(busy));}
-  async function run(work){if(busy)return;busy=true;controls();const progress=t('ui.8bf609c884ca','불러오는 중…');get('status').textContent=progress;try{await work();if(get('status').textContent===progress)get('status').textContent='';}catch(error){pending=null;get('status').textContent=error.message;say('assistant',error.message);if(error.diagnostic?.modelCalls!==undefined)detail(get('body').querySelector('fieldset')||get('body'),t('setup.ai.toolResults','서비스 호출 결과'),error.diagnostic);}finally{busy=false;controls();}}
+  async function run(work){if(busy)return;busy=true;controls();const progress=t('ui.8bf609c884ca','불러오는 중…');get('status').textContent=progress;try{await work();if(get('status').textContent===progress)get('status').textContent='';}catch(error){pending=null;const diagnostic=error.diagnostic,suffix=diagnostic?.code?' · '+diagnostic.code+(diagnostic.tool?' · '+diagnostic.tool:'')+(diagnostic.requestId?' · '+diagnostic.requestId:''):'';get('status').textContent=error.message+suffix;say('assistant',error.message+suffix);if(diagnostic)detail(get('body').querySelector('fieldset')||get('body'),t('setup.ai.toolResults','서비스 호출 결과'),diagnostic);}finally{busy=false;controls();}}
   function say(role,content,choices=[],proposal=null){
     if(role==='assistant')lastAssistant=content;
     const row=el('article',undefined,'setup-chat-message setup-chat-'+role);
@@ -200,9 +200,9 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
     for(const source of sources){const card=el('section',undefined,'setup-source-choice');card.append(button(source.name,()=>choose(source.name)),el('p',`${source.type} · ${source.description||''}`));detail(card,text('callback','콜백 정보'),source.callbacks||{});body.append(card);}
     ask(text('sourceQuestion','어떤 소스를 연결할까요? 기존 연결은 유지합니다.'),choose);
   }
-  async function glossaryList(edit=false){
+  async function glossaryList(edit=false,initialFilter=''){
     reply=null;const body=workspace(text('glossary','업무 용어'),'select');
-    const filter=field(body,text('termFilter','대표 용어 검색'));
+    const filter=field(body,text('termFilter','대표 용어 검색'),initialFilter);
     const rows=el('div');body.append(rows);
     async function load(offset=0){const result=await api('/business-glossary/list?'+new URLSearchParams({filter:filter.value,offset}));rows.replaceChildren();
       if(!result.rows.length)rows.append(el('p',text('noTerms','조회된 용어가 없습니다.')));
@@ -295,7 +295,7 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
     if(action==='navigate'){
       const body=workspace(text('navigation','화면 안내'),'result');link(body,result.answer,args.path);return;
     }
-    if(action==='glossary'){await startTerm();return;}if(action==='glossary-list'){await glossaryList();return;}
+    if(action==='glossary'){await startTerm();return;}if(action==='glossary-list'){await glossaryList(args.edit!==false,args.filter||'');return;}
     await withTarget(async()=>{switch(action){case 'history':page=1;await history();break;case 'sources':await attachSources();break;case 'attribute':await editAttribute(args.attribute,args.value??null);break;case 'query':await startQuery(target);break;default:throw new Error('Unknown AI action');}});
   }
   async function converse(question){

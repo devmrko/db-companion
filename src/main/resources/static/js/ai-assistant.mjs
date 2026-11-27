@@ -12,7 +12,8 @@ export function assistantError(data,status,url=''){
   const remedy=adminRemedy(data,status,url,account);
   const error=new Error((data.error||`HTTP ${status}`)+(remedy?'\n'+remedy:''));
   error.status=status;
-  if((status===422||data.diagnostic?.modelCalls!==undefined)&&data.diagnostic)error.diagnostic=data.diagnostic;
+  const diagnosticCode=typeof data.diagnostic==='string'?data.diagnostic:data.diagnostic?.code;
+  if((status===422||data.diagnostic?.modelCalls!==undefined||/^CONVERSATION_[A-Z_]+$/.test(diagnosticCode||''))&&data.diagnostic)error.diagnostic=typeof data.diagnostic==='string'?{code:data.diagnostic}:data.diagnostic;
   return error;
 }
 export async function assistantApi(url,options={}){

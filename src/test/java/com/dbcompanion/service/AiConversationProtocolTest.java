@@ -34,6 +34,17 @@ class AiConversationProtocolTest {
         assertDoesNotThrow(()->AiConversationProtocol.validateAction("suggest",json.readTree("{\"name\":\"AU_PROFILE\"}")));
         assertDoesNotThrow(()->AiConversationProtocol.validateAction("draft",json.readTree("{\"tables\":[\"ACTIVITY\"]}")));
     }
+    @Test void glossaryEditContractAcceptsAFilterAndBooleanButNotASavePayload(){
+        assertDoesNotThrow(()->AiConversationWorkflows.arguments("workspace.glossaryList",json.readTree("{\"filter\":\"ACTIVE_USER\",\"edit\":true,\"message\":\"기존 정의를 선택하세요\"}")));
+        assertThrows(IllegalArgumentException.class,()->AiConversationWorkflows.arguments("workspace.glossaryList",json.readTree("{\"edit\":\"true\"}")));
+        assertThrows(IllegalArgumentException.class,()->AiConversationWorkflows.arguments("workspace.glossaryList",json.readTree("{\"definition\":\"not a search field\"}")));
+        assertThrows(IllegalArgumentException.class,()->AiConversationWorkflows.arguments("workspace.glossaryList",json.valueToTree(Map.of("filter","x".repeat(257)))));
+    }
+    @Test void validationFailureIdentifiesTheActualAttemptedToolAndCallCount(){
+        var failure=assertThrows(AiConversationProtocol.ResponseFailure.class,()->AiConversationProtocol.run("q",json,Set.of("workspace.glossaryList"),
+            p->"{\"type\":\"tool_call\",\"name\":\"workspace.glossaryList\",\"arguments\":{}}",(n,a)->{throw new IllegalArgumentException("CONVERSATION_ARGUMENT");}));
+        assertEquals("workspace.glossaryList",failure.tool());assertEquals("CONVERSATION_ARGUMENT",failure.getMessage());assertEquals(1,failure.modelCalls());assertTrue(failure.executions().isEmpty());
+    }
     @Test void arbitraryMethodsWritesSqlAndUnexpectedFieldsAreRejected(){
         for(String reply:List.of("{\"type\":\"tool_call\",\"name\":\"profile.delete\",\"arguments\":{}}",
                 "{\"type\":\"final\",\"answer\":\"done\",\"action\":\"apply\",\"arguments\":{}}",

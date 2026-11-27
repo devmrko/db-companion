@@ -24,6 +24,7 @@ public final class AiConversationWorkflows {
             Map<String,Object> props=switch(action){case "draft","suggest"->fields;case "clone","target"->Map.of("profile",string("Exact existing profile name"));case "tables"->Map.of("filter",string("Optional object name filter"));
                 case "attribute"->Map.of("attribute",string("Registered profile attribute name"),"value",string("Optional requested value; boolean as true or false"));
                 case "input"->Map.of("value",string("Explicit answer to the pending NON-creation workspace prompt; never put a question about the field here"));
+                case "glossary-list"->Map.of("filter",Map.of("type","string","maxLength",256,"description","Optional existing business-term name to search; omit to list all"),"edit",Map.of("type","boolean","description","True (default) to choose an existing definition for editing; false for browsing"));
                 case "navigate"->Map.of("path",string("Exact path from menu catalogue"));case "permissions"->Map.of("topic",string("profile, credential, text, semantic, metadata-history, profile-history, network, dds, agent or table"));default->Map.of();};
             List<String> required=switch(action){case "target"->List.of("profile");case "attribute"->List.of("attribute");case "input"->List.of("value");case "navigate"->List.of("path");case "permissions"->List.of("topic");default->List.of();};
             String description=switch(action){
@@ -37,7 +38,8 @@ public final class AiConversationWorkflows {
                 case "resume"->"Resume the existing profile draft.";case "cancel"->"Discard local workspace draft; no database changes.";
                 case "target"->"Select an existing configuration target. This is NOT the assistant model selection.";
                 case "history"->"Read selected profile configuration history.";case "sources"->"Open existing enabled semantic-source attachment review, preserving previous connections. No apply.";
-                case "glossary"->"Open a business-term draft editor. No save.";case "glossary-list"->"Read existing business terms and choose one to edit.";
+                case "glossary"->"Start a NEW business-term registration draft, only when the user explicitly asks to register/add a new term. NEVER use for changing an existing business definition; use workspace.glossaryList or clarify the intended definition instead. No save.";
+                case "glossary-list"->"Search/read EXISTING business terms and choose a definition to EDIT. Use for changing an existing business definition; optional filter is the term name. Does not create a new term or save changes.";
                 case "attribute"->"Open existing profile attribute comparison/confirmation. No save. This edits an existing profile, not a creation draft.";
                 case "query"->"Open SELECT question workflow. Model generation and SQL execution each require separate confirmation.";
                 case "input"->"Pass an explicitly supplied/accepted value to the current NON-creation workspace input. No auto-apply or SQL execution.";
@@ -49,4 +51,11 @@ public final class AiConversationWorkflows {
         });return List.copyOf(out);
     }
     public static void validate(String name,JsonNode args){String action=ACTIONS.get(name);if(action==null)throw new IllegalArgumentException("CONVERSATION_UNREGISTERED_TOOL");AiConversationProtocol.validateAction(action,args);}
+    public static tools.jackson.databind.node.ObjectNode arguments(String name,JsonNode input){
+        if(input==null||!input.isObject())throw new IllegalArgumentException("CONVERSATION_TOOL_FORMAT");
+        var operation=(tools.jackson.databind.node.ObjectNode)input.deepCopy();
+        if(operation.has("message")&&!operation.path("message").isString())throw new IllegalArgumentException("CONVERSATION_MESSAGE_TYPE");
+        if(operation.path("message").asString("").length()>4000)throw new IllegalArgumentException("CONVERSATION_MESSAGE_LENGTH");
+        operation.remove("message");validate(name,operation);return operation;
+    }
 }

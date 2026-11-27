@@ -75,6 +75,27 @@ class AiConversationServiceTest {
         answer="{\"type\":\"final\",\"answer\":\"listed\",\"action\":\"draft\",\"arguments\":{\"name\":\"UNREQUESTED\"}}";
         assertEquals("",service.message(s,input("what tables exist?"),Locale.KOREAN).action());
     }}
+    @Test void existingBusinessDefinitionOpensAFilteredEditListWithoutCreatingAnything(){try(var s=session()){
+        workflow("workspace.glossaryList","{\"filter\":\"ACTIVE_USER\",\"edit\":true}");
+        var result=service.message(s,input("업무정의를 좀 바꿀까 하는데?"),Locale.KOREAN);
+        assertEquals("glossary-list",result.action());assertEquals("ACTIVE_USER",result.arguments().path("filter").asString());assertTrue(result.arguments().path("edit").asBoolean());assertEquals(1,calls);
+    }}
+    @Test void invalidUnexecutedToolInputCanBeCorrectedUsingTheActualSchema(){try(var s=session()){
+        replies.add("{\"type\":\"tool_call\",\"name\":\"workspace.glossaryList\",\"arguments\":{\"definition\":\"not yet a draft\"}}");
+        replies.add("{\"type\":\"tool_call\",\"name\":\"workspace.glossaryList\",\"arguments\":{\"filter\":\"ACTIVE_USER\",\"edit\":true}}");
+        var result=service.message(s,input("기존 정의를 수정하고 싶어"),Locale.KOREAN);
+        assertEquals(2,result.modelCalls());assertEquals("glossary-list",result.action());assertTrue(prompts.get(1).contains("INVALID_TOOL_ARGUMENTS"));assertTrue(prompts.get(1).contains("inputSchema"));
+        var rejected=json.readTree(result.executions().getFirst().result());assertFalse(rejected.path("executed").asBoolean());
+    }}
+    @Test void controllerReturnsAnActionableDiagnosticWithoutEchoingInvalidInput(){try(var s=session()){
+        var request=new org.springframework.mock.web.MockHttpServletRequest();request.getSession().setAttribute(PoolSession.ATTRIBUTE,s);
+        var input=new AiConversationService.Input("","HELPER",version,true,json.readTree("{\"password\":\"SYNTHETIC_SECRET\"}"));
+        var response=new com.dbcompanion.controller.AiConversationController(service).message(input,Locale.KOREAN,request);
+        assertEquals(400,response.getStatusCode().value());var body=json.valueToTree(response.getBody());
+        assertEquals("CONVERSATION_INPUT",body.path("diagnostic").path("code").asString());
+        String id=body.path("diagnostic").path("requestId").asString();assertEquals(id,response.getHeaders().getFirst("X-Request-ID"));assertDoesNotThrow(()->UUID.fromString(id));
+        assertFalse(body.toString().contains("SYNTHETIC_SECRET"));assertEquals(0,calls);
+    }}
     @Test void allSidebarMenusAreInTheModelReferenceCatalogue() throws java.io.IOException {
         try(var input=getClass().getResourceAsStream("/templates/fragments/common.html")){
             var matcher=java.util.regex.Pattern.compile("class=\"app-nav-item\"[^\\n]*?th:href=\"@\\{([^}]+)\\}").matcher(new String(Objects.requireNonNull(input).readAllBytes(),java.nio.charset.StandardCharsets.UTF_8));

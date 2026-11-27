@@ -1,7 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {profileLabel,assistantPost,tokenValue,adminRemedy} from '../../main/resources/static/js/ai-assistant.mjs';
+import {profileLabel,assistantPost,tokenValue,adminRemedy,assistantError} from '../../main/resources/static/js/ai-assistant.mjs';
+test('400 conversation diagnostics survive both legacy codes and structured tool errors',()=>{
+  const legacy=assistantError({error:'Failed',diagnostic:'CONVERSATION_ARGUMENT'},400);
+  assert.deepEqual(legacy.diagnostic,{code:'CONVERSATION_ARGUMENT'});
+  const diagnostic={code:'CONVERSATION_ARGUMENT',tool:'workspace.glossaryList',requestId:'request-1'};
+  assert.deepEqual(assistantError({error:'Failed',diagnostic},400).diagnostic,diagnostic);
+});
 test('RDF owner prerequisite error gives the fixed owner grants only in RDF operations',()=>{
   const error={error:'ORA-20004: Check RDF owner creation privileges before setup.'};
   const guidance=adminRemedy(error,503,'/ontology/native/install','APP_TEST');

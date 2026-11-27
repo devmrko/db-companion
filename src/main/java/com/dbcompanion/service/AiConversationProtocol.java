@@ -15,9 +15,11 @@ public final class AiConversationProtocol {
     public record Result(String answer,String action,JsonNode arguments,List<AiSetupToolLoop.Execution> executions,int modelCalls) {}
     /** Returned only to the requesting session; never log the raw provider response. */
     public static final class ResponseFailure extends IllegalArgumentException {
-        private final int modelCalls;private final List<AiSetupToolLoop.Execution> executions;private final String response;
-        ResponseFailure(String code,int modelCalls,List<AiSetupToolLoop.Execution> executions,String response){super(code);this.modelCalls=modelCalls;this.executions=List.copyOf(executions);this.response=response!=null&&response.length()<=16000?response:"";}
+        private final int modelCalls;private final List<AiSetupToolLoop.Execution> executions;private final String response,tool;
+        ResponseFailure(String code,int modelCalls,List<AiSetupToolLoop.Execution> executions,String response){this(code,modelCalls,executions,response,"");}
+        ResponseFailure(String code,int modelCalls,List<AiSetupToolLoop.Execution> executions,String response,String tool){super(code);this.modelCalls=modelCalls;this.executions=List.copyOf(executions);this.response=response!=null&&response.length()<=16000?response:"";this.tool=tool;}
         public int modelCalls(){return modelCalls;}public List<AiSetupToolLoop.Execution> executions(){return executions;}public String response(){return response;}
+        public String tool(){return tool;}
     }
     public static JsonNode object(String raw,JsonMapper json){
         if(raw==null||raw.length()>16000)throw new IllegalArgumentException("CONVERSATION_RESPONSE_SIZE");
@@ -54,7 +56,7 @@ public final class AiConversationProtocol {
     public static void validateAction(String action,JsonNode args){
         if(!ACTIONS.contains(action)||!args.isObject())throw new IllegalArgumentException("CONVERSATION_ACTION");
         Set<String> allowed=switch(action){case "draft","suggest"->FIELDS;case "clone","target"->Set.of("profile");case "tables"->Set.of("filter");
-            case "attribute"->Set.of("attribute","value");case "input"->Set.of("value");case "navigate"->Set.of("path");case "permissions"->Set.of("topic");default->Set.of();};
+            case "attribute"->Set.of("attribute","value");case "glossary-list"->Set.of("filter","edit");case "input"->Set.of("value");case "navigate"->Set.of("path");case "permissions"->Set.of("topic");default->Set.of();};
         for(String key:args.propertyNames()){
             if(!allowed.contains(key))throw new IllegalArgumentException("CONVERSATION_ARGUMENT");var value=args.path(key);
             if(key.equals("tables")){
@@ -66,9 +68,10 @@ public final class AiConversationProtocol {
                     if(!identifier(table.path("owner")))throw new IllegalArgumentException("CONVERSATION_TABLE_OWNER");
                     if(!identifier(table.path("name")))throw new IllegalArgumentException("CONVERSATION_TABLE_NAME");
                 }
-            }else if(Set.of("comments","conversation").contains(key)){if(!value.isBoolean())throw new IllegalArgumentException("CONVERSATION_BOOLEAN");}
+            }else if(Set.of("comments","conversation","edit").contains(key)){if(!value.isBoolean())throw new IllegalArgumentException("CONVERSATION_BOOLEAN");}
             else if(!value.isString()||value.asString().length()>1000||value.asString().indexOf('\0')>=0)throw new IllegalArgumentException("CONVERSATION_VALUE");
         }
+        if(action.equals("glossary-list")&&args.path("filter").asString("").length()>256)throw new IllegalArgumentException("CONVERSATION_FILTER_LENGTH");
         if(Set.of("draft","suggest").contains(action)&&args.has("name")&&!identifier(args.path("name")))throw new IllegalArgumentException("CONVERSATION_NAME");
         Set<String> required=switch(action){case "target"->Set.of("profile");case "attribute"->Set.of("attribute");case "navigate"->Set.of("path");case "permissions"->Set.of("topic");case "input"->Set.of("value");default->Set.of();};
         if(!args.propertyNames().containsAll(required))throw new IllegalArgumentException("CONVERSATION_ARGUMENT_REQUIRED");
@@ -99,13 +102,17 @@ public final class AiConversationProtocol {
             }
             if(!node.path("type").asString().equals("tool_call")||node.size()!=3||!node.path("name").isString()||!node.path("arguments").isObject())throw new IllegalArgumentException("CONVERSATION_TOOL_FORMAT");
             String name=node.path("name").asString(),key=name+json.writeValueAsString(node.path("arguments"));
-            if(call==7||!tools.contains(name)||!called.add(key))throw new IllegalArgumentException("CONVERSATION_TOOL_LIMIT");
-            String result=json.writeValueAsString(service.apply(name,node.path("arguments")));
+            if(!tools.contains(name))throw new ResponseFailure("CONVERSATION_UNREGISTERED_TOOL",call,executions,reply,"");
+            if(!called.add(key))throw new ResponseFailure("CONVERSATION_REPEATED_TOOL",call,executions,reply,name);
+            if(call==7)throw new ResponseFailure("CONVERSATION_CALL_LIMIT",call,executions,reply,name);
+            final String result;
+            try{result=json.writeValueAsString(service.apply(name,node.path("arguments")));}
+            catch(IllegalArgumentException ex){String code=ex.getMessage()!=null&&ex.getMessage().matches("CONVERSATION_[A-Z_]+")?ex.getMessage():"CONVERSATION_TOOL_ARGUMENT";throw new ResponseFailure(code,call,executions,reply,name);}
             if(result.length()>20000)throw new IllegalArgumentException("CONVERSATION_TOOL_RESULT_LIMIT");
             executions.add(new AiSetupToolLoop.Execution(executions.size()+1,name,result));
             // Workspace Tools return directly: their actual rendered UI is the result. This avoids
             // another generation attempting a second operation instead of ending the current turn.
-            if(AiConversationWorkflows.ACTIONS.containsKey(name))return new Result(json.readTree(result).path("answer").asString("요청한 작업을 작업 영역에 표시합니다."),"",json.createObjectNode(),List.copyOf(executions),call);
+            if(AiConversationWorkflows.ACTIONS.containsKey(name)&&json.readTree(result).path("prepared").asBoolean(false))return new Result(json.readTree(result).path("answer").asString("요청한 작업을 작업 영역에 표시합니다."),"",json.createObjectNode(),List.copyOf(executions),call);
             transcript.append("\nSERVER_TOOL_EXCHANGE ").append(json.writeValueAsString(Map.of("request",node,"result",json.readTree(result))));
             transcript.append("\nUse this actual service result to fulfill USER_MESSAGE. Return exactly one JSON tool_call, or {\"type\":\"final\",\"answer\":\"answer using actual evidence\"}. Do not put actions in a final answer; workspace changes require the registered workflow Tool. No simulated observations or repeated confirmation for an already requested draft edit.");
         }

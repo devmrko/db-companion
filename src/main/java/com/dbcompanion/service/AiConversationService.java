@@ -54,13 +54,14 @@ public class AiConversationService {
                         text->bound(s,true,()->ai.generate(packages.packageOwner(owner),selected.name(),text,SelectAiTest.Action.CHAT)),
                         (name,args)->{
                             var tool=tools().stream().filter(t->t.name().equals(name)).findFirst().orElseThrow();
+                            final JsonNode validated;
+                            if(AiConversationWorkflows.ACTIONS.containsKey(name)){
+                                try{validated=AiConversationWorkflows.arguments(name,args);}
+                                catch(IllegalArgumentException invalid){return Map.of("error","INVALID_TOOL_ARGUMENTS","code",invalid.getMessage(),"executed",false,"inputSchema",tool.inputSchema());}
+                            }else validated=null;
                             return AiSetupServiceTools.invokeRegistered(name,tool.description(),tool.inputSchema(),args,(registered,inputArgs)->{
                                 if(!AiConversationWorkflows.ACTIONS.containsKey(registered))return inspect(s,owner,registered,inputArgs);
-                                var operation=(tools.jackson.databind.node.ObjectNode)inputArgs.deepCopy();
-                                if(operation.has("message")&&!operation.path("message").isString())throw new IllegalArgumentException("CONVERSATION_MESSAGE_TYPE");
-                                String message=operation.path("message").asString("");operation.remove("message");
-                                if(message.length()>4000)throw new IllegalArgumentException("CONVERSATION_MESSAGE_LENGTH");
-                                AiConversationWorkflows.validate(registered,operation);
+                                var operation=Objects.requireNonNull(validated);String message=inputArgs.path("message").asString("");
                                 if(prepared.get()!=null)throw new IllegalArgumentException("CONVERSATION_ONE_WORKFLOW_PER_TURN");
                                 String action=AiConversationWorkflows.ACTIONS.get(registered);
                                 if(Set.of("draft","suggest","tables","models","review","resume").contains(action)&&!input.context().path("creation").isObject())throw new IllegalArgumentException("CONVERSATION_DRAFT_REQUIRED");
@@ -184,6 +185,8 @@ public class AiConversationService {
         Call workspace.adminGuidance if the user wants the existing SQL guidance rendered in the workspace. It never grants anything.
         For a requested existing-profile edit use workspace.editAttribute, not creation.updateDraft.
         For a pending NON-creation input use workspace.respond ONLY when the user supplies or accepts the requested value; a question ABOUT a value needs an explanation instead.
+        Business definitions can mean glossary terms/aggregation rules, ontology concepts/relations, or a profile's semantic-source connection. If the intended kind/target is unclear, ask one brief clarification. A request to CHANGE an existing business definition should open/search existing definitions with workspace.glossaryList, not start NEW registration with workspace.glossary. Use new registration only for an explicit add/register request. A tentative question ('업무정의를 좀 바꿀까 하는데?') never authorizes a save.
+        For a tentative/ambiguous definition-change request, ask WHICH kind or existing definition needs changing. Do not merely say you can help or offer to open a workspace at a future time; ask the missing question or open the appropriate existing-definition selection.
         Profile creation procedure: creation.start OR creation.clone -> name -> tables -> model/auth -> creation.preview -> separate user Apply -> actual DB readback/history.
         For ANY menu-location question ('실행 내역은 어디서 봐?' etc.) you MUST call workspace.navigate with the exact registered path, so the user gets a clickable menu link. Do NOT answer a menu-location question with plain text alone. Menu reference knowledge does NOT mean every menu has an autonomous executor.
         DDS verification checks policies via user-specific MCP/APEX queries; describe prerequisites and use admin.advice, not an invented grant Tool.
