@@ -12,6 +12,7 @@
   "jsonView.copy": ["JSON 복사", "Copy JSON", "复制 JSON", "JSON をコピー"],
   "jsonView.download": ["JSON 내려받기", "Download JSON", "下载 JSON", "JSON をダウンロード"],
   "jsonView.original": ["원본 JSON", "Original JSON", "原始 JSON", "元の JSON"],
+  "jsonView.encoded": ["문자열에 담긴 JSON", "JSON inside a string", "字符串中的 JSON", "文字列内の JSON"],
   "jsonView.more": ["더 보기", "Show more", "显示更多", "さらに表示"],
   "jsonView.copied": ["복사 완료", "Copied", "已复制", "コピー済み"],
   "jsonView.copyFailed": ["원본 JSON을 선택해 복사하세요.", "Select and copy the original JSON.", "请选择并复制原始 JSON。", "元の JSON を選択してコピーしてください。"],

@@ -39,7 +39,13 @@ export function mountJsonView(host,source){
   download.addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([source],{type:'application/json;charset=utf-8'})),a=el('a');a.href=url;a.download='data.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
   toolbar.append(copy,download,status);host.append(toolbar);
   function render(node,parent){
-    if(!node.entries){parent.append(el('span',node.kind==='string'?(node.value||'""'):node.value,'app-json-scalar app-json-'+node.kind));return;}
+    if(!node.entries){
+      const nested=node.kind==='string'&&jsonTree(node.value);
+      if(nested){const details=el('details'),summary=el('summary',t('jsonView.encoded','문자열에 담긴 JSON'));let loaded=false;details.append(summary);
+        details.addEventListener('toggle',()=>{if(details.open&&!loaded){loaded=true;render(nested,details);}});parent.append(details);
+      }else parent.append(el('span',node.kind==='string'?(node.value||'""'):node.value,'app-json-scalar app-json-'+node.kind));
+      return;
+    }
     if(!node.entries.length){parent.append(el('span',node.kind==='object'?'{}':'[]','app-json-empty'));return;}
     const list=el('dl',undefined,'app-json-fields');parent.append(list);let offset=0;
     const more=el('button',t('jsonView.more','더 보기'),'btn app-btn app-btn-secondary');more.type='button';
