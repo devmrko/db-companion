@@ -53,6 +53,7 @@ BEGIN
       policy_name=>'DBC_BT_KO_POLICY',document=>question_text,
       text_query=>'{'||REPLACE(REPLACE(r.LABEL,'\','\\'),'}','\}')||'}',
       restab=>spans,plaintext=>TRUE,format=>'TEXT');
+    {{SURFACE_MATCH}}
     span_no:=spans.FIRST;
     WHILE span_no IS NOT NULL LOOP
       -- Native offsets are UCS2; SUBSTR2 also preserves alignment after emoji.

@@ -70,15 +70,18 @@ class GlossaryFunctionTest {
     @Test void sharedDictionaryKeepsInvokerRightsAndResolvesTheInstalledOwner(){
         var scripts=GlossaryFunctionSql.statements("OWNER_SCHEMA");
         assertThat(scripts.getFirst()).contains("AUTHID CURRENT_USER","glossary API v2");
-        assertThat(scripts.get(1)).contains("glossary API v3");
+        assertThat(scripts.get(1)).contains("glossary API v4", "surface_spans(surface_no).length=literal_length");
         assertThat(scripts.get(1)).contains("ENQUOTE_NAME($$PLSQL_UNIT_OWNER,FALSE)",
             "'.DBC_BT_KO_POLICY'","response.put('schema',$$PLSQL_UNIT_OWNER)");
         assertThat(scripts.get(1)).doesNotContain("SYS_CONTEXT('USERENV','CURRENT_USER')","AUTHID DEFINER");
     }
-    @Test void onlyRecognizedVersionTwoPackagesAreEligibleForReplacement(){
+    @Test void onlyRecognizedVersionTwoAndThreePackagesAreEligibleForReplacement(){
         String source=GlossaryFunctionRepository.storedSource("APP",GlossaryFunctionSql.API,
             GlossaryFunctionSql.legacyApiBodyV2("APP"));
         assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",1,source)).isTrue();
+        String previous=GlossaryFunctionRepository.storedSource("APP",GlossaryFunctionSql.API,GlossaryFunctionSql.legacyApiBodyV3("APP"));
+        assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",1,previous)).isTrue();
+        assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",1,previous+"\n-- custom")).isFalse();
         assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",1,source+"\n-- custom")).isFalse();
         assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",0,source)).isFalse();
         assertThat(GlossaryFunctionRepository.isLegacyApiSource("APP",1,

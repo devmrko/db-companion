@@ -67,6 +67,12 @@ class BusinessGlossaryPhraseRepositoryTest {
         assertThatThrownBy(()->repository.phraseTargets("APP","Active","{ACTIVE}")).isInstanceOf(AiAssistant.Failure.class);
         assertThatThrownBy(()->result.length()).isInstanceOf(SQLException.class);
     }
+    @Test void literalSurfaceRetryRequiresNativeExactSpanAndNeverAcceptsAWordPrefix(){
+        String sql=BusinessGlossarySql.phraseSearch("APP");
+        assertThat(sql).contains("spans.COUNT=0", "surface_spans(surface_no).offset=literal_pos",
+                "surface_spans(surface_no).length=literal_length", "surface_end-literal_pos-literal_length<=128");
+        assertThat(sql).doesNotContain("으로|에서", "를|", "은|는");
+    }
     @Test void matchingAssetUsesCurrentDictionaryAndContainsNoInstallationOrNewRuleStore(){
         String sql=BusinessGlossarySql.phraseSearch("APP");
         assertThat(sql).contains("CONTAINS(SEARCH_TEXT,candidate_query,1)","TERM_TEXT AS LABEL","t.ALIASES_JSON",

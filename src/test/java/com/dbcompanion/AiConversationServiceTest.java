@@ -96,6 +96,16 @@ class AiConversationServiceTest {
         String id=body.path("diagnostic").path("requestId").asString();assertEquals(id,response.getHeaders().getFirst("X-Request-ID"));assertDoesNotThrow(()->UUID.fromString(id));
         assertFalse(body.toString().contains("SYNTHETIC_SECRET"));assertEquals(0,calls);
     }}
+    @Test void readOnlyToolExtraMessageIsNotExecutedAndCanBeCorrected(){try(var s=session()){
+        replies.add("{\"type\":\"tool_call\",\"name\":\"profiles.list\",\"arguments\":{\"message\":\"I will inspect\"}}");
+        replies.add("{\"type\":\"tool_call\",\"name\":\"profiles.list\",\"arguments\":{}}");
+        replies.add("{\"type\":\"final\",\"answer\":\"확인했습니다.\"}");
+        var result=service.message(s,input("프로파일 목록"),Locale.KOREAN);
+        assertEquals(3,result.modelCalls());assertEquals(2,result.executions().size());
+        var rejected=json.readTree(result.executions().getFirst().result());assertFalse(rejected.path("executed").asBoolean());
+        assertEquals("CONVERSATION_TOOL_EXTRA_KEY",rejected.path("code").asString());
+        assertTrue(prompts.get(1).contains("inputSchema"));assertEquals("",result.action());
+    }}
     @Test void allSidebarMenusAreInTheModelReferenceCatalogue() throws java.io.IOException {
         try(var input=getClass().getResourceAsStream("/templates/fragments/common.html")){
             var matcher=java.util.regex.Pattern.compile("class=\"app-nav-item\"[^\\n]*?th:href=\"@\\{([^}]+)\\}").matcher(new String(Objects.requireNonNull(input).readAllBytes(),java.nio.charset.StandardCharsets.UTF_8));

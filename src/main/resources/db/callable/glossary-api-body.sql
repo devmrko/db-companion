@@ -1,5 +1,5 @@
 CREATE PACKAGE BODY {{API}} AS
-  -- DB Companion glossary API v3: dictionary owner is fixed at compilation.
+  -- DB Companion glossary API v4: dictionary owner is fixed at compilation.
   FUNCTION dictionary_table RETURN VARCHAR2 IS
   BEGIN
     RETURN DBMS_ASSERT.ENQUOTE_NAME($$PLSQL_UNIT_OWNER,FALSE)
@@ -118,6 +118,7 @@ CREATE PACKAGE BODY {{API}} AS
         policy_name=>DBMS_ASSERT.ENQUOTE_NAME($$PLSQL_UNIT_OWNER,FALSE)||'.DBC_BT_KO_POLICY',document=>p_question,
         text_query=>escape_text_phrase(label_text),
         restab=>spans,plaintext=>TRUE,format=>'TEXT');
+      {{SURFACE_MATCH}}
       position_no:=spans.FIRST;
       WHILE position_no IS NOT NULL LOOP
         item:=JSON_OBJECT_T();

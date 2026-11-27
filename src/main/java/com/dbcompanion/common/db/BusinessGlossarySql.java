@@ -10,9 +10,20 @@ public final class BusinessGlossarySql {
     public static final String TABLE="DBC_BUSINESS_TERM", LEXER="DBC_BT_KO_LEXER", POLICY="DBC_BT_KO_POLICY", INDEX="DBC_BT_CTX";
     public static String table(String owner){return ProfileHistorySql.object(owner,TABLE);}
     public static String phraseSearch(String owner){
-        String qualified=table(owner);
-        try{return new ClassPathResource("db/glossary/phrase-search.sql").getContentAsString(StandardCharsets.UTF_8).replace("{{TABLE}}",qualified);}
+        return phraseAsset("phrase-search.sql").replace("{{TABLE}}",table(owner)).replace("{{SURFACE_MATCH}}",surfaceMatch(false));
+    }
+    public static String legacyPhraseSearch(String owner){return phraseAsset("phrase-search-v1.sql").replace("{{TABLE}}",table(owner));}
+    private static String phraseAsset(String name){
+        try{return new ClassPathResource("db/glossary/"+name).getContentAsString(StandardCharsets.UTF_8);}
         catch(java.io.IOException ex){throw new IllegalStateException("Dictionary phrase SQL asset is missing",ex);}
+    }
+    static String surfaceMatch(boolean installed){
+        return phraseAsset("phrase-surface-match.sql")
+            .replace("{{LABEL}}",installed?"label_text":"r.LABEL")
+            .replace("{{TERM_ID}}",installed?"term_id":"r.TERM_ID")
+            .replace("{{KIND}}",installed?"match_kind":"r.KIND")
+            .replace("{{QUESTION}}",installed?"p_question":"question_text")
+            .replace("{{POLICY}}",installed?"DBMS_ASSERT.ENQUOTE_NAME($$PLSQL_UNIT_OWNER,FALSE)||'.DBC_BT_KO_POLICY'":"'DBC_BT_KO_POLICY'");
     }
     public static String create(String owner){return "CREATE TABLE "+table(owner)+"""
         (TERM_ID VARCHAR2(36 CHAR) CONSTRAINT DBC_BT_PK PRIMARY KEY,

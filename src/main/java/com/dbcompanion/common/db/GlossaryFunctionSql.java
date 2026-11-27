@@ -18,7 +18,7 @@ public final class GlossaryFunctionSql {
     }
     public static java.util.List<String> statements(String owner){
         return java.util.List.of(CallableAiSql.resource("glossary-api-spec.sql").replace("{{API}}",ProfileHistorySql.object(owner,API)),
-            CallableAiSql.resource("glossary-api-body.sql").replace("{{API}}",ProfileHistorySql.object(owner,API)),create(owner),
+            CallableAiSql.resource("glossary-api-body.sql").replace("{{API}}",ProfileHistorySql.object(owner,API)).replace("{{SURFACE_MATCH}}",BusinessGlossarySql.surfaceMatch(true)),create(owner),
             CallableAiSql.resource("glossary-context.sql").replace("{{API}}",ProfileHistorySql.object(owner,API))
                 .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT)));
     }
@@ -27,6 +27,7 @@ public final class GlossaryFunctionSql {
         return CallableAiSql.resource("glossary-api-body-v2.sql")
             .replace("{{API}}",ProfileHistorySql.object(owner,API));
     }
+    public static String legacyApiBodyV3(String owner){return CallableAiSql.resource("glossary-api-body-v3.sql").replace("{{API}}",ProfileHistorySql.object(owner,API));}
     public static String legacyContext(String owner){
         return CallableAiSql.resource("glossary-context-v1.sql").replace("{{API}}",ProfileHistorySql.object(owner,API))
             .replace("{{CONTEXT}}",ProfileHistorySql.object(owner,CONTEXT));
@@ -73,7 +74,7 @@ public final class GlossaryFunctionSql {
             END DBC_GLOSSARY_SEARCH;
             """.formatted(ProfileHistorySql.object(owner,NAME),
                 CallableAiSql.resource("glossary-functions.sql").stripTrailing())
-                .replace("{{PHRASE_BLOCK}}",CallableAiSql.phraseBlock());
+                .replace("{{PHRASE_BLOCK}}",CallableAiSql.legacyPhraseBlock());
     }
     public static String example(String owner){
         return "SELECT "+ProfileHistorySql.object(owner,NAME)+"(:question) AS EVIDENCE_JSON FROM DUAL";

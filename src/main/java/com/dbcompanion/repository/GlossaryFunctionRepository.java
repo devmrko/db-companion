@@ -66,8 +66,9 @@ public class GlossaryFunctionRepository {
             com.dbcompanion.service.OntologyQueryService.hash(String.join("\n",snapshots)));
     }
     public static boolean isLegacyApiSource(String owner,int index,String actual){
-        return index==1&&normalize(actual).equals(normalize(storedSource(owner,
-            GlossaryFunctionSql.API,GlossaryFunctionSql.legacyApiBodyV2(owner))));
+        return index==1&&(normalize(actual).equals(normalize(storedSource(owner,
+            GlossaryFunctionSql.API,GlossaryFunctionSql.legacyApiBodyV2(owner))))||normalize(actual).equals(normalize(storedSource(owner,
+            GlossaryFunctionSql.API,GlossaryFunctionSql.legacyApiBodyV3(owner)))));
     }
     public static String replacementSql(String sql){
         if(!sql.startsWith("CREATE FUNCTION ")&&!sql.startsWith("CREATE PACKAGE "))

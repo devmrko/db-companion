@@ -19,13 +19,17 @@ public final class CallableAiSql {
         return statements(owner, "");
     }
     public static List<String> legacyStatements(String owner){ return statements(owner, "v1-"); }
-    public static String legacyNumericBody(String owner){return resource("v1-numeric-body.sql").replace("{{PACKAGE}}",ProfileHistorySql.object(owner,NAME)).replace("{{PHRASE_BLOCK}}",phraseBlock());}
+    public static String legacyNumericBody(String owner){return resource("v1-numeric-body.sql").replace("{{PACKAGE}}",ProfileHistorySql.object(owner,NAME)).replace("{{PHRASE_BLOCK}}",legacyPhraseBlock());}
     private static List<String> statements(String owner, String prefix){
         return List.of(resource(prefix+"spec.sql").replace("{{PACKAGE}}",ProfileHistorySql.object(owner,NAME)),
-            resource(prefix+"body.sql").replace("{{PACKAGE}}",ProfileHistorySql.object(owner,NAME)).replace("{{PHRASE_BLOCK}}",phraseBlock()));
+            resource(prefix+"body.sql").replace("{{PACKAGE}}",ProfileHistorySql.object(owner,NAME)).replace("{{PHRASE_BLOCK}}",prefix.isEmpty()?phraseBlock():legacyPhraseBlock()));
     }
     public static String phraseBlock(){
-        String phrase=BusinessGlossarySql.phraseSearch("DBC_CALLER_SCHEMA")
+        return phraseBlock(BusinessGlossarySql.phraseSearch("DBC_CALLER_SCHEMA"));
+    }
+    public static String legacyPhraseBlock(){return phraseBlock(BusinessGlossarySql.legacyPhraseSearch("DBC_CALLER_SCHEMA"));}
+    private static String phraseBlock(String source){
+        String phrase=source
             .replace("\"DBC_CALLER_SCHEMA\".\"DBC_BUSINESS_TERM\"","{{GLOSSARY_TABLE}}")
             .replaceFirst("\\?",":question_bind").replaceFirst("\\?",":query_bind").replaceFirst("\\?",":result_bind");
         // Bind placeholders are positional inside the dynamic anonymous block.
