@@ -7,6 +7,7 @@ import {mountInspection,renderPromptInspection,renderSqlReferences} from './sele
 import {mountBusinessGlossary,renderGlossarySnapshot} from './business-glossary.mjs';
 import {mountProgress} from './select-ai-progress.mjs';
 import {mountResultReview} from './select-ai-result-review.mjs';
+import {renderQueryData} from './query-result-view.mjs';
 
 export const validQuestion=value=>typeof value==='string'&&value.trim().length>0&&value.length<=16000&&!value.includes('\0');
 export const canPrepare=(selected,question,busy)=>Boolean(selected)&&validQuestion(question)&&!busy;
@@ -230,17 +231,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ai-test]').for
     get('execute-message').textContent=result.error?[result.error,result.code,t('aitest.progress.seconds','{0}초',(result.elapsedMillis/1000).toFixed(2))].filter(Boolean).join(' · '):t('aitest.rowCount','{0}행 · {1}초',result.data.rows.length,(result.elapsedMillis/1000).toFixed(2));
     if(result.code==='ORA-01013')get('execute-message').textContent+='\n'+t('aitest.progress.cancelHint','작업 취소가 반환되었습니다. 앱의 SQL 실행 제한은 {0}초입니다. 제한시간에 따른 취소일 수 있으나 이 코드만으로 원인을 확정할 수 없습니다. 단계별 시간을 확인하세요.',root.dataset.executionTimeoutSeconds||'—');
     if(result.error)return;
-    const data=result.data;let page=0;
-    const stamp=document.createElement('p');stamp.className='app-filter-message';stamp.textContent=`${data.actor} · ${new Date(data.executedAt).toLocaleString()}`;host.append(stamp);
-    if(data.truncated){const note=document.createElement('p');note.textContent=t('aitest.moreRows','200행까지만 표시합니다. 추가 행이 있습니다.');host.append(note);}
-    const wrapper=document.createElement('div');wrapper.className='table-responsive';const table=document.createElement('table');table.className='app-table';
-    const head=document.createElement('thead'),header=document.createElement('tr'),body=document.createElement('tbody');
-    for(const name of data.columns){const cell=document.createElement('th');cell.textContent=name;header.append(cell);}head.append(header);table.append(head,body);wrapper.append(table);host.append(wrapper);
-    const paging=document.createElement('div');paging.className='app-assistant-actions';const previous=document.createElement('button'),next=document.createElement('button'),count=document.createElement('span');
-    for(const button of [previous,next]){button.type='button';button.className='btn app-btn app-btn-quiet';}
-    previous.textContent=t('ui.da7e61c67cc5','이전');next.textContent=t('ui.aef613c6612d','다음');paging.append(previous,count,next);host.append(paging);
-    const paint=()=>{body.replaceChildren();for(const row of data.rows.slice(page*10,page*10+10)){const tr=document.createElement('tr');for(const cell of row){const td=document.createElement('td');td.textContent=cell.value===null?'NULL':cell.value;if(cell.truncated){td.append(document.createTextNode('…'));td.title=t('aitest.cellClipped','2,000자 표시 한도');}tr.append(td);}body.append(tr);}count.textContent=`${page+1} / ${Math.max(1,Math.ceil(data.rows.length/10))}`;previous.disabled=page===0;next.disabled=(page+1)*10>=data.rows.length;};
-    previous.addEventListener('click',()=>{page--;paint();});next.addEventListener('click',()=>{page++;paint();});paint();
+    renderQueryData(host,result.data);
   }
   const executionDialog=get('execution-dialog');
   async function closeExecution(){if(busy)return;const token=execution?.token;execution=null;executionDialog.close();controls();if(token){try{await post('cancel',{token});}catch(ex){message(ex.message,true);}}}

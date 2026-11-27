@@ -24,6 +24,10 @@ public class AiCreationController {
         @com.fasterxml.jackson.annotation.JsonAnySetter public void reject(String key,Object value){throw new IllegalArgumentException("Unknown copy field: "+key);}
     }
     @GetMapping("/form") public ResponseEntity<?> form(@RequestParam String schema,@RequestParam Kind kind,@RequestParam(defaultValue="") String source,HttpServletRequest r){return run(r,()->service.form(session(r),schema,kind,source));}
+    @GetMapping("/profile-options") public ResponseEntity<?> profileOptions(@RequestParam String schema,@RequestParam String owner,
+            @RequestParam(defaultValue="") String filter,@RequestParam(defaultValue="oci") String provider,HttpServletRequest r){
+        return run(r,()->service.profileOptions(session(r),schema,owner,filter,provider));
+    }
     @PostMapping("/install") public ResponseEntity<?> install(@RequestBody Install v,HttpServletRequest r){return run(r,()->{service.install(session(r),v.schema());return Map.of("ready",true);});}
     @PostMapping("/preview") public ResponseEntity<?> preview(@RequestBody Input v,HttpServletRequest r){return run(r,()->service.preview(session(r),v));}
     @PostMapping("/create") public ResponseEntity<?> create(@RequestBody Create v,HttpServletRequest r){return run(r,()->service.create(session(r),v.token(),v.confirmed(),v.consent()));}

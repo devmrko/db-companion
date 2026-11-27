@@ -2,6 +2,7 @@ package com.dbcompanion.service;
 
 import com.dbcompanion.common.db.*;
 import com.dbcompanion.model.AiCreation;
+import com.dbcompanion.model.ProfileEdit;
 import com.dbcompanion.model.AiCreation.*;
 import com.dbcompanion.repository.*;
 import java.util.*;
@@ -30,6 +31,15 @@ public class AiCreationService {
             String description="";if(snapshot.get(kind==Kind.PROFILE?"profile":"object") instanceof Map<?,?> fields)description=Objects.toString(fields.get("DESCRIPTION"),"");
             return new Form(AiCreation.fingerprint(snapshot,json),description,original.isEmpty()?"{}":AiCreation.attributesJson(snapshot,json),history.ready(schema),repository.credentials(),repository.references(kind));
         }));
+    }
+    public record ProfileOptions(List<String> schemas,ProfileEdit.ObjectChoices objects,List<String> models,List<String> regions) {}
+    public ProfileOptions profileOptions(PoolSession s,String schema,String owner,String filter,String provider){
+        return bound(s,schema,()->{
+            if(owner==null||!s.metadata().schemas().contains(owner))throw AiCreation.error(403,"ownerOnly");
+            if(filter==null||filter.length()>128||filter.indexOf('\0')>=0||provider==null||!provider.matches("[a-z]{1,32}"))throw AiCreation.error(400,"attributesInvalid");
+            return read.execute(tx->new ProfileOptions(List.copyOf(s.metadata().schemas()),repository.profileObjects(owner,filter),
+                    repository.profileSuggestions("model",provider),repository.profileSuggestions("region",provider)));
+        });
     }
     public void install(PoolSession s,String schema){bound(s,schema,()->{try{write.executeWithoutResult(tx->history.install(schema));return null;}catch(RuntimeException ex){throw new com.dbcompanion.common.exception.MetadataEditException(503,"History preparation interrupted",com.dbcompanion.common.i18n.UiMessages.text("creation.installFailed","History preparation interrupted; inspect existing objects before retrying")+"\n"+detail(ex));}});}
     public Preview preview(PoolSession s,Input input){
@@ -67,7 +77,11 @@ public class AiCreationService {
                 stage="readback";var after=read.execute(tx->repository.snapshot(in.schema(),in.kind(),in.name()));boolean matches=AiCreation.matches(in,after,json);
                 stage="history";write.executeWithoutResult(tx->history.after(in.schema(),in.kind().name(),in.name(),key,matches?"VERIFIED":"UNCERTAIN",json.writeValueAsString(after)));
                 if(!matches){p.blocked=true;return result(p,false,"readback","creation.readbackMismatch");}p.created=after;return result(p,true,"created","");
-            }catch(RuntimeException ex){p.blocked=true;String followup=called?observeFailure(p,key,stage,ex):"";return result(p,false,stage,(called?"creation.partial":"creation.notCalled")+"\n"+detail(ex)+followup);}
+            }catch(RuntimeException ex){
+                org.slf4j.LoggerFactory.getLogger(getClass()).warn("AI creation interrupted: stage={} type={} oracle={} frames={}",stage,ex.getClass().getName(),
+                        OracleErrorDetails.firstCode(ex),Arrays.stream(ex.getStackTrace()).limit(8).map(StackTraceElement::toString).toList());
+                p.blocked=true;String followup=called?observeFailure(p,key,stage,ex):"";return result(p,false,stage,(called?"creation.partial":"creation.notCalled")+"\n"+detail(ex)+followup);
+            }
         });}
     }
     public synchronized Result copyNext(PoolSession s,String token,int index,boolean consent){

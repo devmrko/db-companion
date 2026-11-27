@@ -1,0 +1,68 @@
+{
+  "workbench.actionUncertain": [
+    "처리 결과를 확인하지 못했습니다. 실제 상태를 확인한 뒤 다시 진행하세요. 자동 재시도하지 않습니다.",
+    "The outcome is unverified. Inspect actual state before retrying. No automatic retry.",
+    "处理结果未确认。请确认实际状态后再继续，不会自动重试。",
+    "処理結果は未確認です。実際の状態を確認してください。自動再試行しません。"
+  ],
+  "workbench.queryTest": [
+    "질문으로 확인",
+    "Test with a question",
+    "使用问题验证",
+    "質問で確認"
+  ],
+  "workbench.queryQuestion": [
+    "{0}로 확인할 질문을 입력하세요. 전송 내용 확인 후 AI를 1회 호출하며, 생성 SQL 실행은 별도로 확인합니다.",
+    "Enter a question for {0}. Review the payload before one AI call; SQL execution requires separate confirmation.",
+    "输入要用{0}验证的问题。确认传输内容后调用AI一次；SQL执行须另行确认。",
+    "{0}で確認する質問を入力してください。送信内容確認後にAIを1回呼び出し、SQL実行は別途確認します。"
+  ],
+  "workbench.generateSql": [
+    "SQL 생성",
+    "Generate SQL",
+    "生成SQL",
+    "SQL生成"
+  ],
+  "workbench.sqlReview": [
+    "생성 SQL 확인",
+    "Review generated SQL",
+    "确认生成SQL",
+    "生成SQLを確認"
+  ],
+  "workbench.sqlConsent": [
+    "표시된 SQL과 조회 대상을 확인했으며 실행에 동의합니다.",
+    "I reviewed the SQL and query scope and consent to execution.",
+    "已确认所示SQL及查询范围，同意执行。",
+    "表示SQLと照会対象を確認し、実行に同意します。"
+  ],
+  "workbench.executeSql": [
+    "SQL 실행",
+    "Execute SQL",
+    "执行SQL",
+    "SQL実行"
+  ],
+  "workbench.queryResult": [
+    "조회 결과",
+    "Query result",
+    "查询结果",
+    "照会結果"
+  ],
+  "workbench.queryExecuted": [
+    "SQL 조회 결과를 받았습니다. 업무상 정답 여부는 기대값과 비교해 확인하세요.",
+    "SQL results received. Compare them with expected values to establish business correctness.",
+    "已收到SQL结果。请与期望值比较以确认业务正确性。",
+    "SQL結果を取得しました。期待値と比較して業務上の正しさを確認してください。"
+  ],
+  "workbench.sqlReady": [
+    "SQL을 생성했습니다. 표시된 SQL을 확인한 뒤 별도로 실행하세요.",
+    "SQL generated. Review it before separately confirming execution.",
+    "已生成SQL。请确认后另行执行。",
+    "SQLを生成しました。確認して別途実行してください。"
+  ],
+  "workbench.queryReady": [
+    "전송할 질문과 정보를 준비했습니다. 동의 후 SQL 생성을 선택하세요.",
+    "The question and payload are ready. Consent, then choose Generate SQL.",
+    "问题及传输信息已准备。同意后选择生成SQL。",
+    "送信する質問と情報を準備しました。同意後にSQL生成を選択してください。"
+  ]
+}

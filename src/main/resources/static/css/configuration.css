@@ -109,7 +109,7 @@
 @media(prefers-reduced-motion:no-preference){.setup-chat-message{animation:setup-chat-appear .15s ease-out}@keyframes setup-chat-appear{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
 .app-assistant-launcher{position:fixed;right:24px;bottom:24px;z-index:1040;border:1px solid #245b73;background:#286b85;color:#fff;border-radius:28px;padding:13px 22px;box-shadow:0 5px 18px #152d3833;font-weight:650;cursor:pointer}
 .app-assistant-launcher:hover{background:#20566b}
-.app-assistant-window{position:fixed;right:24px;bottom:88px;z-index:1041;width:min(440px,calc(100vw - 48px));height:min(760px,calc(100dvh - 118px));border:1px solid #aebfc9;border-radius:14px;background:#fff;color:#20282c;box-shadow:0 12px 45px #152d383b;display:flex;flex-direction:column;overflow:hidden}
+.app-assistant-window{position:fixed;right:24px;bottom:88px;z-index:1041;box-sizing:border-box;max-width:calc(100% - 24px);width:min(440px,calc(100% - 48px));height:min(760px,calc(100dvh - 118px));border:1px solid #aebfc9;border-radius:14px;background:#fff;color:#20282c;box-shadow:0 12px 45px #152d383b;display:flex;flex-direction:column;overflow:hidden}
 .app-assistant-window[hidden]{display:none}
 .app-floating-assistant.is-task-open .app-assistant-window{width:min(1020px,calc(100vw - 48px))}
 .app-assistant-window-header{display:flex;gap:10px;align-items:center;padding:12px 16px;background:#f1f6f8;border-bottom:1px solid #d8dfe2;flex-shrink:0}

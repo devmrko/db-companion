@@ -1,0 +1,227 @@
+{
+  "adminAdvice.notChecked": ["{0}의 현재 권한과 계정 존재 여부는 조회하지 않았습니다. ADMIN이 같은 DB에서 확인하고 필요한 항목만 적용하세요.", "The existence and current privileges of {0} have not been queried. ADMIN must check them in the same database and apply only required changes.", "未查询{0}是否存在及其当前权限。请ADMIN在同一数据库确认，仅应用所需变更。", "{0}の存在と現在の権限は照会していません。ADMINが同じDBで確認し、必要な変更だけ適用してください。"],
+  "workbench.permissionFeature": ["어떤 기능의 권한이 필요한가요? 기능을 선택하거나 입력하세요.", "Which feature needs permissions? Select or enter it.", "需要哪个功能的权限？请选择或输入。", "どの機能の権限が必要ですか。選択または入力してください。"],
+  "workbench.permissionVerify": ["ADMIN 확인용 조회 SQL", "Verification SQL for ADMIN", "供ADMIN确认的查询SQL", "ADMINの確認用照会SQL"],
+  "creationChat.draft": [
+    "현재 생성 초안",
+    "Current creation draft",
+    "当前创建草稿",
+    "現在の作成案"
+  ],
+  "creationChat.pick": [
+    "표시된 목록의 번호나 정확한 객체 이름을 선택하세요.",
+    "Choose a displayed number or exact object name.",
+    "请选择列表编号或准确对象名。",
+    "表示された番号または正確なオブジェクト名を選択してください。"
+  ],
+  "creationChat.nameHelp": [
+    "이름은 영문자로 시작하는 영문 대문자·숫자·_·$·# 125자 이내로 입력하세요.",
+    "Use up to 125 uppercase letters, digits, _, $, #, starting with a letter.",
+    "名称须以字母开头，限125位大写字母、数字、_、$、#。",
+    "名前は英字で始まる英大文字・数字・_・$・#の125文字以内です。"
+  ],
+  "creationChat.providerHelp": [
+    "목록의 제공자를 선택하세요.",
+    "Choose a listed provider.",
+    "请选择列出的提供方。",
+    "一覧のプロバイダーを選択してください。"
+  ],
+  "creationChat.tables": [
+    "조회할 테이블 선택",
+    "Select query tables",
+    "选择查询表",
+    "照会する表を選択"
+  ],
+  "creationChat.schema": [
+    "검색할 스키마",
+    "Schema to search",
+    "搜索模式",
+    "検索するスキーマ"
+  ],
+  "creationChat.filter": [
+    "객체 이름 검색",
+    "Filter object names",
+    "筛选对象名",
+    "オブジェクト名を検索"
+  ],
+  "creationChat.search": [
+    "검색",
+    "Search",
+    "搜索",
+    "検索"
+  ],
+  "creationChat.more": [
+    "일부 결과입니다. 검색어를 좁혀 다른 객체를 찾으세요.",
+    "Partial results. Narrow the filter to find other objects.",
+    "仅显示部分结果。请缩小筛选范围。",
+    "一部の結果です。条件を絞り込んでください。"
+  ],
+  "creationChat.model": [
+    "모델·인증 선택",
+    "Select model and authentication",
+    "选择模型及认证",
+    "モデル・認証を選択"
+  ],
+  "creationChat.tableQuestion": [
+    "번호나 정확한 테이블 이름을 입력하거나 목록에서 선택하세요. 선택 후 “다음”을 입력하세요.",
+    "Enter a number or exact table name, or select from the list. Then enter next.",
+    "输入编号或准确表名，或从列表选择，然后输入next。",
+    "番号または正確な表名を入力するか一覧で選び、nextと入力してください。"
+  ],
+  "creationChat.candidateNote": [
+    "모델·리전 후보는 같은 제공자를 사용하는 기존 프로필값입니다. 전체 지원 목록이나 호출 성공을 의미하지 않습니다. 도우미 실행 모델은 변경하지 않습니다.",
+    "Model and region suggestions come from existing profiles using this provider. They do not prove support or successful calls. The assistant model stays unchanged.",
+    "模型和区域候选来自相同提供方的现有配置，并不保证支持或调用成功。助手模型不变。",
+    "モデル・リージョン候補は同じプロバイダーの既存値です。対応や呼出成功の保証ではありません。アシスタントのモデルは変わりません。"
+  ],
+  "creationChat.noSecret": [
+    "인증 정보는 Credential 이름만 사용합니다. 비밀번호·API 키를 입력하지 마세요. 빈 인증값의 사용 가능 여부는 제공자의 인증 방식에 따라 확인해야 합니다.",
+    "Use only Credential names. Do not enter passwords or API keys. Whether credentials may be omitted depends on provider authentication.",
+    "仅使用Credential名称。请勿输入密码或API密钥。能否省略凭证取决于提供方的认证方式。",
+    "Credential名のみを使用します。パスワードやAPIキーは入力しないでください。省略可否は認証方式により確認が必要です。"
+  ],
+  "creationChat.review": [
+    "생성안 확인",
+    "Review creation",
+    "确认创建方案",
+    "作成案を確認"
+  ],
+  "creationChat.modelQuestion": [
+    "값을 입력하거나 “모델은 모델명 쓰자”처럼 수정하세요. “이대로 만들어”를 입력하면 생성안을 표시합니다.",
+    "Edit the fields or enter model MODEL. Enter create to review the draft.",
+    "编辑字段或输入model MODEL，输入create查看方案。",
+    "項目を編集するかmodel MODELと入力します。createで案を確認します。"
+  ],
+  "creationChat.required": [
+    "이름·모델·테이블을 선택하세요.",
+    "Choose a name, model and tables.",
+    "请选择名称、模型及表。",
+    "名前・モデル・表を選択してください。"
+  ],
+  "creationChat.new": [
+    "신규 프로파일",
+    "New profile",
+    "新建配置文件",
+    "新規プロファイル"
+  ],
+  "creationChat.result": [
+    "프로파일 생성 결과",
+    "Profile creation result",
+    "配置文件创建结果",
+    "プロファイル作成結果"
+  ],
+  "creationChat.created": [
+    "프로파일 생성값을 재조회해 일치를 확인했습니다. 실제 질문 실행 성공은 별도 확인이 필요합니다.",
+    "Stored profile values match the request. A real query must be tested separately.",
+    "已回读确认配置值一致。实际查询须另行验证。",
+    "保存値の一致を確認しました。実際の質問実行は別途確認が必要です。"
+  ],
+  "creationChat.open": [
+    "프로파일 상세",
+    "Profile details",
+    "配置文件详情",
+    "プロファイル詳細"
+  ],
+  "creationChat.test": [
+    "질문으로 확인",
+    "Test with a question",
+    "使用问题验证",
+    "質問で確認"
+  ],
+  "creationChat.history": [
+    "변경 이력",
+    "Change history",
+    "变更历史",
+    "変更履歴"
+  ],
+  "creationChat.uncertain": [
+    "생성 결과를 확정하지 못했습니다. 상세와 이력을 조회하세요. 자동 재시도하지 않습니다.",
+    "Creation is unverified. Read details and history before retrying. No automatic retry.",
+    "创建结果未确认。请查看详情及历史。不会自动重试。",
+    "作成結果は未確認です。詳細と履歴を確認してください。自動再試行しません。"
+  ],
+  "creationChat.sqlExample": [
+    "SQL 예제 · 현재 초안의 실제 값은 위 생성안 참조",
+    "SQL example; actual draft values are shown above",
+    "SQL示例；实际草稿值见上方",
+    "SQL例・実際の値は上の作成案を参照"
+  ],
+  "creationChat.consent": [
+    "적용 시 표시된 메타데이터가 AI 제공자에게 전송되거나 비용이 발생할 수 있습니다. 내용을 검토하고 동의할 때만 적용하세요.",
+    "Applying may transmit the displayed metadata to the AI provider and incur cost. Apply only after reviewing and consenting.",
+    "应用可能向AI提供方传输所示元数据并产生费用。请审核同意后应用。",
+    "適用時にメタデータがAI提供元へ送信され費用が発生する場合があります。確認・同意後に適用してください。"
+  ],
+  "creationChat.reviewHelp": [
+    "생성안을 확인한 뒤 체크하고 적용하세요. 수정 요청은 확인을 무효화합니다.",
+    "Review, check and apply. An edit invalidates this review.",
+    "确认方案后勾选并应用。修改会使本次确认失效。",
+    "作成案を確認してチェックし適用してください。編集すると確認は無効になります。"
+  ],
+  "creationChat.clarify": [
+    "수정할 항목을 지정하세요. 예: 이름은 AU_PROFILE, 모델은 모델명 쓰자, 테이블 목록, 이대로 만들어.",
+    "Specify what to edit: name AU_PROFILE, model MODEL, table list, or create.",
+    "请指定修改项：name AU_PROFILE、model MODEL、table list或create。",
+    "項目を指定してください：name AU_PROFILE、model MODEL、table list、create。"
+  ],
+  "creationChat.prepare": [
+    "프로파일 이력 준비",
+    "Prepare profile history",
+    "准备配置文件历史",
+    "プロファイル履歴を準備"
+  ],
+  "creationChat.historyRequired": [
+    "생성 전 프로파일 이력 저장소가 필요합니다. 준비 화면에서 설치 내용을 확인하세요.",
+    "Prepare the profile history repository before creation. Review installation on the setup screen.",
+    "创建前需准备配置文件历史存储。请在设置页面查看安装内容。",
+    "作成前に履歴保存先が必要です。準備画面で導入内容を確認してください。"
+  ],
+  "creationChat.nameQuestion": [
+    "새 프로파일 이름을 입력하세요.",
+    "Enter the new profile name.",
+    "输入新配置文件名称。",
+    "新しいプロファイル名を入力してください。"
+  ],
+  "workbench.resumeCreation": [
+    "프로파일 생성 계속",
+    "Resume profile creation",
+    "继续创建配置文件",
+    "プロファイル作成を再開"
+  ],
+  "workbench.permissionTarget": [
+    "권한 안내를 받을 대상 일반 계정 이름을 입력하세요.",
+    "Enter the ordinary account to review.",
+    "输入需要权限说明的普通账户名。",
+    "権限案内の対象一般ユーザーを入力してください。"
+  ],
+  "workbench.exampleCreate": [
+    "프로파일 만들기",
+    "Create a profile",
+    "创建配置文件",
+    "プロファイルを作成"
+  ],
+  "workbench.examplePermissions": [
+    "필요한 권한 안내",
+    "Required permissions",
+    "所需权限说明",
+    "必要な権限案内"
+  ],
+  "adminAdvice.dds": [
+    "DDS의 계정·정책·권한 상태를 ADMIN으로 확인한 뒤 필요한 권한의 미리보기를 사용하세요.",
+    "Use ADMIN to inspect DDS identities, policies and privileges, then preview the required changes.",
+    "请使用ADMIN检查DDS账户、策略及权限，再预览所需变更。",
+    "ADMINでDDSのユーザー・ポリシー・権限を確認し、必要な変更をプレビューしてください。"
+  ],
+  "adminAdvice.self": [
+    "일반 계정은 자신의 권한 안내만 조회할 수 있습니다.",
+    "Ordinary accounts can read guidance for themselves only.",
+    "普通账户只能查看自身的权限说明。",
+    "一般ユーザーは自分の権限案内のみ参照できます。"
+  ],
+  "adminAdvice.invalid": [
+    "대상 계정과 기능을 다시 선택하세요.",
+    "Select a valid target account and feature.",
+    "请重新选择目标账户及功能。",
+    "対象ユーザーと機能を再選択してください。"
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "assistantNav.executions": [
+    "질문·응답 실행 내역",
+    "Question and response history",
+    "问题及回答执行历史",
+    "質問・応答の実行履歴"
+  ],
+  "assistantNav.executionsHelp": [
+    "실행 내역에서 기간·프로파일·질문으로 찾고, 항목을 열어 질문·응답·생성 SQL을 확인합니다. 조회 가능한 정보는 DB 기록과 권한에 따라 다릅니다.",
+    "Filter execution history by date, profile or question; open an entry for its question, response and generated SQL. Available details depend on database records and privileges.",
+    "按日期、配置或问题筛选执行历史，打开记录查看问题、回答及生成SQL。可用信息取决于数据库记录及权限。",
+    "期間・プロファイル・質問で絞り込み、項目を開いて質問・応答・生成SQLを確認します。参照内容はDB記録と権限によります。"
+  ],
+  "assistantNav.agents": [
+    "Agent 실행 내역",
+    "Agent execution history",
+    "Agent执行历史",
+    "Agent実行履歴"
+  ],
+  "assistantNav.agentsHelp": [
+    "Agent의 Run·Task·Tool 실행 내역을 확인합니다.",
+    "Review Agent runs, tasks and tool executions.",
+    "查看Agent的Run、Task及Tool执行历史。",
+    "AgentのRun・Task・Tool実行履歴を確認します。"
+  ],
+  "assistantNav.sql": [
+    "SQL 실행 기록의 출처",
+    "SQL history sources",
+    "SQL执行历史来源",
+    "SQL実行履歴の参照元"
+  ],
+  "assistantNav.sqlHelp": [
+    "SQL 기록의 출처와 수집·조회 준비 상태를 확인합니다. 설정 변경 이력과는 별도입니다.",
+    "Review SQL record sources and collection/read readiness, separately from configuration history.",
+    "查看SQL记录来源及采集、查询准备状态。与配置变更历史分开。",
+    "SQL記録の参照元と収集・参照の準備状態を確認します。設定変更履歴とは別です。"
+  ],
+  "assistantNav.glossary": [
+    "업무 용어",
+    "Business glossary",
+    "业务术语",
+    "業務用語"
+  ],
+  "assistantNav.tables": [
+    "테이블·컬럼",
+    "Tables and columns",
+    "表及列",
+    "表・列"
+  ],
+  "assistantNav.semantic": [
+    "시멘틱 소스",
+    "Semantic sources",
+    "语义源",
+    "セマンティックソース"
+  ],
+  "assistantNav.profiles": [
+    "프로파일 설정",
+    "Profile settings",
+    "配置文件设置",
+    "プロファイル設定"
+  ],
+  "assistantNav.readOnly": [
+    "이동할 화면 안내입니다. AI 호출이나 설정 변경은 실행하지 않습니다.",
+    "Navigation help only. No AI call or configuration change is executed.",
+    "仅提供页面导航。不会调用AI或修改配置。",
+    "画面の案内です。AI呼出や設定変更は実行しません。"
+  ],
+  "workbench.navigation": [
+    "화면 안내",
+    "Screen navigation",
+    "页面导航",
+    "画面案内"
+  ]
+}

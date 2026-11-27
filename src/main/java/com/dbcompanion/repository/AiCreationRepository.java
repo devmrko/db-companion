@@ -33,6 +33,8 @@ public class AiCreationRepository {
         return Map.of("exists",true,"object",fields,"attributes",attrs);
     }
     public List<String> credentials(){return profileChoices.credentials();}
+    public ProfileEdit.ObjectChoices profileObjects(String owner,String filter){return profileChoices.objects(owner,filter);}
+    public List<String> profileSuggestions(String attribute,String provider){return profileChoices.suggestions(attribute,provider);}
     public Map<String,List<String>> references(Kind kind){
         if(kind==Kind.PROFILE)return Map.of();var refs=new TreeMap<String,List<String>>();
         refs.put("profile_name",objects.profiles());
@@ -73,7 +75,13 @@ public class AiCreationRepository {
         String pkg=kind==Kind.PROFILE?"DBMS_CLOUD_AI":"DBMS_CLOUD_AI_AGENT";
         return "DECLARE a CLOB := ?; d CLOB := ?; BEGIN "+ProfileHistorySql.object(owner,pkg)+".CREATE_"+kind.name()+"("+kind.name().toLowerCase(Locale.ROOT)+"_name => ?, attributes => a, status => ?, description => d); END;";
     }
-    public void create(String owner,Input in){write.update(createSql(owner,in.kind()),s->{s.setClob(1,new StringReader(in.attributes()),in.attributes().length());s.setClob(2,new StringReader(in.description()),in.description().length());s.setString(3,in.name());s.setString(4,in.status());});}
+    public void create(String owner,Input in){write.update(createSql(owner,in.kind()),s->{
+        s.setClob(1,new StringReader(in.attributes()),in.attributes().length());
+        // Oracle JDBC rejects Reader CLOBs of length zero before executing the block.
+        if(in.description().isEmpty())s.setNull(2,java.sql.Types.CLOB);
+        else s.setClob(2,new StringReader(in.description()),in.description().length());
+        s.setString(3,in.name());s.setString(4,in.status());
+    });}
     public List<Feedback> feedback(String schema,String name){
         if(!feedback.tableExists(schema,name))return List.of();
         var batch=new AiCreation.FeedbackBatch();

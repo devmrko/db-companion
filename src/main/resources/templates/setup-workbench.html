@@ -4,7 +4,7 @@
 <body class="app-shell">
 <aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
-<main class="app-content setup-workbench" data-setup-workbench th:attr="data-schema=${info.username},data-allowed=${ownerRequired != true and unavailable != true},data-initial-profile=${profile},data-model=${assistantSelection != null ? assistantSelection.name : ''}">
+<main class="app-content setup-workbench" data-setup-workbench th:attr="data-schema=${info.username},data-allowed=${true},data-initial-profile=${profile},data-model=${assistantSelection != null ? assistantSelection.name : ''}">
   <div class="setup-workbench-heading"><h1 th:text="#{setup.natural.title}"></h1><span class="app-badge" data-wb-target th:text="#{workbench.noTarget}"></span><button type="button" class="btn app-btn app-btn-secondary" data-wb-retarget th:text="#{workbench.target}"></button></div>
   <p class="app-alert" th:if="${ownerRequired == true}" th:text="#{setup.ownerHelp}"></p>
   <p class="app-alert" th:if="${unavailable == true}" th:text="#{setup.unavailable}"></p>

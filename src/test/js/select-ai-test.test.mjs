@@ -25,7 +25,7 @@ test('both modes and safe output paths are present',()=>{
   assert.match(source,/post\('generate',\{token,consent:true\}\)/);
   assert.match(source,/post\('execute',\{token,consent:true\}\)/);
   assert.match(source,/post\('execute\/preview',\{resultId:latest.id\}\)/);
-  assert.match(source,/rows.slice\(page\*10,page\*10\+10\)/);
+  assert.match(source,/renderQueryData\(host,result.data\)/);
 });
 test('prompt review requires an exact question and selected profile',()=>{
   const prompt={profile:{selection:{name:'PROFILE'}},question:'질문',error:null};
