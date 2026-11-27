@@ -40,7 +40,12 @@ public class DdsManagementController {
         try{return ResponseEntity.ok().header("Cache-Control","no-store").body(action.apply(session));}
         catch(Failure ex){return error(409,ex.getMessage());}
         catch(IllegalArgumentException|NullPointerException ex){return error(400,"invalid");}
-        catch(RuntimeException ex){String code=OrdsManagementRepository.errorKey(ex);return ResponseEntity.status(503).header("Cache-Control","no-store").body(Map.of("error",UiMessages.text("ddsManage.failed","Refresh state; no automatic retry.")+" ("+code+") "+UiMessages.text("ddsManage.adminHelp","Ask ADMIN to review DDS privileges.")));}
+        catch(RuntimeException ex){
+            String code=OrdsManagementRepository.errorKey(ex);
+            boolean prerequisite="GET".equals(r.getMethod())&&java.util.Set.of("ACCESS_REQUIRED","METADATA_UNAVAILABLE","UNSUPPORTED").contains(code);
+            String message=prerequisite?UiMessages.text("ddsManage.readinessRequired","Check DDS metadata access and supported views."):UiMessages.text("ddsManage.failed","Refresh state; no automatic retry.");
+            return ResponseEntity.status(prerequisite?409:503).header("Cache-Control","no-store").body(Map.of("error",message+" ("+code+") "+UiMessages.text("ddsManage.adminHelp","Ask ADMIN to review DDS privileges.")));
+        }
     }
     private ResponseEntity<?> error(int status,String key){return ResponseEntity.status(status).header("Cache-Control","no-store").body(Map.of("error",UiMessages.text("ddsManage."+key,key)));}
 }

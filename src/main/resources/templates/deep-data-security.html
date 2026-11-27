@@ -43,8 +43,8 @@
     </form>
     <section data-dm-review hidden>
       <p class="app-alert" th:text="#{ddsManage.warning}"></p>
-      <pre data-dm-sql style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
-      <pre data-dm-before style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+      <pre data-dm-sql class="app-preview-value"></pre>
+      <pre data-dm-before class="app-preview-value"></pre>
       <label class="app-field"><span data-dm-confirm-label></span><input class="form-control" data-dm-confirm autocomplete="off"></label>
       <label class="app-check-field"><input type="checkbox" data-dm-consent><span th:text="#{ddsManage.consent}"></span></label>
       <button class="btn app-btn" type="button" data-dm-apply disabled th:text="#{ddsManage.apply}"></button>

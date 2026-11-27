@@ -55,12 +55,13 @@ h2 { font-size: 18px; font-weight: 650; letter-spacing: -.4px; }
 .app-card { background: var(--app-surface); border: 1px solid var(--app-border); border-radius: var(--app-radius); box-shadow: var(--app-shadow); }
 .app-card h3 { font-size: 14px; line-height: 1.5; font-weight: 650; overflow-wrap: anywhere; }
 .app-card h4 { font-size: 13px; line-height: 1.5; font-weight: 600; overflow-wrap: anywhere; }
-.app-btn { display: inline-flex; gap: 8px; align-items: center; justify-content: center; border-radius: var(--app-radius); padding: 8px 14px; font-size: 12px; font-weight: 600; min-height: 36px; transition: background .15s, box-shadow .15s; }
+.app-btn { display: inline-flex; gap: 8px; align-items: center; justify-content: center; border: 1px solid var(--app-border); background: var(--app-surface); color: var(--app-text); text-decoration: none; cursor: pointer; border-radius: var(--app-radius); padding: 8px 14px; font-size: 12px; font-weight: 600; min-height: 36px; transition: background .15s, box-shadow .15s; }
+.app-btn:disabled { opacity: .55; cursor: not-allowed; }
 .app-btn-primary { --bs-btn-disabled-color: white; --bs-btn-disabled-bg: var(--app-accent); --bs-btn-disabled-border-color: var(--app-accent); color: white; background: var(--app-accent); border-color: var(--app-accent); box-shadow: none; }
 .app-btn-primary:hover, .app-btn-primary:active { color: white !important; background: var(--app-accent-hover) !important; }
 .app-btn-secondary { color: var(--app-text); background: white; border: 1px solid var(--app-border); }
 .app-btn-secondary:hover, .app-btn-quiet:hover { background: var(--app-accent-soft); color: var(--app-accent); border-color: var(--app-border); }
-.app-btn-quiet { color: var(--app-muted); border: 1px solid transparent; }
+.app-btn-quiet { color: var(--app-muted); background: transparent; border: 1px solid transparent; }
 .app-btn:focus-visible, a:focus-visible { outline: 3px solid var(--app-focus); outline-offset: 3px; box-shadow: none; }
 .form-control, .form-select { border-color: #bdb9b4; border-radius: var(--app-radius); color: var(--app-text); font-size: 13px; line-height: 1.5; min-width: 0; max-width: 100%; }
 :where(input.form-control:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select.form-select:not([multiple]):not([size])) { min-height: var(--app-control-height); }
@@ -264,6 +265,7 @@ textarea.form-control { resize: vertical; }
 .app-attribute-title { margin: 18px 0 8px; font-size: 13px; overflow-wrap: anywhere; }
 .app-preview-value, .app-preview-source { padding: 14px; font-size: 12px; background: var(--app-canvas); border: 1px solid var(--app-border); border-radius: 6px; }
 .app-preview-value { white-space: pre-wrap; overflow-wrap: anywhere; }
+.app-profile-attribute-value { margin: 0; font: inherit; white-space: pre-wrap; overflow-wrap: anywhere; }
 .app-preview-source { white-space: pre; overflow: auto; max-height: 55vh; }
 .app-editor-form { padding: 20px 24px; }
 .app-editor-form label { display: block; margin: 16px 0 7px; font-size: 12px; font-weight: 600; }

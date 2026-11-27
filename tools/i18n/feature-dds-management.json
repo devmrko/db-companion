@@ -1,4 +1,5 @@
 {
+  "ddsManage.readinessRequired": ["DDS 메타데이터 조회 권한과 지원 뷰를 확인해 주세요.", "Check DDS metadata privileges and supported views.", "请检查 DDS 元数据查询权限和支持的视图。", "DDS メタデータの参照権限と対応ビューを確認してください。"],
   "ddsManage.title": [
     "DDS 생성·변경",
     "Create and edit DDS",

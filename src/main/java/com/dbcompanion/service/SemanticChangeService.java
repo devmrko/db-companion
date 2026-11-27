@@ -60,9 +60,10 @@ public class SemanticChangeService {
         if(!consent)throw SemanticChange.error(400,"confirm");
         return bound(session,schema,kind,()->{write.executeWithoutResult(tx->records.install(schema,schema));return Map.of("storage",records.status(schema,schema));});
     }
-    public Object page(PoolSession session,String schema,String kind,String name){return bound(session,schema,kind,()->{records.require(schema,schema);return history.page(schema,kind,name);});}
+    private void requireRecords(String schema){if(!records.status(schema,schema).equals("READY"))throw SemanticChange.error(409,"missing");}
+    public Object page(PoolSession session,String schema,String kind,String name){return bound(session,schema,kind,()->{requireRecords(schema);return history.page(schema,kind,name);});}
     public Object detail(PoolSession session,String schema,String kind,String id){return bound(session,schema,kind,()->{
-        records.require(schema,schema);var entry=records.detail(schema,id,SemanticChange.TYPE);
+        requireRecords(schema);var entry=records.detail(schema,id,SemanticChange.TYPE);
         if(entry==null||!entry.payload().path("kind").asString().equals(kind))throw SemanticChange.error(404,"missingEntry");return entry;
     });}
 }

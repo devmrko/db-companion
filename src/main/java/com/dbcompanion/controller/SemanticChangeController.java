@@ -24,7 +24,8 @@ public class SemanticChangeController {
         var http=r.getSession(false);var session=http==null?null:(PoolSession)http.getAttribute(PoolSession.ATTRIBUTE);
         if(session==null)return ResponseEntity.status(401).body(Map.of("error","Session expired"));
         try{return ResponseEntity.ok().header("Cache-Control","no-store").body(action.apply(session));}
-        catch(MetadataEditException ex){return ResponseEntity.status(ex.status()).body(Map.of("error",ex.userMessage()));}
-        catch(RuntimeException ex){return ResponseEntity.status(503).body(Map.of("error",SemanticChange.error(503,"unavailable").userMessage()));}
+        catch(MetadataEditException ex){return ResponseEntity.status(ex.status()).header("Cache-Control","no-store").body(Map.of("error",ex.userMessage()));}
+        catch(com.dbcompanion.model.Ontology.Failure ex){return ResponseEntity.status(ex.status()).header("Cache-Control","no-store").body(Map.of("error",ex.getMessage()));}
+        catch(RuntimeException ex){return ResponseEntity.status(503).header("Cache-Control","no-store").body(Map.of("error",SemanticChange.error(503,"unavailable").userMessage()));}
     }
 }
