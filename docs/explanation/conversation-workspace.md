@@ -12,18 +12,20 @@ Dashboard readiness keeps static help, the loaded summary and actions inside the
 
 - Reuse existing owner-scoped profile, glossary, semantic-source and history services. Do not add a second configuration store, model framework or arbitrary SQL executor.
 - Ask for a missing target in the conversation. Session model selection is separate from the profile being edited.
-- Recognized setup commands open a real editor: profile options, glossary registration/editing, or attaching an existing semantic source. Ambiguous requests go to the existing opt-in AI analysis, with reviewed payload and cost consent.
-- The command dispatcher is a bounded UI shortcut, not a general language model. Unsupported requests must not imply that they were executed.
+- Every free-text message goes to the selected LLM with the current phase, safe draft fields, last workspace prompt and recent server-held dialogue. It can select registered in-process read services using their input/output contracts and reference the app menu catalogue. The old command classifier is not the default chat path.
+- Choose the conversation model and transmission/usage consent once when starting. A message can use up to seven model calls including service exchanges. This is separate from consent for profile changes or SELECT generation/execution. Unsupported operations are explained with a registered menu link.
 - Each write requires a visible comparison and an explicit Apply action. Editing, cancelling, changing targets or starting another request invalidates the local pending change. Reuse server version checks; never retry an uncertain write automatically.
 - Show actual readback and available history after execution. A history lookup failure must not change a verified save into a failed save, or imply a missing history record.
-- Keep conversation state in page memory only; no localStorage, cookies or server-side transcript store. Refresh starts a new conversation. Do not weaken CSP or embed configuration pages in frames.
+- Draft/workspace state stays in page memory. The last twelve dialogue messages stay in login-session server memory, bound to the helper profile and version; there is no persistent transcript store. Refresh resets page state and consent; logout expires server state. Do not weaken CSP or embed configuration pages in frames.
 
 ## First supported tasks
 
 1. Enable/disable conversation, comments or constraints; edit registered profile attributes through the existing attribute editor contract.
 2. Register or edit a business term through successive questions, review the draft, save with the existing atomic glossary/history transaction, and inspect history.
 3. Select an existing enabled native semantic source and append it to the selected profile without replacing other sources; review before saving.
-4. Read profile history and configuration readiness. Other requests use the existing optional service-Tool assistant. This does not implement arbitrary multi-step autonomous configuration or source/callback creation.
+4. Read profile history and configuration readiness. Registered model-selected reads cover profiles, creation candidates, safe profile attributes, semantic sources and glossary readiness. Other menus are described as references, not arbitrary autonomous executors. Source/callback creation still uses existing management screens.
+
+The creation workflow exposes the current draft phase to the LLM. Recommendations do not edit the draft until the user asks or accepts; edits preserve unspecified fields. Table names are bound to the login schema and verified against actual metadata. [Conversation design](../llm-conversation-design.md).
 
 ## Acceptance
 

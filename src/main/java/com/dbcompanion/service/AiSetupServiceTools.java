@@ -44,13 +44,18 @@ public final class AiSetupServiceTools {
     }
     public static Object invoke(String name,JsonNode arguments,BiFunction<String,JsonNode,Object> server){
         validate(name,arguments);
+        var contract=contract(name);
+        return invokeRegistered(name,contract.description(),contract.inputSchema(),arguments,server);
+    }
+    /** Callers must resolve the name from their server-owned registry and validate arguments. */
+    public static Object invokeRegistered(String name,String description,Map<String,Object> inputSchema,JsonNode arguments,BiFunction<String,JsonNode,Object> server){
         // The callback and context are created by the server for this invocation only.
         var callback=FunctionToolCallback.<Map<String,Object>,Object>builder(name,(input,context)->{
             @SuppressWarnings("unchecked")
             var target=(BiFunction<String,JsonNode,Object>)context.getContext().get("invocation");
             return target.apply(name,JSON.valueToTree(input));
-        }).description(contract(name).description()).inputType(new org.springframework.core.ParameterizedTypeReference<Map<String,Object>>() {})
-                .inputSchema(JSON.writeValueAsString(contract(name).inputSchema()))
+        }).description(description).inputType(new org.springframework.core.ParameterizedTypeReference<Map<String,Object>>() {})
+                .inputSchema(JSON.writeValueAsString(inputSchema))
                 .toolCallResultConverter((result,type)->JSON.writeValueAsString(result)).build();
         try{return JSON.readTree(callback.call(JSON.writeValueAsString(arguments),new ToolContext(Map.of("invocation",server))));}
         catch(org.springframework.ai.tool.execution.ToolExecutionException ex){

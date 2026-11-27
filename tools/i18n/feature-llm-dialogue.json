@@ -1,0 +1,16 @@
+{
+  "dialogue.accept":["제안 반영","Use suggestion","采用建议","提案を反映"],
+  "dialogue.profileName":["프로파일 이름","Profile name","配置名称","プロファイル名"],
+  "dialogue.capabilities":["메뉴·서비스 역할·입출력","Menus and service input/output contracts","菜单与服务输入输出","メニュー・サービス役割・入出力"],
+  "dialogue.title":["AI 대화 설정","AI conversation settings","AI对话设置","AI会話設定"],
+  "dialogue.modelHelp":["대화를 처리할 모델입니다. 생성·수정 대상 프로파일과는 별개입니다.","Model for this conversation, separate from the profile being created or edited.","处理对话的模型，与创建或修改的配置分开。","会話に使うモデルです。作成・編集対象とは別です。"],
+  "dialogue.consent":["이 창에서 보내는 질문·최근 대화·설정 초안과 조회한 메타데이터를 선택한 AI 모델에 전송합니다. 메시지당 최대 7회 호출과 비용 발생에 동의합니다. DB 변경·SQL 실행은 별도로 확인합니다.","Send questions, recent dialogue, configuration drafts and retrieved metadata to this model. I agree to usage charges and up to 7 calls per message. Database changes and SQL execution require separate confirmation.","将问题、近期对话、配置草稿及查询的元数据发送给所选模型。同意每条消息最多7次调用及费用。数据库修改与SQL执行须另行确认。","質問・直近の会話・設定案・取得したメタデータを選択モデルに送信します。1メッセージ最大7回の呼び出しと課金に同意します。DB変更・SQL実行は別途確認します。"],
+  "dialogue.start":["대화 시작","Start conversation","开始对话","会話を開始"],
+  "dialogue.ready":["AI 대화를 시작했습니다. 요청을 입력하세요.","AI conversation is ready. Enter a request.","AI对话已启动。请输入请求。","AI会話を開始しました。依頼を入力してください。"],
+  "dialogue.noModels":["대화에 사용할 활성 AI 프로파일이 없습니다. 프로파일 설정에서 모델·인증을 준비하세요.","No enabled AI profile is available. Configure a model and authentication in profile settings.","没有可用的AI配置。请在配置设置中准备模型与认证。","有効なAIプロファイルがありません。モデル・認証を準備してください。"],
+  "dialogue.choose":["처음 한 번 대화 모델과 전송 동의를 선택하세요. 이후 입력은 AI가 대화 내용에 따라 처리합니다.","Choose a model and consent once to start. AI then handles your messages using the conversation context.","首次请选择模型并同意发送。之后AI将根据对话上下文处理消息。","最初にモデルと送信同意を選んでください。以降はAIが会話に応じて処理します。"],
+  "dialogue.settings":["대화 모델·동의","Conversation model and consent","对话模型与同意","会話モデル・同意"],
+  "dialogue.noInput":["현재 값을 받을 입력 단계가 없습니다. 요청을 구체적으로 입력하세요.","No input is pending. Please clarify the request.","当前没有待输入步骤。请具体说明请求。","現在入力待ちではありません。依頼を具体的にしてください。"],
+  "dialogue.evidence":["사용한 서비스·조회 결과","Services used and retrieved results","使用的服务与查询结果","使用サービス・取得結果"],
+  "creationChat.startFirst":["프로파일 초안을 먼저 시작하세요.","Start a profile draft first.","请先开始配置草稿。","先にプロファイル案を開始してください。"]
+}

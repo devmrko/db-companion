@@ -15,7 +15,7 @@ class ConversationalCreationTest {
     @Test void permissionAdviceIsReadOnlyScopedAndDoesNotPretendToDetectMissingGrants(){
         var advice=AdminHelpController.advice("APP","APP","profile");
         assertThat(advice.privilegeStatus()).isEqualTo("NOT_CHECKED");
-        assertThat(advice.instructions()).extracting(AdminHelpController.Instruction::sql).containsExactly("GRANT EXECUTE ON DBMS_CLOUD_AI TO \"APP\";");
+        assertThat(advice.instructions()).extracting(com.dbcompanion.service.AdminHelpService.Instruction::sql).containsExactly("GRANT EXECUTE ON DBMS_CLOUD_AI TO \"APP\";");
         assertThat(AdminHelpController.advice("ADMIN","APP","semantic").instructions()).isEmpty();
         assertThat(AdminHelpController.advice("ADMIN","APP","network").link()).isEqualTo("/db/accounts#ai-network");
         assertThatThrownBy(()->AdminHelpController.advice("APP","OTHER","profile")).isInstanceOf(SecurityException.class);

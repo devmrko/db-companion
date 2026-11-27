@@ -51,6 +51,17 @@ function harness({ready=true,verified=true}={}){
       if(url.endsWith('/create'))return {name:'AU_PROFILE',verified,done:verified};throw new Error(url);}};
   state.chat=creationConversation(ui);return state;
 }
+test('LLM draft operations bypass command regex and expose the pending field without replacing other settings',async()=>{
+  const h=harness();await h.chat.operate('create');assert.equal(h.chat.context().stage,'name');
+  await h.chat.operate('draft',{name:'AI_SUGGESTED'});assert.equal(h.chat.context().draft.name,'AI_SUGGESTED');
+  await h.chat.operate('draft',{tables:[{owner:'APP',name:'ACTIVITY'}],model:'MODEL'});
+  await h.chat.operate('draft',{name:'ANOTHER_NAME'});
+  assert.equal(h.chat.context().draft.name,'ANOTHER_NAME');assert.equal(h.chat.context().draft.attributes.model,'MODEL');
+  assert.deepEqual(h.chat.context().draft.attributes.object_list,[{owner:'APP',name:'ACTIVITY'}]);
+  assert.equal(h.requests.filter(v=>v.url.endsWith('/create')).length,0);
+  await h.chat.operate('review');assert.equal(h.review.name,'ANOTHER_NAME');
+  assert(!JSON.stringify(h.chat.context()).includes('9223372036854775807'));
+});
 test('questions and global tasks take precedence over value prompts while exact names remain literal',()=>{
   for(const question of ['이전 프로파일 복제 가능?','모델은 뭐야?','어떤 이름이 좋아?','복제 가능한가요'])assert.equal(isConversationQuestion(question),true);
   for(const q of ['AU_PROFILE','MODEL_HISTORY','WS_ADMIN_PROFILE'])assert.equal(isConversationQuestion(q),false);

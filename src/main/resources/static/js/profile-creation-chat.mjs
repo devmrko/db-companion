@@ -60,7 +60,7 @@ export function creationConversation(ui){
   const newDraft=()=>({name:'',source:'',description:'',attributes:{provider:'oci',model:'',credential_name:'',region:'',oci_compartment_id:'',comments:true,conversation:false,object_list:[]}});
   const encoded=attributes=>creationAttributesJson(attributes,draft?.source?form.attributes:'');
   const url=()=>'/ai-create/profile-options?'+new URLSearchParams({schema,owner,filter,provider:draft.attributes.provider});
-  const summary=body=>detail(body,tr('draft','현재 생성 초안'),{...draft,attributes:encoded(draft.attributes)});
+  const summary=body=>{body.append(el('p',draft.name||tr('new','신규 프로파일'),'app-badge'));return detail(body,tr('draft','현재 생성 초안'),{...draft,attributes:encoded(draft.attributes)});};
   const set=(key,value)=>{if(key==='name'){value=value.toUpperCase();if(!/^[A-Z][A-Z0-9_$#]{0,124}$/.test(value))throw new Error(tr('nameHelp','이름은 영문자로 시작하는 영문 대문자·숫자·_·$·# 125자 이내로 입력하세요.'));draft.name=value;}
     else {if(key==='provider'&&!profileField('provider').choices.includes(value))throw new Error(tr('providerHelp','목록의 제공자를 선택하세요.'));draft.attributes[key]=value;}};
   function namePrompt(){stage='name';summary(workspace(tr('new','신규 프로파일'),'edit'));ask(tr('nameQuestion','새 프로파일 이름을 입력하세요.'),handle);}
@@ -177,6 +177,29 @@ export function creationConversation(ui){
     ownsReply:handler=>handler===handle||handler===sourceSelect,
     literalAnswer:value=>stage==='name'&&/^[A-Za-z][A-Za-z0-9_$#]{0,124}$/.test(value)&&!/^(clone|copy|continue|resume|next|review|create)$/i.test(value)||stage==='source'&&(ui.profileNames?.()||[]).includes(value),
     resume,
+    context:()=>draft?{stage,draft:{name:draft.name,source:draft.source,description:draft.description,
+      attributes:Object.fromEntries(Object.entries(draft.attributes).filter(([key])=>['provider','model','credential_name','region','oci_compartment_id','comments','conversation','object_list'].includes(key)))},owner,filter,
+      displayedObjects:rows.slice(0,40),displayedObjectCount:rows.length,displayedObjectsPartial:rows.length>40,
+      models:options?.models?.slice(0,20)||[],regions:options?.regions?.slice(0,20)||[],credentialNames:form?.credentials?.slice(0,20)||[]}:null,
+    async operate(action,args={}){
+      if(action==='create'){await this.start();return;}
+      if(action==='clone'){await this.clone();if(args.profile)await sourceSelect(args.profile);return;}
+      if(!draft)throw new Error(tr('startFirst','프로파일 초안을 먼저 시작하세요.'));
+      if(action==='draft'){
+        for(const [key,value]of Object.entries(args)){
+          if(key==='tables')draft.attributes.object_list=value.map(v=>({owner:v.owner,name:v.name}));
+          else if(key==='comments'||key==='conversation'){if(typeof value!=='boolean')throw new Error('Invalid boolean');draft.attributes[key]=value;}
+          else if(['name','provider','model','credential_name','region','oci_compartment_id'].includes(key))set(key,value);
+          else throw new Error('Invalid draft field');
+        }
+        if(!draft.name)namePrompt();else if(!draft.attributes.object_list?.length)await tables();else await models();return;
+      }
+      if(action==='tables'){filter=args.filter||'';await tables();return;}
+      if(action==='models'){await models();return;}
+      if(action==='review'){await prepare();return;}
+      if(action==='resume'){await resume();return;}
+      throw new Error('Invalid creation action');
+    },
     handle,
   };
 }

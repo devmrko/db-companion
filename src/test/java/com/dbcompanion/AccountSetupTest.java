@@ -81,7 +81,7 @@ class AccountSetupTest {
         assertThat(ScottDemoService.adminSql("A\"B",List.of("CREATE TABLE"),0)).containsExactly("GRANT CREATE TABLE TO \"A\"\"B\";");
         var guide=com.dbcompanion.controller.AdminHelpController.instructions("APP_TEST");
         assertThat(guide).hasSize(9);
-        assertThat(guide.stream().map(com.dbcompanion.controller.AdminHelpController.Instruction::sql)).allSatisfy(sql->assertThat(sql).endsWith("TO \"APP_TEST\";").doesNotContain(" ANY ","DBA","UNLIMITED","WITH GRANT"));
+        assertThat(guide.stream().map(com.dbcompanion.service.AdminHelpService.Instruction::sql)).allSatisfy(sql->assertThat(sql).endsWith("TO \"APP_TEST\";").doesNotContain(" ANY ","DBA","UNLIMITED","WITH GRANT"));
     }
     @Test void controllerConsumesCreationAndOnlyRecoversItsCreatedIdentity(){
         int[] creates={0},configures={0};boolean[] fail={true};
