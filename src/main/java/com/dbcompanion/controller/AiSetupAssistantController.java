@@ -18,6 +18,7 @@ public class AiSetupAssistantController {
     private final AiSetupAssistantService service;
     public AiSetupAssistantController(AiSetupAssistantService service){this.service=service;}
     public record Run(String token,boolean consent) {}
+    @GetMapping("/catalogue") public ResponseEntity<?> catalogue(HttpServletRequest r){return respond(r,service::catalogue);}
     @PostMapping("/preview") public ResponseEntity<?> preview(@RequestBody AiSetupAssistantService.Input input,Locale locale,HttpServletRequest r){return respond(r,s->service.preview(s,input,locale));}
     @PostMapping("/analyze") public ResponseEntity<?> analyze(@RequestBody Run input,HttpServletRequest r){return respond(r,s->service.analyze(s,input.token(),input.consent()));}
     @PostMapping("/change-preview") public ResponseEntity<?> changePreview(HttpServletRequest r){return respond(r,service::changePreview);}

@@ -44,10 +44,24 @@ class AiSetupToolLoopTest {
         assertThat(models).hasValue(2);assertThat(services).hasValue(1);
     }
     @Test void threeDistinctReadsAndFinalAnswerFitTheFourCallBudget() {
-        var responses=new ArrayDeque<>(AiSetupToolLoop.tools().stream().map(t->tool(t.name())).toList());responses.add(finish(""));
+        var responses=new ArrayDeque<>(AiSetupToolLoop.tools().stream().limit(3).map(t->tool(t.name())).toList());responses.add(finish(""));
         var models=new AtomicInteger();
         var result=AiSetupToolLoop.run("scope",json,p->{models.incrementAndGet();return responses.remove();},name->Map.of("state","UNKNOWN"));
         assertThat(models).hasValue(4);assertThat(result.executions()).hasSize(3);assertThat(result.advice().action()).isEmpty();
+    }
+    @Test void sixServicesWithStrictArgumentsFitSevenCalls(){
+        var responses=new ArrayDeque<String>();
+        AiSetupToolLoop.tools().forEach(t->responses.add(t.name().equals("semantic.previewAttachment")?AiSetupServiceToolsTest.sourcePreview("BUSINESS_TERMS"):tool(t.name())));
+        responses.add(finish("attach-semantic-source"));var calls=new AtomicInteger();
+        var result=AiSetupToolLoop.run("scope",json,p->{calls.incrementAndGet();return responses.remove();},(name,args)->Map.of("observed",true));
+        assertThat(calls).hasValue(AiSetupToolLoop.MAX_MODEL_CALLS);assertThat(result.executions()).hasSize(6);
+        for(String input:List.of("{}","{\"source\":\"BUSINESS_TERMS\",\"schema\":\"OTHER\"}","{\"source\":\"A;DROP TABLE X\"}")){
+            var reads=new AtomicInteger();String request="{\"type\":\"tool_call\",\"name\":\"semantic.previewAttachment\",\"arguments\":"+input+"}";
+            assertThatThrownBy(()->AiSetupToolLoop.run("scope",json,p->request,(name,args)->{reads.incrementAndGet();return true;})).isInstanceOf(AiSetupToolLoop.ProtocolException.class);
+            assertThat(reads).hasValue(0);
+        }
+        assertThatThrownBy(()->AiSetupToolLoop.run("scope",json,p->AiSetupServiceToolsTest.sourcePreview("BUSINESS_TERMS"),(name,args)->true))
+                .isInstanceOf(AiSetupToolLoop.ProtocolException.class).hasMessage("SOURCES_READ_REQUIRED");
     }
     @Test void failureOrOversizedServiceResultStopsBeforeAnotherModelCall() {
         for(boolean fail:List.of(true,false)) {

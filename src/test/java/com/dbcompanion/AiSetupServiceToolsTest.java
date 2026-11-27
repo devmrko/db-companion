@@ -13,7 +13,7 @@ class AiSetupServiceToolsTest {
         final OntologyReadCacheTest db=new OntologyReadCacheTest();
         final ArrayDeque<String> replies=new ArrayDeque<>();
         final List<String> prompts=new ArrayList<>();
-        String version="v1",comments="false";int diagnoses,histories,edits,saves;boolean historyReady=true;
+        String version="v1",comments="false",sourceValue="[\"EXISTING\"]";int diagnoses,histories,edits,saves;boolean historyReady=true,sourceEnabled=true;
         Runnable afterModel=()->{};
         final DatabaseService database=new DatabaseService(null,db.source,null,null,null) {
             @Override public ProfilePage profiles(PoolSession s,String name){return new ProfilePage(List.of(new AiProfile("TARGET","ENABLED","","","","")),
@@ -35,22 +35,92 @@ class AiSetupServiceToolsTest {
             @Override public List<Check> diagnose(PoolSession s,List<AiProfileAttribute> attrs){histories++;return List.of(new Check("profileStore",historyReady?AiSetupService.State.CONFIGURED:AiSetupService.State.UNKNOWN,"/ai-profiles",""));}
         };
         final ProfileEditService editor=new ProfileEditService(db.source,packages,null,db.json) {
-            @Override public ProfileEdit.Form edit(PoolSession s,ProfileEdit.Target target){edits++;return new ProfileEdit.Form(target,comments,version,2000,List.of(),List.of());}
+            @Override public ProfileEdit.Form edit(PoolSession s,ProfileEdit.Target target){edits++;return new ProfileEdit.Form(target,target.attribute().equals("semantic_source")?sourceValue:comments,version,2000,List.of(),List.of());}
             @Override public ProfileEdit.SaveResult save(PoolSession s,ProfileEdit.SaveRequest request){
                 assertThat(request.schema()).isEqualTo("APP");assertThat(request.profile()).isEqualTo("TARGET");
-                assertThat(request.attribute()).isEqualTo("comments");assertThat(request.version()).isEqualTo(version);
-                saves++;comments=request.value();version="v2";return new ProfileEdit.SaveResult(true,"Verified by editor");
+                assertThat(request.attribute()).isIn("comments","semantic_source");assertThat(request.version()).isEqualTo(version);
+                saves++;if(request.attribute().equals("semantic_source"))sourceValue=request.value();else comments=request.value();version="v2";return new ProfileEdit.SaveResult(true,"Verified by editor");
             }
         };
-        final AiSetupAssistantService service=new AiSetupAssistantService(db.source,ai,packages,database,setup,history,editor,db.json);
+        final BusinessGlossaryService glossary=new BusinessGlossaryService(db.source,null,db.json){
+            @Override public BusinessGlossary.Status status(PoolSession s){return new BusinessGlossary.Status("APP","READY","READY","Synthetic storage");}
+            @Override public String historyStatus(PoolSession s){return "READY";}
+        };
+        final SemanticContextService semantic=new SemanticContextService(db.source,null,null){
+            @Override public Status status(PoolSession s,String schema){assertThat(schema).isEqualTo("APP");return new Status("23.26.4.1.0",true,"","23.26.4.1.0",true,
+                    List.of(new SemanticContext.Source("BUSINESS_TERMS","CUSTOM",sourceEnabled?"ENABLED":"DISABLED","Synthetic")));}
+        };
+        final AiSetupAssistantService service=new AiSetupAssistantService(db.source,ai,packages,database,setup,history,editor,db.json,glossary,semantic);
         PoolSession session(){var s=db.session();s.metadata().assistant().select(new AiAssistant.Selection("APP","CONTROL"));return s;}
         AiAssistant.Preview preview(PoolSession s,boolean tools){return service.preview(s,new AiSetupAssistantService.Input("nl2sql","TARGET","Enable comments",tools),Locale.KOREAN);}
+    }
+    static String sourcePreview(String source){return "{\"type\":\"tool_call\",\"name\":\"semantic.previewAttachment\",\"arguments\":{\"source\":\""+source+"\"}}";}
+    static void attachmentReplies(Fixture f){f.replies.addAll(List.of(AiSetupToolLoopTest.tool("semantic.listSources"),sourcePreview("BUSINESS_TERMS"),AiSetupToolLoopTest.finish("attach-semantic-source")));}
+    @Test void sourceAttachmentUsesActualServicesPreservesExistingAndRequiresSeparateConsent(){
+        var f=new Fixture();attachmentReplies(f);
+        try(var s=f.session()){
+            var preview=f.preview(s,true);var result=f.service.analyze(s,preview.token(),true);
+            assertThat(result.executions()).extracting(AiSetupToolLoop.Execution::name).containsExactly("semantic.listSources","semantic.previewAttachment");
+            assertThat(f.prompts.getLast()).contains("EXISTING","BUSINESS_TERMS","confirmationRequired");assertThat(f.saves).isZero();
+            var change=f.service.changePreview(s);assertThat(change.after()).isEqualTo("[\"EXISTING\",\"BUSINESS_TERMS\"]");
+            assertThatThrownBy(()->f.service.apply(s,change.token(),false)).isInstanceOf(AiAssistant.Failure.class);assertThat(f.saves).isZero();
+            assertThat(f.service.apply(s,change.token(),true).verified()).isTrue();assertThat(f.saves).isEqualTo(1);
+            assertThat(f.sourceValue).isEqualTo(change.after());
+            assertThatThrownBy(()->f.service.apply(s,change.token(),true)).isInstanceOf(AiAssistant.Failure.class);
+        }
+    }
+    @Test void disabledMissingAndAlreadyAttachedSourcesCannotAuthorizeChanges(){
+        for(String state:List.of("disabled","missing","already")){
+            var f=new Fixture();if(state.equals("disabled"))f.sourceEnabled=false;if(state.equals("already"))f.sourceValue="[\"BUSINESS_TERMS\"]";
+            f.replies.addAll(List.of(AiSetupToolLoopTest.tool("semantic.listSources"),sourcePreview(state.equals("missing")?"UNKNOWN":"BUSINESS_TERMS"),AiSetupToolLoopTest.finish("attach-semantic-source")));
+            try(var s=f.session()){
+                var preview=f.preview(s,true);assertThatThrownBy(()->f.service.analyze(s,preview.token(),true)).isInstanceOf(RuntimeException.class);
+                assertThatThrownBy(()->f.service.changePreview(s)).isInstanceOf(AiAssistant.Failure.class);assertThat(f.saves).isZero();
+            }
+        }
+    }
+    @Test void attachmentRechecksSourceAndProfileAtReviewAndApply(){
+        for(boolean atApply:List.of(false,true)){
+            var f=new Fixture();attachmentReplies(f);
+            try(var s=f.session()){
+                var preview=f.preview(s,true);f.service.analyze(s,preview.token(),true);
+                if(atApply){var change=f.service.changePreview(s);f.sourceEnabled=false;
+                    assertThatThrownBy(()->f.service.apply(s,change.token(),true)).isInstanceOf(AiAssistant.Failure.class);
+                    f.sourceEnabled=true;assertThatThrownBy(()->f.service.apply(s,change.token(),true)).isInstanceOf(AiAssistant.Failure.class);
+                }else{f.version="other";assertThatThrownBy(()->f.service.changePreview(s)).isInstanceOf(AiAssistant.Failure.class);}
+                assertThat(f.saves).isZero();
+            }
+        }
+    }
+    @Test void glossaryReadReturnsActualServiceOutputThroughCallback(){
+        var f=new Fixture();f.replies.addAll(List.of(AiSetupToolLoopTest.tool("glossary.inspectStorage"),AiSetupToolLoopTest.finish("")));
+        try(var s=f.session()){var preview=f.preview(s,true);var result=f.service.analyze(s,preview.token(),true);
+            assertThat(result.executions().getFirst().result()).contains("Synthetic storage","READY");assertThat(f.saves).isZero();}
+    }
+    @Test void failedNewPreviewInvalidatesAnEarlierChange(){
+        var f=new Fixture();attachmentReplies(f);
+        try(var s=f.session()){
+            var preview=f.preview(s,true);f.service.analyze(s,preview.token(),true);var change=f.service.changePreview(s);
+            assertThatThrownBy(()->f.service.preview(s,new AiSetupAssistantService.Input("invalid","TARGET","New request",true),Locale.KOREAN)).isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(()->f.service.apply(s,change.token(),true)).isInstanceOf(AiAssistant.Failure.class);assertThat(f.saves).isZero();
+        }
+    }
+    @Test void anInvalidNewRequestDuringAnalysisInvalidatesOldResultsAndReleasesBusyState(){
+        var f=new Fixture();f.replies.add(AiSetupToolLoopTest.tool("profile.inspectOptions"));
+        try(var s=f.session()){
+            var preview=f.preview(s,true);f.afterModel=()->assertThatThrownBy(()->f.service.preview(s,
+                    new AiSetupAssistantService.Input("invalid","TARGET","New request",true),Locale.KOREAN)).isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(()->f.service.analyze(s,preview.token(),true)).isInstanceOf(AiAssistant.Failure.class);
+            f.afterModel=()->{};f.replies.addAll(List.of(AiSetupToolLoopTest.tool("profile.inspectOptions"),AiSetupToolLoopTest.finish("")));
+            var fresh=f.preview(s,true);assertThat(f.service.analyze(s,fresh.token(),true).action()).isEmpty();assertThat(f.saves).isZero();
+        }
     }
     @Test void serviceModeActuallyDispatchesReadsAndStillRequiresSeparateChangeConsent() {
         var f=new Fixture();f.replies.addAll(List.of(AiSetupToolLoopTest.tool("profile.inspectOptions"),AiSetupToolLoopTest.finish("enable-comments")));
         try(var s=f.session()) {
             var preview=f.preview(s,true);assertThat(f.prompts).isEmpty();int before=f.diagnoses;
-            assertThat(preview.source()).doesNotContain("\"configuration\":", "\"history\":", "\"currentOptionValues\":");
+            assertThat(preview.source().substring(preview.source().lastIndexOf("REVIEWED_REQUEST")))
+                    .doesNotContain("\"configuration\":", "\"history\":", "\"currentOptionValues\":");
             assertThatThrownBy(()->f.service.analyze(s,preview.token(),false)).isInstanceOf(AiAssistant.Failure.class);
             assertThat(f.prompts).isEmpty();
             var result=f.service.analyze(s,preview.token(),true);

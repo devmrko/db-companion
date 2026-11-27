@@ -1,4 +1,5 @@
 import {mountSourceViewer} from './source-viewer.mjs';
+import {jsonTree,mountJsonView} from './json-view.mjs';
 
 // Keep the original PRE as the application's data source. Updating its text
 // updates the viewer too; copying uses the unmodified source, not line numbers.
@@ -10,15 +11,17 @@ export function mountCodeViews(root){
   const update=pre=>{
     if(pre.closest('.app-code-view'))return;
     const sql=pre.dataset.codeLanguage==='sql'||isSql(pre.textContent);
+    const json=!sql&&jsonTree(pre.textContent);
     let view=views.get(pre);
-    if(!sql){if(view)view.hidden=true;pre.classList.remove('app-code-source');return;}
+    if(!sql&&!json){if(view)view.hidden=true;pre.classList.remove('app-code-source');return;}
     if(!view){
       const host=pre.ownerDocument.createElement('div');host.className='app-code-view';
       pre.after(host);view=host;views.set(pre,view);
     }
     if(view.source!==pre.textContent){
       view.source=pre.textContent;view.replaceChildren();
-      mountSourceViewer(view,[{type:'SQL / PL/SQL',text:view.source}],null);
+      if(json){view.classList.add('app-json-view');mountJsonView(view,view.source);}
+      else{view.classList.remove('app-json-view');mountSourceViewer(view,[{type:'SQL / PL/SQL',text:view.source}],null);}
     }
     pre.classList.add('app-code-source');view.hidden=pre.hidden||!pre.textContent.trim();
   };

@@ -19,7 +19,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-setup-assistan
     preview=await post('preview',{purpose:root.dataset.purpose,profile:root.dataset.profile,question:get('question').value,serviceTools:get('tools').checked});
     get('source').textContent=preview.source;get('model').textContent=`${preview.profile.selection.name} · ${preview.profile.provider} / ${preview.profile.model||'—'}`;
     get('consent').checked=false;get('preview-panel').hidden=false;
-    get('consent-text').textContent=get('tools').checked?t('setup.ai.toolsConsent','표시된 정보와 후속 서비스 조회 결과의 외부 전송 및 최대 AI 호출 4회 비용 발생에 동의합니다.'):t('setup.ai.consent','표시된 정보의 외부 전송과 AI 호출 1회 비용 발생에 동의합니다.');
+    get('consent-text').textContent=get('tools').checked?t('setup.ai.toolsConsent','표시된 정보와 후속 서비스 조회 결과의 외부 전송 및 최대 AI 호출 7회 비용 발생에 동의합니다.'):t('setup.ai.consent','표시된 정보의 외부 전송과 AI 호출 1회 비용 발생에 동의합니다.');
   }));
   get('analyze').addEventListener('click',()=>perform(async()=>{
     const token=preview.token;preview=null;const result=await post('analyze',{token,consent:get('consent').checked});

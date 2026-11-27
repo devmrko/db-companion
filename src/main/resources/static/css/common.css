@@ -1416,3 +1416,10 @@ dialog.app-profile-editor-compact { width: min(640px, calc(100vw - 32px)); }
 .is-sidebar-collapsed .app-menu-group > nav { display:block; padding-left:0; }
 
 .app-nav-term { display:block; margin-top:2px; font-size:10px; line-height:1.4; font-weight:400; overflow-wrap:anywhere; }
+/* Shared JSON result views retain the original PRE as their data source. */
+.app-json-view{min-width:0;max-width:100%;padding:.75rem;border:1px solid var(--app-border,#ddd);border-radius:.35rem;background:var(--app-surface,#fff)}
+.app-json-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-bottom:.6rem}
+.app-json-fields{margin:0;min-width:0}.app-json-field{display:grid;grid-template-columns:minmax(5rem,30%) minmax(0,1fr);gap:.75rem;padding:.5rem 0;border-bottom:1px solid var(--app-border,#ddd)}
+.app-json-field dt,.app-json-field dd{margin:0;min-width:0;overflow-wrap:anywhere;white-space:pre-wrap}.app-json-field dt{font-weight:600}.app-json-field details{white-space:normal}
+.app-json-scalar{white-space:pre-wrap;overflow-wrap:anywhere}.app-json-null,.app-json-empty{color:var(--app-muted,#666)}.app-json-original{margin-top:.75rem}.app-json-original pre{max-height:24rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:540px){.app-json-field{grid-template-columns:minmax(0,1fr);gap:.2rem}}

@@ -48,7 +48,7 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
   let busy=false,reply=null,pending=null,turns=[],page=1,termDraft=null,termOriginal=null;
   const el=(tag,value,css)=>{const node=doc.createElement(tag);if(value!==undefined)node.textContent=value;if(css)node.className=css;return node;};
   const post=(url,value)=>api(url,assistantPost(csrf,value));
-  const button=(label,action)=>{const node=el('button',label,'app-btn');node.type='button';node.addEventListener('click',()=>{if(!busy)run(action);});return node;};
+  const button=(label,action)=>{const node=el('button',label,'btn app-btn app-btn-secondary');node.type='button';node.addEventListener('click',()=>{if(!busy)run(action);});return node;};
   function controls(){get('send').disabled=busy||root.dataset.allowed!=='true';get('input').disabled=busy||root.dataset.allowed!=='true';get('retarget').disabled=busy;const fields=get('body').querySelector('fieldset');if(fields)fields.disabled=busy;get('workspace').setAttribute('aria-busy',String(busy));}
   async function run(work){if(busy)return;busy=true;controls();const progress=t('ui.8bf609c884ca','불러오는 중…');get('status').textContent=progress;try{await work();if(get('status').textContent===progress)get('status').textContent='';}catch(error){pending=null;get('status').textContent=error.message;say('assistant',error.message);if(error.diagnostic?.executions?.length)detail(workspace(text('analysis','AI 분석'),'result'),t('setup.ai.toolResults','서비스 호출 결과'),error.diagnostic.executions);}finally{busy=false;controls();}}
   function say(role,content,choices=[]){
@@ -191,11 +191,15 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
     async function prepare(){
       const body=workspace(text('analysis','AI 분석'),'edit'),tools=el('input');tools.type='checkbox';
       const label=el('label');label.append(tools,el('span',t('setup.ai.tools','서비스 Tool 사용 (선택)')));body.append(label);
+      body.append(el('p',t('setup.ai.toolsHelp','서비스 역할·입출력·업무 순서를 참조해 앱 내부 서비스를 호출. 최대 AI 7회 호출. 변경은 별도 확인 후 적용.')));
+      const purpose=el('select');purpose.className='form-select';purpose.setAttribute('aria-label',t('setup.purpose','하려는 일'));
+      for(const key of ['nl2sql','glossary','mcp']){const option=el('option',t('setup.purpose.'+key,key));option.value=key;purpose.append(option);}body.append(purpose);
+      detail(body,t('setup.ai.catalogue','서비스 역할·입출력·업무 순서'),await api('/ai-setup/assistant/catalogue'));
       body.append(button(text('prepare','분석 요청 확인'),async()=>{
-        const preview=await post('/ai-setup/assistant/preview',{purpose:'nl2sql',profile:target,question:conversationRequest(turns,question),serviceTools:tools.checked});
+        const preview=await post('/ai-setup/assistant/preview',{purpose:purpose.value,profile:target,question:conversationRequest(turns,question),serviceTools:tools.checked});
         const panel=workspace(text('analysis','AI 분석'),'review');panel.append(el('p',profileLabel({...preview.profile,name:preview.profile.selection.name})));
         detail(panel,t('setup.ai.payload','전송할 정보'),preview.source);
-        const consent=el('label'),check=el('input');check.type='checkbox';consent.append(check,el('span',tools.checked?t('setup.ai.toolsConsent','표시된 정보와 후속 서비스 조회 결과의 외부 전송 및 최대 AI 호출 4회 비용 발생에 동의합니다.'):t('setup.ai.consent','표시된 정보의 외부 전송과 AI 호출 1회 비용 발생에 동의합니다.')));panel.append(consent);
+        const consent=el('label'),check=el('input');check.type='checkbox';consent.append(check,el('span',tools.checked?t('setup.ai.toolsConsent','표시된 정보와 후속 서비스 조회 결과의 외부 전송 및 최대 AI 호출 7회 비용 발생에 동의합니다.'):t('setup.ai.consent','표시된 정보의 외부 전송과 AI 호출 1회 비용 발생에 동의합니다.')));panel.append(consent);
         const ticket={};pending=ticket;
         const analyze=button(text('analyze','분석 실행'),async()=>{
           if(!check.checked||pending!==ticket)return;pending=null;analyze.disabled=true;

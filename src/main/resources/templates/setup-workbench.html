@@ -5,7 +5,7 @@
 <aside th:replace="~{fragments/common :: sidebar}"></aside>
 <div class="app-main"><header th:replace="~{fragments/common :: topbar}"></header>
 <main class="app-content setup-workbench" data-setup-workbench th:attr="data-schema=${info.username},data-allowed=${ownerRequired != true and unavailable != true},data-initial-profile=${profile},data-model=${assistantSelection != null ? assistantSelection.name : ''}">
-  <div class="setup-workbench-heading"><h1 th:text="#{setup.natural.title}"></h1><span class="app-badge" data-wb-target th:text="#{workbench.noTarget}"></span><button type="button" class="app-btn" data-wb-retarget th:text="#{workbench.target}"></button></div>
+  <div class="setup-workbench-heading"><h1 th:text="#{setup.natural.title}"></h1><span class="app-badge" data-wb-target th:text="#{workbench.noTarget}"></span><button type="button" class="btn app-btn app-btn-secondary" data-wb-retarget th:text="#{workbench.target}"></button></div>
   <p class="app-alert" th:if="${ownerRequired == true}" th:text="#{setup.ownerHelp}"></p>
   <p class="app-alert" th:if="${unavailable == true}" th:text="#{setup.unavailable}"></p>
   <input type="hidden" th:value="${_csrf.token}" th:attr="data-csrf-header=${_csrf.headerName}" data-wb-csrf>
@@ -16,7 +16,7 @@
       <form class="setup-chat-compose" data-wb-form>
         <label for="setup-chat-question" th:text="#{workbench.request}"></label>
         <textarea id="setup-chat-question" class="form-control" rows="3" maxlength="2000" data-wb-input th:placeholder="#{workbench.placeholder}" required></textarea>
-        <div class="setup-chat-compose-actions"><small th:text="#{workbench.memory}"></small><button class="app-btn app-btn-primary" type="submit" data-wb-send th:text="#{workbench.send}"></button></div>
+        <div class="setup-chat-compose-actions"><small th:text="#{workbench.memory}"></small><button class="btn app-btn app-btn-primary" type="submit" data-wb-send th:text="#{workbench.send}"></button></div>
       </form>
     </section>
     <section class="setup-workspace" th:aria-label="#{workbench.workspace}" data-wb-workspace tabindex="-1">

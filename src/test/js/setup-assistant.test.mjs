@@ -61,7 +61,7 @@ test('editing or failing to refresh a preview hides stale data and clears consen
     assert.equal(get('analyze').disabled,true);
     await get('preview').events.click();
     assert.equal(requests.at(-1).body.serviceTools,true);
-    assert.match(get('consent-text').textContent,/4/);
+    assert.match(get('consent-text').textContent,/7/);
     get('consent').checked=true;get('consent').events.change();
     await get('analyze').events.click();
     assert.equal(get('tools-panel').hidden,false);
