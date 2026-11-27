@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org"><body>
 <nav th:fragment="tabs(current)" class="app-tabs" th:aria-label="#{ui.6a17ea651819}">
+  <a th:href="@{/ai-executions/results}" th:classappend="${current == 'results'} ? 'is-active'" th:attr="aria-current=${current == 'results' ? 'page' : null}" th:text="#{resultArchive.title}">보관한 조회 결과</a>
   <a th:href="@{/ai-executions}" th:classappend="${current == 'conversations'} ? 'is-active'" th:attr="aria-current=${current == 'conversations' ? 'page' : null}" th:text="#{ui.dca5e7d32e68}">저장된 대화</a>
   <a th:href="@{/ai-executions/agents}" th:classappend="${current == 'agents'} ? 'is-active'" th:attr="aria-current=${current == 'agents' ? 'page' : null}" th:text="#{ui.575531e24aa6}">Agent 실행</a>
   <a th:href="@{/ai-executions/sql/sources(source='cache')}" th:classappend="${current == 'sql'} ? 'is-active'" th:attr="aria-current=${current == 'sql' ? 'page' : null}">Select AI SQL / GENERATE</a>

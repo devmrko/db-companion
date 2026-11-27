@@ -21,6 +21,7 @@ vendor support commitment. Product names identify the systems with which it work
 - SQL generation and review with profile settings, related metadata, feedback, and
   generated-SQL table references shown together.
 - DB-authorized query execution after explicit review, with a read-only transaction, timeout and result-size limits. Oracle, not an application SQL/function allowlist, validates syntax and privileges.
+- [Explicit query-result retention](docs/select-ai-result-history.md): save displayed rows with their question, SQL and execution time, then reopen them from execution history after signing in again. Unsaved historical rows cannot be reconstructed from generated SQL.
 - Live activity indicator and per-stage server timings for single-profile Select AI
   requests and query execution. The last eight timing records remain in the login
   session, including the failed stage; status polling makes no database or AI calls.

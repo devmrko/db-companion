@@ -37,7 +37,7 @@ public class AppRecordRepository {
     public void install(String schema,String login){QueryArchive.owner(schema,login);var state=status(schema,login);if(state.equals("READY"))return;if(!state.equals("MISSING"))throw new Ontology.Failure(409,"mismatch");jdbc.execute(AppRecordSql.create(schema));require(schema,login);}
     private String encode(JsonNode payload){String value=json.writeValueAsString(payload);if(!payload.isObject()||value.length()>QueryArchive.MAX_JSON)throw new Ontology.Failure(413,"archive.limit");return value;}
     public void begin(String schema,String id,String type,JsonNode payload){
-        QueryArchive.id(id);if(!Set.of(QueryArchive.TYPE,QueryArchive.STORE,OntologyScope.TYPE,ProblemQuestion.TYPE,ProblemQuestion.ATTEMPT_TYPE,ProblemEvaluation.TYPE,OntologyDiscoveryArchive.PLAN,OntologyDiscoveryArchive.CALL,SemanticChange.TYPE).contains(type))throw new Ontology.Failure(400,"archive.invalid");var value=encode(payload);
+        QueryArchive.id(id);if(!Set.of(QueryArchive.TYPE,QueryArchive.STORE,OntologyScope.TYPE,ProblemQuestion.TYPE,ProblemQuestion.ATTEMPT_TYPE,ProblemEvaluation.TYPE,OntologyDiscoveryArchive.PLAN,OntologyDiscoveryArchive.CALL,SemanticChange.TYPE,SelectAiResultArchive.TYPE).contains(type))throw new Ontology.Failure(400,"archive.invalid");var value=encode(payload);
         jdbc.update("INSERT INTO "+AppRecordSql.table(schema)+" (RECORD_ID,RECORD_TYPE,STATE,PAYLOAD) VALUES (?,?,'REQUESTED',?)",s->{s.setString(1,id);s.setString(2,type);s.setCharacterStream(3,new StringReader(value),value.length());});
     }
     /** Only transition a pending record; a late failure must never overwrite a committed success. */
@@ -56,6 +56,21 @@ public class AppRecordRepository {
             var clob=r.getClob(7);try{if(clob==null||clob.length()>QueryArchive.MAX_JSON)throw new Ontology.Failure(409,"mismatch");var p=json.readTree(clob.getSubString(1,(int)clob.length()));return new Item(r.getString(1),r.getString(2),r.getString(3),r.getString(4),r.getString(5),r.getString(6),p.path("question").asString(""));}finally{if(clob!=null)clob.free();}
         },args.toArray());
         var page=rows.stream().limit(10).toList();return new Page(page,rows.size()>10?page.getLast().seq():"");
+    }
+    public SelectAiResultArchive.Page selectAiResults(String schema,AiExecutionHistory.Query query){
+        var args=new ArrayList<Object>();args.add(SelectAiResultArchive.TYPE);
+        args.add(query.from().atStartOfDay(AiExecutionHistory.ZONE).toInstant().toString().replace("Z","+00:00"));
+        args.add(query.to().plusDays(1).atStartOfDay(AiExecutionHistory.ZONE).toInstant().toString().replace("Z","+00:00"));
+        String sql="SELECT RECORD_ID,JSON_VALUE(PAYLOAD,'$.profile'),JSON_VALUE(PAYLOAD,'$.question' RETURNING VARCHAR2(16000)),"
+                +"JSON_VALUE(PAYLOAD,'$.data.executedAt'),JSON_VALUE(PAYLOAD,'$.data.rows.size()' RETURNING NUMBER),"
+                +"JSON_VALUE(PAYLOAD,'$.data.truncated') FROM "+AppRecordSql.table(schema)
+                +" WHERE RECORD_TYPE=? AND STATE='SUCCEEDED' AND RECORDED_AT>=TO_TIMESTAMP_TZ(?, 'YYYY-MM-DD\"T\"HH24:MI:SSTZH:TZM')"
+                +" AND RECORDED_AT<TO_TIMESTAMP_TZ(?, 'YYYY-MM-DD\"T\"HH24:MI:SSTZH:TZM')";
+        if(!query.profile().isEmpty()){sql+=" AND INSTR(UPPER(JSON_VALUE(PAYLOAD,'$.profile')),UPPER(?))>0";args.add(query.profile());}
+        if(!query.question().isEmpty()){sql+=" AND INSTR(UPPER(JSON_VALUE(PAYLOAD,'$.question' RETURNING VARCHAR2(16000))),UPPER(?))>0";args.add(query.question());}
+        sql+=" ORDER BY RECORDED_AT DESC,SEQ DESC OFFSET ? ROWS FETCH NEXT 11 ROWS ONLY";args.add(query.offset());
+        var items=jdbc.query(sql,(r,n)->new SelectAiResultArchive.Item(r.getString(1),r.getString(2),r.getString(3),r.getString(4),r.getInt(5),"true".equals(r.getString(6))),args.toArray());
+        return new SelectAiResultArchive.Page(List.copyOf(items.stream().limit(10).toList()),query.page(),items.size()>10);
     }
     /** Scope snapshots are separate from query archives. No RDF store is required. */
     public OntologyScope.Page scopes(String schema,String database,String before){

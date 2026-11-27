@@ -137,7 +137,7 @@ public class AiConversationService {
         Map.entry("/ai-profiles","프로파일 생성·복제·속성 수정·이력, Semantic Source 연결"),Map.entry("/ai-test","자연어 질문→SQL 생성→SQL 검토·실행"),
         Map.entry("/ai-assistant","도우미 실행 모델·토큰 설정: 대상 프로파일 모델과 별개"),Map.entry("/ai-setup","설정·조회 준비 상태 진단"),
         Map.entry("/business-glossary","업무 용어·정의·동의어 등록·수정·비활성화·이력"),Map.entry("/tables","테이블·컬럼 설명 조회·수정·이력"),
-        Map.entry("/ai-executions","질문·응답·생성 SQL 실행 내역"),Map.entry("/ai-feedback","정답 SQL·Feedback 관리"),Map.entry("/ai-agents","Agent·Task·Tool 구성"),
+        Map.entry("/ai-executions","질문·AI 응답·생성 SQL 이력. 당시 조회 행은 별도 보관 필요"),Map.entry("/ai-executions/results","명시적으로 보관한 당시 질문·SQL·조회 결과 표. 새 로그인 뒤 조회 가능. 보관 전 과거 행 복원 불가"),Map.entry("/ai-feedback","정답 SQL·Feedback 관리"),Map.entry("/ai-agents","Agent·Task·Tool 구성"),
         Map.entry("/ai-memory","Agent Memory 관리"),Map.entry("/ai-agent-engine","Agent 워크플로 편집·실행"),Map.entry("/ontology","업무 개념·관계·온톨로지 관리"),
         Map.entry("/ontology-query","온톨로지 검색"),Map.entry("/semantic-versions","시멘틱 정보 변경 이력"),Map.entry("/vector-search","벡터 의미 검색"),
         Map.entry("/db/accounts","계정·권한·AI 네트워크 ACL"),Map.entry("/db/security","DDS 정책·IAM 사용자·접근 제어"),Map.entry("/db/vpd","행 접근 VPD 정책"),
@@ -198,6 +198,7 @@ public class AiConversationService {
         Available tables: {"type":"tool_call","name":"creation.options","arguments":{}} then WAIT.
         TABLE selection after reading ACTIVITY: {"type":"tool_call","name":"creation.updateDraft","arguments":{"tables":["ACTIVITY"]}} then WAIT.
         Execution history location: {"type":"tool_call","name":"workspace.navigate","arguments":{"path":"/ai-executions"}} then WAIT.
+        For retained past SELECT rows or saved query results, navigate to /ai-executions/results. Saving is explicit after query execution. Never claim unsaved historical rows can be reconstructed or that opening history reruns a query.
         Finish after real result: {"type":"final","answer":"조회 결과를 확인했습니다."}
         MENU REFERENCE: %s
         REGISTERED TOOL INPUT/OUTPUT CONTRACTS: %s

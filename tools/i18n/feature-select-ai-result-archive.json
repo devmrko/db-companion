@@ -1,0 +1,86 @@
+{
+  "resultArchive.title": [
+    "보관한 조회 결과",
+    "Saved query results",
+    "已保存的查询结果",
+    "保存した照会結果"
+  ],
+  "resultArchive.detail": [
+    "보관한 조회 결과 상세",
+    "Retained query result details",
+    "已保存的查询结果详情",
+    "保存した照会結果の詳細"
+  ],
+  "resultArchive.executedAt": [
+    "실행일시",
+    "Executed at",
+    "执行时间",
+    "実行日時"
+  ],
+  "resultArchive.rowCount": [
+    "보관 행 수",
+    "Saved rows",
+    "已保存行数",
+    "保存行数"
+  ],
+  "resultArchive.help": [
+    "DB Companion에서 결과 보관을 선택한 조회입니다. 질문·SQL·당시 표시한 결과를 다시 봅니다. 저장 전의 결과는 복원되지 않습니다. 기간은 보관일 기준입니다.",
+    "Queries explicitly saved in DB Companion. Review the question, SQL and displayed rows at execution time. Earlier unsaved results cannot be restored. The date filter uses the save date.",
+    "在DB Companion中明确保存的问题、SQL和执行时显示的结果行。无法恢复未保存的历史结果。日期按保存日期筛选。",
+    "DB Companionで明示的に保存した質問・SQL・実行時の表示行です。未保存の過去の結果は復元できません。期間は保存日基準です。"
+  ],
+  "resultArchive.save": [
+    "결과 보관",
+    "Save result",
+    "保存结果",
+    "結果を保存"
+  ],
+  "resultArchive.saveHelp": [
+    "표시한 질문·SQL·조회 행을 내 DB에 삭제 전까지 보관합니다. 최대 200행과 셀별 표시 한도가 그대로 저장됩니다.",
+    "Save the displayed question, SQL and rows in your database until explicitly deleted. Row and cell display limits are preserved (up to 200 rows).",
+    "将显示的问题、SQL和结果行保存在自己的数据库中，直至明确删除。保留最多200行及单元格显示限制。",
+    "表示中の質問・SQL・照会行を削除するまで自分のDBに保存します。最大200行とセルの表示制限を維持します。"
+  ],
+  "resultArchive.saving": [
+    "보관 중…",
+    "Saving…",
+    "正在保存…",
+    "保存中…"
+  ],
+  "resultArchive.saved": [
+    "보관 완료 · 이력에서 당시 결과를 다시 볼 수 있습니다.",
+    "Saved · Review this snapshot from execution history.",
+    "保存完成 · 可从执行历史查看当时的结果。",
+    "保存完了 · 実行履歴から当時の結果を確認できます。"
+  ],
+  "resultArchive.loading": [
+    "불러오는 중…",
+    "Loading…",
+    "正在加载…",
+    "読み込み中…"
+  ],
+  "resultArchive.snapshot": [
+    "보관 당시 결과 · 현재 데이터를 다시 조회한 결과가 아닙니다.",
+    "Snapshot at save time · This does not query current data again.",
+    "保存时的结果 · 不会重新查询当前数据。",
+    "保存時の結果 · 現在のデータを再照会するものではありません。"
+  ],
+  "resultArchive.empty": [
+    "보관한 결과가 없습니다. 자연어 데이터 조회에서 SQL 실행 후 결과 보관을 선택하세요.",
+    "No saved results. Execute SQL in Natural language data query, then select Save result.",
+    "尚无保存的结果。请在自然语言查询中执行SQL后选择保存结果。",
+    "保存結果がありません。自然言語照会でSQL実行後、結果を保存してください。"
+  ],
+  "resultArchive.nativeSql": [
+    "이 응답은 저장된 생성 SQL입니다. 당시 조회 행은 포함하지 않습니다. 별도로 보관한 결과는 보관한 조회 결과 탭에서 확인하세요.",
+    "This response contains stored generated SQL, not the rows returned at the time. Open Saved query results for separately saved snapshots.",
+    "此响应是保存的生成SQL，不包含当时的结果行。另行保存的结果可在已保存的查询结果标签中查看。",
+    "保存された生成SQLです。当時の照会行は含まれません。別途保存した結果は保存した照会結果タブで確認してください。"
+  ],
+  "resultArchive.nativeResponse": [
+    "저장된 AI 응답입니다. 조회 행을 별도로 보관한 결과 표와는 다릅니다.",
+    "Stored AI response. This differs from a separately retained query result table.",
+    "已保存的AI响应，与另行保存的查询结果表不同。",
+    "保存されたAI応答です。別途保存した照会結果表とは異なります。"
+  ]
+}

@@ -30,6 +30,9 @@ class AiExecutionHistoryTemplateTest {
     private String render(String selector, Page page, String error) {
         var resolver = new ClassLoaderTemplateResolver(); resolver.setPrefix("templates/"); resolver.setSuffix(".html"); resolver.setCharacterEncoding("UTF-8");
         var engine = new SpringTemplateEngine(); engine.setTemplateEngineMessageSource(com.dbcompanion.common.i18n.UiMessages.source()); engine.setTemplateResolver(resolver);
+        engine.setLinkBuilder(new org.thymeleaf.linkbuilder.StandardLinkBuilder(){
+            @Override protected String computeContextPath(org.thymeleaf.context.IExpressionContext context,String base,java.util.Map<String,Object> parameters){return "";}
+        });
         var context = new Context(java.util.Locale.KOREAN); context.setVariable("history", page); context.setVariable("loadError", error);
         return engine.process("ai-executions", Set.of(selector), context);
     }

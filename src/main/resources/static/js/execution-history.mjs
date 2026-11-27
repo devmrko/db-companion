@@ -22,6 +22,12 @@ export function detailRequest(mode, schema, id) {
     : `/ai-executions/detail?${new URLSearchParams({schema, id})}`;
 }
 
+export function nativeResponseNote(action){
+  return ['RUNSQL','SHOWSQL'].includes(String(action).toUpperCase())
+    ?t('resultArchive.nativeSql','이 응답은 저장된 생성 SQL입니다. 당시 조회 행은 포함하지 않습니다. 별도로 보관한 결과는 보관한 조회 결과 탭에서 확인하세요.')
+    :t('resultArchive.nativeResponse','저장된 AI 응답입니다. 조회 행을 별도로 보관한 결과 표와는 다릅니다.');
+}
+
 export function sourceFields(detail) {
   const labels = {
     PARSING_USER_NAME: ['sqlh.detail.parsingUser', '최초 파싱 사용자'],
@@ -111,7 +117,7 @@ if (typeof document !== 'undefined') {
           }
         }
         else if (sqlMode) { prompt.textContent = data.originalSql ?? '—'; response.textContent = data.mappedSql ?? '—'; }
-        else { prompt.textContent = data.prompt ?? '—'; response.textContent = data.response ?? '—'; }
+        else { prompt.textContent = data.prompt ?? '—'; response.textContent = data.response ?? '—';const note=root.querySelector('[data-execution-result-note]');if(note)note.textContent=nativeResponseNote(data.action); }
         content.hidden = false; message.textContent = '';
       } catch (error) {
         if (error.name !== 'AbortError' && current === version && dialog.open) message.textContent = error.message;

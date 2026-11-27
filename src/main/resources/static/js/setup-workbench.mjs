@@ -4,6 +4,7 @@ import {t} from './i18n.mjs';
 import {creationConversation} from './profile-creation-chat.mjs';
 import {navigationRequest,navigationItems} from './assistant-navigation.mjs';
 import {renderQueryData} from './query-result-view.mjs';
+import {resultArchiveAction} from './select-ai-result-archive.mjs';
 import {isCloneRequest,isConversationQuestion} from './conversation-turn.mjs';
 
 const text=(key,fallback,...args)=>t('workbench.'+key,fallback,...args);
@@ -147,7 +148,7 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
         const execution=await post('/ai-test/execute/preview',{resultId:generated.id});
         confirmWork(panel,text('sqlReview','생성 SQL 확인'),text('sqlConsent','표시된 SQL과 조회 대상을 확인했으며 실행에 동의합니다.'),text('executeSql','SQL 실행'),async()=>{
           const result=await post('/ai-test/execute',{token:execution.token,consent:true});if(result.error)throw new Error([result.code,result.error].filter(Boolean).join(' · '));const host=workspace(text('queryResult','조회 결과'),'result');
-          detail(host,text('sqlReview','생성 SQL 확인'),execution.sql);const rows=el('div');host.append(rows);renderQueryData(rows,result.data,doc);
+          detail(host,text('sqlReview','생성 SQL 확인'),execution.sql);const rows=el('div');host.append(rows);renderQueryData(rows,result.data,doc);resultArchiveAction(host,result.resultId,csrf,doc);
           say('assistant',text('queryExecuted','SQL 조회 결과를 받았습니다. 업무상 정답 여부는 기대값과 비교해 확인하세요.'));
           link(host,t('assistantNav.executions','질문·응답 실행 내역'),'/ai-executions?'+new URLSearchParams({profile:name}));
           host.append(button(text('queryTest','질문으로 확인'),()=>startQuery(name)));

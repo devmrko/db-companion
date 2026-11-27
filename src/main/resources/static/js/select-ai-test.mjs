@@ -8,6 +8,7 @@ import {mountBusinessGlossary,renderGlossarySnapshot} from './business-glossary.
 import {mountProgress} from './select-ai-progress.mjs';
 import {mountResultReview} from './select-ai-result-review.mjs';
 import {renderQueryData} from './query-result-view.mjs';
+import {resultArchiveAction} from './select-ai-result-archive.mjs';
 
 export const validQuestion=value=>typeof value==='string'&&value.trim().length>0&&value.length<=16000&&!value.includes('\0');
 export const canPrepare=(selected,question,busy)=>Boolean(selected)&&validQuestion(question)&&!busy;
@@ -232,6 +233,7 @@ if(typeof document!=='undefined')document.querySelectorAll('[data-ai-test]').for
     if(result.code==='ORA-01013')get('execute-message').textContent+='\n'+t('aitest.progress.cancelHint','작업 취소가 반환되었습니다. 앱의 SQL 실행 제한은 {0}초입니다. 제한시간에 따른 취소일 수 있으나 이 코드만으로 원인을 확정할 수 없습니다. 단계별 시간을 확인하세요.',root.dataset.executionTimeoutSeconds||'—');
     if(result.error)return;
     renderQueryData(host,result.data);
+    resultArchiveAction(host,result.resultId,get('csrf'));
   }
   const executionDialog=get('execution-dialog');
   async function closeExecution(){if(busy)return;const token=execution?.token;execution=null;executionDialog.close();controls();if(token){try{await post('cancel',{token});}catch(ex){message(ex.message,true);}}}
