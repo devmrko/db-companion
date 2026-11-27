@@ -4,16 +4,19 @@ import {t} from './i18n.mjs';
 import {creationConversation} from './profile-creation-chat.mjs';
 import {navigationRequest,navigationItems} from './assistant-navigation.mjs';
 import {renderQueryData} from './query-result-view.mjs';
+import {isCloneRequest,isConversationQuestion,fieldQuestion,turnDisposition} from './conversation-turn.mjs';
+import {profileField} from './profile-fields.mjs';
 
 const text=(key,fallback,...args)=>t('workbench.'+key,fallback,...args);
 const attributeNames={conversation:'conversation',comments:'comments',constraints:'constraints',model:'model',provider:'provider',temperature:'temperature',max_tokens:'max_tokens',object_list:'object_list',prompt:'prompt',semantic_source:'semantic_source'};
 export function requestIntent(question){
   const q=question.trim();
   if(/^(취소|그만|cancel|キャンセル|取消)$/i.test(q))return {kind:'cancel'};
-  if(/(?:권한|admin|grant|privilege|permission|관리자)/i.test(q))return {kind:'permissions'};
+  if(/권한|관리자|(?:^|\s)(?:admin|grant|privilege|permission)(?:$|[\s?])/i.test(q))return {kind:'permissions'};
   if(navigationRequest(q))return {kind:'navigation'};
+  if(isCloneRequest(q))return {kind:'clone-profile'};
   if(/^(질문으로\s*확인|프로필\s*테스트|프로파일\s*테스트|test profile)$/i.test(q))return {kind:'query-profile'};
-  if(!/(?:말고|하지\s*마|설명만|don't|do not)/i.test(q)&&/(?:프로파일|프로필|profile)/i.test(q)&&/(?:만들|생성|create)/i.test(q))return {kind:'create-profile'};
+  if(!/(?:말고|하지\s*마|설명만|don't|do not)/i.test(q)&&/(?:프로파일|프로필|profile)/i.test(q)&&/(?:만들|생성|create)/i.test(q))return {kind:isConversationQuestion(q)?'help':'create-profile'};
   if(/(?:이력|history|履歴|历史)/i.test(q)&&!/(?:저장|활성|설정|enable)/i.test(q))return {kind:'history'};
   if(/(?:시멘틱|시맨틱|semantic|업무.?용어|업무.?지식|business definitions|knowledge|用語|术语|业务定义)/i.test(q)&&/(?:연결|붙|attach|connect|接続|连接)/i.test(q))return {kind:'sources'};
   if(/(?:용어|term|用語|术语)/i.test(q)&&/(?:등록|추가|수정|편집|register|create|edit|add|登録|追加|編集|编辑|注册|创建|新增)/i.test(q))return {kind:'glossary'};
@@ -52,7 +55,7 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
   const get=name=>root.querySelector(`[data-wb-${name}]`),csrf=get('csrf');
   const profiles=Array.from(get('profiles').options).map(v=>v.value),schema=root.dataset.schema;
   let target=profiles.includes(root.dataset.initialProfile)?root.dataset.initialProfile:'',model=root.dataset.model||'';
-  let busy=false,reply=null,pending=null,turns=[],page=1,termDraft=null,termOriginal=null;
+  let busy=false,reply=null,replyMode='value',replyValues=[],pending=null,turns=[],page=1,termDraft=null,termOriginal=null;
   const el=(tag,value,css)=>{const node=doc.createElement(tag);if(value!==undefined)node.textContent=value;if(css)node.className=css;return node;};
   const post=(url,value)=>api(url,assistantPost(csrf,value));
   const button=(label,action)=>{const node=el('button',label,'btn app-btn app-btn-secondary');node.type='button';node.addEventListener('click',()=>{if(!busy)run(action);});return node;};
@@ -76,7 +79,7 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
   const profileUrl=()=>'/ai-profiles/detail?'+new URLSearchParams({profile:target});
   const attributeUrl=attribute=>'/ai-profiles/attribute?'+new URLSearchParams({schema,profile:target,attribute});
   const creation=creationConversation({schema,api,post,workspace,field,button,ask,say,detail,link,review,el,lang:doc.documentElement.lang,
-    body:()=>get('body').querySelector('fieldset'),verify:startQuery,created:name=>{if(!profiles.includes(name))profiles.push(name);target=name;get('target').textContent=schema+'.'+name;}});
+    body:()=>get('body').querySelector('fieldset'),profileNames:()=>profiles,verify:startQuery,created:name=>{if(!profiles.includes(name))profiles.push(name);target=name;get('target').textContent=schema+'.'+name;}});
   async function permissions(question){
     if(!/프로필|프로파일|profile|시멘틱|시맨틱|semantic|소스|콜백|메타|컬럼|주석|metadata|이력|history|네트워크|acl|network|dds|보안|data grant|text|형태소|검색|agent|에이전트|credential|인증|테이블|table/i.test(question)){
       const body=workspace(t('adminHelp.title','ADMIN 조치 안내'),'select');
@@ -104,19 +107,20 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
     if(creation.active())body.append(button(text('resumeCreation','프로파일 생성 계속'),()=>creation.resume()));
   }
   function field(host,label,value='',multiline=false){const wrap=el('label',undefined,'app-field'),input=el(multiline?'textarea':'input');input.className='form-control';input.value=value;if(multiline)input.rows=3;wrap.append(el('span',label),input);host.append(wrap);return input;}
-  function ask(message,handler,choices=[]){reply=handler;say('assistant',message,choices.map(value=>({label:value,action:()=>receive(value)})));}
+  function ask(message,handler,choices=[],mode='value',values=choices){reply=handler;replyMode=mode;replyValues=values;say('assistant',message,choices.map(value=>({label:value,action:()=>receive(value)})));}
   async function chooseTarget(continuation){
     const body=workspace(text('target','대상 프로필'),'select');
     if(!profiles.length){say('assistant',text('noProfiles','조회된 프로필이 없습니다. 프로필 생성 후 다시 시작하세요.'));link(body,text('profiles','프로필 설정'),'/ai-profiles');reply=null;return;}
     const choose=async value=>{if(!profiles.includes(value)){reply=choose;say('assistant',text('pickTarget','목록의 프로필 이름을 선택하세요.'));return;}target=value;get('target').textContent=schema+'.'+target;reply=null;say('user',target);await continuation();};
     for(const name of profiles)body.append(button(name,()=>choose(name)));
-    ask(text('whichTarget','어느 프로필에서 진행할까요?'),choose);
+    ask(text('whichTarget','어느 프로필에서 진행할까요?'),choose,[],'value',profiles);
   }
   async function withTarget(action){if(target)await action();else await chooseTarget(action);}
   function confirmWork(body,title,confirmation,label,work){
     const consent=el('label',undefined,'setup-workspace-consent'),check=el('input');check.type='checkbox';consent.append(check,el('span',confirmation));body.append(consent);
     const ticket={};pending=ticket;
     const apply=button(label,async()=>{if(!check.checked||pending!==ticket)return;pending=null;apply.disabled=true;check.checked=false;reply=null;try{await work();}catch(error){workspace(title,'result').append(el('p',text('actionUncertain','처리 결과를 확인하지 못했습니다. 실제 상태를 확인한 뒤 다시 진행하세요. 자동 재시도하지 않습니다.')));throw error;}});
+    apply.dataset.wbConfirmAction='';
     apply.disabled=true;check.addEventListener('change',()=>{apply.disabled=!check.checked||pending!==ticket;});body.append(apply,button(text('cancel','취소'),cancel));
   }
   function review(title,before,after,save,confirmation=''){
@@ -127,7 +131,7 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
     say('assistant',text('reviewHelp','오른쪽 변경안을 확인한 뒤 적용하세요. 수정 요청이나 취소를 입력하면 이 변경안은 무효화됩니다.'));
   }
   async function startQuery(name){
-    reply=null;creation.clear();workspace(text('queryTest','질문으로 확인'),'edit');
+    reply=null;workspace(text('queryTest','질문으로 확인'),'edit');
     ask(text('queryQuestion','{0}로 확인할 질문을 입력하세요. 전송 내용 확인 후 AI를 1회 호출하며, 생성 SQL 실행은 별도로 확인합니다.',name),async question=>{
       await post('/ai-test/selection',{name});
       const prepared=await post('/ai-test/preview',{action:'SQL',question,useOntology:false,evidenceHash:''});
@@ -147,7 +151,7 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
         });say('assistant',text('sqlReady','SQL을 생성했습니다. 표시된 SQL을 확인한 뒤 별도로 실행하세요.'));
       });
       say('assistant',text('queryReady','전송할 질문과 정보를 준비했습니다. 동의 후 SQL 생성을 선택하세요.'));
-    });
+    },[],'content');
   }
   async function history(host=null){
     const body=host||workspace(text('history','프로필 변경 이력'),'result');
@@ -223,9 +227,9 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
           termDraft.aliases=/^(없음|none|なし|无)$/i.test(aliases.trim())?[]:aliases.split(/[,\n]/).map(v=>v.trim()).filter(Boolean);renderTerm();
           ask(text('termCriteriaQuestion','참고 SQL·필터 기준을 입력하세요. 없으면 “없음”을 입력하세요. SQL은 실행하지 않습니다.'),async criteria=>{
             termDraft.criteria=/^(없음|none|なし|无)$/i.test(criteria.trim())?'':criteria;reply=null;await reviewTerm();
-          });
+          },[],'content');
         });
-      });
+      },[],'content');
     });
   }
   async function editTerm(term){termOriginal=term;termDraft={term:term.term,definition:term.definition,aliases:[...term.aliases],criteria:term.criteria||'',enabled:term.enabled,rdf:term.rdf};reply=null;renderTerm();say('assistant',text('editTermHelp','오른쪽에서 용어를 수정한 뒤 변경안을 확인하세요. “취소”로 종료할 수 있습니다.'));}
@@ -287,21 +291,30 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
   async function dispatch(question){
     const intent=requestIntent(question);
     if(intent.kind==='cancel'){cancel();return;}
+    if(intent.kind==='help'){
+      if(creation.active()){creation.explain(question);return;}
+      const body=workspace(text('workspace','현재 작업'),'select');
+      say('assistant',text('creationHelp','새 프로파일 생성과 기존 프로파일 복제를 시작할 수 있습니다. 테이블·모델을 선택하고 변경안을 확인한 뒤 적용합니다.'));
+      body.append(button(text('exampleCreate','프로파일 만들기'),()=>creation.start()),button(t('creationChat.cloneTitle','기존 프로파일 복제'),()=>creation.clone()));return;
+    }
     if(intent.kind==='permissions'){await permissions(question);return;}
     if(intent.kind==='navigation'){navigation(question);return;}
     if(intent.kind==='create-profile'){await creation.start();return;}
+    if(intent.kind==='clone-profile'){await creation.clone();return;}
     if(intent.kind==='query-profile'){await withTarget(()=>startQuery(target));return;}
     if(intent.kind==='glossary'){if(/수정|편집|edit|编辑|編集/i.test(question))await glossaryList(true);else await startTerm();return;}
     if(intent.kind==='glossary-list'){await glossaryList();return;}
     await withTarget(async()=>{switch(intent.kind){case 'history':page=1;await history();say('assistant',text('historyLoaded','현재 프로필의 변경 이력을 조회했습니다.'));break;case 'sources':await attachSources();break;case 'attribute':await editAttribute(intent.attribute,intent.value);break;default:await assistant(question);}});
   }
   async function receive(raw){const question=raw.trim();if(!question)return;say('user',question);pending=null;
-    if(requestIntent(question).kind==='cancel'){cancel();return;}
-    if(requestIntent(question).kind==='permissions'){reply=null;await permissions(question);return;}
-    if(requestIntent(question).kind==='navigation'){reply=null;navigation(question);return;}
-    if(creation.active()&&requestIntent(question).kind==='create-profile'){reply=null;creation.clear();await creation.start();return;}
-    const handler=reply;reply=null;
-    try{if(handler)await handler(question);else await dispatch(question);}
+    for(const node of get('body').querySelectorAll('[data-wb-confirm-action]'))node.disabled=true;
+    const intent=requestIntent(question),handler=reply,creating=creation.active()&&(!handler||creation.ownsReply(handler));
+    const route=turnDisposition(intent.kind,{hasReply:!!handler||creation.active(),literal:creating&&creation.literalAnswer(question)||!!handler&&replyValues.includes(question),creating,content:!!handler&&replyMode==='content'});
+    if(route==='reply'&&handler&&replyMode!=='content'&&!creating&&isConversationQuestion(question)){
+      const key=fieldQuestion(question);say('assistant',key&&key!=='general'&&key!=='name'?profileField(key).help:text('questionHeld','질문을 입력값으로 저장하지 않았습니다. 현재 작업을 유지합니다. 프로파일 복제·권한·화면 위치를 물어보거나 필요한 값을 입력해 계속할 수 있습니다.'));return;
+    }
+    reply=null;
+    try{if(route==='reply')await(handler||creation.handle)(question);else await dispatch(question);}
     catch(error){if(handler&&!reply)reply=handler;throw error;}
   }
   get('form').addEventListener('submit',event=>{event.preventDefault();const question=get('input').value;if(!question.trim()||busy)return;get('input').value='';run(()=>receive(question));});
@@ -311,6 +324,7 @@ export function mountWorkbench(root,{api=assistantApi,doc=document}={}){
   workspace(text('workspace','현재 작업'),'waiting').append(el('p',text('workspaceHelp','요청에 맞는 설정·변경안·결과를 이곳에 표시합니다.')));
   say('assistant',text('welcome','무엇을 설정할까요? 필요한 정보는 대화에서 확인합니다.'),[
     {label:text('exampleCreate','프로파일 만들기'),action:()=>receive(text('exampleCreate','프로파일 만들기'))},
+    {label:t('creationChat.cloneTitle','기존 프로파일 복제'),action:()=>receive(t('creationChat.cloneTitle','기존 프로파일 복제'))},
     {label:text('examplePermissions','필요한 권한 안내'),action:()=>receive(text('examplePermissions','필요한 권한 안내'))},
     {label:text('exampleConversation','대화 저장 켜기'),action:()=>receive(text('exampleConversation','대화 저장 켜기'))},
     {label:text('exampleTerm','업무 용어 등록'),action:()=>receive(text('exampleTerm','업무 용어 등록'))},
